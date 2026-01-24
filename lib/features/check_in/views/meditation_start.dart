@@ -1,0 +1,758 @@
+import 'dart:math' as math;
+import 'package:flutter/material.dart';
+
+class MeditationStart extends StatefulWidget {
+  const MeditationStart({super.key});
+
+  @override
+  State<MeditationStart> createState() => _MeditationStartState();
+}
+
+class _MeditationStartState extends State<MeditationStart>
+    with TickerProviderStateMixin {
+  // 🔹 Entry animation
+  late AnimationController _entryController;
+  late Animation<double> _fadeAnimation;
+  late Animation<double> _scaleAnimation;
+
+  // 🔹 Breathing / Pulse
+  late AnimationController _breathingController;
+  late Animation<double> _pulseAnimation;
+  late Animation<double> _bgScaleAnimation;
+
+  // 🔹 Halo & Rotation
+  late AnimationController _haloController;
+
+  // 🔹 Ripple
+  late AnimationController _rippleController;
+
+  bool showPlayImage = false;
+  bool showPlayUI = false;
+  bool _isStarted = false;
+  bool _isPlaying = false;
+
+  late AnimationController _timerController;
+  final int _totalDuration = 60;
+
+  bool _showSongSelection = false;
+  int _selectedTrack = 0;
+  final List<String> _tracks = [
+    "Zen Garden",
+    "Deep Space",
+    "Healing Rain",
+    "Morning Mist",
+    "Cosmic Om",
+    "Nature's Call",
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    /// 1️⃣ ENTRY
+    _entryController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2500),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _entryController,
+      curve: const _SafeCurve(Curves.easeIn),
+    );
+    _scaleAnimation = Tween<double>(begin: 0.6, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _entryController,
+        curve: const _SafeCurve(Curves.elasticOut),
+      ),
+    );
+
+    /// 2️⃣ BREATHING (Pulsating heart of the scene)
+    _breathingController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 4000),
+    );
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
+      CurvedAnimation(
+        parent: _breathingController,
+        curve: const _SafeCurve(Curves.easeInOutSine),
+      ),
+    );
+    _bgScaleAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
+      CurvedAnimation(
+        parent: _breathingController,
+        curve: const _SafeCurve(Curves.easeInOutSine),
+      ),
+    );
+
+    /// 3️⃣ HALO ROTATION (Constant celestial rotation)
+    _haloController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 20),
+    )..repeat();
+
+    /// 4️⃣ RIPPLE
+    _rippleController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 5000),
+    );
+
+    /// 5️⃣ TIMER
+    _timerController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: _totalDuration),
+    );
+
+    _startFlow();
+  }
+
+  void _startFlow() {
+    Future.delayed(const Duration(milliseconds: 800), () {
+      _entryController.forward();
+    });
+
+    Future.delayed(const Duration(milliseconds: 3500), () {
+      setState(() => showPlayImage = true);
+    });
+  }
+
+  @override
+  void dispose() {
+    _entryController.dispose();
+    _breathingController.dispose();
+    _haloController.dispose();
+    _rippleController.dispose();
+    _timerController.dispose();
+    super.dispose();
+  }
+
+  void _toggleMeditation() {
+    if (!_isStarted) {
+      setState(() {
+        _isStarted = true;
+        _isPlaying = true;
+      });
+      _timerController.forward();
+      _breathingController.repeat(reverse: true);
+      _rippleController.repeat();
+    } else if (_isPlaying) {
+      setState(() {
+        _isPlaying = false;
+      });
+      _timerController.stop();
+      _breathingController.stop();
+      _rippleController.stop();
+    } else {
+      setState(() {
+        _isPlaying = true;
+      });
+      _timerController.forward();
+      _breathingController.repeat(reverse: true);
+      _rippleController.repeat();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          /// 🌌 Parallax Breathing Background
+          Positioned.fill(
+            child: AnimatedBuilder(
+              animation: _bgScaleAnimation,
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: _bgScaleAnimation.value,
+                  child: child,
+                );
+              },
+              child: Image.asset(
+                'assets/images/medi_bg.png',
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+
+          /// 🌌 Celestial Aurora Glow (Animated Mesh Glow)
+          const Positioned.fill(child: _AuroraGlow()),
+
+          /// ✨ Magic Particles
+          for (int i = 0; i < 25; i++) _MagicParticle(index: i),
+
+          /// ✖️ Top Controls
+          Positioned(
+            top: 50,
+            left: 20,
+            right: 20,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                GestureDetector(
+                  onTap: () => setState(() => _showSongSelection = !_showSongSelection),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.black26,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.white12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.music_note, color: Colors.white70, size: 16),
+                        const SizedBox(width: 8),
+                        Text(
+                          _tracks[_selectedTrack],
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.keyboard_arrow_down, color: Colors.white70, size: 16),
+                      ],
+                    ),
+                  ),
+                ),
+                _CloseButton(onPressed: () => Navigator.pop(context)),
+              ],
+            ),
+          ),
+
+          /// 🌠 DIVINE CENTER (Halo + Image + Breathing)
+          Align(
+            alignment: const Alignment(0, -0.25),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                /// 1. The Divine Halo (Rotating)
+                RotationTransition(
+                  turns: _haloController,
+                  child: Container(
+                    width: size.width * 0.9,
+                    height: size.width * 0.9,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          Colors.white.withOpacity(0.15),
+                          Colors.amber.withOpacity(0.05),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.4, 0.7, 1.0],
+                      ),
+                    ),
+                  ),
+                ),
+
+                /// 2. Zen Ripples (Only when playing)
+                if (_isPlaying)
+                  for (int i = 0; i < 3; i++)
+                    _ZenRipple(controller: _rippleController, index: i),
+
+                /// 3. The Main Avatar (Breathing & Switching)
+                FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: ScaleTransition(
+                    scale: _scaleAnimation,
+                    child: ScaleTransition(
+                      scale: _pulseAnimation,
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 1600),
+                        switchInCurve: const _SafeCurve(Curves.elasticInOut),
+                        switchOutCurve: const _SafeCurve(Curves.easeIn),
+                        transitionBuilder: (child, animation) {
+                          if ((child.key as ValueKey).value == true) {
+                            animation.addStatusListener((status) {
+                              if (status == AnimationStatus.completed &&
+                                  !showPlayUI) {
+                                setState(() => showPlayUI = true);
+                              }
+                            });
+                            return ScaleTransition(
+                              scale: Tween<double>(begin: 0.5, end: 1.0)
+                                  .animate(
+                                    CurvedAnimation(
+                                      parent: animation,
+                                      curve: const _SafeCurve(Curves.elasticOut),
+                                    ),
+                                  ),
+                              child: FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              ),
+                            );
+                          }
+                          return FadeTransition(
+                            opacity: animation,
+                            child: child,
+                          );
+                        },
+                        child: Image.asset(
+                          showPlayImage
+                              ? 'assets/images/medi_play.png'
+                              : 'assets/images/medit_star.png',
+                          key: ValueKey(showPlayImage),
+                          width: size.width * 0.85,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          /// 🔘 ELEGANT CONTROLS
+          _BottomControls(
+            isVisible: showPlayUI && !_showSongSelection,
+            isStarted: _isStarted,
+            isPlaying: _isPlaying,
+            onToggle: _toggleMeditation,
+            timerController: _timerController,
+            totalDuration: _totalDuration,
+          ),
+
+          /// 🎵 SONG SELECTION GRID
+          if (_showSongSelection)
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () => setState(() => _showSongSelection = false),
+                child: TweenAnimationBuilder<double>(
+                  duration: const Duration(milliseconds: 400),
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  builder: (context, value, child) {
+                    return Opacity(
+                      opacity: value,
+                      child: Container(
+                        color: Colors.black.withOpacity(0.6 * value),
+                        alignment: Alignment.center,
+                        child: Transform.scale(
+                          scale: 0.9 + (0.1 * value),
+                          child: GestureDetector(
+                            onTap: () {}, // Prevent tap through
+                            child: Container(
+                              width: size.width * 0.85,
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[900]?.withOpacity(0.95),
+                                borderRadius: BorderRadius.circular(30),
+                                border: Border.all(color: Colors.white12, width: 1.5),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.5),
+                                    blurRadius: 40,
+                                    spreadRadius: 10,
+                                  )
+                                ],
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const SizedBox(width: 24),
+                                      const Text(
+                                        "SELECT MUSIC",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w400,
+                                          letterSpacing: 3,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () => setState(() => _showSongSelection = false),
+                                        icon: const Icon(Icons.close, color: Colors.white54, size: 20),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  GridView.builder(
+                                    shrinkWrap: true,
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      crossAxisSpacing: 16,
+                                      mainAxisSpacing: 16,
+                                      childAspectRatio: 1.8,
+                                    ),
+                                    itemCount: _tracks.length,
+                                    itemBuilder: (context, index) {
+                                      bool isSelected = _selectedTrack == index;
+                                      return GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _selectedTrack = index;
+                                            _showSongSelection = false;
+                                          });
+                                        },
+                                        child: AnimatedContainer(
+                                          duration: const Duration(milliseconds: 300),
+                                          alignment: Alignment.center,
+                                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                                          decoration: BoxDecoration(
+                                            color: isSelected ? Colors.white10 : Colors.white.withOpacity(0.04),
+                                            borderRadius: BorderRadius.circular(20),
+                                            border: Border.all(
+                                              color: isSelected ? Colors.amber.withOpacity(0.5) : Colors.white12,
+                                              width: isSelected ? 2 : 1.2,
+                                            ),
+                                            boxShadow: isSelected ? [
+                                              BoxShadow(
+                                                color: Colors.amber.withOpacity(0.15),
+                                                blurRadius: 15,
+                                                spreadRadius: 2,
+                                              )
+                                            ] : null,
+                                          ),
+                                          child: Text(
+                                            _tracks[index],
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: isSelected ? Colors.amber[200] : Colors.white.withOpacity(0.8),
+                                              fontSize: 13,
+                                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// --- SUPPORTING WIDGETS ---
+
+class _ZenRipple extends StatelessWidget {
+  final AnimationController controller;
+  final int index;
+  const _ZenRipple({required this.controller, required this.index});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, child) {
+        double progress = (controller.value + (index * 0.33)) % 1.0;
+        double opacity = (1.0 - progress).clamp(0.0, 1.0);
+        double sizeFactor = 1.0 + (progress * 1.8);
+
+        return Container(
+          width: 220 * sizeFactor,
+          height: 220 * sizeFactor,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Colors.white.withOpacity(opacity * 0.3),
+              width: 1.2,
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _AuroraGlow extends StatefulWidget {
+  const _AuroraGlow();
+  @override
+  State<_AuroraGlow> createState() => _AuroraGlowState();
+}
+
+class _AuroraGlowState extends State<_AuroraGlow>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 10),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Container(
+          decoration: BoxDecoration(
+            gradient: RadialGradient(
+              center: Alignment(
+                0.3 * math.sin(_controller.value * 2 * math.pi),
+                -0.3 * math.cos(_controller.value * 2 * math.pi),
+              ),
+              colors: [
+                const Color(0xFF6A1B9A).withOpacity(0.1),
+                const Color(0xFF1A237E).withOpacity(0.0),
+              ],
+              radius: 1.5,
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _MagicParticle extends StatefulWidget {
+  final int index;
+  const _MagicParticle({required this.index});
+  @override
+  State<_MagicParticle> createState() => _MagicParticleState();
+}
+
+class _MagicParticleState extends State<_MagicParticle>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late double x, y, size;
+  late Color color;
+
+  @override
+  void initState() {
+    super.initState();
+    final r = math.Random();
+    x = r.nextDouble();
+    y = r.nextDouble();
+    size = r.nextDouble() * 4 + 1;
+    color = r.nextBool() ? Colors.white : Colors.amber.withOpacity(0.5);
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 8 + r.nextInt(10)),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: MediaQuery.of(context).size.width * x,
+      top: MediaQuery.of(context).size.height * y,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return Transform.translate(
+            offset: Offset(0, MediaQuery.of(context).size.height * (0.1 * math.sin(_controller.value * math.pi))),
+            child: Opacity(
+              opacity: 0.1 + (0.4 * _controller.value),
+              child: Container(
+                width: size,
+                height: size,
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: color.withOpacity(0.5),
+                      blurRadius: 4,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _CloseButton extends StatelessWidget {
+  final VoidCallback onPressed;
+  const _CloseButton({required this.onPressed});
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.black38,
+          border: Border.all(color: Colors.white12),
+        ),
+        child: const Icon(Icons.close, color: Colors.white70, size: 24),
+      ),
+    );
+  }
+}
+
+class _BottomControls extends StatelessWidget {
+  final bool isVisible;
+  final bool isStarted;
+  final bool isPlaying;
+  final VoidCallback onToggle;
+  final AnimationController timerController;
+  final int totalDuration;
+
+  const _BottomControls({
+    required this.isVisible,
+    required this.isStarted,
+    required this.isPlaying,
+    required this.onToggle,
+    required this.timerController,
+    required this.totalDuration,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 1200),
+      curve: const _SafeCurve(Curves.easeOutExpo),
+      bottom: isVisible ? 80 : -300,
+      left: 30,
+      right: 30,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 1000),
+        opacity: isVisible ? 1.0 : 0.0,
+        child: Column(
+          children: [
+            Text(
+              !isStarted
+                  ? "READY TO MEDITATE"
+                  : isPlaying
+                  ? "INHALE ... EXHALE"
+                  : "PAUSED",
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w300,
+                letterSpacing: 4,
+              ),
+            ),
+            const SizedBox(height: 35),
+            GestureDetector(
+              onTap: onToggle,
+              child: _PlayButton(isPlaying: isPlaying, isStarted: isStarted),
+            ),
+            const SizedBox(height: 45),
+            _ZenTimer(
+              timerController: timerController,
+              totalDuration: totalDuration,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PlayButton extends StatelessWidget {
+  final bool isPlaying;
+  final bool isStarted;
+  const _PlayButton({required this.isPlaying, required this.isStarted});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 80,
+      height: 80,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(
+          colors: [
+            Colors.white.withOpacity(0.2),
+            Colors.white.withOpacity(0.05),
+          ],
+        ),
+        border: Border.all(color: Colors.white24, width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black54,
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Icon(
+        !isStarted || !isPlaying
+            ? Icons.play_arrow_rounded
+            : Icons.pause_rounded,
+        color: Colors.white,
+        size: 45,
+      ),
+    );
+  }
+}
+
+class _ZenTimer extends StatelessWidget {
+  final AnimationController timerController;
+  final int totalDuration;
+  const _ZenTimer({required this.timerController, required this.totalDuration});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: timerController,
+      builder: (context, child) {
+        int rem =
+            totalDuration - (timerController.value * totalDuration).round();
+        String time =
+            "${(rem ~/ 60).toString().padLeft(2, '0')}:${(rem % 60).toString().padLeft(2, '0')}";
+        return Column(
+          children: [
+            Text(
+              time,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.w200,
+                letterSpacing: 6,
+              ),
+            ),
+            const SizedBox(height: 20),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: LinearProgressIndicator(
+                value: timerController.value,
+                minHeight: 2,
+                backgroundColor: Colors.white10,
+                color: Colors.white60,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _SafeCurve extends Curve {
+  final Curve curve;
+  const _SafeCurve(this.curve);
+  @override
+  double transform(double t) => curve.transform(t.clamp(0.0, 1.0));
+}
