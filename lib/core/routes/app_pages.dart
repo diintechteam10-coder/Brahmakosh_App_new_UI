@@ -1,7 +1,6 @@
 import 'package:brahmakosh/features/auth/controllers/mobile_controller.dart';
 import 'package:brahmakosh/features/auth/views/login.dart';
 import 'package:brahmakosh/features/auth/views/mobile_number_page.dart';
-import 'package:brahmakosh/features/auth/views/mobile_number_page.dart';
 import 'package:brahmakosh/features/brahm_bazar/brahm_bazar_view.dart';
 import 'package:brahmakosh/features/check_in/views/check_in_view.dart';
 import 'package:brahmakosh/features/check_in/views/meditations.dart';
@@ -28,6 +27,7 @@ import '../../features/intro/views/intro_view.dart';
 import '../../features/splash/views/splash_view.dart';
 import '../constants/app_constants.dart';
 import '../services/storage_service.dart';
+import '../../features/walkthrough/views/walkthrough_view.dart';
 
 class AppPages {
   static final List<GetPage> pages = [
@@ -118,10 +118,7 @@ class AppPages {
         }
       }),
     ),
-    GetPage(
-      name: AppConstants.routeCheckIn,
-      page: () => const CheckInView(),
-    ),
+    GetPage(name: AppConstants.routeCheckIn, page: () => const CheckInView()),
     GetPage(
       name: AppConstants.routeMeditate,
       page: () => const MeditateScreen(),
@@ -133,6 +130,10 @@ class AppPages {
     GetPage(
       name: AppConstants.routeMeditationStart,
       page: () => const MeditationStart(),
+    ),
+    GetPage(
+      name: AppConstants.routeWalkthrough,
+      page: () => const WalkthroughView(),
     ),
   ];
 }

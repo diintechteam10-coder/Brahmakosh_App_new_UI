@@ -5,6 +5,8 @@ import 'package:brahmakosh/core/services/location_service.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../../../core/common_imports.dart';
 import '../../../common/utils.dart';
+import '../../agent/controllers/agent_controller.dart';
+import '../../ai_rashmi/ai_rashmi_chat.dart';
 
 class DashboardViewModel extends ChangeNotifier {
   DashboardViewModel() {
@@ -17,6 +19,17 @@ class DashboardViewModel extends ChangeNotifier {
   int get currentIndex => _currentIndex;
 
   void changeTab(int index) {
+    if (index == 2) {
+      if (!Get.isRegistered<AgentController>()) {
+        Get.put(AgentController());
+      }
+      Get.to(
+        () =>
+            const RashmiChat(backgroundImage: 'assets/images/Krishna_chat.png'),
+      );
+      return;
+    }
+
     if (_currentIndex == index) return;
 
     _currentIndex = index;
@@ -27,7 +40,10 @@ class DashboardViewModel extends ChangeNotifier {
   String? _userLocationAddress;
   String? get userLocationAddress => _userLocationAddress;
 
-  Future<void> initLocationUpdate(TickerProvider? tickerProvider, {bool forceRefresh = false}) async {
+  Future<void> initLocationUpdate(
+    TickerProvider? tickerProvider, {
+    bool forceRefresh = false,
+  }) async {
     print('initLocationUpdate called (standard print)');
     Utils.print(
       'initLocationUpdate called, current _locationCalled: $_locationCalled, force: $forceRefresh',
@@ -39,9 +55,9 @@ class DashboardViewModel extends ChangeNotifier {
     _userLocationAddress = StorageService.getString(
       AppConstants.keyUserLocation,
     );
-    
+
     // Clear corrupted cache if found
-    if (_userLocationAddress == ", " || _userLocationAddress == "" ) {
+    if (_userLocationAddress == ", " || _userLocationAddress == "") {
       _userLocationAddress = "Detecting location...";
     }
 
@@ -70,38 +86,47 @@ class DashboardViewModel extends ChangeNotifier {
           position.latitude,
           position.longitude,
         );
-        
-        print('DEBUG: getReverseGeocode call finished. Result success: ${locResult?.success}');
+
+        print(
+          'DEBUG: getReverseGeocode call finished. Result success: ${locResult?.success}',
+        );
         Utils.print('Reverse Geocode Model Success: ${locResult?.success}');
 
-        Utils.print('Reverse geocode result: ${jsonEncode(locResult?.toJson())}');
+        Utils.print(
+          'Reverse geocode result: ${jsonEncode(locResult?.toJson())}',
+        );
 
         final loc = locResult?.data?.location;
-        if (loc?.city != null && loc!.city!.isNotEmpty &&
-            loc.state != null && loc.state!.isNotEmpty) {
+        if (loc?.city != null &&
+            loc!.city!.isNotEmpty &&
+            loc.state != null &&
+            loc.state!.isNotEmpty) {
           _userLocationAddress = "${loc.city}, ${loc.state}";
           await StorageService.setString(
             AppConstants.keyUserLocation,
             _userLocationAddress!,
           );
-          
+
           Utils.print(
             'Location address updated to City, State: $_userLocationAddress',
           );
           notifyListeners();
-        } else if (loc?.formattedAddress != null && loc!.formattedAddress!.isNotEmpty) {
+        } else if (loc?.formattedAddress != null &&
+            loc!.formattedAddress!.isNotEmpty) {
           // If city/state are empty but we have a formattedAddress
           // Check if it's a Plus Code (starts with alphanumeric-plus-alphanumeric)
-          bool isPlusCode = RegExp(r'^[A-Z0-9]{4,8}\+[A-Z0-9]{2,3}').hasMatch(loc.formattedAddress!);
-          
+          bool isPlusCode = RegExp(
+            r'^[A-Z0-9]{4,8}\+[A-Z0-9]{2,3}',
+          ).hasMatch(loc.formattedAddress!);
+
           if (isPlusCode) {
-             // Fallback if city/state are empty and we only have a plus code
-             // You can try to show something else or just the coordinates
-             _userLocationAddress = "India"; // Generic fallback 
+            // Fallback if city/state are empty and we only have a plus code
+            // You can try to show something else or just the coordinates
+            _userLocationAddress = "India"; // Generic fallback
           } else {
-             _userLocationAddress = loc.formattedAddress;
+            _userLocationAddress = loc.formattedAddress;
           }
-          
+
           await StorageService.setString(
             AppConstants.keyUserLocation,
             _userLocationAddress!,
@@ -111,9 +136,11 @@ class DashboardViewModel extends ChangeNotifier {
           );
           notifyListeners();
         } else {
-          Utils.print('No valid address fields found (city: "${loc?.city}", state: "${loc?.state}", formatted: "${loc?.formattedAddress}")');
-           _userLocationAddress = "Location active"; // Generic status
-           notifyListeners();
+          Utils.print(
+            'No valid address fields found (city: "${loc?.city}", state: "${loc?.state}", formatted: "${loc?.formattedAddress}")',
+          );
+          _userLocationAddress = "Location active"; // Generic status
+          notifyListeners();
         }
       } else {
         Utils.print('Position is null, update skipped.');

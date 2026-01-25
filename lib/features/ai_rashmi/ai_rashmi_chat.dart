@@ -3,14 +3,19 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
+import 'package:collection/collection.dart';
 
 import 'ai_rashmi_service.dart';
 import 'ai_rashmi_view_model.dart';
 import '../dashboard/viewmodels/dashboard_viewmodel.dart';
 import 'deity_selection_service.dart';
+import 'package:brahmakosh/features/agent/controllers/agent_controller.dart';
+import '../../common/models/avtar_list.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class RashmiChat extends StatelessWidget {
-  const RashmiChat({super.key});
+  final String? backgroundImage;
+  const RashmiChat({super.key, this.backgroundImage});
 
   @override
   Widget build(BuildContext context) {
@@ -18,12 +23,13 @@ class RashmiChat extends StatelessWidget {
     if (!Get.isRegistered<AiRashmiController>()) {
       Get.put(AiRashmiController(service: AiRashmiService()));
     }
-    return const _RashmiChatView();
+    return _RashmiChatView(backgroundImage: backgroundImage);
   }
 }
 
 class _RashmiChatView extends StatefulWidget {
-  const _RashmiChatView();
+  final String? backgroundImage;
+  const _RashmiChatView({this.backgroundImage});
 
   @override
   State<_RashmiChatView> createState() => _RashmiChatViewState();
@@ -88,6 +94,22 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
               //         )
               //       : Container(color: Colors.black),
               // ),
+              Builder(
+                builder: (context) {
+                  String? currentBg = widget.backgroundImage;
+                  // If user has started chatting (messages exist), switch to default background
+                  if (vm.messages.isNotEmpty) {
+                    currentBg = 'assets/images/Chat_background.png';
+                  }
+
+                  if (currentBg != null) {
+                    return Positioned.fill(
+                      child: Image.asset(currentBg, fit: BoxFit.cover),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
 
               // Dark overlay
               Positioned.fill(
@@ -111,10 +133,95 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                             _scaffoldKey.currentState?.openDrawer();
                           },
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.close, color: Colors.white),
-                          onPressed: () {
-                            Get.back();
+                        // IconButton(
+                        //   icon: const Icon(Icons.close, color: Colors.white),
+                        //   onPressed: () {
+                        //     Get.back();
+                        //   },
+                        // ),
+                        PopupMenuButton<Data>(
+                          icon: const Icon(Icons.settings, color: Colors.white),
+                          offset: const Offset(0, 40),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          onSelected: (avatar) async {
+                            // Update selected deity
+                            _deityService.setSelectedDeity(avatar);
+                            setState(() {});
+                            final vm = Get.find<AiRashmiController>();
+                            await vm.newChat();
+                          },
+                          itemBuilder: (context) {
+                            if (!Get.isRegistered<AgentController>()) {
+                              Get.put(AgentController());
+                            }
+                            final agentController = Get.find<AgentController>();
+
+                            // Ensure avatars are loaded
+                            if (agentController.avatars.isEmpty) {
+                              agentController.fetchAvatars(null);
+                              return [
+                                const PopupMenuItem(
+                                  enabled: false,
+                                  child: Text('Loading...'),
+                                ),
+                              ];
+                            }
+
+                            final currentId = _deityService.selectedDeity?.sId;
+
+                            // Filter for Rashmi and Krishna
+                            final relevantAvatars = agentController.avatars
+                                .where((a) {
+                                  final name = (a.name ?? '').toLowerCase();
+                                  return name.contains('rashmi') ||
+                                      name.contains('krishna');
+                                })
+                                .toList();
+
+                            // Find the one that is NOT the current one
+                            // If relevantAvatars is empty (fallback), use all avatars
+                            final sourceList = relevantAvatars.isNotEmpty
+                                ? relevantAvatars
+                                : agentController.avatars;
+
+                            final otherDeity = sourceList.firstWhereOrNull(
+                              (a) => a.sId != currentId,
+                            );
+
+                            if (otherDeity == null) {
+                              return [
+                                const PopupMenuItem(
+                                  enabled: false,
+                                  child: Text('No other option'),
+                                ),
+                              ];
+                            }
+
+                            return [
+                              PopupMenuItem(
+                                value: otherDeity,
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.swap_horiz,
+                                      color: Theme.of(context).primaryColor,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        'Switch to Talk to ${otherDeity.name}',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ];
                           },
                         ),
                       ],
@@ -129,22 +236,25 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                   // Spacing for top icons
                   const SizedBox(height: 80),
 
-                  // Messages List
+                  // Messages List or Suggestions
                   Expanded(
-                    child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 16,
-                      ),
-                      itemCount: vm.messages.length + (vm.isSending ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        if (vm.isSending && index == vm.messages.length) {
-                          return _buildTypingIndicator(context);
-                        }
-                        final msg = vm.messages[index];
-                        return _buildMessageBubble(context, msg, theme);
-                      },
-                    ),
+                    child: vm.messages.isEmpty
+                        ? _buildSuggestions(context, vm)
+                        : ListView.builder(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 16,
+                            ),
+                            itemCount:
+                                vm.messages.length + (vm.isSending ? 1 : 0),
+                            itemBuilder: (context, index) {
+                              if (vm.isSending && index == vm.messages.length) {
+                                return _buildTypingIndicator(context);
+                              }
+                              final msg = vm.messages[index];
+                              return _buildMessageBubble(context, msg, theme);
+                            },
+                          ),
                   ),
 
                   // Input Area - Text Focused
@@ -170,6 +280,16 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                         ),
                         child: Row(
                           children: [
+                            GestureDetector(
+                              onTap: () {
+                                // TODO: Implement mic functionality
+                              },
+                              child: Icon(
+                                Icons.mic,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
                             Expanded(
                               child: TextField(
                                 controller: _controller,
@@ -506,6 +626,81 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSuggestions(BuildContext context, AiRashmiController vm) {
+    final suggestions = [
+      "Why does my mind keep pulling me in different directions?",
+      "What is the right action when I feel completely stuck?",
+      "How do I choose correctly when every option feels uncertain?",
+      "How can I act with clarity instead of doubt?",
+    ];
+
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.4,
+            ), // Spacer to push content down
+            Text(
+              'Try asking...',
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.9),
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ...suggestions.map((question) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12.0),
+                child: InkWell(
+                  onTap: () {
+                    vm.sendMessage(question);
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.2),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            question,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              height: 1.4,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          color: Colors.white.withOpacity(0.7),
+                          size: 14,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ],
+        ),
       ),
     );
   }

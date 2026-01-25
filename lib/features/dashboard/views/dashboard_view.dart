@@ -13,7 +13,6 @@ import '../../services/controllers/services_controller.dart';
 import '../../report/views/report_view.dart';
 import '../../check_in/views/check_in_view.dart';
 
-
 class DashboardView extends StatelessWidget {
   const DashboardView({super.key});
 
@@ -24,14 +23,19 @@ class DashboardView extends StatelessWidget {
     if (!Get.isRegistered<ServicesController>()) {
       Get.put(ServicesController());
     }
-    
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
           create: (_) {
             final viewModel = DashboardViewModel();
+            if (Get.arguments != null && Get.arguments is int) {
+              viewModel.changeTab(Get.arguments);
+            }
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              viewModel.initLocationUpdate(null); // Passing null since it's outside any TickerProvider
+              viewModel.initLocationUpdate(
+                null,
+              ); // Passing null since it's outside any TickerProvider
             });
             return viewModel;
           },

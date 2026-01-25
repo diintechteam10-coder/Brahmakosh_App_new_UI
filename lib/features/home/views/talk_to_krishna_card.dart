@@ -30,7 +30,11 @@ class TalkToKrishnaCard extends StatelessWidget {
             Get.put(AgentController());
           }
           // Provider.of<DashboardViewModel>(context, listen: false).changeTab(2);
-          Get.to(() => const RashmiChat());
+          Get.to(
+            () => const RashmiChat(
+              backgroundImage: 'assets/images/Krishna_chat.png',
+            ),
+          );
         },
         child: Container(
           height: MediaQuery.of(context).size.height * 0.20,
