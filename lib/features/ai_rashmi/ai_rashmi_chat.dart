@@ -30,7 +30,7 @@ class _RashmiChatView extends StatefulWidget {
 }
 
 class _RashmiChatViewState extends State<_RashmiChatView> {
-  late VideoPlayerController _vicontroller;
+  // late VideoPlayerController _vicontroller;
   final TextEditingController _controller = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final DeitySelectionService _deityService = DeitySelectionService();
@@ -38,24 +38,26 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
   @override
   void initState() {
     super.initState();
-    _vicontroller = VideoPlayerController.asset('assets/images/bi_bg.mp4')
-      ..initialize().then((_) {
-        if (mounted) {
-          _vicontroller.setLooping(true);
-          _vicontroller.setVolume(0);
-          _vicontroller.play();
-          setState(() {});
-        }
-      }).catchError((error) {
-        print('Video initialization error: $error');
-      });
+    // _vicontroller = VideoPlayerController.asset('assets/images/bi_bg.mp4')
+    //   ..initialize()
+    //       .then((_) {
+    //         if (mounted) {
+    //           _vicontroller.setLooping(true);
+    //           _vicontroller.setVolume(0);
+    //           _vicontroller.play();
+    //           setState(() {});
+    //         }
+    //       })
+    //       .catchError((error) {
+    //         print('Video initialization error: $error');
+    //       });
   }
 
   @override
   void dispose() {
     _controller.dispose();
-    _vicontroller.pause();
-    _vicontroller.dispose();
+    // _vicontroller.pause();
+    // _vicontroller.dispose();
     super.dispose();
   }
 
@@ -73,18 +75,19 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
           body: Stack(
             children: [
               // Video Background
-              Positioned.fill(
-                child: _vicontroller.value.isInitialized
-                    ? FittedBox(
-                        fit: BoxFit.cover,
-                        child: SizedBox(
-                          width: _vicontroller.value.size.width,
-                          height: _vicontroller.value.size.height,
-                          child: VideoPlayer(_vicontroller),
-                        ),
-                      )
-                    : Container(color: Colors.black),
-              ),
+              // Video Background
+              // Positioned.fill(
+              //   child: _vicontroller.value.isInitialized
+              //       ? FittedBox(
+              //           fit: BoxFit.cover,
+              //           child: SizedBox(
+              //             width: _vicontroller.value.size.width,
+              //             height: _vicontroller.value.size.height,
+              //             child: VideoPlayer(_vicontroller),
+              //           ),
+              //         )
+              //       : Container(color: Colors.black),
+              // ),
 
               // Dark overlay
               Positioned.fill(
@@ -321,7 +324,11 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                 const CircleAvatar(
                   backgroundColor: Colors.white,
                   radius: 24,
-                  child: Icon(Icons.auto_awesome, color: Colors.amber, size: 28),
+                  child: Icon(
+                    Icons.auto_awesome,
+                    color: Colors.amber,
+                    size: 28,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -334,15 +341,12 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                 ),
                 const Text(
                   'Your Personal Assistant',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white70,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.white70),
                 ),
               ],
             ),
           ),
-          
+
           Expanded(
             child: Container(
               color: Colors.grey[50],
@@ -362,10 +366,16 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                         },
                         borderRadius: BorderRadius.circular(12),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                           child: Row(
                             children: [
-                              Icon(Icons.add_circle, color: Theme.of(context).primaryColor),
+                              Icon(
+                                Icons.add_circle,
+                                color: Theme.of(context).primaryColor,
+                              ),
                               const SizedBox(width: 12),
                               Text(
                                 'New Chat',
@@ -399,7 +409,9 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                   if (vm.isLoadingHistory)
                     const Padding(
                       padding: EdgeInsets.all(20.0),
-                      child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                      child: Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
                     )
                   else if (vm.history.isEmpty)
                     Padding(
@@ -407,7 +419,11 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                       child: Center(
                         child: Column(
                           children: [
-                            Icon(Icons.chat_bubble_outline, size: 48, color: Colors.grey[300]),
+                            Icon(
+                              Icons.chat_bubble_outline,
+                              size: 48,
+                              color: Colors.grey[300],
+                            ),
                             const SizedBox(height: 12),
                             Text(
                               'No chat history',
@@ -422,37 +438,46 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                       child: ListView.separated(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         itemCount: vm.history.length,
-                        separatorBuilder: (context, index) => const SizedBox(height: 4),
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 4),
                         itemBuilder: (context, index) {
                           final chat = vm.history[index];
                           final isSelected = chat.chatId == vm.chatId;
-                          
+
                           return Material(
-                            color: isSelected ? Colors.white : Colors.transparent,
+                            color: isSelected
+                                ? Colors.white
+                                : Colors.transparent,
                             elevation: isSelected ? 2 : 0,
                             borderRadius: BorderRadius.circular(12),
                             child: ListTile(
                               leading: Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: isSelected 
-                                      ? Theme.of(context).primaryColor.withOpacity(0.1)
+                                  color: isSelected
+                                      ? Theme.of(
+                                          context,
+                                        ).primaryColor.withOpacity(0.1)
                                       : Colors.grey[200],
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
                                   Icons.chat_bubble_outline,
                                   size: 18,
-                                  color: isSelected 
-                                      ? Theme.of(context).primaryColor 
+                                  color: isSelected
+                                      ? Theme.of(context).primaryColor
                                       : Colors.grey[600],
                                 ),
                               ),
                               title: Text(
                                 chat.title,
                                 style: TextStyle(
-                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                  color: isSelected ? Colors.black87 : Colors.black54,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.w500,
+                                  color: isSelected
+                                      ? Colors.black87
+                                      : Colors.black54,
                                 ),
                               ),
                               subtitle: Text(

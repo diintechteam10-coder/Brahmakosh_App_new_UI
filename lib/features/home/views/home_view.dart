@@ -1,21 +1,21 @@
+import 'dart:async';
 import 'package:brahmakosh/features/home/controllers/home_controller.dart';
-import 'package:brahmakosh/features/home/views/brahmkosh_bazar_card.dart';
-import 'package:brahmakosh/features/home/views/chatbot_bannner.dart';
-import 'package:brahmakosh/features/home/views/focus.dart';
-import 'package:brahmakosh/features/home/views/founder_massegs.dart';
 import 'package:brahmakosh/features/home/views/generate_avtar_card.dart';
-import 'package:brahmakosh/features/home/views/lucky_flip_card.dart';
-import 'package:brahmakosh/features/home/views/panchang_card.dart';
-import 'package:brahmakosh/features/home/views/testimonials.dart';
-import 'package:brahmakosh/features/home/views/sponsor_card.dart'; // Import the new SponsorCard
-import 'package:brahmakosh/features/updates/story.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart'; // Import smooth_page_indicator
+import 'package:brahmakosh/features/home/views/sponsor_card.dart';
 
 import '../../../common/utils.dart';
-import '../../ai_rashmi/aradhya_selection_view.dart';
-import '../../profile/viewmodels/profile_viewmodel.dart';
 import '../../../../core/common_imports.dart';
 import '../../dashboard/viewmodels/dashboard_viewmodel.dart';
+
+// New Imports
+import 'home_top_bar.dart';
+import 'talk_to_rashmi_card.dart';
+import 'talk_to_krishna_card.dart';
+import 'destiny_guidance_section.dart';
+import 'todays_muhrat_section.dart';
+import 'personality_discovery_section.dart';
+import 'pahar_section.dart';
+import 'luck_in_favour_section.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -30,6 +30,9 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
   late final HomeController homeController = Get.put(HomeController());
   final PageController _pageController = PageController();
+  final PageController _cardsPageController = PageController();
+  Timer? _cardsTimer;
+  int _currentCardPage = 0;
 
   @override
   void initState() {
@@ -38,10 +41,31 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       homeController.fetchFounderMessages(this);
       homeController.fetchSponsors(this);
     });
+    _startCardsAutoSlide();
+  }
+
+  void _startCardsAutoSlide() {
+    _cardsTimer = Timer.periodic(const Duration(seconds: 5), (Timer timer) {
+      if (_currentCardPage < 1) {
+        _currentCardPage++;
+      } else {
+        _currentCardPage = 0;
+      }
+
+      if (_cardsPageController.hasClients) {
+        _cardsPageController.animateToPage(
+          _currentCardPage,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
   }
 
   @override
   void dispose() {
+    _cardsTimer?.cancel();
+    _cardsPageController.dispose();
     _pageController.dispose();
     super.dispose();
   }
@@ -67,383 +91,84 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Consumer<ProfileViewModel>(
-                      builder: (context, profileViewModel, child) {
-                        final profile = profileViewModel.profile;
-                        final String? name =
-                            profile?.profile?.name ??
-                            StorageService.getString(AppConstants.keyUserName);
-                        final String? image =
-                            profile?.profileImageUrl ??
-                            StorageService.getString(AppConstants.keyUserImage);
+            SafeArea(bottom: false, child: const HomeTopBar()),
 
-                        return Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () => Scaffold.of(context).openDrawer(),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  // border: Border.all(
-                                  //   color: AppTheme.primaryGold.withOpacity(0.5),
-                                  //   width: 2,
-                                  // ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppTheme.primaryGold.withOpacity(
-                                        0.2,
-                                      ),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: ClipOval(
-                                  child: Image.asset(
-                                    'assets/images/brahmkosh_logo.jpeg',
-                                    width: 40,
-                                    height: 40,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(width: 12),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  name ?? "Brahmakosh",
-                                  style: GoogleFonts.playfairDisplay(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppTheme.textPrimary,
-                                  ),
-                                ),
-                                Consumer<DashboardViewModel>(
-                                  builder:
-                                      (context, dashboardViewModel, child) {
-                                        final address =
-                                            dashboardViewModel
-                                                .userLocationAddress ??
-                                            StorageService.getString(
-                                              AppConstants.keyUserLocation,
-                                            );
-                                        if (address == null || address.isEmpty)
-                                          return const SizedBox.shrink();
-                                        return Text(
-                                          address,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: GoogleFonts.lora(
-                                            fontSize: 11,
-                                            color: AppTheme.textSecondary,
-                                          ),
-                                        );
-                                      },
-                                ),
-                              ],
-                            ),
-                            const Spacer(),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.notifications,
-                                color: AppTheme.textPrimary,
-                              ),
-                              onPressed: () {},
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                  ],
-                ),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.24,
+              child: PageView(
+                controller: _cardsPageController,
+                onPageChanged: (index) {
+                  _currentCardPage = index;
+                },
+                children: const [TalkToRashmiCard(), TalkToKrishnaCard()],
               ),
             ),
-            _buildTopBar(),
+            const SizedBox(height: 18),
 
-            const SizedBox(height: 10),
-            PremiumChatCard(
-              title: "Talk to BI Rashmi",
-              subtitle: "Premium guidance just for you",
-              backgroundImage: "assets/images/rashmi_bi_without.jpeg",
-              messages: [
-                "✨ Career & Finance Advice",
-                "❤️ Love & Relationship",
-                "🕉️ Kundli Analysis",
-                "🔮 Future Predictions",
-              ],
-              onTap: () async {
-                // Navigate to Aradhya Selection screen with callback
-                await Get.to(
-                  () => AradhyaSelectionView(
-                    onDeitySelected: () async {
-                      // Navigate to Rashmi AI screen (index 2 in dashboard)
-                      Provider.of<DashboardViewModel>(
-                        context,
-                        listen: false,
-                      ).changeTab(2);
-                    },
-                  ),
-                );
-              },
-            ),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 1.0),
-              child: Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(
-                    color: AppTheme.primaryGold.withOpacity(0.5),
-                    width: 2,
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 1, right: 1, top: 12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // PraharSectionHeader(
-                      //   praharName: 'BRAHMA PRAHAR',
-                      //   timing: '8:00 AM - 10:00 AM',
-                      // ), //backgroundImage: "assets/images/banner_bi.jpeg",
-                      // PraharInfoCard(
-                      //   praharName: "BRAHMA PRAHAR",
-                      //   praharTiming: "12 PM - 3 PM",
-                      //   energy: "High Energy",
-                      //   auspiciousTime: "12:30 PM - 1:30 PM",
-                      //   actionGoodFor: "New Plasms, Meditation",
-                      //   actionAvoid: "Ergo clash, Stressful tasks",
-                      //   inuspiciousTime: "12:30 PM - 1:30 PM",
-                      // ),
-                      // const SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Container(
-                          padding: const EdgeInsets.all(
-                            16,
-                          ), // slightly reduced padding
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                AppTheme.cardBackground.withOpacity(0.95),
-                                AppTheme.cardBackground.withOpacity(0.9),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(24),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                blurRadius: 18,
-                                offset: const Offset(0, 8),
-                              ),
-                              BoxShadow(
-                                color: AppTheme.primaryGold.withOpacity(0.2),
-                                blurRadius: 24,
-                                offset: const Offset(0, 12),
-                              ),
-                            ],
-                            border: Border.all(
-                              color: AppTheme.primaryGold.withOpacity(0.25),
-                              width: 1,
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Luck in Your Favour ⭐',
-                                style: GoogleFonts.playfairDisplay(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppTheme.textPrimary,
-                                  shadows: const [
-                                    Shadow(
-                                      color: Colors.black26,
-                                      offset: Offset(0, 1),
-                                      blurRadius: 2,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: LuckyFlipCard(
-                                      icon: Icons.color_lens,
-                                      title: 'Lucky Colors',
-                                      luckyNumber: '7',
-                                      luckyColor: AppTheme.primaryGold,
-                                      luckyColorName: 'Gold',
-                                      cardId: 'lucky_colors',
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: LuckyFlipCard(
-                                      icon: Icons.numbers,
-                                      title: 'Lucky Number',
-                                      luckyNumber: '8',
-                                      luckyColor: AppTheme.chakraBlue,
-                                      luckyColorName: 'Azure',
-                                      cardId: 'lucky_number',
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: LuckyFlipCard(
-                                      icon: Icons.emoji_people,
-                                      title: 'Angel Blessing',
-                                      luckyNumber: '111',
-                                      luckyColor: AppTheme.primaryGold,
-                                      luckyColorName: 'Blessing',
-                                      cardId: 'angel_blessing',
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              Center(
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.touch_app,
-                                      size: 16,
-                                      color: AppTheme.textSecondary,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      'Tap to reveal',
-                                      style: GoogleFonts.lora(
-                                        fontSize: 10.5,
-                                        color: AppTheme.textSecondary,
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      PanchangCard(),
-
-                      const SizedBox(height: 20),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            FocusInfoCard(),
+            const DestinyGuidanceSection(),
             const SizedBox(height: 20),
 
+            const TodaysMuhratSection(),
+            const SizedBox(height: 20),
+
+            const PersonalityDiscoverySection(),
+            const SizedBox(height: 20),
+
+            const PaharSection(),
+            const SizedBox(height: 20),
+
+            const LuckInFavourSection(),
+            const SizedBox(height: 20),
+
+            // "Add Brahm Avatar section from old screen into new screen for i'll change later"
             AvatarStudioCard(),
             const SizedBox(height: 20),
-            BrahmBazarCard(
-              onMoreTap: () {
-                Get.toNamed(AppConstants.brahmBazar);
-              },
-            ),
 
-            TestimonialsCarousel(),
+            // "our Sponsors section should also add from old screen"
+            _buildSponsorsSection(),
             const SizedBox(height: 20),
-            Obx(() {
-              if (homeController.isSponsorLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (homeController.sponsors.isEmpty) {
-                return const SizedBox.shrink();
-              }
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Our Sponsors',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.normal,
-                        color: AppTheme.textPrimary,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    // Use PageView.builder for single sponsor display
-                    Container(
-                      height: 90, // 👈 patli strip
-                      margin: const EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        //  color: Colors.black.withOpacity(0.85),
-                        border: Border(
-                          top: BorderSide(color: Colors.white.withOpacity(0.1)),
-                          bottom: BorderSide(
-                            color: Colors.white.withOpacity(0.1),
-                          ),
-                        ),
-                      ),
-                      child: SponsorLogoTicker(
-                        sponsors: homeController.sponsors,
-                      ),
-                    ),
-
-                    const SizedBox(height: 4),
-                    Center(
-                      child: SmoothPageIndicator(
-                        controller: _pageController,
-                        count: homeController.sponsors.length,
-                        effect: const ExpandingDotsEffect(
-                          activeDotColor: AppTheme.primaryGold,
-                          dotColor: AppTheme.lightGold,
-                          dotHeight: 8,
-                          dotWidth: 8,
-                          expansionFactor: 4,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }),
-            const SizedBox(height: 20),
-            Obx(() {
-              if (homeController.isLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              final message = homeController.activeFounderMessage;
-              if (message == null) return const SizedBox.shrink();
-
-              return FounderMessageCard(
-                founderName: message.founderName,
-                designation: message.position,
-                message: message.content,
-                imageUrl: message.founderImage,
-              );
-            }),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTopBar() {
-    return Column(children: [WhatsAppStatusWidget()]);
+  Widget _buildSponsorsSection() {
+    return Obx(() {
+      if (homeController.isSponsorLoading) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      if (homeController.sponsors.isEmpty) {
+        return const SizedBox.shrink();
+      }
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Our Sponsors',
+              style: GoogleFonts.lora(
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF6D3A0C),
+                fontSize: 18,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              height: 90,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: Colors.white.withOpacity(0.1)),
+                  bottom: BorderSide(color: Colors.white.withOpacity(0.1)),
+                ),
+              ),
+              child: SponsorLogoTicker(sponsors: homeController.sponsors),
+            ),
+          ],
+        ),
+      );
+    });
   }
 }
