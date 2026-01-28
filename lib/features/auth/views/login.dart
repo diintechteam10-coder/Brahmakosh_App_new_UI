@@ -3,9 +3,11 @@ import 'package:brahmakosh/core/theme/app_theme.dart';
 import 'package:brahmakosh/features/auth/controllers/auth_controller.dart';
 import 'package:brahmakosh/features/auth/views/email_register_view.dart';
 import 'package:brahmakosh/features/auth/views/forgot_password.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginPhoneView extends StatelessWidget {
   LoginPhoneView({super.key});
@@ -234,10 +236,51 @@ class LoginPhoneView extends StatelessWidget {
 
               const SizedBox(height: 26),
 
-              Text(
-                "By continuing, you agree to our Terms & Privacy Policy",
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(fontSize: 10.5, color: Colors.black45),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Obx(
+                    () => Checkbox(
+                      value: authController.isPrivacyPolicyAccepted.value,
+                      onChanged: (value) {
+                        authController.isPrivacyPolicyAccepted.value =
+                            value ?? false;
+                      },
+                      activeColor: AppTheme.primaryGold,
+                    ),
+                  ),
+                  Expanded(
+                    child: RichText(
+                      text: TextSpan(
+                        text: "I accept the ",
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: Colors.black54,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: "Privacy Policy",
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.primaryGold,
+                              decoration: TextDecoration.underline,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () async {
+                                final url = Uri.parse(
+                                  "https://www.brahmakosh.com/privacy-policy",
+                                );
+                                if (await canLaunchUrl(url)) {
+                                  await launchUrl(url);
+                                }
+                              },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
 
               const SizedBox(height: 16),

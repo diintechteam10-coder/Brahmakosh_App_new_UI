@@ -19,79 +19,83 @@ class AuthController extends GetxController {
 
   var isLoading = false.obs;
   var isEmailLoading = false.obs;
+  var isPrivacyPolicyAccepted = false.obs;
 
   User? get currentUser => _auth.currentUser;
 
-Future<void> loginWithEmail() async {
-  if (isEmailLoading.value) return;
+  Future<void> loginWithEmail() async {
+    if (isEmailLoading.value) return;
 
-  final email = emailController.text.trim();
-  final password = passwordController.text.trim();
-
-  if (email.isEmpty || password.isEmpty) {
-    Get.snackbar("Required", "Email & Password required");
-    return;
-  }
-
-  isEmailLoading.value = true;
-
-  final url = Uri.parse(ApiUrls.login);
-
-  final headers = {
-    'Content-Type': 'application/json',
-  };
-
-  final body = {
-    "email": email,
-    "password": password,
-    "clientId": "CLI-KBHUMT",
-  };
-
-  /// 🔹 PRINT REQUEST
-  print("📤 LOGIN REQUEST");
-  print("➡️ URL: $url");
-  print("➡️ Headers: $headers");
-  print("➡️ Body: ${jsonEncode(body)}");
-
-  try {
-    final response = await http.post(
-      url,
-      headers: headers,
-      body: jsonEncode(body),
-    );
-
-    /// 🔹 PRINT RESPONSE
-    print("📥 LOGIN RESPONSE");
-    print("⬅️ Status Code: ${response.statusCode}");
-    print("⬅️ Headers: ${response.headers}");
-    print("⬅️ Body: ${response.body}");
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-
-      final userId = data['data']?['user']?['_id'] ?? '';
-      final token = data['data']?['token'] ?? '';
-
-      await StorageService.setBool(AppConstants.keyIsLoggedIn, true);
-      await StorageService.setString(AppConstants.keyUserId, userId);
-      await StorageService.setString(AppConstants.keyAuthToken, token);
-      await StorageService.setString(AppConstants.keyUserEmail, email);
-
-      Get.offAllNamed(AppConstants.routeDashboard);
-    } else {
-      final msg = jsonDecode(response.body)['message'] ?? "Login failed";
-      Get.snackbar("Login Failed", msg);
+    if (!isPrivacyPolicyAccepted.value) {
+      Get.snackbar("Required", "Please accept the Privacy Policy");
+      return;
     }
-  } catch (e, stack) {
-    print("❌ LOGIN EXCEPTION");
-    print("Error: $e");
-    print("StackTrace: $stack");
 
-    Get.snackbar("Error", "Something went wrong");
-  } finally {
-    isEmailLoading.value = false;
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      Get.snackbar("Required", "Email & Password required");
+      return;
+    }
+
+    isEmailLoading.value = true;
+
+    final url = Uri.parse(ApiUrls.login);
+
+    final headers = {'Content-Type': 'application/json'};
+
+    final body = {
+      "email": email,
+      "password": password,
+      "clientId": "CLI-KBHUMT",
+    };
+
+    /// 🔹 PRINT REQUEST
+    print("📤 LOGIN REQUEST");
+    print("➡️ URL: $url");
+    print("➡️ Headers: $headers");
+    print("➡️ Body: ${jsonEncode(body)}");
+
+    try {
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: jsonEncode(body),
+      );
+
+      /// 🔹 PRINT RESPONSE
+      print("📥 LOGIN RESPONSE");
+      print("⬅️ Status Code: ${response.statusCode}");
+      print("⬅️ Headers: ${response.headers}");
+      print("⬅️ Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        final userId = data['data']?['user']?['_id'] ?? '';
+        final token = data['data']?['token'] ?? '';
+
+        await StorageService.setBool(AppConstants.keyIsLoggedIn, true);
+        await StorageService.setString(AppConstants.keyUserId, userId);
+        await StorageService.setString(AppConstants.keyAuthToken, token);
+        await StorageService.setString(AppConstants.keyUserEmail, email);
+
+        Get.offAllNamed(AppConstants.routeDashboard);
+      } else {
+        final msg = jsonDecode(response.body)['message'] ?? "Login failed";
+        Get.snackbar("Login Failed", msg);
+      }
+    } catch (e, stack) {
+      print("❌ LOGIN EXCEPTION");
+      print("Error: $e");
+      print("StackTrace: $stack");
+
+      Get.snackbar("Error", "Something went wrong");
+    } finally {
+      isEmailLoading.value = false;
+    }
   }
-}
 
   Future<void> signInWithGoogle() async {
     if (isLoading.value) {

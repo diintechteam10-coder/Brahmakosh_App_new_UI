@@ -53,7 +53,8 @@ class MobileOtpController extends GetxController {
     // Determine OTP Method
     String otpMethod = "whatsapp";
     if (selectedChannel.value == "phone") {
-      otpMethod = (countryCode.value == "91") ? "gupshup" : "twilio";
+      // otpMethod = (countryCode.value == "91") ? "gupshup" : "twilio";
+      otpMethod = "twilio";
     }
 
     final fullMobile = "+${countryCode.value}$mobile";
@@ -132,7 +133,8 @@ class MobileOtpController extends GetxController {
     // Determine OTP Method for verification too (if original API requires it)
     String otpMethod = "whatsapp";
     if (selectedChannel.value == "phone") {
-      otpMethod = (countryCode.value == "91") ? "gupshup" : "twilio";
+      // otpMethod = (countryCode.value == "91") ? "gupshup" : "twilio";
+      otpMethod = "twilio";
     }
 
     final payload = {

@@ -51,6 +51,7 @@ class LoginController extends GetxController {
             await StorageService.setString(AppConstants.keyUserEmail, email);
             await StorageService.setBool(AppConstants.keyIsLoggedIn, true);
             print("✅ Token saved to SharedPreferences: $token");
+            print("🔑 DEBUG_TOKEN: $token");
           }
 
           Get.snackbar(

@@ -83,51 +83,54 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: _handleRefresh,
-      color: AppTheme.primaryGold,
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SafeArea(bottom: false, child: const HomeTopBar()),
+    return Container(
+      color: AppTheme.homeBackground,
+      child: RefreshIndicator(
+        onRefresh: _handleRefresh,
+        color: AppTheme.primaryGold,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const HomeTopBar(),
 
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.24,
-              child: PageView(
-                controller: _cardsPageController,
-                onPageChanged: (index) {
-                  _currentCardPage = index;
-                },
-                children: const [TalkToRashmiCard(), TalkToKrishnaCard()],
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.24,
+                child: PageView(
+                  controller: _cardsPageController,
+                  onPageChanged: (index) {
+                    _currentCardPage = index;
+                  },
+                  children: const [TalkToRashmiCard(), TalkToKrishnaCard()],
+                ),
               ),
-            ),
-            const SizedBox(height: 18),
+              const SizedBox(height: 18),
 
-            const DestinyGuidanceSection(),
-            const SizedBox(height: 20),
+              const DestinyGuidanceSection(),
+              const SizedBox(height: 20),
 
-            const TodaysMuhratSection(),
-            const SizedBox(height: 20),
+              const TodaysMuhratSection(),
+              const SizedBox(height: 20),
 
-            const PersonalityDiscoverySection(),
-            const SizedBox(height: 20),
+              const PersonalityDiscoverySection(),
+              const SizedBox(height: 20),
 
-            const PaharSection(),
-            const SizedBox(height: 20),
+              const PaharSection(),
+              const SizedBox(height: 20),
 
-            const LuckInFavourSection(),
-            const SizedBox(height: 20),
+              const LuckInFavourSection(),
+              const SizedBox(height: 20),
 
-            // "Add Brahm Avatar section from old screen into new screen for i'll change later"
-            AvatarStudioCard(),
-            const SizedBox(height: 20),
+              // "Add Brahm Avatar section from old screen into new screen for i'll change later"
+              AvatarStudioCard(),
+              const SizedBox(height: 20),
 
-            // "our Sponsors section should also add from old screen"
-            _buildSponsorsSection(),
-            const SizedBox(height: 20),
-          ],
+              // "our Sponsors section should also add from old screen"
+              _buildSponsorsSection(),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );

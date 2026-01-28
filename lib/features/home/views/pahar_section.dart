@@ -14,6 +14,11 @@ class _PaharSectionState extends State<PaharSection> {
 
   @override
   Widget build(BuildContext context) {
+    double w = MediaQuery.of(context).size.width;
+    // Base width 375.0 (standard mobile).
+    // Clamp scale to avoid too small or too large text on extreme devices.
+    double scale = (w / 375.0).clamp(0.85, 1.3);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
@@ -22,7 +27,7 @@ class _PaharSectionState extends State<PaharSection> {
           Text(
             "Pahar",
             style: GoogleFonts.lora(
-              fontSize: 18,
+              fontSize: 18 * scale,
               fontWeight: FontWeight.bold,
               color: const Color(0xFF6D3A0C),
             ),
@@ -41,9 +46,9 @@ class _PaharSectionState extends State<PaharSection> {
                   },
                   child: Container(
                     margin: const EdgeInsets.only(right: 12),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 8,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20 * scale,
+                      vertical: 8 * scale,
                     ),
                     decoration: BoxDecoration(
                       color: isSelected
@@ -57,7 +62,7 @@ class _PaharSectionState extends State<PaharSection> {
                     child: Text(
                       _tabs[index],
                       style: GoogleFonts.lora(
-                        fontSize: 12,
+                        fontSize: 12 * scale,
                         fontWeight: isSelected
                             ? FontWeight.bold
                             : FontWeight.normal,
@@ -74,12 +79,11 @@ class _PaharSectionState extends State<PaharSection> {
           const SizedBox(height: 16),
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(20 * scale),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF00396B), Color(0xFF1F1F1F)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+              image: const DecorationImage(
+                image: AssetImage('assets/images/Pahar_background.jpeg'),
+                fit: BoxFit.cover,
               ),
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
@@ -97,32 +101,13 @@ class _PaharSectionState extends State<PaharSection> {
                   child: Text(
                     "Sunday, January 22, 2026",
                     style: GoogleFonts.lora(
-                      fontSize: 12,
-                      color: Colors.white70,
+                      fontSize: 14 * scale,
+                      color: Colors.white,
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ),
-                const SizedBox(height: 4),
-                Center(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(height: 1, width: 30, color: Colors.amber),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Text(
-                          "Current Phase",
-                          style: GoogleFonts.lora(
-                            fontSize: 10,
-                            color: Colors.amber,
-                          ),
-                        ),
-                      ),
-                      Container(height: 1, width: 30, color: Colors.amber),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
+                SizedBox(height: 20 * scale),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -131,92 +116,149 @@ class _PaharSectionState extends State<PaharSection> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "Pradosh Pahar (Night Pahar)",
-                            style: GoogleFonts.playfairDisplay(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                          RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: "Pradosh Pahar ",
+                                  style: GoogleFonts.playfairDisplay(
+                                    fontSize: 22 * scale,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: "(Night Pahar)",
+                                  style: GoogleFonts.lora(
+                                    fontSize: 14 * scale,
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 8 * scale),
                           Text(
-                            "6:00 - 9:00 PM",
+                            "6.00 - 9.00 Pm",
                             style: GoogleFonts.lora(
-                              fontSize: 14,
-                              color: Colors.white70,
+                              fontSize: 16 * scale,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const Icon(
-                      Icons.nightlight_round,
-                      color: Colors.white,
-                      size: 40,
-                    ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 20 * scale),
                 Text(
-                  "The Moon grace the sky, encouraging reflection and letting go. A serene time for relaxation, meditating and finding peaceful closure.",
+                  "The Moon grace the sky, encouraging reflection and letting go. A serene time for relaxation, meditating and finding peaceful closer.",
                   style: GoogleFonts.lora(
-                    fontSize: 12,
-                    color: Colors.white70,
+                    fontSize: 13 * scale,
+                    color: Colors.white,
                     height: 1.4,
                   ),
                 ),
-                const SizedBox(height: 16),
-                _buildInfoRow("Energy", "Moderate", Colors.greenAccent),
-                const SizedBox(height: 8),
+                SizedBox(height: 20 * scale),
+                _buildInfoRow(
+                  "Energy",
+                  "Moderate",
+                  const Color(0xFF4ADE80),
+                  scale,
+                ),
+                SizedBox(height: 8 * scale),
                 _buildInfoRow(
                   "Avoid",
                   "Negativity & Excess Emotion",
-                  Colors.redAccent,
+                  const Color(0xFFFF5252),
+                  scale,
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 20 * scale),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16 * scale,
+                    vertical: 8 * scale,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white24),
+                    color: Colors.white.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.2),
+                      width: 1,
+                    ),
                   ),
-                  child: Text(
-                    "Muhurat: Shubh/Amrit (06:00 - 09:00 PM)",
-                    style: GoogleFonts.lora(fontSize: 10, color: Colors.white),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "Muhurat: ",
+                        style: GoogleFonts.lora(
+                          fontSize: 12 * scale,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFFE0E0E0),
+                        ),
+                      ),
+                      Text(
+                        "Supportive Window ( 6.18 - 7.02 PM )",
+                        style: GoogleFonts.lora(
+                          fontSize: 11 * scale,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  "Good For: Auspicious endeavors",
-                  style: GoogleFonts.lora(fontSize: 12, color: Colors.amber),
+                SizedBox(height: 20 * scale),
+                Row(
+                  children: [
+                    Text(
+                      "Good For: ",
+                      style: GoogleFonts.lora(
+                        fontSize: 15 * scale,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      "Auspicious endeavors",
+                      style: GoogleFonts.lora(
+                        fontSize: 15 * scale,
+                        color: const Color(0xFFFFA726),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 8),
-                _buildBulletPoint("Meditation"),
-                _buildBulletPoint("Letting Go Rituals"),
-                _buildBulletPoint("Forgiveness"),
-                const SizedBox(height: 16),
+                SizedBox(height: 12 * scale),
+                _buildBulletPoint("Meditation", scale),
+                _buildBulletPoint("Letting Go Rituals", scale),
+                _buildBulletPoint("Forgiveness", scale),
+                const SizedBox(height: 10),
                 Align(
-                  alignment: Alignment.centerRight,
+                  alignment: Alignment.bottomRight,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 10,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 32 * scale,
+                      vertical: 12 * scale,
                     ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFDECB6),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
                     child: Text(
                       "Ask BI",
                       style: GoogleFonts.lora(
-                        fontSize: 12,
+                        fontSize: 14 * scale,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF6D3A0C),
+                        color: const Color(0xFF4A3426),
                       ),
                     ),
                   ),
@@ -229,32 +271,43 @@ class _PaharSectionState extends State<PaharSection> {
     );
   }
 
-  Widget _buildInfoRow(String label, String value, Color valueColor) {
+  Widget _buildInfoRow(
+    String label,
+    String value,
+    Color valueColor,
+    double scale,
+  ) {
     return Row(
       children: [
         Text(
           "$label : ",
           style: GoogleFonts.lora(
-            fontSize: 12,
+            fontSize: 12 * scale,
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
         ),
-        Text(value, style: GoogleFonts.lora(fontSize: 12, color: valueColor)),
+        Text(
+          value,
+          style: GoogleFonts.lora(fontSize: 12 * scale, color: valueColor),
+        ),
       ],
     );
   }
 
-  Widget _buildBulletPoint(String text) {
+  Widget _buildBulletPoint(String text, double scale) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
       child: Row(
         children: [
-          const Icon(Icons.circle, size: 4, color: Colors.white70),
-          const SizedBox(width: 8),
+          Icon(Icons.circle, size: 4 * scale, color: Colors.white70),
+          SizedBox(width: 8 * scale),
           Text(
             text,
-            style: GoogleFonts.lora(fontSize: 12, color: Colors.white70),
+            style: GoogleFonts.lora(
+              fontSize: 12 * scale,
+              color: Colors.white70,
+            ),
           ),
         ],
       ),

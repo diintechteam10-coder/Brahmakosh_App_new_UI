@@ -198,8 +198,8 @@ class CompleteProfileView extends StatelessWidget {
                       const SizedBox(height: 12),
 
                       AppInputField(
-                        label: "Gowthra",
-                        hint: "Gowthra",
+                        label: "Profession",
+                        hint: "Profession",
                         icon: Icons.auto_awesome_outlined,
                         controller: controller.gowthraController,
                       ),

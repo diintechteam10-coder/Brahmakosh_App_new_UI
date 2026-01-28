@@ -51,15 +51,14 @@ class _WalkthroughViewState extends State<WalkthroughView> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
-    // Using MediaQuery for responsiveness
     final size = MediaQuery.of(context).size;
-    final padding = MediaQuery.of(context).padding;
 
     return Scaffold(
       body: Stack(
         children: [
-          // Carousel
+          // Carousel Background
           PageView.builder(
             controller: _pageController,
             itemCount: _images.length,
@@ -81,128 +80,163 @@ class _WalkthroughViewState extends State<WalkthroughView> {
             },
           ),
 
-          // Overlay Content
+          // Main Content
           SafeArea(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+            child: Column(
+              children: [
+                SizedBox(height: size.height * 0.02),
+
+                // Header
+                Column(
                   children: [
-                    SizedBox(height: size.height * 0.02),
-
-                    // Header
-                    const Text(
+                    Text(
                       'Brahmakosh',
-                      style: TextStyle(
-                        fontFamily:
-                            'Serif', // Using a serif font to match design
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF5D2E18), // Dark Brown/Maroon
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Your Spiritual Operating System',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Color(0xFF8D6E63), // Lighter Brown
-                      ),
-                    ),
-
-                    SizedBox(
-                      height: size.height * 0.38,
-                    ), // Spacer for image visibility
-                    // Section Title
-                    const Text(
-                      'Choose Your Option',
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         fontFamily: 'Serif',
-                        fontSize: 24,
+                        fontSize: size.width * 0.05,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF5D2E18),
+                        color: const Color(0xFF5D2E18),
                       ),
                     ),
-                    const SizedBox(height: 20),
-
-                    // Option Cards
-                    _buildOptionCard(
-                      icon: Icons.spa_outlined, // Lotus-like
-                      title: 'Are You Spiritual?',
-                      subtitle:
-                          'Pause, reflect, and track your spiritual growth',
-                      onTap: () {
-                        Get.offAllNamed(
-                          AppConstants.routeDashboard,
-                          arguments: 1,
-                        );
-                      },
+                    const SizedBox(height: 4),
+                    Text(
+                      'Your Spiritual Operating System',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: size.width * 0.04,
+                        color: const Color(0xFF8D6E63),
+                      ),
                     ),
-                    const SizedBox(height: 16),
-                    _buildOptionCard(
-                      icon: Icons.auto_awesome_outlined, // Sparkles/Hand-like
-                      title: 'Divine Guidance from Krishna',
-                      subtitle:
-                          'Seek wisdom, comfort, and clarity on your life path',
-                      onTap: () {
-                        if (!Get.isRegistered<AgentController>()) {
-                          Get.put(AgentController());
-                        }
-                        Get.to(
-                          () => const RashmiChat(
-                            backgroundImage: 'assets/images/Krishna_chat.png',
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    _buildOptionCard(
-                      icon:
-                          Icons.settings_suggest_outlined, // Chakra/Wheel-like
-                      title: 'Cosmic Alignment & Energies',
-                      subtitle: 'Learn Kundali, astrology, and sacred timings',
-                      onTap: () {
-                        Get.offAllNamed(AppConstants.routeDashboard);
-                      },
-                    ),
-
-                    const SizedBox(height: 20),
                   ],
                 ),
-              ),
+
+                const Spacer(flex: 3), // Pushes button down
+                // Talk to Krishna Button
+                GestureDetector(
+                  onTap: () {
+                    if (!Get.isRegistered<AgentController>()) {
+                      Get.put(AgentController());
+                    }
+                    Get.to(
+                      () => const RashmiChat(
+                        backgroundImage: 'assets/images/Krishna_chat.png',
+                      ),
+                    );
+                  },
+                  child: Container(
+                    width: size.width > 600 ? 400 : size.width * 0.75,
+                    padding: EdgeInsets.symmetric(
+                      vertical: size.height * 0.015,
+                      horizontal: size.width * 0.05,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFFFE082), Color(0xFFFFB300)],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Talk to Krishna',
+                          style: TextStyle(
+                            fontFamily: 'Serif',
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF5D2E18),
+                          ),
+                        ),
+                        const Text(
+                          'Powered by BI',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF5D2E18),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                // Section Title
+                const Text(
+                  'Choose a path that resonates with you',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'Serif',
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF5D2E18),
+                  ),
+                ),
+
+                //const Spacer(flex: 1), // Space between title and cards
+                const SizedBox(height: 10),
+                // Option Cards
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    children: [
+                      _buildOptionCard(
+                        icon: Icons.spa_outlined,
+                        title: 'Are You Spiritual?',
+                        subtitle:
+                            'Pause, reflect, and track your spiritual growth',
+                        onTap: () {
+                          Get.offAllNamed(
+                            AppConstants.routeDashboard,
+                            arguments: 1,
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 6),
+                      _buildOptionCard(
+                        icon: Icons.auto_awesome_outlined,
+                        title: 'Divine Guidance from Krishna',
+                        subtitle:
+                            'Seek wisdom, comfort, and clarity on your life path',
+                        onTap: () {
+                          if (!Get.isRegistered<AgentController>()) {
+                            Get.put(AgentController());
+                          }
+                          Get.to(
+                            () => const RashmiChat(
+                              backgroundImage: 'assets/images/Krishna_chat.png',
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 6),
+                      _buildOptionCard(
+                        icon: Icons.settings_suggest_outlined,
+                        title: 'Cosmic Alignment & Energies',
+                        subtitle:
+                            'Learn Kundali, astrology, and sacred timings',
+                        onTap: () {
+                          Get.offAllNamed(AppConstants.routeDashboard);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(height: size.height * 0.02),
+              ],
             ),
           ),
-
-          // Next Button (Top Right)
-          // Positioned(
-          //   top: padding.top + 20,
-          //   right: 20,
-          //   child: GestureDetector(
-          //     onTap: () {
-          //       Get.offAllNamed(AppConstants.routeDashboard);
-          //     },
-          //     child: Container(
-          //       padding: const EdgeInsets.symmetric(
-          //         horizontal: 20,
-          //         vertical: 10,
-          //       ),
-          //       decoration: BoxDecoration(
-          //         color: Colors.black.withOpacity(0.5),
-          //         borderRadius: BorderRadius.circular(20),
-          //         border: Border.all(color: Colors.white, width: 1),
-          //       ),
-          //       child: const Text(
-          //         'Next',
-          //         style: TextStyle(
-          //           color: Colors.white,
-          //           fontWeight: FontWeight.bold,
-          //           fontSize: 16,
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // ),
         ],
       ),
     );
@@ -217,14 +251,11 @@ class _WalkthroughViewState extends State<WalkthroughView> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: const Color(0xFF4A1818), // Dark Maroon background
+          color: const Color(0xFF4A1818),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: const Color(0xFFD4AF37),
-            width: 1.5,
-          ), // Gold border
+          border: Border.all(color: const Color(0xFFD4AF37), width: 1.5),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.3),
@@ -235,22 +266,15 @@ class _WalkthroughViewState extends State<WalkthroughView> {
         ),
         child: Row(
           children: [
-            // Icon Circle
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color: const Color(0xFFD4AF37), width: 1.5),
               ),
-              child: Icon(
-                icon,
-                color: const Color(0xFFD4AF37), // Gold icon
-                size: 28,
-              ),
+              child: Icon(icon, color: const Color(0xFFD4AF37), size: 20),
             ),
-            const SizedBox(width: 16),
-
-            // Text Content
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -258,29 +282,27 @@ class _WalkthroughViewState extends State<WalkthroughView> {
                   Text(
                     title,
                     style: const TextStyle(
-                      color: Color(0xFFD4AF37), // Gold title
-                      fontSize: 18,
+                      color: Color(0xFFD4AF37),
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Serif',
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Text(
                     subtitle,
                     style: const TextStyle(
-                      color: Color(0xFFCBB2A6), // Light brownish text
-                      fontSize: 14,
+                      color: Color(0xFFCBB2A6),
+                      fontSize: 11,
                     ),
                   ),
                 ],
               ),
             ),
-
-            // Arrow Icon
             const Icon(
               Icons.arrow_forward_ios,
               color: Color(0xFFD4AF37),
-              size: 16,
+              size: 14,
             ),
           ],
         ),

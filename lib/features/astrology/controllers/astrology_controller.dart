@@ -12,39 +12,51 @@ import '../views/astrologist_profile_view.dart';
 
 class AstrologyController extends GetxController {
   final _experts = <AstrologistItem>[].obs;
-  final _categories = ["Astrology", "Tarot", "Numerology", "Vastu", "Reiki"].obs;
-  final _selectedCategory = "Astrology".obs;
+  final _categories = <Map<String, dynamic>>[].obs;
+  final _selectedCategoryId = "all".obs; // Store ID of selected category
   final _searchQuery = "".obs;
   final searchController = TextEditingController();
+  final categoryScrollController = ScrollController();
   final isLoading = false.obs;
   bool _hasLoadedOnce = false;
 
   List<AstrologistItem> get experts => _experts;
-  List<String> get categories => _categories;
-  String get selectedCategory => _selectedCategory.value;
-  
+  List<Map<String, dynamic>> get categories => _categories;
+  String get selectedCategoryId => _selectedCategoryId.value;
+
   List<AstrologistItem> get filteredExperts {
     final query = _searchQuery.value.toLowerCase();
+
+    // Find selected category name for filtering - REMOVED as we don't filter by name anymore
+    // String selectedCategoryName = "Astrology";
+    // if (_selectedCategoryId.value != "all") { ... }
+
     return _experts.where((expert) {
       // Parse skills from expertise
       final skills = expert.expertise != null && expert.expertise!.isNotEmpty
-          ? expert.expertise!.split(',').map((e) => e.trim().toLowerCase()).toList()
+          ? expert.expertise!
+                .split(',')
+                .map((e) => e.trim().toLowerCase())
+                .toList()
           : <String>[];
-      
-      final matchesCategory = selectedCategory == "Astrology" || 
-        skills.any((skill) => skill.contains(selectedCategory.toLowerCase()));
-      
+
+      // Note: We do NOT filter by category name here anymore.
+      // The API already filters by category ID when we call fetchExperts(categoryId: ...).
+      // Client-side filtering by name was causing issues (e.g. "Healer" vs "Energy Healing").
+
       final expertName = (expert.name ?? '').toLowerCase();
       final languages = expert.languages ?? [];
-      
-      final matchesSearch = query.isEmpty || 
-        expertName.contains(query) ||
-        skills.any((skill) => skill.contains(query)) ||
-        languages.any((lang) => lang.toLowerCase().contains(query));
-      return matchesCategory && matchesSearch;
+
+      final matchesSearch =
+          query.isEmpty ||
+          expertName.contains(query) ||
+          skills.any((skill) => skill.contains(query)) ||
+          languages.any((lang) => lang.toLowerCase().contains(query));
+
+      return matchesSearch;
     }).toList();
   }
-  
+
   List<AstrologistItem> get trendingExperts {
     // Return top rated experts as trending
     final sorted = List<AstrologistItem>.from(_experts);
@@ -55,88 +67,168 @@ class AstrologyController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    fetchCategories();
     fetchExperts(); // initial load (cached by fetchExperts)
     searchController.addListener(() {
       _searchQuery.value = searchController.text;
     });
   }
 
+  Future<void> fetchCategories() async {
+    try {
+      final token = StorageService.getString(AppConstants.keyAuthToken) ?? '';
+      await callWebApiGet(
+        null,
+        ApiUrls.sadhnaServices,
+        token: token,
+        showLoader: false,
+        hideLoader: false,
+        onResponse: (response) {
+          print("📦 Categories Response Code: ${response.statusCode}");
+          print("📦 Categories Response Body: ${response.body}");
+
+          final responseBody = json.decode(response.body);
+          if (responseBody['success'] == true && responseBody['data'] != null) {
+            final data = responseBody['data'];
+            List<dynamic> categoryList = [];
+
+            if (data is Map && data['data'] is List) {
+              categoryList = data['data'];
+            } else if (data is List) {
+              categoryList = data;
+            }
+
+            print("✅ Parsed ${categoryList.length} categories");
+
+            if (categoryList.isNotEmpty) {
+              _categories.value = categoryList.cast<Map<String, dynamic>>();
+
+              // Select first category by default if not "all"
+              // But usually "All" is the first tab.
+              // If we want to slide to position, we'll handle that in the view.
+            }
+          } else {
+            print("❌ Categories API Success is false or data null");
+          }
+        },
+        onError: (error) {
+          print("❌ Error fetching categories: $error");
+        },
+      );
+    } catch (e) {
+      print("Error in fetchCategories: $e");
+    }
+  }
+
+  void selectCategory(String id) {
+    _selectedCategoryId.value = id;
+    fetchExperts(force: true, categoryId: id);
+  }
+
   /// Fetch experts.
-  /// - If experts are already loaded, this will NOT re-fetch unless [force] is true.
-  /// - Shimmer (`isLoading`) is shown only on first load or manual refresh.
-  Future<void> fetchExperts({bool force = false}) async {
-    if (!force && _hasLoadedOnce && _experts.isNotEmpty) return;
+  /// - If [categoryId] is provided and not 'all', it filters by category.
+  Future<void> fetchExperts({bool force = false, String? categoryId}) async {
+    final targetCategory = categoryId ?? _selectedCategoryId.value;
+    if (!force &&
+        _hasLoadedOnce &&
+        _experts.isNotEmpty &&
+        targetCategory == _selectedCategoryId.value)
+      return;
 
     final shouldShowLoading = force || _experts.isEmpty;
     if (shouldShowLoading) isLoading.value = true;
-    
+
     try {
       final token = StorageService.getString(AppConstants.keyAuthToken) ?? '';
 
+      String url = ApiUrls.experts;
+      // final targetCategory = categoryId ?? _selectedCategoryId.value; // Already defined above
+      if (targetCategory != "all") {
+        url += "?category=$targetCategory";
+      }
+
+      print("🚀 Fetching Experts from: $url");
+
       await callWebApiGet(
         null,
-        ApiUrls.experts,
+        url,
         token: token,
         showLoader: false,
         hideLoader: false,
         onResponse: (response) {
           try {
+            print("📦 Experts Response Code: ${response.statusCode}");
+            print("📦 Experts Response Body: ${response.body}");
+
             final responseBody = json.decode(response.body);
-            print("📦 Experts Response: ${response.body}");
 
             if (responseBody['success'] == true) {
               // Handle different response structures
               var data = responseBody['data'];
-              
+              List<AstrologistItem> parsedExperts = [];
+
               if (data is List) {
                 // Direct list structure
-                _experts.value = data
+                parsedExperts = data
                     .map((item) => AstrologistItem.fromJson(item))
-                    .where((item) => item.isActive == true && item.isDeleted != true)
+                    .where(
+                      (item) => item.isActive == true && item.isDeleted != true,
+                    )
                     .toList();
               } else if (data is Map) {
                 // Nested structure
                 if (data['data'] != null && data['data'] is List) {
-                  _experts.value = (data['data'] as List)
+                  parsedExperts = (data['data'] as List)
                       .map((item) => AstrologistItem.fromJson(item))
-                      .where((item) => item.isActive == true && item.isDeleted != true)
+                      .where(
+                        (item) =>
+                            item.isActive == true && item.isDeleted != true,
+                      )
                       .toList();
                 } else {
                   // Try AstrologistModel structure
                   final expertModel = AstrologistModel.fromJson(responseBody);
                   if (expertModel.data != null) {
-                    _experts.value = expertModel.data!
-                        .where((item) => item.isActive == true && item.isDeleted != true)
+                    parsedExperts = expertModel.data!
+                        .where(
+                          (item) =>
+                              item.isActive == true && item.isDeleted != true,
+                        )
                         .toList();
                   }
                 }
               }
 
+              print("✅ Parsed ${parsedExperts.length} experts");
+              _experts.value = parsedExperts;
+
               // Fallback to mock data if API returns empty
               if (_experts.isEmpty) {
-                _loadMockData();
+                print("⚠️ API returned 0 experts.");
+                // _loadMockData(); // REMOVED MOCK DATA FALLBACK
               }
             } else {
+              print("❌ API Success is false: ${responseBody['message']}");
               // Fallback to mock data on API error
-              _loadMockData();
+              // _loadMockData(); // REMOVED MOCK DATA FALLBACK
             }
           } catch (e) {
             print("❌ Error parsing experts: $e");
-            _loadMockData(); // Fallback to mock data
+            // _loadMockData(); // Fallback to mock data // REMOVED MOCK DATA FALLBACK
           }
           _hasLoadedOnce = true;
           if (shouldShowLoading) isLoading.value = false;
         },
         onError: (error) {
           print("❌ Error fetching experts: $error");
-          _loadMockData(); // Fallback to mock data
+          // _loadMockData(); // Fallback to mock data // REMOVED MOCK DATA FALLBACK
           _hasLoadedOnce = true;
           if (shouldShowLoading) isLoading.value = false;
         },
       );
     } catch (e) {
       print("❌ Exception in fetchExperts: $e");
-      _loadMockData(); // Fallback to mock data
+      // _loadMockData(); // Fallback to mock data // REMOVED MOCK DATA FALLBACK
       _hasLoadedOnce = true;
       if (shouldShowLoading) isLoading.value = false;
     }
@@ -147,91 +239,13 @@ class AstrologyController extends GetxController {
     await fetchExperts(force: true);
   }
 
-  void _loadMockData() {
-    _experts.value = [
-      AstrologistItem(
-        id: "1",
-        name: "Acharya Mukesh",
-        profilePhoto: "https://randomuser.me/api/portraits/men/1.jpg",
-        expertise: "Vedic, Vastu, Palmistry",
-        languages: ["Hindi", "English"],
-        experience: "12",
-        rating: 4.8,
-        reviews: 15400,
-        chatCharge: 25,
-        voiceCharge: 30,
-        videoCharge: 50,
-        status: "online",
-        profileSummary: "Acharya Mukesh is a world-renowned Vedic astrologer with over 12 years of experience. He specializes in Vastu Shastra and Palmistry, providing deep insights into personal and professional life.",
-        isActive: true,
-        isDeleted: false,
-      ),
-      AstrologistItem(
-        id: "2",
-        name: "Tarot Sunita",
-        profilePhoto: "https://randomuser.me/api/portraits/women/2.jpg",
-        expertise: "Tarot, Numerology",
-        languages: ["Hindi", "English", "Punjabi"],
-        experience: "8",
-        rating: 4.9,
-        reviews: 9800,
-        chatCharge: 20,
-        voiceCharge: 25,
-        videoCharge: 45,
-        status: "online",
-        profileSummary: "Sunita is an expert Tarot Reader and Numerologist. Her intuitive readings have helped thousands find their true path in life.",
-        isActive: true,
-        isDeleted: false,
-      ),
-      AstrologistItem(
-        id: "3",
-        name: "Pandit Rajesh",
-        profilePhoto: "https://randomuser.me/api/portraits/men/3.jpg",
-        expertise: "Vedic, Palmistry",
-        languages: ["Hindi", "Sanskrit"],
-        experience: "25",
-        rating: 4.7,
-        reviews: 45000,
-        chatCharge: 40,
-        voiceCharge: 45,
-        videoCharge: 60,
-        status: "offline",
-        profileSummary: "One of the most senior astrologers with a vast knowledge of Sanskrit and ancient Vedic texts.",
-        isActive: true,
-        isDeleted: false,
-      ),
-      AstrologistItem(
-        id: "4",
-        name: "Acharya Aditya",
-        profilePhoto: "https://randomuser.me/api/portraits/men/4.jpg",
-        expertise: "Vedic, Nadi",
-        languages: ["Hindi", "English"],
-        experience: "15",
-        rating: 4.9,
-        reviews: 25000,
-        chatCharge: 30,
-        voiceCharge: 35,
-        videoCharge: 55,
-        status: "online",
-        profileSummary: "Acharya Aditya is a highly experienced astrologer specializing in Nadi astrology.",
-        isActive: true,
-        isDeleted: false,
-      ),
-    ];
-  }
-
-  void selectCategory(String category) {
-    _selectedCategory.value = category;
-  }
-
   void navigateToProfile(AstrologistItem expert) {
     Get.to(() => AstrologistProfileView(expert: expert));
   }
 
-void startChat(AstrologistItem expert) {
-  Get.to(() => AstrologyChatView(expert: expert.toAstrologist()));
-}
-
+  void startChat(AstrologistItem expert) {
+    Get.to(() => AstrologyChatView(expert: expert.toAstrologist()));
+  }
 
   void filterExperts() {
     // This is handled by Obx in the view using the searchController listener
@@ -263,7 +277,10 @@ void startChat(AstrologistItem expert) {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                IconButton(onPressed: () => Get.back(), icon: const Icon(Icons.close)),
+                IconButton(
+                  onPressed: () => Get.back(),
+                  icon: const Icon(Icons.close),
+                ),
               ],
             ),
             const Divider(),
@@ -279,11 +296,18 @@ void startChat(AstrologistItem expert) {
                 return InkWell(
                   onTap: () {
                     Get.back();
-                    Get.snackbar("Success", "Wallet recharged with \u20B9$amount",
-                      backgroundColor: Colors.green, colorText: Colors.white);
+                    Get.snackbar(
+                      "Success",
+                      "Wallet recharged with \u20B9$amount",
+                      backgroundColor: Colors.green,
+                      colorText: Colors.white,
+                    );
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
                       border: Border.all(color: AppTheme.primaryGold),
                       borderRadius: BorderRadius.circular(10),
@@ -303,16 +327,21 @@ void startChat(AstrologistItem expert) {
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.primaryGold,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 child: const Text(
                   "Proceed to Pay",
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
-             const SizedBox(height: 30),
+            const SizedBox(height: 30),
           ],
         ),
       ),
@@ -327,17 +356,23 @@ void startChat(AstrologistItem expert) {
   }
 
   void openUserProfile() {
-    Get.snackbar("Profile", "Opening Account details...",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xFF10B981),
-        colorText: Colors.white);
+    Get.snackbar(
+      "Profile",
+      "Opening Account details...",
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: const Color(0xFF10B981),
+      colorText: Colors.white,
+    );
   }
 
   void openFAQs() {
-    Get.snackbar("FAQs", "Opening Help & Support...",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xFFF59E0B),
-        colorText: Colors.white);
+    Get.snackbar(
+      "FAQs",
+      "Opening Help & Support...",
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: const Color(0xFFF59E0B),
+      colorText: Colors.white,
+    );
   }
 
   @override

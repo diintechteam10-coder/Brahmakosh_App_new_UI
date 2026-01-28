@@ -8,10 +8,11 @@ import '../../../common/utils.dart';
 import '../viewmodels/dashboard_viewmodel.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../../home/views/home_view.dart';
-import '../../services/views/services_view.dart';
+
 import '../../services/controllers/services_controller.dart';
 import '../../report/views/report_view.dart';
 import '../../check_in/views/check_in_view.dart';
+import '../../astrology/views/astrology_experts_view.dart';
 
 class DashboardView extends StatelessWidget {
   const DashboardView({super.key});
@@ -51,16 +52,17 @@ class DashboardView extends StatelessWidget {
         ),
       ],
       child: Scaffold(
+        extendBody: true,
         drawer: const AppDrawer(),
         body: Consumer<DashboardViewModel>(
           builder: (context, viewModel, child) {
             return IndexedStack(
               index: viewModel.currentIndex,
-              children: const [
+              children: [
                 HomeView(),
                 CheckInView(),
                 RashmiAi(),
-                ServicesView(),
+                AstrologyExpertsView(screenTitle: "Connect"),
                 ComingSoonView(title: 'Remedies'),
                 ReportView(), // Keeping ReportView for My Kosh (Drawer navigation)
               ],
@@ -73,12 +75,9 @@ class DashboardView extends StatelessWidget {
             if (viewModel.currentIndex == 2) {
               return const SizedBox.shrink();
             }
-            return SafeArea(
-              top: false,
-              child: CustomBottomNavBar(
-                currentIndex: viewModel.currentIndex,
-                onTap: viewModel.changeTab,
-              ),
+            return CustomBottomNavBar(
+              currentIndex: viewModel.currentIndex,
+              onTap: viewModel.changeTab,
             );
           },
         ),

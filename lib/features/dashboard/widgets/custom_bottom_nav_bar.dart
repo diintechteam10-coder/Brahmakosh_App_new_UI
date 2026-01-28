@@ -59,59 +59,72 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar>
   Widget build(BuildContext context) {
     final isRashmiSelected = widget.currentIndex == 2;
 
-    return Container(
-      height: 70,
-      decoration: BoxDecoration(
-        color: AppTheme.cardBackground,
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.primaryGold.withOpacity(0.15),
-            blurRadius: 15,
-            offset: const Offset(0, -3),
-          ),
-        ],
-      ),
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
+    return SizedBox(
+      height:
+          110 +
+          bottomPadding, // Increased height to include the floating button and bottom padding
       child: Stack(
         clipBehavior: Clip.none,
+        alignment: Alignment.bottomCenter,
         children: [
-          // Bottom Navigation Items (flat background, no curve line)
-          Padding(
-            padding: const EdgeInsets.only(top: 8, bottom: 4),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _buildNavItem(
-                  icon: Icons.home_rounded,
-                  label: 'Home',
-                  index: 0,
+          // Bottom Navigation Background & Items
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 70 + bottomPadding,
+              decoration: BoxDecoration(
+                color: AppTheme.cardBackground,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.primaryGold.withOpacity(0.15),
+                    blurRadius: 15,
+                    offset: const Offset(0, -3),
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: EdgeInsets.only(top: 8, bottom: 4 + bottomPadding),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _buildNavItem(
+                      icon: Icons.home_rounded,
+                      label: 'Home',
+                      index: 0,
+                    ),
+                    _buildNavItem(
+                      icon: Icons.search_rounded,
+                      svgPath: 'assets/images/checked.png',
+                      label: 'Check-In',
+                      index: 1,
+                    ),
+                    const SizedBox(width: 70),
+                    _buildNavItem(
+                      icon: Icons.self_improvement_rounded,
+                      label: 'Connect',
+                      index: 3,
+                    ),
+                    _buildNavItem(
+                      icon: Icons.card_giftcard_rounded,
+                      label: 'Remedies',
+                      index: 4,
+                    ),
+                  ],
                 ),
-                _buildNavItem(
-                  icon: Icons.search_rounded,
-                  svgPath: 'assets/images/checked.png',
-                  label: 'Check-In',
-                  index: 1,
-                ),
-                const SizedBox(width: 70),
-                _buildNavItem(
-                  icon: Icons.self_improvement_rounded,
-                  label: 'Connect',
-                  index: 3,
-                ),
-                _buildNavItem(
-                  icon: Icons.card_giftcard_rounded,
-                  label: 'Remedies',
-                  index: 4,
-                ),
-              ],
+              ),
             ),
           ),
-          // Center Floating Button with rotation
+          // Center Floating Button
           Positioned(
-            left: MediaQuery.of(context).size.width / 2 - 35,
-            top: -40, // Adjusted top to accommodate label
+            top: 0,
             child: GestureDetector(
               onTap: () => widget.onTap(2),
+              behavior: HitTestBehavior.opaque, // Ensure taps are caught
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -194,7 +207,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar>
                                     width: 60,
                                     height: 60,
                                     child: Image.asset(
-                                      'assets/images/rashmi_bi_without.jpeg',
+                                      'assets/images/brahmkosh_logo.jpeg',
                                       fit: BoxFit.cover,
                                     ),
                                   ),
