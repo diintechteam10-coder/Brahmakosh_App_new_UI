@@ -118,7 +118,7 @@ class AppPages {
         }
       }),
     ),
-    GetPage(name: AppConstants.routeCheckIn, page: () => const CheckInView()),
+    GetPage(name: AppConstants.routeCheckIn, page: () => CheckInView()),
     GetPage(
       name: AppConstants.routeMeditate,
       page: () => const MeditateScreen(),

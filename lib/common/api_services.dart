@@ -17,6 +17,7 @@ import 'package:brahmakosh/common/models/sponsor_model.dart';
 import 'package:brahmakosh/common/models/chanting_mantra.dart';
 import 'package:brahmakosh/common/models/brahm_reel.dart';
 import 'package:brahmakosh/common/models/get_loc.dart';
+import 'package:brahmakosh/features/check_in/models/spiritual_checkin_model.dart';
 
 const bool allowInsecureDevFallback = false;
 
@@ -741,4 +742,27 @@ Future<GetCurrentLoc?> getReverseGeocode(
     shouldLogoutOn401: false,
   );
   return result;
+}
+
+Future<SpiritualCheckinResponse?> getSpiritualCheckin(
+  TickerProvider? tickerProvider,
+) async {
+  SpiritualCheckinResponse? checkinResponse;
+  final token = StorageService.getString(AppConstants.keyAuthToken) ?? "";
+  await callWebApiGet(
+    tickerProvider,
+    ApiUrls.spiritualCheckin,
+    token: token,
+    onResponse: (response) {
+      checkinResponse = SpiritualCheckinResponse.fromJson(
+        jsonDecode(response.body),
+      );
+    },
+    onError: (error) {
+      Utils.print('Error fetching spiritual checkin: $error');
+    },
+    showLoader: false,
+    shouldLogoutOn401: false,
+  );
+  return checkinResponse;
 }

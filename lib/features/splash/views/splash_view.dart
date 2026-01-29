@@ -1,4 +1,3 @@
-import 'package:brahmakosh/core/custom_widgets/splash_welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/common_imports.dart';
@@ -40,12 +39,47 @@ class _SplashViewState extends State<SplashView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: SizedBox.expand(
-        child: WelcomeVideo(
-          videoAsset: 'assets/images/app_launcher.mp4',
-          fit: BoxFit.cover, // 🔥 full screen cover
-          loop: false,
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/images/brahmkosh_logo.jpeg',
+                  height: 200,
+                  width: 200,
+                ),
+                //const SizedBox(height: 5),
+                Text(
+                  'BRAHMAKOSH',
+                  style: GoogleFonts.lora(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFFD4AF37), // Gold color
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Your Spiritual Operating System',
+                  style: GoogleFonts.lora(fontSize: 18, color: Colors.black87),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Spirituality • Astrology • Companion • Intelligence',
+                  style: GoogleFonts.lora(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

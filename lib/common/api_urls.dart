@@ -20,14 +20,16 @@ class ApiUrls {
 
   /// 🔹 Forgot Password APIs
   static const String forgotPassword = '$baseUrl/api/auth/user/forgot-password';
-  static const String verifyResetOtp = '$baseUrl/api/auth/user/verify-reset-otp';
+  static const String verifyResetOtp =
+      '$baseUrl/api/auth/user/verify-reset-otp';
   static const String resetPassword = '$baseUrl/api/auth/user/reset-password';
 
   /// 🔹 Testimonials
   static const String testimonials = '$baseUrl/api/testimonials';
   static const String founderMessages = '$baseUrl/api/founder-messages';
   static const String sponsors = '$baseUrl/api/sponsors';
-  static const String chantings = 'https://backend-jfg8.onrender.com/api/chantings';
+  static const String chantings =
+      'https://backend-jfg8.onrender.com/api/chantings';
   static const String liveAvatars = '$baseUrl/api/live-avatars';
 
   ///Sadhna APIs
@@ -36,4 +38,5 @@ class ApiUrls {
   static const String brahmAvatars = '$baseUrl/api/brahm-avatars';
   static const String updateLocation = '$apiUrl/user/get-location';
   static const String reverseGeocode = '$apiUrl/user/reverse-geocode';
+  static const String spiritualCheckin = '$apiUrl/content/spiritual-checkin';
 }
