@@ -128,7 +128,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
               // "our Sponsors section should also add from old screen"
               _buildSponsorsSection(),
-              const SizedBox(height: 20),
+              const SizedBox(height: 120),
             ],
           ),
         ),
@@ -157,7 +157,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                 fontSize: 18,
               ),
             ),
-            const SizedBox(height: 12),
+            //const SizedBox(height: 8),
             Container(
               height: 90,
               margin: const EdgeInsets.symmetric(vertical: 12),

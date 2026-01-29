@@ -30,6 +30,14 @@
           }
         },
         {
+          "client_id": "449350149768-6jpi7u46jb4qkrduq9rk8mp9l8peto7s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.brahmakosh.app",
+            "certificate_hash": "419b42f06b928b9e6ba3e0d1418f86277632abb6"
+          }
+        },
+        {
           "client_id": "449350149768-d2ekrp14osg4gm4bfcj5lil14shgrh83.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

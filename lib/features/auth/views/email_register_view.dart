@@ -147,35 +147,33 @@ class EmailRegisterView extends StatelessWidget {
                       activeColor: AppTheme.primaryGold,
                     ),
                   ),
-                  Expanded(
-                    child: RichText(
-                      text: TextSpan(
-                        text: "I accept the ",
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: Colors.black54,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: "Privacy Policy",
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: AppTheme.primaryGold,
-                              decoration: TextDecoration.underline,
-                            ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () async {
-                                final url = Uri.parse(
-                                  "https://www.brahmakosh.com/privacy-policy",
-                                );
-                                if (await canLaunchUrl(url)) {
-                                  await launchUrl(url);
-                                }
-                              },
-                          ),
-                        ],
+                  RichText(
+                    text: TextSpan(
+                      text: "I accept the ",
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: Colors.black54,
                       ),
+                      children: [
+                        TextSpan(
+                          text: "Privacy Policy",
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppTheme.primaryGold,
+                            decoration: TextDecoration.underline,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () async {
+                              final url = Uri.parse(
+                                "https://www.brahmakosh.com/privacy-policy",
+                              );
+                              if (await canLaunchUrl(url)) {
+                                await launchUrl(url);
+                              }
+                            },
+                        ),
+                      ],
                     ),
                   ),
                 ],
