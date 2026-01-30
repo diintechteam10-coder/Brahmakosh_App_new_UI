@@ -39,4 +39,3 @@ class StorageService {
     return await _prefs?.clear() ?? false;
   }
 }
-

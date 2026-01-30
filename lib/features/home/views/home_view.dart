@@ -28,7 +28,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   int selectedDateIndex = 1;
   bool isAM = true;
 
-  late final HomeController homeController = Get.put(HomeController());
+  final HomeController homeController = Get.put(HomeController());
   final PageController _pageController = PageController();
   final PageController _cardsPageController = PageController();
   Timer? _cardsTimer;

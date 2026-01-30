@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:brahmakosh/features/home/views/astrology_details_screen.dart';
 
 class DestinyGuidanceSection extends StatelessWidget {
   const DestinyGuidanceSection({super.key});
@@ -30,19 +31,30 @@ class DestinyGuidanceSection extends StatelessWidget {
                 context,
                 title: "Astrology",
                 subtitle: "Planetary movements\ninfluencing your day.",
-                icon: Icons.auto_awesome, // Using a generic star/sparkle icon
+                icon: Icons.auto_awesome,
                 color: const Color(0xFFFDECB6),
                 buttonText: "View Astrology",
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AstrologyDetailsScreen(),
+                    ),
+                  );
+                },
               ),
               const SizedBox(width: 12),
-              _buildCard(
-                context,
-                title: "Numerology",
-                subtitle: "Numbers reveal\nlife patterns & more.",
-                icon: Icons.star, // Using star as fallback
-                color: const Color(0xFFF2E3BC),
-                buttonText: "View Numerology",
-              ),
+              // _buildCard(
+              //   context,
+              //   title: "Numerology",
+              //   subtitle: "Numbers reveal\nlife patterns & more.",
+              //   icon: Icons.star,
+              //   color: const Color(0xFFF2E3BC),
+              //   buttonText: "View Numerology",
+              //   onTap: () {
+              //     // Navigate to Numerology screen
+              //   },
+              // ),
             ],
           ),
         ),
@@ -57,78 +69,82 @@ class DestinyGuidanceSection extends StatelessWidget {
     required IconData icon,
     required Color color,
     required String buttonText,
+    required VoidCallback onTap,
   }) {
-    return Container(
-      width: 280,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white.withOpacity(0.5),
-              border: Border.all(color: Colors.white, width: 2),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 280,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
-            child: Icon(icon, size: 28, color: const Color(0xFF874101)),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.playfairDisplay(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF6D3A0C),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: GoogleFonts.lora(
-                    fontSize: 12,
-                    color: const Color(0xFF596072),
-                    height: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    buttonText,
-                    style: GoogleFonts.lora(
-                      fontSize: 10,
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.5),
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+              child: Icon(icon, size: 28, color: const Color(0xFF874101)),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.playfairDisplay(
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFF6D3A0C),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.lora(
+                      fontSize: 12,
+                      color: const Color(0xFF596072),
+                      height: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      buttonText,
+                      style: GoogleFonts.lora(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF6D3A0C),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

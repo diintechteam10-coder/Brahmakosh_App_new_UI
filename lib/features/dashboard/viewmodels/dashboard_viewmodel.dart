@@ -48,8 +48,8 @@ class DashboardViewModel extends ChangeNotifier {
     Utils.print(
       'initLocationUpdate called, current _locationCalled: $_locationCalled, force: $forceRefresh',
     );
-    if (_locationCalled && !forceRefresh) return;
-    _locationCalled = true;
+    // if (_locationCalled && !forceRefresh) return;
+    // _locationCalled = true;
 
     // Load cached location if available
     _userLocationAddress = StorageService.getString(

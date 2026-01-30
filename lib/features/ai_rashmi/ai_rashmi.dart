@@ -35,13 +35,13 @@ class _RashmiAiView extends StatefulWidget {
 }
 
 class _RashmiAiViewState extends State<_RashmiAiView> {
-  late VideoPlayerController _vicontroller;
+  VideoPlayerController? _vicontroller;
   final TextEditingController _controller = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _previousTabIndex = -1;
   final DeitySelectionService _deityService = DeitySelectionService();
   bool _isInitialized = false;
-  Data? _currentDeity; // Track current deity to detect changes
+  Data? _currentDeity;
 
   @override
   void initState() {
@@ -54,14 +54,15 @@ class _RashmiAiViewState extends State<_RashmiAiView> {
 
   Future<void> _ensureDeitySelected() async {
     final agentController = Get.find<AgentController>();
-    
+
     // Fetch avatars if empty
     if (agentController.avatars.isEmpty) {
       await agentController.fetchAvatars(null);
     }
 
     // If still no deity selected, pick the first one from API
-    if (_deityService.selectedDeity == null && agentController.avatars.isNotEmpty) {
+    if (_deityService.selectedDeity == null &&
+        agentController.avatars.isNotEmpty) {
       _deityService.setSelectedDeity(agentController.avatars.first);
     }
 
@@ -77,6 +78,9 @@ class _RashmiAiViewState extends State<_RashmiAiView> {
       return;
     }
 
+    // Dispose previous controller if exists
+    _vicontroller?.dispose();
+
     if (videoPath.startsWith('http')) {
       _vicontroller = VideoPlayerController.network(videoPath);
     } else {
@@ -84,10 +88,10 @@ class _RashmiAiViewState extends State<_RashmiAiView> {
     }
 
     try {
-      await _vicontroller.initialize();
+      await _vicontroller!.initialize();
       if (mounted) {
-        _vicontroller.setLooping(false);
-        _vicontroller.setVolume(1.0);
+        _vicontroller!.setLooping(false);
+        _vicontroller!.setVolume(1.0);
         _isInitialized = true;
         setState(() {});
       }
@@ -120,16 +124,20 @@ class _RashmiAiViewState extends State<_RashmiAiView> {
         }
       } else {
         // Same deity, resume playing from where it was paused
-        if (_vicontroller.value.isInitialized && !_vicontroller.value.isPlaying) {
-          _vicontroller.play();
+        if (_vicontroller != null &&
+            _vicontroller!.value.isInitialized &&
+            !_vicontroller!.value.isPlaying) {
+          _vicontroller!.play();
         }
       }
     }
 
     // If we're navigating away from this tab, pause the video
     if (currentIndex != 2 && _previousTabIndex == 2) {
-      if (_vicontroller.value.isInitialized && _vicontroller.value.isPlaying) {
-        _vicontroller.pause();
+      if (_vicontroller != null &&
+          _vicontroller!.value.isInitialized &&
+          _vicontroller!.value.isPlaying) {
+        _vicontroller!.pause();
       }
     }
 
@@ -141,10 +149,10 @@ class _RashmiAiViewState extends State<_RashmiAiView> {
     if (videoPath == null) return;
     try {
       // Pause and dispose the old controller
-      if (_vicontroller.value.isInitialized) {
-        await _vicontroller.pause();
+      if (_vicontroller != null && _vicontroller!.value.isInitialized) {
+        await _vicontroller!.pause();
       }
-      await _vicontroller.dispose();
+      _vicontroller?.dispose(); // Use safe call
 
       _isInitialized = false;
       setState(() {});
@@ -158,11 +166,11 @@ class _RashmiAiViewState extends State<_RashmiAiView> {
       } else {
         _vicontroller = VideoPlayerController.asset(videoPath);
       }
-      await _vicontroller.initialize();
+      await _vicontroller!.initialize();
 
       if (mounted) {
-        _vicontroller.setLooping(false);
-        _vicontroller.setVolume(1.0);
+        _vicontroller!.setLooping(false);
+        _vicontroller!.setVolume(1.0);
         _isInitialized = true;
         setState(() {});
 
@@ -179,9 +187,9 @@ class _RashmiAiViewState extends State<_RashmiAiView> {
   }
 
   void _playVideoFromStart() {
-    if (_vicontroller.value.isInitialized) {
-      _vicontroller.seekTo(Duration.zero); // Reset to beginning
-      _vicontroller.play();
+    if (_vicontroller != null && _vicontroller!.value.isInitialized) {
+      _vicontroller!.seekTo(Duration.zero); // Reset to beginning
+      _vicontroller!.play();
       setState(() {});
     }
   }
@@ -189,8 +197,8 @@ class _RashmiAiViewState extends State<_RashmiAiView> {
   @override
   void dispose() {
     _controller.dispose();
-    _vicontroller.pause();
-    _vicontroller.dispose();
+    _vicontroller?.pause();
+    _vicontroller?.dispose();
     super.dispose();
   }
 
@@ -232,15 +240,17 @@ class _RashmiAiViewState extends State<_RashmiAiView> {
             drawer: _buildDrawer(vm),
             body: Stack(
               children: [
-                // Video Background - यहाँ VideoPlayer widget use हो रहा है, AssetImage नहीं!
+                // Video Background - Using VideoPlayer widget
                 Positioned.fill(
-                  child: _vicontroller.value.isInitialized
+                  child:
+                      (_vicontroller != null &&
+                          _vicontroller!.value.isInitialized)
                       ? FittedBox(
                           fit: BoxFit.cover,
                           child: SizedBox(
-                            width: _vicontroller.value.size.width,
-                            height: _vicontroller.value.size.height,
-                            child: VideoPlayer(_vicontroller),
+                            width: _vicontroller!.value.size.width,
+                            height: _vicontroller!.value.size.height,
+                            child: VideoPlayer(_vicontroller!),
                           ),
                         )
                       : Container(color: Colors.black),
@@ -271,8 +281,7 @@ class _RashmiAiViewState extends State<_RashmiAiView> {
                           // Change Deity Button
                           GestureDetector(
                             onTap: () async {
-                              // Pause video
-                              _vicontroller.pause();
+                              _vicontroller?.pause();
 
                               // Navigate to Aradhya Selection
                               await Get.to(
@@ -341,7 +350,7 @@ class _RashmiAiViewState extends State<_RashmiAiView> {
                             icon: const Icon(Icons.close, color: Colors.white),
                             onPressed: () {
                               // Stop and pause video
-                              _vicontroller.pause();
+                              _vicontroller?.pause();
 
                               // Navigate back to Home (index 0) in dashboard
                               final dashboardViewModel =
@@ -370,12 +379,16 @@ class _RashmiAiViewState extends State<_RashmiAiView> {
                       GestureDetector(
                         onTap: () {
                           // Stop video before navigating
-                          _vicontroller.pause();
+                          _vicontroller?.pause();
 
                           // Pass the selected agent's ID to the talk page
                           final agentId = _deityService.selectedDeity?.agentId;
-                          debugPrint('AiRashmi: Navigating to AvatarAgentPage with agentId: $agentId, deity: ${_deityService.selectedDeity?.name}');
-                          Get.to(() => AvatarAgentPage(initialAgentId: agentId));
+                          debugPrint(
+                            'AiRashmi: Navigating to AvatarAgentPage with agentId: $agentId, deity: ${_deityService.selectedDeity?.name}',
+                          );
+                          Get.to(
+                            () => AvatarAgentPage(initialAgentId: agentId),
+                          );
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(

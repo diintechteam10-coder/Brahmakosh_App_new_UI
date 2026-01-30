@@ -13,12 +13,7 @@ class LocationService {
     permission = await Geolocator.checkPermission();
     Utils.print('Initial location permission: $permission');
     if (permission == LocationPermission.denied) {
-      // Show custom dialog before requesting permission as per user request
-      Utils.print('Permission denied, showing dialog');
-      bool? shouldRequest = await _showPermissionDialog();
-      Utils.print('User choice for permission dialog: $shouldRequest');
-      if (shouldRequest != true) return null;
-
+      Utils.print('Permission denied, requesting permission');
       permission = await Geolocator.requestPermission();
       Utils.print('Permission after request: $permission');
       if (permission == LocationPermission.denied) {
@@ -29,7 +24,9 @@ class LocationService {
 
     if (permission == LocationPermission.deniedForever) {
       Utils.print('Permission denied forever');
-      Utils.showToast('Location permissions are permanently denied, we cannot request permissions.');
+      Utils.showToast(
+        'Location permissions are permanently denied, we cannot request permissions.',
+      );
       return null;
     }
 
@@ -58,28 +55,6 @@ class LocationService {
       Utils.print('Error getting location: $e');
       return null;
     }
-  }
-
-  static Future<bool?> _showPermissionDialog() async {
-    Utils.print('Displaying permission dialog...');
-    return await Get.dialog<bool>(
-      barrierDismissible: false,
-      AlertDialog(
-        title: const Text('Location Permission'),
-        content: const Text(
-          'Brahmakosh needs your location to provide personalized services. Please enable location permission.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(result: false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Get.back(result: true),
-            child: const Text('Enable'),
-          ),
-        ],
-    ));
   }
 
   static Future<bool?> _showServiceDisabledDialog() async {

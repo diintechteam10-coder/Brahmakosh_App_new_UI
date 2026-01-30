@@ -133,29 +133,46 @@ class AstrologistProfileView extends StatelessWidget {
                     backgroundImage: NetworkImage(imageUrl),
                   ),
                   const SizedBox(height: 6),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: isOnline
-                              ? AppTheme.successGreen
-                              : AppTheme.textSecondary,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        isOnline ? "Available" : "Offline",
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: AppTheme.textSecondary,
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 12),
+                  Text(
+                    "SKILLS:",
+                    style: GoogleFonts.cinzel(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    width: 130,
+                    child: Wrap(
+                      spacing: 4,
+                      runSpacing: 6,
+                      alignment: WrapAlignment.center,
+                      children: skills.map((skill) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: AppTheme.lightGold,
+                              width: 1.1,
+                            ),
+                          ),
+                          child: Text(
+                            skill,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.lora(
+                              fontSize: 10,
+                              color: AppTheme.textPrimary,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ],
               ),
@@ -189,72 +206,33 @@ class AstrologistProfileView extends StatelessWidget {
                     const SizedBox(height: 12),
 
                     Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          "Skills: ",
-                          style: GoogleFonts.cinzel(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w500,
-                            color: AppTheme.textPrimary,
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: isOnline
+                                ? AppTheme.successGreen
+                                : AppTheme.textSecondary,
                           ),
                         ),
-                        Expanded(
-                          child: Wrap(
-                            spacing: 8,
-                            runSpacing: 4,
-                            children: skills.map((skill) {
-                              return Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: AppTheme.lightGold,
-                                    width: 1.1,
-                                  ),
-                                ),
-                                child: Text(
-                                  skill,
-                                  style: GoogleFonts.lora(
-                                    fontSize: 10,
-                                    color: AppTheme.textPrimary,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
+                        const SizedBox(width: 6),
+                        Text(
+                          isOnline ? "Available" : "Offline",
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: isOnline
+                                ? AppTheme.successGreen
+                                : AppTheme.textSecondary,
                           ),
                         ),
                       ],
                     ),
 
                     const SizedBox(height: 8),
-
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Languages: ",
-                          style: GoogleFonts.cinzel(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w500,
-                            color: AppTheme.textSecondary,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            languages.join(", "),
-                            style: GoogleFonts.lora(
-                              fontSize: 10,
-                              color: AppTheme.textPrimary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
                   ],
                 ),
               ),
@@ -263,6 +241,30 @@ class AstrologistProfileView extends StatelessWidget {
 
           const SizedBox(height: 16),
 
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "LANGUAGES:",
+                style: GoogleFonts.cinzel(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textPrimary,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  languages.join(", "),
+                  style: GoogleFonts.lora(
+                    fontSize: 10,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
           Text("Description:", style: _sectionTitleStyle),
           const SizedBox(height: 4),
           Text(
@@ -333,10 +335,10 @@ class AstrologistProfileView extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         _buildConsultationRow(
-          Icons.videocam,
-          "Video Call",
-          "RS.$videoCharge/min",
-          () {},
+          Icons.chat_bubble_outline,
+          "Live Chat",
+          "RS.$chatCharge/min",
+          () => controller.startChat(expert),
         ),
         const SizedBox(height: 10),
         _buildConsultationRow(
@@ -347,10 +349,10 @@ class AstrologistProfileView extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         _buildConsultationRow(
-          Icons.chat_bubble_outline,
-          "Live Chat",
-          "RS.$chatCharge/min",
-          () => controller.startChat(expert),
+          Icons.videocam,
+          "Video Call",
+          "RS.$videoCharge/min",
+          () {},
         ),
       ],
     );

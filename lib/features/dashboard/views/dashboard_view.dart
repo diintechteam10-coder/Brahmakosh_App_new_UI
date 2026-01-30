@@ -51,36 +51,75 @@ class DashboardView extends StatelessWidget {
           },
         ),
       ],
-      child: Scaffold(
-        extendBody: true,
-        drawer: const AppDrawer(),
-        body: Consumer<DashboardViewModel>(
-          builder: (context, viewModel, child) {
-            return IndexedStack(
-              index: viewModel.currentIndex,
-              children: [
-                HomeView(),
-                CheckInView(),
-                RashmiAi(),
-                AstrologyExpertsView(screenTitle: "Connect"),
-                ComingSoonView(title: 'Remedies'),
-                ReportView(), // Keeping ReportView for My Kosh (Drawer navigation)
-              ],
-            );
-          },
-        ),
-        bottomNavigationBar: Consumer<DashboardViewModel>(
-          builder: (context, viewModel, child) {
-            // Hide bottom navigation bar when on RashmiAi (index 2)
-            if (viewModel.currentIndex == 2) {
-              return const SizedBox.shrink();
-            }
-            return CustomBottomNavBar(
-              currentIndex: viewModel.currentIndex,
-              onTap: viewModel.changeTab,
-            );
-          },
-        ),
+      child: const DashboardLayout(),
+    );
+  }
+}
+
+class DashboardLayout extends StatefulWidget {
+  const DashboardLayout({super.key});
+
+  @override
+  State<DashboardLayout> createState() => _DashboardLayoutState();
+}
+
+class _DashboardLayoutState extends State<DashboardLayout>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      Utils.print("App resumed - updating location");
+      // Update location when app comes to foreground
+      Provider.of<DashboardViewModel>(
+        context,
+        listen: false,
+      ).initLocationUpdate(null, forceRefresh: true);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBody: true,
+      drawer: const AppDrawer(),
+      body: Consumer<DashboardViewModel>(
+        builder: (context, viewModel, child) {
+          return IndexedStack(
+            index: viewModel.currentIndex,
+            children: [
+              HomeView(),
+              CheckInView(),
+              RashmiAi(),
+              AstrologyExpertsView(screenTitle: "Connect"),
+              ComingSoonView(title: 'Remedies'),
+              ReportView(), // Keeping ReportView for My Kosh (Drawer navigation)
+            ],
+          );
+        },
+      ),
+      bottomNavigationBar: Consumer<DashboardViewModel>(
+        builder: (context, viewModel, child) {
+          // Hide bottom navigation bar when on RashmiAi (index 2)
+          if (viewModel.currentIndex == 2) {
+            return const SizedBox.shrink();
+          }
+          return CustomBottomNavBar(
+            currentIndex: viewModel.currentIndex,
+            onTap: viewModel.changeTab,
+          );
+        },
       ),
     );
   }

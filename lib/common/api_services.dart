@@ -18,6 +18,7 @@ import 'package:brahmakosh/common/models/chanting_mantra.dart';
 import 'package:brahmakosh/common/models/brahm_reel.dart';
 import 'package:brahmakosh/common/models/get_loc.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_checkin_model.dart';
+import 'package:brahmakosh/common/models/user_complete_details_model.dart';
 
 const bool allowInsecureDevFallback = false;
 
@@ -765,4 +766,64 @@ Future<SpiritualCheckinResponse?> getSpiritualCheckin(
     shouldLogoutOn401: false,
   );
   return checkinResponse;
+}
+
+Future<dynamic> getPanchang(
+  TickerProvider? tickerProvider,
+  String userId,
+) async {
+  final token = StorageService.getString(AppConstants.keyAuthToken) ?? "";
+  final url = "${ApiUrls.panchang}/$userId/panchang";
+
+  Utils.print("🔮 PANCHANG API REQUEST URL: $url");
+
+  dynamic result;
+  await callWebApiGet(
+    tickerProvider,
+    url,
+    token: token,
+    onResponse: (response) {
+      print("📥 Panchang status: ${response.statusCode}");
+      print("📥 Panchang body: ${response.body}");
+      Utils.print("✅ PANCHANG API RESPONSE: ${response.body}");
+      result = jsonDecode(response.body);
+    },
+    onError: (error) {
+      Utils.print("❌ PANCHANG API ERROR: $error");
+      if (error is http.Response) {
+        print("📥 Panchang status: ${error.statusCode}");
+        print("📥 Panchang body: ${error.body}");
+        Utils.print("❌ ERROR BODY: ${error.body}");
+      }
+    },
+    showLoader: false,
+    shouldLogoutOn401: false,
+  );
+  return result;
+}
+
+Future<UserCompleteDetailsModel?> getUserCompleteDetails(
+  TickerProvider? tickerProvider,
+  String userId,
+) async {
+  UserCompleteDetailsModel? userDetails;
+  final token = StorageService.getString(AppConstants.keyAuthToken) ?? "";
+  final url = "${ApiUrls.completeUserDetails}/$userId/complete-details";
+
+  await callWebApiGet(
+    tickerProvider,
+    url,
+    token: token,
+    onResponse: (response) {
+      userDetails = UserCompleteDetailsModel.fromJson(
+        jsonDecode(response.body),
+      );
+    },
+    onError: (error) {
+      Utils.print('Error fetching user complete details: $error');
+    },
+    showLoader: false,
+    shouldLogoutOn401: false,
+  );
+  return userDetails;
 }

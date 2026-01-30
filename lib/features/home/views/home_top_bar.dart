@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:brahmakosh/common/api_services.dart';
+import 'package:brahmakosh/core/constants/app_constants.dart';
+import 'package:brahmakosh/core/services/storage_service.dart';
 import '../../../../core/common_imports.dart';
 
 class HomeTopBar extends StatefulWidget {
@@ -10,18 +13,40 @@ class HomeTopBar extends StatefulWidget {
   State<HomeTopBar> createState() => _HomeTopBarState();
 }
 
-class _HomeTopBarState extends State<HomeTopBar> {
+class _HomeTopBarState extends State<HomeTopBar> with TickerProviderStateMixin {
   int _currentPage = 0;
   Timer? _timer;
-  final List<Map<String, String>> _signs = [
-    {"label": "Your Moon Sign", "value": "Leo"},
-    {"label": "Your Sun Sign", "value": "Sagittarius"},
+  List<Map<String, String>> _signs = [
+    {"label": "Your Moon Sign", "value": "Loading..."},
+    {"label": "Your Ascendant", "value": "Loading..."},
   ];
 
   @override
   void initState() {
     super.initState();
+    _fetchData();
     _startAutoSlide();
+  }
+
+  Future<void> _fetchData() async {
+    final userId = StorageService.getString(AppConstants.keyUserId);
+    if (userId != null) {
+      final data = await getUserCompleteDetails(this, userId);
+      if (mounted && data?.data?.astrology?.astroDetails != null) {
+        final astro = data!.data!.astrology!.astroDetails!;
+        setState(() {
+          _signs = [
+            {"label": "Your Sign", "value": astro.sign ?? "-"},
+            {"label": "Your Sign Lord", "value": astro.signLord ?? "-"},
+            {"label": "Your Ascendant", "value": astro.ascendant ?? "-"},
+            {
+              "label": "Your Ascendant Lord",
+              "value": astro.ascendantLord ?? "-",
+            },
+          ];
+        });
+      }
+    }
   }
 
   void _startAutoSlide() {
@@ -183,22 +208,22 @@ class _HomeTopBarState extends State<HomeTopBar> {
                 ),
               ),
               const SizedBox(height: 16),
-              Text(
-                "Discipline gives freedom",
-                style: GoogleFonts.lora(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF894A1E),
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                "Clear rules make creative work easier.",
-                style: GoogleFonts.lora(
-                  fontSize: 13,
-                  color: const Color(0xFF596072),
-                ),
-              ),
+              // Text(
+              //   "Discipline gives freedom",
+              //   style: GoogleFonts.lora(
+              //     fontSize: 16,
+              //     fontWeight: FontWeight.bold,
+              //     color: const Color(0xFF894A1E),
+              //   ),
+              // ),
+              // const SizedBox(height: 4),
+              // Text(
+              //   "Clear rules make creative work easier.",
+              //   style: GoogleFonts.lora(
+              //     fontSize: 13,
+              //     color: const Color(0xFF596072),
+              //   ),
+              // ),
             ],
           ),
         ),
