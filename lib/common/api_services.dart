@@ -18,6 +18,9 @@ import 'package:brahmakosh/common/models/chanting_mantra.dart';
 import 'package:brahmakosh/common/models/brahm_reel.dart';
 import 'package:brahmakosh/common/models/get_loc.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_checkin_model.dart';
+import 'package:brahmakosh/features/check_in/models/spiritual_session_model.dart';
+import 'package:brahmakosh/features/check_in/models/spiritual_configuration_model.dart';
+import 'package:brahmakosh/features/check_in/models/spiritual_clip_model.dart';
 import 'package:brahmakosh/common/models/user_complete_details_model.dart';
 
 const bool allowInsecureDevFallback = false;
@@ -766,6 +769,132 @@ Future<SpiritualCheckinResponse?> getSpiritualCheckin(
     shouldLogoutOn401: false,
   );
   return checkinResponse;
+}
+
+Future<SpiritualConfigurationResponse?> getSpiritualConfigurations(
+  TickerProvider? tickerProvider,
+  String categoryId,
+) async {
+  SpiritualConfigurationResponse? configResponse;
+  final token = StorageService.getString(AppConstants.keyAuthToken) ?? "";
+  final url = "${ApiUrls.spiritualConfigurations}?categoryId=$categoryId";
+
+  print("🔍 DEBUG_SPIRITUAL: Requesting URL: $url");
+  print("🔍 DEBUG_SPIRITUAL: CategoryId: $categoryId");
+
+  await callWebApiGet(
+    tickerProvider,
+    url,
+    token: token,
+    onResponse: (response) {
+      print("✅ DEBUG_SPIRITUAL: Response Status: ${response.statusCode}");
+      print("✅ DEBUG_SPIRITUAL: Response Body: ${response.body}");
+      try {
+        configResponse = SpiritualConfigurationResponse.fromJson(
+          jsonDecode(response.body),
+        );
+        print(
+          "✅ DEBUG_SPIRITUAL: Parsed count: ${configResponse?.data?.length}",
+        );
+      } catch (e) {
+        print("❌ DEBUG_SPIRITUAL: Parsing Error: $e");
+      }
+    },
+    onError: (error) {
+      print("❌ DEBUG_SPIRITUAL: Error: $error");
+      Utils.print('Error fetching spiritual configurations: $error');
+    },
+    showLoader: false, // Independent loader in controller
+    shouldLogoutOn401: false,
+  );
+  return configResponse;
+}
+
+Future<SpiritualClipResponse?> getClipsByConfigurationId(
+  TickerProvider? tickerProvider,
+  String configurationId,
+) async {
+  SpiritualClipResponse? clipResponse;
+  final token = StorageService.getString(AppConstants.keyAuthToken) ?? "";
+  final url = "${ApiUrls.spiritualClipsByConfig}/$configurationId";
+
+  print("🔍 DEBUG_CLIPS: Requesting URL: $url");
+
+  await callWebApiGet(
+    tickerProvider,
+    url,
+    token: token,
+    onResponse: (response) {
+      print("✅ DEBUG_CLIPS: Response Status: ${response.statusCode}");
+      print("✅ DEBUG_CLIPS: Response Body: ${response.body}");
+      try {
+        clipResponse = SpiritualClipResponse.fromJson(
+          jsonDecode(response.body),
+        );
+        print("✅ DEBUG_CLIPS: Parsed count: ${clipResponse?.count}");
+      } catch (e) {
+        print("❌ DEBUG_CLIPS: Parsing Error: $e");
+      }
+    },
+    onError: (error) {
+      print("❌ DEBUG_CLIPS: Error: $error");
+      Utils.print('Error fetching spiritual clips: $error');
+    },
+    showLoader: true,
+
+    shouldLogoutOn401: false,
+  );
+  return clipResponse;
+}
+
+Future<void> saveSpiritualSession(
+  TickerProvider? tickerProvider,
+  SpiritualSessionRequest request, {
+  required Function(Map<String, dynamic>) onSuccess,
+  required Function(String) onError,
+}) async {
+  final token = StorageService.getString(AppConstants.keyAuthToken) ?? "";
+  final url = ApiUrls.saveSpiritualSession;
+
+  print("🔍 DEBUG_SESSION_SAVE [REQUEST]: URL: $url");
+  print(
+    "🔍 DEBUG_SESSION_SAVE [REQUEST]: BODY: ${jsonEncode(request.toJson())}",
+  );
+
+  await callWebApi(
+    tickerProvider,
+    url,
+    request.toJson(),
+    token: token,
+    onResponse: (response) {
+      print("✅ DEBUG_SESSION_SAVE [RESPONSE]: STATUS: ${response.statusCode}");
+      print("✅ DEBUG_SESSION_SAVE [RESPONSE]: BODY: ${response.body}");
+      try {
+        final body = jsonDecode(response.body);
+        if (body['success'] == true) {
+          onSuccess(body);
+        } else {
+          onError(body['message'] ?? 'Failed to save session');
+        }
+      } catch (e) {
+        onError('Error parsing response');
+      }
+    },
+    onError: (error) {
+      if (error is http.Response) {
+        try {
+          final body = jsonDecode(error.body);
+          onError(body['message'] ?? 'Error saving session');
+        } catch (_) {
+          onError('Error saving session');
+        }
+      } else {
+        onError(error.toString());
+      }
+    },
+    showLoader: true,
+    shouldLogoutOn401: false,
+  );
 }
 
 Future<dynamic> getPanchang(

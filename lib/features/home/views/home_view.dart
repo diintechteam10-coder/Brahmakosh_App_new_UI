@@ -135,11 +135,11 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
-            // "Add Brahm Avatar section from old screen into new screen for i'll change later"
-            SliverToBoxAdapter(
-              child: RepaintBoundary(child: AvatarStudioCard()),
-            ),
-            const SliverToBoxAdapter(child: SizedBox(height: 20)),
+            // // "Add Brahm Avatar section from old screen into new screen for i'll change later"
+            // SliverToBoxAdapter(
+            //   child: RepaintBoundary(child: AvatarStudioCard()),
+            // ),
+            // const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
             // "our Sponsors section should also add from old screen"
             _buildSponsorsSection(),

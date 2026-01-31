@@ -1,5 +1,13 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:get/get.dart';
+import 'package:brahmakosh/common/api_services.dart';
+import 'package:brahmakosh/features/check_in/models/spiritual_session_model.dart';
+import 'package:brahmakosh/features/check_in/models/spiritual_configuration_model.dart';
+import 'package:brahmakosh/common/utils.dart';
+import 'package:brahmakosh/features/check_in/controllers/check_in_controller.dart';
+import 'package:brahmakosh/core/constants/app_constants.dart';
 
 class MeditationStart extends StatefulWidget {
   const MeditationStart({super.key});
@@ -32,7 +40,14 @@ class _MeditationStartState extends State<MeditationStart>
   bool _isPlaying = false;
 
   late AnimationController _timerController;
-  final int _totalDuration = 60;
+
+  int _totalDuration = 60; // Default, will be updated from arguments
+  SpiritualConfiguration? _config;
+
+  // 🔹 Audio Player
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  String? _currentAudioUrl;
+  bool _isAudioInitialized = false;
 
   bool _showSongSelection = false;
   int _selectedTrack = 0;
@@ -48,6 +63,17 @@ class _MeditationStartState extends State<MeditationStart>
   @override
   void initState() {
     super.initState();
+
+    final args = Get.arguments;
+    if (args != null) {
+      if (args['duration'] != null) {
+        // duration passed in minutes, convert to seconds
+        _totalDuration = (args['duration'] as num).toInt() * 60;
+      }
+      if (args['config'] != null) {
+        _config = args['config'] as SpiritualConfiguration?;
+      }
+    }
 
     /// 1️⃣ ENTRY
     _entryController = AnimationController(
@@ -101,7 +127,197 @@ class _MeditationStartState extends State<MeditationStart>
       duration: Duration(seconds: _totalDuration),
     );
 
+    // Listen for timer completion
+    _timerController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        // Stop audio when timer completes
+        if (_isAudioInitialized) {
+          try {
+            _audioPlayer.stop();
+          } catch (e) {
+            print("Error stopping audio: $e");
+          }
+        }
+        setState(() {
+          _isPlaying = false;
+          _isStarted = false;
+        });
+
+        // Save Session
+        _saveSession();
+      }
+    });
+
     _startFlow();
+  }
+
+  Future<void> _saveSession() async {
+    // Construct Request
+    SpiritualSessionRequest request = SpiritualSessionRequest(
+      type: _config?.type ?? "chanting",
+      title: _config?.title ?? "Meditation Session",
+      targetDuration: _totalDuration ~/ 60,
+      actualDuration: _totalDuration ~/ 60,
+      chantingName: _config?.title ?? "Meditation",
+      chantCount: 108,
+      karmaPoints: _config?.karmaPoints ?? 0,
+      emotion: _config?.emotion ?? "neutral",
+      status: "completed",
+      completionPercentage: 100,
+      videoUrl: "",
+      audioUrl: _currentAudioUrl ?? "",
+      configurationId: _config?.sId,
+    );
+
+    await saveSpiritualSession(
+      this,
+      request,
+      onSuccess: (responseMap) {
+        if (mounted) {
+          _showCompletionDialog(context, responseMap);
+        }
+
+        // Refresh Check-in Data
+        if (Get.isRegistered<CheckInController>()) {
+          Get.find<CheckInController>().fetchCheckInData();
+        }
+      },
+      onError: (error) {
+        Utils.showToast(error);
+      },
+    );
+  }
+
+  void _showCompletionDialog(
+    BuildContext context,
+    Map<String, dynamic> response,
+  ) {
+    int earnedKarma = 0;
+    if (response['data'] != null && response['data'] is Map) {
+      earnedKarma =
+          response['data']['karmaPoints'] ??
+          response['data']['karma_points'] ??
+          0;
+    } else if (response['karmaPoints'] != null) {
+      earnedKarma = response['karmaPoints'];
+    }
+
+    // Fallback: If 0 found in response, show the configured/requested points
+    if (earnedKarma == 0) {
+      earnedKarma = _config?.karmaPoints ?? 60;
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.check_circle_rounded,
+                  color: Colors.green,
+                  size: 48,
+                ),
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                "Session Completed!",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                "You have successfully completed a meditation session.",
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 14, color: Colors.black54),
+              ),
+              const SizedBox(height: 24),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(50),
+                  border: Border.all(color: Colors.amber.withOpacity(0.3)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.stars_rounded,
+                      color: Colors.amber,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      "+$earnedKarma Karma Points",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.amber,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black87,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 0,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context); // Close dialog
+                    Get.offAllNamed(AppConstants.routeDashboard, arguments: 1);
+                  },
+                  child: const Text(
+                    "Got it",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void _startFlow() {
@@ -112,6 +328,49 @@ class _MeditationStartState extends State<MeditationStart>
     Future.delayed(const Duration(milliseconds: 3500), () {
       setState(() => showPlayImage = true);
     });
+
+    _initAudio();
+  }
+
+  Future<void> _initAudio() async {
+    try {
+      final args = Get.arguments;
+      List? clips = args != null ? args['clips'] : null;
+
+      String sourceUrl = "";
+      bool isNetwork = false;
+
+      if (clips != null && clips.isNotEmpty) {
+        final clip = clips[0];
+        if (clip.fileUrl != null && clip.fileUrl!.isNotEmpty) {
+          sourceUrl = clip.fileUrl!;
+          isNetwork = true;
+        }
+      }
+
+      if (sourceUrl.isEmpty) {
+        // Default music: assets/images/Default_music.mpeg
+        // AssetSource automatically looks in assets/
+        sourceUrl = 'images/Default_music.mpeg';
+        isNetwork = false;
+      }
+
+      _currentAudioUrl = sourceUrl;
+      print("🎵 Audio Init: URL=$sourceUrl, Network=$isNetwork");
+
+      await _audioPlayer.setReleaseMode(ReleaseMode.loop);
+
+      if (isNetwork) {
+        await _audioPlayer.setSourceUrl(sourceUrl);
+      } else {
+        await _audioPlayer.setSource(AssetSource(sourceUrl));
+      }
+
+      _isAudioInitialized = true;
+      print("✅ Audio Initialized Successfully");
+    } catch (e) {
+      print("❌ Error initializing audio: $e");
+    }
   }
 
   @override
@@ -121,6 +380,7 @@ class _MeditationStartState extends State<MeditationStart>
     _haloController.dispose();
     _rippleController.dispose();
     _timerController.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -133,6 +393,7 @@ class _MeditationStartState extends State<MeditationStart>
       _timerController.forward();
       _breathingController.repeat(reverse: true);
       _rippleController.repeat();
+      if (_isAudioInitialized) _audioPlayer.resume();
     } else if (_isPlaying) {
       setState(() {
         _isPlaying = false;
@@ -140,6 +401,7 @@ class _MeditationStartState extends State<MeditationStart>
       _timerController.stop();
       _breathingController.stop();
       _rippleController.stop();
+      if (_isAudioInitialized) _audioPlayer.pause();
     } else {
       setState(() {
         _isPlaying = true;
@@ -147,6 +409,7 @@ class _MeditationStartState extends State<MeditationStart>
       _timerController.forward();
       _breathingController.repeat(reverse: true);
       _rippleController.repeat();
+      if (_isAudioInitialized) _audioPlayer.resume();
     }
   }
 
@@ -190,9 +453,13 @@ class _MeditationStartState extends State<MeditationStart>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 GestureDetector(
-                  onTap: () => setState(() => _showSongSelection = !_showSongSelection),
+                  onTap: () =>
+                      setState(() => _showSongSelection = !_showSongSelection),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.black26,
                       borderRadius: BorderRadius.circular(20),
@@ -201,7 +468,11 @@ class _MeditationStartState extends State<MeditationStart>
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.music_note, color: Colors.white70, size: 16),
+                        const Icon(
+                          Icons.music_note,
+                          color: Colors.white70,
+                          size: 16,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           _tracks[_selectedTrack],
@@ -212,7 +483,11 @@ class _MeditationStartState extends State<MeditationStart>
                           ),
                         ),
                         const SizedBox(width: 4),
-                        const Icon(Icons.keyboard_arrow_down, color: Colors.white70, size: 16),
+                        const Icon(
+                          Icons.keyboard_arrow_down,
+                          color: Colors.white70,
+                          size: 16,
+                        ),
                       ],
                     ),
                   ),
@@ -277,7 +552,9 @@ class _MeditationStartState extends State<MeditationStart>
                                   .animate(
                                     CurvedAnimation(
                                       parent: animation,
-                                      curve: const _SafeCurve(Curves.elasticOut),
+                                      curve: const _SafeCurve(
+                                        Curves.elasticOut,
+                                      ),
                                     ),
                                   ),
                               child: FadeTransition(
@@ -341,20 +618,24 @@ class _MeditationStartState extends State<MeditationStart>
                               decoration: BoxDecoration(
                                 color: Colors.grey[900]?.withOpacity(0.95),
                                 borderRadius: BorderRadius.circular(30),
-                                border: Border.all(color: Colors.white12, width: 1.5),
+                                border: Border.all(
+                                  color: Colors.white12,
+                                  width: 1.5,
+                                ),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withOpacity(0.5),
                                     blurRadius: 40,
                                     spreadRadius: 10,
-                                  )
+                                  ),
                                 ],
                               ),
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       const SizedBox(width: 24),
                                       const Text(
@@ -367,21 +648,29 @@ class _MeditationStartState extends State<MeditationStart>
                                         ),
                                       ),
                                       IconButton(
-                                        onPressed: () => setState(() => _showSongSelection = false),
-                                        icon: const Icon(Icons.close, color: Colors.white54, size: 20),
+                                        onPressed: () => setState(
+                                          () => _showSongSelection = false,
+                                        ),
+                                        icon: const Icon(
+                                          Icons.close,
+                                          color: Colors.white54,
+                                          size: 20,
+                                        ),
                                       ),
                                     ],
                                   ),
                                   const SizedBox(height: 16),
                                   GridView.builder(
                                     shrinkWrap: true,
-                                    physics: const NeverScrollableScrollPhysics(),
-                                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 2,
-                                      crossAxisSpacing: 16,
-                                      mainAxisSpacing: 16,
-                                      childAspectRatio: 1.8,
-                                    ),
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    gridDelegate:
+                                        const SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 2,
+                                          crossAxisSpacing: 16,
+                                          mainAxisSpacing: 16,
+                                          childAspectRatio: 1.8,
+                                        ),
                                     itemCount: _tracks.length,
                                     itemBuilder: (context, index) {
                                       bool isSelected = _selectedTrack == index;
@@ -393,31 +682,54 @@ class _MeditationStartState extends State<MeditationStart>
                                           });
                                         },
                                         child: AnimatedContainer(
-                                          duration: const Duration(milliseconds: 300),
+                                          duration: const Duration(
+                                            milliseconds: 300,
+                                          ),
                                           alignment: Alignment.center,
-                                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                          ),
                                           decoration: BoxDecoration(
-                                            color: isSelected ? Colors.white10 : Colors.white.withOpacity(0.04),
-                                            borderRadius: BorderRadius.circular(20),
+                                            color: isSelected
+                                                ? Colors.white10
+                                                : Colors.white.withOpacity(
+                                                    0.04,
+                                                  ),
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
                                             border: Border.all(
-                                              color: isSelected ? Colors.amber.withOpacity(0.5) : Colors.white12,
+                                              color: isSelected
+                                                  ? Colors.amber.withOpacity(
+                                                      0.5,
+                                                    )
+                                                  : Colors.white12,
                                               width: isSelected ? 2 : 1.2,
                                             ),
-                                            boxShadow: isSelected ? [
-                                              BoxShadow(
-                                                color: Colors.amber.withOpacity(0.15),
-                                                blurRadius: 15,
-                                                spreadRadius: 2,
-                                              )
-                                            ] : null,
+                                            boxShadow: isSelected
+                                                ? [
+                                                    BoxShadow(
+                                                      color: Colors.amber
+                                                          .withOpacity(0.15),
+                                                      blurRadius: 15,
+                                                      spreadRadius: 2,
+                                                    ),
+                                                  ]
+                                                : null,
                                           ),
                                           child: Text(
                                             _tracks[index],
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
-                                              color: isSelected ? Colors.amber[200] : Colors.white.withOpacity(0.8),
+                                              color: isSelected
+                                                  ? Colors.amber[200]
+                                                  : Colors.white.withOpacity(
+                                                      0.8,
+                                                    ),
                                               fontSize: 13,
-                                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
+                                              fontWeight: isSelected
+                                                  ? FontWeight.w700
+                                                  : FontWeight.w400,
                                             ),
                                           ),
                                         ),
@@ -564,7 +876,11 @@ class _MagicParticleState extends State<_MagicParticle>
         animation: _controller,
         builder: (context, child) {
           return Transform.translate(
-            offset: Offset(0, MediaQuery.of(context).size.height * (0.1 * math.sin(_controller.value * math.pi))),
+            offset: Offset(
+              0,
+              MediaQuery.of(context).size.height *
+                  (0.1 * math.sin(_controller.value * math.pi)),
+            ),
             child: Opacity(
               opacity: 0.1 + (0.4 * _controller.value),
               child: Container(

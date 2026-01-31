@@ -14,15 +14,15 @@ class CheckInView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xffFFFDF8), Color(0xffFFF2D9), Color(0xffFFE4B5)],
+      body: SafeArea(
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xffFFFDF8), Color(0xffFFF2D9), Color(0xffFFE4B5)],
+            ),
           ),
-        ),
-        child: SafeArea(
           child: Obx(() {
             if (controller.isLoading.value) {
               return const Center(child: CircularProgressIndicator());
@@ -33,174 +33,192 @@ class CheckInView extends StatelessWidget {
               return const Center(child: Text("No data available"));
             }
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 24),
-              child: Column(
-                children: [
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            return Column(
+              children: [
+                // Header row
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 0,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.history,
+                          color: Color(0xff7B4A12),
+                        ),
+                        onPressed: () {},
+                      ),
+                      Text(
+                        'BRAHMAKOSH',
+                        style: GoogleFonts.lora(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 2,
+                          color: const Color(0xff7B4A12),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.share, color: Color(0xff7B4A12)),
+                        onPressed: () {},
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Scrollable content
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.only(bottom: 40),
+                    child: Column(
                       children: [
-                        IconButton(
-                          icon: const Icon(
-                            Icons.history,
-                            color: Color(0xff7B4A12),
+                        // Main title
+                        Text(
+                          '#AreYouSpiritual',
+                          style: GoogleFonts.playfairDisplay(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xff7B4A12),
                           ),
-                          onPressed: () {},
                         ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.share,
-                            color: Color(0xff7B4A12),
+
+                        const SizedBox(height: 2),
+
+                        // Subtitle
+                        Text(
+                          'Take a moment for yourself',
+                          style: GoogleFonts.lora(
+                            fontSize: 16,
+                            color: Colors.black87,
                           ),
-                          onPressed: () {},
                         ),
+
+                        // ───────────────────────────────────────────────
+                        // CHECK-IN OPTIONS SECTION (only if activities exist)
+                        if (data.activities != null &&
+                            data.activities!.isNotEmpty) ...[
+                          const SizedBox(height: 16),
+
+                          Text(
+                            'CHECK-IN OPTIONS',
+                            style: GoogleFonts.cinzel(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xff7B4A12),
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 32),
+                            child: GridView.builder(
+                              shrinkWrap: true,
+                              itemCount: data.activities!.length,
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 24,
+                                    mainAxisSpacing: 24,
+                                    childAspectRatio: 1.0,
+                                  ),
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                final activity = data.activities![index];
+                                return _card(
+                                  image: activity.image,
+                                  title: activity.title?.toUpperCase() ?? '',
+                                  onTap: () {
+                                    if (activity.route != null) {
+                                      if (activity.title == 'Meditation') {
+                                        Get.toNamed(
+                                          AppConstants
+                                              .routeSpiritualConfiguration,
+                                          arguments: activity.id,
+                                        );
+                                      } else if (activity.title == 'Chanting') {
+                                        Get.toNamed(
+                                          AppConstants.routeMantraChanting,
+                                        );
+                                      } else {
+                                        Get.toNamed(
+                                          AppConstants
+                                              .routeSpiritualConfiguration,
+                                          arguments: activity.id,
+                                        );
+                                      }
+                                    }
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
+                        ],
+                        // ───────────────────────────────────────────────
+
+                        // Overview stats
+                        if (data.stats != null) ...[
+                          _buildOverviewStats(data.stats!),
+                          const SizedBox(height: 32),
+                        ],
+
+                        // Category progress
+                        if (data.categoryStats != null) ...[
+                          _buildCategoryStats(data.categoryStats!),
+                          const SizedBox(height: 32),
+                        ],
+
+                        // Recent activities
+                        if (data.recentActivities != null &&
+                            data.recentActivities!.isNotEmpty) ...[
+                          _buildRecentActivities(data.recentActivities!),
+                          const SizedBox(height: 36),
+                        ],
+
+                        // Karma & motivation
+                        if (data.motivation?.emoji != null)
+                          Text(
+                            data.motivation!.emoji!,
+                            style: const TextStyle(fontSize: 40),
+                          ),
+
+                        const SizedBox(height: 12),
+
+                        Text(
+                          'Earn Karma points',
+                          style: GoogleFonts.lora(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xff7B4A12),
+                          ),
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        if (data.motivation?.text != null)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 32),
+                            child: Text(
+                              data.motivation!.text!,
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.lora(
+                                fontSize: 14,
+                                color: Colors.black54,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+
+                        const SizedBox(height: 48), // final bottom padding
                       ],
                     ),
                   ),
-
-                  /// 🔱 App Title
-                  Text(
-                    'BRAHMAKOSH',
-                    style: GoogleFonts.cinzel(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 2,
-                      color: const Color(0xff7B4A12),
-                    ),
-                  ),
-
-                  const SizedBox(height: 4),
-
-                  /// #AreYouSpiritual
-                  Text(
-                    '#AreYouSpiritual',
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xff7B4A12),
-                    ),
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  /// Subtitle
-                  Text(
-                    'Take a moment for yourself',
-                    style: GoogleFonts.lora(
-                      fontSize: 16,
-                      color: Colors.black87,
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  Text(
-                    'CHECK-IN OPTIONS',
-                    style: GoogleFonts.cinzel(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xff7B4A12),
-                    ),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  /// 🧘 Cards Grid
-                  if (data.activities != null && data.activities!.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: GridView.builder(
-                        shrinkWrap: true,
-                        itemCount: data.activities!.length,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 16,
-                              mainAxisSpacing: 16,
-                              childAspectRatio: 0.85, // Taller for image
-                            ),
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          final activity = data.activities![index];
-                          return _card(
-                            image: activity.image,
-                            title: activity.title?.toUpperCase() ?? '',
-                            onTap: () {
-                              if (activity.route != null) {
-                                if (activity.title == 'Meditation') {
-                                  Get.toNamed(AppConstants.routeMeditate);
-                                } else if (activity.title == 'Chanting') {
-                                  Get.toNamed(AppConstants.routeMantraChanting);
-                                } else {
-                                  Get.toNamed(AppConstants.routeMeditate);
-                                }
-                              }
-                            },
-                          );
-                        },
-                      ),
-                    ),
-
-                  const SizedBox(height: 24),
-
-                  const SizedBox(height: 20),
-
-                  /// 📊 Overview Stats
-                  if (data.stats != null) _buildOverviewStats(data.stats!),
-
-                  const SizedBox(height: 24),
-
-                  /// 📈 Category Stats
-                  if (data.categoryStats != null)
-                    _buildCategoryStats(data.categoryStats!),
-
-                  const SizedBox(height: 24),
-
-                  /// 🕒 Recent Activities
-                  if (data.recentActivities != null &&
-                      data.recentActivities!.isNotEmpty)
-                    _buildRecentActivities(data.recentActivities!),
-
-                  const SizedBox(height: 24),
-
-                  /// ⭐ Karma & Motivation
-                  if (data.motivation?.emoji != null)
-                    Text(
-                      data.motivation!.emoji!,
-                      style: const TextStyle(fontSize: 24),
-                    ),
-
-                  const SizedBox(height: 8),
-
-                  Text(
-                    'Earn Karma points',
-                    style: GoogleFonts.lora(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xff7B4A12),
-                    ),
-                  ),
-
-                  const SizedBox(height: 4),
-
-                  if (data.motivation?.text != null)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 32),
-                      child: Text(
-                        data.motivation!.text!,
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.lora(
-                          fontSize: 14,
-                          color: Colors.black54,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
+                ),
+              ],
             );
           }),
         ),
@@ -435,28 +453,22 @@ class CheckInView extends StatelessWidget {
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.9),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: const Color(0xff7B4A12).withOpacity(0.1),
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 15,
-              color: Colors.black.withOpacity(0.05),
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            // Image covers top 1/3rd (approx, adjusted by flex)
-            Expanded(
-              flex: 4,
+      child: Column(
+        children: [
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              clipBehavior: Clip.antiAlias,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 10,
+                    color: Colors.black.withOpacity(0.1),
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
               child: image != null
                   ? CachedNetworkImage(
                       imageUrl: image,
@@ -482,28 +494,21 @@ class CheckInView extends StatelessWidget {
                       ),
                     ),
             ),
-            // Text at bottom
-            Expanded(
-              flex: 2,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                alignment: Alignment.center,
-                child: Text(
-                  title,
-                  style: GoogleFonts.cinzel(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.5,
-                    color: const Color(0xff5D3A1A),
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            style: GoogleFonts.cinzel(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+              color: const Color(0xff4A2C0F),
             ),
-          ],
-        ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }

@@ -5,6 +5,7 @@ import 'package:brahmakosh/features/brahm_bazar/brahm_bazar_view.dart';
 import 'package:brahmakosh/features/check_in/views/check_in_view.dart';
 import 'package:brahmakosh/features/check_in/views/meditations.dart';
 import 'package:brahmakosh/features/check_in/views/meditation_start.dart';
+import 'package:brahmakosh/features/check_in/views/spiritual_configuration_view.dart';
 import 'package:brahmakosh/features/home/mantra/mantra_chanting.dart';
 import 'package:brahmakosh/features/avatar/views/create_avatar_view.dart';
 import 'package:brahmakosh/features/panchang/views/panchang_view.dart';
@@ -130,6 +131,10 @@ class AppPages {
     GetPage(
       name: AppConstants.routeMeditationStart,
       page: () => const MeditationStart(),
+    ),
+    GetPage(
+      name: AppConstants.routeSpiritualConfiguration,
+      page: () => const SpiritualConfigurationView(),
     ),
     GetPage(
       name: AppConstants.routeWalkthrough,

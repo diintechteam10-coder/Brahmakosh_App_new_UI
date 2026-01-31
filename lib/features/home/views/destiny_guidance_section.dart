@@ -44,17 +44,17 @@ class DestinyGuidanceSection extends StatelessWidget {
                 },
               ),
               const SizedBox(width: 12),
-              // _buildCard(
-              //   context,
-              //   title: "Numerology",
-              //   subtitle: "Numbers reveal\nlife patterns & more.",
-              //   icon: Icons.star,
-              //   color: const Color(0xFFF2E3BC),
-              //   buttonText: "View Numerology",
-              //   onTap: () {
-              //     // Navigate to Numerology screen
-              //   },
-              // ),
+              _buildCard(
+                context,
+                title: "Numerology",
+                subtitle: "Numbers reveal\nlife patterns & more.",
+                icon: Icons.star,
+                color: const Color(0xFFF2E3BC),
+                buttonText: "View Numerology",
+                onTap: () {
+                  // Navigate to Numerology screen
+                },
+              ),
             ],
           ),
         ),

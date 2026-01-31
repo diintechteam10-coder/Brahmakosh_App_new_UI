@@ -39,6 +39,12 @@ class ApiUrls {
   static const String updateLocation = '$apiUrl/user/get-location';
   static const String reverseGeocode = '$apiUrl/user/reverse-geocode';
   static const String spiritualCheckin = '$apiUrl/content/spiritual-checkin';
+  static const String spiritualConfigurations =
+      '$baseUrl/api/spiritual-configurations';
+  static const String spiritualClipsByConfig =
+      '$baseUrl/api/spiritual-clips/configuration';
+  static const String saveSpiritualSession =
+      '$baseUrl/api/spiritual-stats/save-session';
   static const String panchang = '$baseUrl/api/client/users';
   static const String completeUserDetails = '$baseUrl/api/client/users';
 }
