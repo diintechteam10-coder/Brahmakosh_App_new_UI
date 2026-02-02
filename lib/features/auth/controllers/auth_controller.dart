@@ -103,6 +103,11 @@ class AuthController extends GetxController {
       return;
     }
 
+    if (!isPrivacyPolicyAccepted.value) {
+      Get.snackbar("Required", "Please accept the Privacy Policy");
+      return;
+    }
+
     print('🚀 Google Sign-In START');
     isLoading.value = true;
 

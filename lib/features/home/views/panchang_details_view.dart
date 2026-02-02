@@ -53,10 +53,10 @@ class PanchangDetailsView extends StatelessWidget {
                 _buildInfoRow("Date", panchang.dateKey ?? "-"),
                 _buildInfoRow("Utility", "Tithi: ${basic?.tithi ?? '-'}"),
                 _buildInfoRow("Day", basic?.day ?? "-"),
-                _buildInfoRow("Sunrise", basic?.sunrise ?? "-"),
-                _buildInfoRow("Sunset", basic?.sunset ?? "-"),
-                _buildInfoRow("Moonrise", basic?.moonrise ?? "-"),
-                _buildInfoRow("Moonset", basic?.moonset ?? "-"),
+                _buildInfoRow("Sunrise", advanced?.sunrise ?? "-"),
+                _buildInfoRow("Sunset", advanced?.sunset ?? "-"),
+                _buildInfoRow("Moonrise", advanced?.moonrise ?? "-"),
+                _buildInfoRow("Moonset", advanced?.moonset ?? "-"),
               ]),
 
               const SizedBox(height: 20),
@@ -66,11 +66,11 @@ class PanchangDetailsView extends StatelessWidget {
               _buildInfoCard([
                 _buildInfoRow(
                   "Vikram Samvat",
-                  "${basic?.vikramSamvat ?? '-'} (${basic?.vkramSamvatName ?? '-'})",
+                  "${advanced?.vikramSamvat ?? '-'} (${advanced?.vkramSamvatName ?? '-'})",
                 ),
                 _buildInfoRow(
                   "Shaka Samvat",
-                  "${basic?.shakaSamvat ?? '-'} (${basic?.shakaSamvatName ?? '-'})",
+                  "${advanced?.shakaSamvat ?? '-'} (${advanced?.shakaSamvatName ?? '-'})",
                 ),
                 _buildInfoRow(
                   "Purnimanta Month",
@@ -80,9 +80,9 @@ class PanchangDetailsView extends StatelessWidget {
                   "Amanta Month",
                   advanced?.hinduMaah?.amanta ?? "-",
                 ),
-                _buildInfoRow("Paksha", basic?.paksha ?? "-"),
-                _buildInfoRow("Ritu", basic?.ritu ?? "-"),
-                _buildInfoRow("Ayana", basic?.ayana ?? "-"),
+                _buildInfoRow("Paksha", advanced?.paksha ?? "-"),
+                _buildInfoRow("Ritu", advanced?.ritu ?? "-"),
+                _buildInfoRow("Ayana", advanced?.ayana ?? "-"),
               ]),
 
               const SizedBox(height: 20),
@@ -144,17 +144,17 @@ class PanchangDetailsView extends StatelessWidget {
               // Other Details
               _buildSectionTitle("Other Details"),
               _buildInfoCard([
-                _buildInfoRow("Sun Sign", basic?.sunSign ?? "-"),
-                _buildInfoRow("Moon Sign", basic?.moonSign ?? "-"),
+                _buildInfoRow("Sun Sign", advanced?.sunSign ?? "-"),
+                _buildInfoRow("Moon Sign", advanced?.moonSign ?? "-"),
                 _buildInfoRow(
                   "Disha Shool",
-                  "${basic?.dishaShool ?? '-'} (Remedy: ${basic?.dishaShoolRemedies ?? '-'})",
+                  "${advanced?.dishaShool ?? '-'} (Remedy: ${advanced?.dishaShoolRemedies ?? '-'})",
                 ),
                 _buildInfoRow(
                   "Nakshatra Shool",
                   "${advanced?.nakShool?.direction ?? '-'} (Remedy: ${advanced?.nakShool?.remedies ?? '-'})",
                 ),
-                _buildInfoRow("Moon Nivas", basic?.moonNivas ?? "-"),
+                _buildInfoRow("Moon Nivas", advanced?.moonNivas ?? "-"),
               ]),
 
               const SizedBox(height: 20),

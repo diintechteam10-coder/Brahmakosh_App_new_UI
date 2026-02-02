@@ -22,6 +22,7 @@ import 'package:brahmakosh/features/check_in/models/spiritual_session_model.dart
 import 'package:brahmakosh/features/check_in/models/spiritual_configuration_model.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_clip_model.dart';
 import 'package:brahmakosh/common/models/user_complete_details_model.dart';
+import 'package:brahmakosh/features/numerology/models/numerology_history_model.dart';
 
 const bool allowInsecureDevFallback = false;
 
@@ -955,4 +956,36 @@ Future<UserCompleteDetailsModel?> getUserCompleteDetails(
     shouldLogoutOn401: false,
   );
   return userDetails;
+}
+
+Future<NumerologyHistoryResponse?> getNumerologyHistory(
+  TickerProvider? tickerProvider,
+  String userId, {
+  int limit = 10,
+  int skip = 0,
+}) async {
+  NumerologyHistoryResponse? responseModel;
+  final token = StorageService.getString(AppConstants.keyAuthToken) ?? "";
+  final url =
+      "${ApiUrls.numerologyHistory}/$userId/numerology/history?limit=$limit&skip=$skip";
+
+  Utils.print("🔮 NUMEROLOGY HISTORY API REQUEST URL: $url");
+
+  await callWebApiGet(
+    tickerProvider,
+    url,
+    token: token,
+    onResponse: (response) {
+      Utils.print("✅ NUMEROLOGY HISTORY API RESPONSE: ${response.body}");
+      responseModel = NumerologyHistoryResponse.fromJson(
+        jsonDecode(response.body),
+      );
+    },
+    onError: (error) {
+      Utils.print("❌ NUMEROLOGY HISTORY API ERROR: $error");
+    },
+    showLoader: false,
+    shouldLogoutOn401: false,
+  );
+  return responseModel;
 }

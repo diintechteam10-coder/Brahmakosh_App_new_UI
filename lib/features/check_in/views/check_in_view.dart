@@ -6,10 +6,41 @@ import 'package:get/get.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_checkin_model.dart';
 import '../controllers/check_in_controller.dart';
 
-class CheckInView extends StatelessWidget {
-  CheckInView({super.key});
+import 'dart:async';
 
+class CheckInView extends StatefulWidget {
+  const CheckInView({super.key});
+
+  @override
+  State<CheckInView> createState() => _CheckInViewState();
+}
+
+class _CheckInViewState extends State<CheckInView> {
   final CheckInController controller = Get.put(CheckInController());
+  int _currentStatIndex = 0;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startCarousel();
+  }
+
+  void _startCarousel() {
+    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
+      if (mounted) {
+        setState(() {
+          _currentStatIndex = (_currentStatIndex + 1) % 2;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +144,7 @@ class CheckInView extends StatelessWidget {
                           const SizedBox(height: 16),
 
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 32),
+                            padding: const EdgeInsets.symmetric(horizontal: 56),
                             child: GridView.builder(
                               shrinkWrap: true,
                               itemCount: data.activities!.length,
@@ -156,12 +187,41 @@ class CheckInView extends StatelessWidget {
                             ),
                           ),
 
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 10),
                         ],
                         // ───────────────────────────────────────────────
 
-                        // Overview stats
+                        // ───────────────────────────────────────────────
+
+                        // Overview stats wrapper with header text
                         if (data.stats != null) ...[
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Column(
+                              children: [
+                                Text(
+                                  'Last Check-In 2.30PM 2.02.2026',
+                                  style: GoogleFonts.lora(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xff7B4A12),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'With Each Check-In Earn Karma Points',
+                                  style: GoogleFonts.lora(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: const Color(0xff7B4A12),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
                           _buildOverviewStats(data.stats!),
                           const SizedBox(height: 32),
                         ],
@@ -237,12 +297,72 @@ class CheckInView extends StatelessWidget {
           border: Border.all(color: const Color(0xff7B4A12).withOpacity(0.1)),
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _statItem('Days', '${stats.days}'),
-            _statItem('Sessions', '${stats.sessions}'),
-            _statItem('Minutes', '${stats.minutes}'),
-            _statItem('Points', '${stats.points}'),
+            Expanded(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 800),
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0.0, 0.5),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
+                    ),
+                  );
+                },
+                child: KeyedSubtree(
+                  key: ValueKey<int>(_currentStatIndex),
+                  child: _currentStatIndex == 0
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            //_statItem('Days', '${stats.days}'),
+                            _statItem(
+                              'Your Total Check-In',
+                              '${stats.sessions}',
+                            ),
+                          ],
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            //_statItem('Minutes', '${stats.minutes}'),
+                            _statItem(
+                              'Your Total Karma Points',
+                              '${stats.points}',
+                            ),
+                          ],
+                        ),
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 233, 130, 11),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+              child: Text(
+                'Redeem',
+                style: GoogleFonts.lora(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -251,18 +371,33 @@ class CheckInView extends StatelessWidget {
 
   Widget _statItem(String label, String value) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          value,
-          style: GoogleFonts.lora(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xff7B4A12),
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              'assets/images/brahmkosh_logo.jpeg',
+              height: 28,
+              width: 28,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) =>
+                  const SizedBox.shrink(),
+            ),
+            const SizedBox(width: 2),
+            Text(
+              value,
+              style: GoogleFonts.lora(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xff7B4A12),
+              ),
+            ),
+          ],
         ),
         Text(
           label,
-          style: GoogleFonts.lora(fontSize: 12, color: Colors.black54),
+          style: GoogleFonts.lora(fontSize: 14, color: const Color(0xff7B4A12)),
         ),
       ],
     );
@@ -286,7 +421,6 @@ class CheckInView extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.8),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: const Color(0xff7B4A12).withOpacity(0.1),
@@ -357,7 +491,6 @@ class CheckInView extends StatelessWidget {
               return Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.8),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: const Color(0xff7B4A12).withOpacity(0.1),
@@ -453,62 +586,79 @@ class CheckInView extends StatelessWidget {
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        children: [
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 10,
-                    color: Colors.black.withOpacity(0.1),
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: image != null
-                  ? CachedNetworkImage(
-                      imageUrl: image,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        color: Colors.grey[200],
-                        child: const Center(
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        color: Colors.grey[200],
-                        child: const Icon(Icons.error, color: Colors.red),
-                      ),
-                    )
-                  : Container(
-                      color: const Color(0xff7B4A12).withOpacity(0.1),
-                      child: const Icon(
-                        Icons.spa,
-                        color: Color(0xff7B4A12),
-                        size: 40,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 10,
+              color: Colors.black.withOpacity(0.1),
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Background Image
+            image != null
+                ? CachedNetworkImage(
+                    imageUrl: image,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      color: Colors.transparent,
+                      child: const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
                       ),
                     ),
+                    errorWidget: (context, url, error) => Container(
+                      color: Colors.transparent,
+                      child: const Icon(Icons.error, color: Colors.red),
+                    ),
+                  )
+                : Container(
+                    color: const Color(0xff7B4A12).withOpacity(0.1),
+                    child: const Icon(
+                      Icons.spa,
+                      color: Color(0xff7B4A12),
+                      size: 40,
+                    ),
+                  ),
+
+            // Gradient Overlay
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                  stops: const [0.6, 1.0],
+                ),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: GoogleFonts.cinzel(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
-              color: const Color(0xff4A2C0F),
+
+            // Title Text
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Text(
+                  title,
+                  style: GoogleFonts.cinzel(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

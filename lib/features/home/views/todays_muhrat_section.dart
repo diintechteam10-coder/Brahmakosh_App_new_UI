@@ -44,9 +44,9 @@ class TodaysMuhratSection extends StatelessWidget {
                       Expanded(
                         child: _buildSunMoonCard(
                           title1: "Sunrise",
-                          time1: basic?.sunrise ?? "--:--",
+                          time1: advanced?.sunrise ?? "--:--",
                           title2: "Sunset",
-                          time2: basic?.sunset ?? "--:--",
+                          time2: advanced?.sunset ?? "--:--",
                           isSun: true,
                         ),
                       ),
@@ -54,9 +54,9 @@ class TodaysMuhratSection extends StatelessWidget {
                       Expanded(
                         child: _buildSunMoonCard(
                           title1: "Moonrise",
-                          time1: basic?.moonrise ?? "--:--",
+                          time1: advanced?.moonrise ?? "--:--",
                           title2: "Moonset",
-                          time2: basic?.moonset ?? "--:--",
+                          time2: advanced?.moonset ?? "--:--",
                           isSun: false,
                         ),
                       ),
@@ -80,13 +80,13 @@ class TodaysMuhratSection extends StatelessWidget {
                         _buildDetailRow(
                           Icons.wb_sunny_outlined,
                           "Ritu",
-                          basic?.ritu ?? "--",
+                          advanced?.ritu ?? "--",
                         ),
                         const SizedBox(height: 12),
                         _buildDetailRow(
                           Icons.explore_outlined,
                           "Direction",
-                          basic?.dishaShool ?? "--",
+                          advanced?.dishaShool ?? "--",
                         ),
                         const SizedBox(height: 12),
                         _buildDetailRow(

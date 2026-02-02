@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:brahmakosh/features/home/views/astrology_details_screen.dart';
+import 'package:brahmakosh/features/numerology/views/numerology_history_view.dart';
 
 class DestinyGuidanceSection extends StatelessWidget {
   const DestinyGuidanceSection({super.key});
@@ -52,7 +53,12 @@ class DestinyGuidanceSection extends StatelessWidget {
                 color: const Color(0xFFF2E3BC),
                 buttonText: "View Numerology",
                 onTap: () {
-                  // Navigate to Numerology screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const NumerologyHistoryView(),
+                    ),
+                  );
                 },
               ),
             ],
