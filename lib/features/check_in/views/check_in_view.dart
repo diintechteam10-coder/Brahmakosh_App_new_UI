@@ -27,7 +27,7 @@ class _CheckInViewState extends State<CheckInView> {
   }
 
   void _startCarousel() {
-    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
       if (mounted) {
         setState(() {
           _currentStatIndex = (_currentStatIndex + 1) % 2;
@@ -153,7 +153,7 @@ class _CheckInViewState extends State<CheckInView> {
                                     crossAxisCount: 2,
                                     crossAxisSpacing: 24,
                                     mainAxisSpacing: 24,
-                                    childAspectRatio: 1.0,
+                                    childAspectRatio: 0.8,
                                   ),
                               physics: const NeverScrollableScrollPhysics(),
                               itemBuilder: (context, index) {
@@ -187,7 +187,7 @@ class _CheckInViewState extends State<CheckInView> {
                             ),
                           ),
 
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 15),
                         ],
                         // ───────────────────────────────────────────────
 
@@ -221,7 +221,7 @@ class _CheckInViewState extends State<CheckInView> {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 20),
                           _buildOverviewStats(data.stats!),
                           const SizedBox(height: 32),
                         ],
@@ -301,7 +301,7 @@ class _CheckInViewState extends State<CheckInView> {
           children: [
             Expanded(
               child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 800),
+                duration: const Duration(milliseconds: 2500),
                 transitionBuilder: (Widget child, Animation<double> animation) {
                   return FadeTransition(
                     opacity: animation,
@@ -341,7 +341,9 @@ class _CheckInViewState extends State<CheckInView> {
               ),
             ),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Get.toNamed(AppConstants.routeRedeem);
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 233, 130, 11),
                 minimumSize: Size.zero,
@@ -586,79 +588,70 @@ class _CheckInViewState extends State<CheckInView> {
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 10,
-              color: Colors.black.withOpacity(0.1),
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            // Background Image
-            image != null
-                ? CachedNetworkImage(
-                    imageUrl: image,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      color: Colors.transparent,
-                      child: const Center(
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    ),
-                    errorWidget: (context, url, error) => Container(
-                      color: Colors.transparent,
-                      child: const Icon(Icons.error, color: Colors.red),
-                    ),
-                  )
-                : Container(
-                    color: const Color(0xff7B4A12).withOpacity(0.1),
-                    child: const Icon(
-                      Icons.spa,
-                      color: Color(0xff7B4A12),
-                      size: 40,
-                    ),
-                  ),
-
-            // Gradient Overlay
-            Container(
+      child: Column(
+        children: [
+          Expanded(
+            child: Container(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
-                  stops: const [0.6, 1.0],
-                ),
-              ),
-            ),
-
-            // Title Text
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Text(
-                  title,
-                  style: GoogleFonts.cinzel(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
-                    color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 10,
+                    color: Colors.black.withOpacity(0.1),
+                    offset: const Offset(0, 4),
                   ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                ],
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Background Image
+                  image != null
+                      ? CachedNetworkImage(
+                          imageUrl: image,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
+                            color: Colors.transparent,
+                            child: const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            color: Colors.transparent,
+                            child: const Icon(Icons.error, color: Colors.red),
+                          ),
+                        )
+                      : Container(
+                          color: const Color(0xff7B4A12).withOpacity(0.1),
+                          child: const Icon(
+                            Icons.spa,
+                            color: Color(0xff7B4A12),
+                            size: 40,
+                          ),
+                        ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 12),
+          // Title Text
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: Text(
+              title,
+              style: GoogleFonts.cinzel(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+                color: const Color(0xff7B4A12),
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
       ),
     );
   }

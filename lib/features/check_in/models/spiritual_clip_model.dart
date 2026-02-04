@@ -40,6 +40,8 @@ class SpiritualClip {
   String? title;
   String? description;
   String? fileUrl;
+  String? audioUrl;
+  String? videoUrl;
   String? type;
   String? configurationId;
   String? createdAt;
@@ -50,6 +52,8 @@ class SpiritualClip {
     this.title,
     this.description,
     this.fileUrl,
+    this.audioUrl,
+    this.videoUrl,
     this.type,
     this.configurationId,
     this.createdAt,
@@ -60,7 +64,9 @@ class SpiritualClip {
     sId = json['_id'];
     title = json['title'];
     description = json['description'];
-    fileUrl = json['url'] ?? json['fileUrl']; // Fallback for flexibility
+    fileUrl = json['url'] ?? json['fileUrl'];
+    audioUrl = json['audioUrl'];
+    videoUrl = json['videoUrl'];
     type = json['type'];
     configurationId = json['configurationId'];
     createdAt = json['createdAt'];
@@ -73,6 +79,8 @@ class SpiritualClip {
     data['title'] = title;
     data['description'] = description;
     data['url'] = fileUrl;
+    data['audioUrl'] = audioUrl;
+    data['videoUrl'] = videoUrl;
     data['type'] = type;
     data['configurationId'] = configurationId;
     data['createdAt'] = createdAt;

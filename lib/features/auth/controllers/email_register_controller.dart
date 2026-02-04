@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:brahmakosh/common/api_urls.dart';
-import 'package:brahmakosh/core/routes/app_router.dart';
+
 import 'package:brahmakosh/features/auth/views/email_verify.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

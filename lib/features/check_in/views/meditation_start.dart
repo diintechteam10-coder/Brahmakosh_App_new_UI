@@ -8,6 +8,7 @@ import 'package:brahmakosh/features/check_in/models/spiritual_configuration_mode
 import 'package:brahmakosh/common/utils.dart';
 import 'package:brahmakosh/features/check_in/controllers/check_in_controller.dart';
 import 'package:brahmakosh/core/constants/app_constants.dart';
+import 'package:brahmakosh/features/check_in/models/spiritual_clip_model.dart';
 
 class MeditationStart extends StatefulWidget {
   const MeditationStart({super.key});
@@ -342,9 +343,27 @@ class _MeditationStartState extends State<MeditationStart>
 
       if (clips != null && clips.isNotEmpty) {
         final clip = clips[0];
-        if (clip.fileUrl != null && clip.fileUrl!.isNotEmpty) {
-          sourceUrl = clip.fileUrl!;
-          isNetwork = true;
+        if (clip is SpiritualClip) {
+          if (clip.audioUrl != null && clip.audioUrl!.isNotEmpty) {
+            sourceUrl = clip.audioUrl!;
+            isNetwork = true;
+          } else if (clip.fileUrl != null && clip.fileUrl!.isNotEmpty) {
+            sourceUrl = clip.fileUrl!;
+            isNetwork = true;
+          }
+        } else {
+          // Fallback if generic object
+          try {
+            if (clip.audioUrl != null && clip.audioUrl.isNotEmpty) {
+              sourceUrl = clip.audioUrl;
+              isNetwork = true;
+            } else if (clip.fileUrl != null && clip.fileUrl.isNotEmpty) {
+              sourceUrl = clip.fileUrl;
+              isNetwork = true;
+            }
+          } catch (e) {
+            print("Error accessing clip properties: $e");
+          }
         }
       }
 

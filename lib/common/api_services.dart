@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:async'; // Added for TimeoutException
 import 'package:brahmakosh/common/exception.dart';
 import 'package:brahmakosh/common/models/avtar_list.dart';
 import 'package:brahmakosh/common/utils.dart';
@@ -73,7 +74,7 @@ Future<dynamic> callWebApi(
       Uri.parse(url),
       headers,
       json.encode(data),
-    );
+    ).timeout(const Duration(seconds: 30));
 
     return await _returnResponse(
       response,
@@ -87,7 +88,16 @@ Future<dynamic> callWebApi(
     if (onError != null) {
       onError(e);
     }
+    // Only show toast if loader is shown or we specifically want to
     Utils.showToast('No Internet Connection');
+    if (hideLoader) Utils.hideLoader();
+    return;
+  } on TimeoutException catch (e) {
+    Utils.print('TimeoutException: ${e.toString()}');
+    if (onError != null) {
+      onError(e);
+    }
+    Utils.showToast('Server is taking too long to respond. Please try again.');
     if (hideLoader) Utils.hideLoader();
     return;
   } on http.ClientException catch (e) {
@@ -111,7 +121,10 @@ Future<dynamic> callWebApi(
     // Don't show generic error for UnauthorizedException as it's handled in _returnResponse
     if (e is! UnauthorisedException) {
       Utils.print('Errors: ${e.toString()}');
-      Utils.showToast('Something went wrongs');
+      // Replace generic message with something friendlier
+      Utils.showToast(
+        'We are facing some technical issues. Please try again later.',
+      );
     }
     if (hideLoader) Utils.hideLoader();
   }
@@ -168,10 +181,9 @@ Future<dynamic> callWebApiGet(
     print('Request headers: ' + headers.toString());
     Utils.print('headers: ' + json.encode(headers));
 
-    final http.Response response = await http.get(
-      Uri.parse(url),
-      headers: headers,
-    );
+    final http.Response response = await http
+        .get(Uri.parse(url), headers: headers)
+        .timeout(const Duration(seconds: 30));
 
     return await _returnResponse(
       response,
@@ -186,6 +198,14 @@ Future<dynamic> callWebApiGet(
       onError(e);
     }
     Utils.showToast('No Internet Connection');
+    if (hideLoader) Utils.hideLoader();
+    return;
+  } on TimeoutException catch (e) {
+    Utils.print('TimeoutException: ${e.toString()}');
+    if (onError != null) {
+      onError(e);
+    }
+    Utils.showToast('Server is taking too long to respond. Please try again.');
     if (hideLoader) Utils.hideLoader();
     return;
   } on http.ClientException catch (e) {
@@ -207,7 +227,9 @@ Future<dynamic> callWebApiGet(
     }
     if (e is! UnauthorisedException) {
       Utils.print('Error: ${e.toString()}');
-      Utils.showToast('Something went wrong');
+      Utils.showToast(
+        'We are facing some technical issues. Please try again later.',
+      );
     }
     if (hideLoader) Utils.hideLoader();
   }
@@ -238,11 +260,9 @@ Future<dynamic> callWebApiPut(
     headers.addIf(token.isNotEmpty, "Authorization", "$authPrefix $token");
     Utils.print('headers: ' + json.encode(headers));
 
-    final http.Response response = await http.put(
-      Uri.parse(url),
-      headers: headers,
-      body: json.encode(data),
-    );
+    final http.Response response = await http
+        .put(Uri.parse(url), headers: headers, body: json.encode(data))
+        .timeout(const Duration(seconds: 30));
 
     return await _returnResponse(
       response,
@@ -257,6 +277,14 @@ Future<dynamic> callWebApiPut(
       onError(e);
     }
     Utils.showToast('No Internet Connection');
+    if (hideLoader) Utils.hideLoader();
+    return;
+  } on TimeoutException catch (e) {
+    Utils.print('TimeoutException: ${e.toString()}');
+    if (onError != null) {
+      onError(e);
+    }
+    Utils.showToast('Server is taking too long to respond. Please try again.');
     if (hideLoader) Utils.hideLoader();
     return;
   } on http.ClientException catch (e) {
@@ -278,7 +306,9 @@ Future<dynamic> callWebApiPut(
     }
     if (e is! UnauthorisedException) {
       Utils.print('Error: ${e.toString()}');
-      Utils.showToast('Something went wrong');
+      Utils.showToast(
+        'We are facing some technical issues. Please try again later.',
+      );
     }
     if (hideLoader) Utils.hideLoader();
   }
@@ -307,10 +337,9 @@ Future<dynamic> callWebApiDelete(
     headers.addIf(token.isNotEmpty, "Authorization", "$authPrefix $token");
     Utils.print('headers: ' + json.encode(headers));
 
-    final http.Response response = await http.delete(
-      Uri.parse(url),
-      headers: headers,
-    );
+    final http.Response response = await http
+        .delete(Uri.parse(url), headers: headers)
+        .timeout(const Duration(seconds: 30));
 
     return await _returnResponse(
       response,
@@ -325,6 +354,14 @@ Future<dynamic> callWebApiDelete(
       onError(e);
     }
     Utils.showToast('No Internet Connection');
+    if (hideLoader) Utils.hideLoader();
+    return;
+  } on TimeoutException catch (e) {
+    Utils.print('TimeoutException: ${e.toString()}');
+    if (onError != null) {
+      onError(e);
+    }
+    Utils.showToast('Server is taking too long to respond. Please try again.');
     if (hideLoader) Utils.hideLoader();
     return;
   } on http.ClientException catch (e) {
@@ -346,7 +383,9 @@ Future<dynamic> callWebApiDelete(
     }
     if (e is! UnauthorisedException) {
       Utils.print('Error: ${e.toString()}');
-      Utils.showToast('Something went wrong');
+      Utils.showToast(
+        'We are facing some technical issues. Please try again later.',
+      );
     }
     if (hideLoader) Utils.hideLoader();
   }

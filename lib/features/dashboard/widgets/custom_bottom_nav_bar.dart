@@ -204,8 +204,8 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar>
                                 // Icon
                                 ClipOval(
                                   child: SizedBox(
-                                    width: 60,
-                                    height: 60,
+                                    width: 70,
+                                    height: 70,
                                     child: Image.asset(
                                       'assets/images/brahmkosh_logo.jpeg',
                                       fit: BoxFit.cover,

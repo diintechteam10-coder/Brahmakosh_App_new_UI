@@ -37,10 +37,6 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      homeController.fetchFounderMessages(this);
-      homeController.fetchSponsors(this);
-    });
     _startCardsAutoSlide();
   }
 
@@ -72,8 +68,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
   Future<void> _handleRefresh() async {
     await Future.wait([
-      homeController.fetchFounderMessages(this),
-      homeController.fetchSponsors(this),
+      homeController.refreshHomeData(),
       Provider.of<DashboardViewModel>(
         context,
         listen: false,
@@ -127,9 +122,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
-            SliverToBoxAdapter(child: RepaintBoundary(child: PaharSection())),
-            const SliverToBoxAdapter(child: SizedBox(height: 20)),
-
+            // SliverToBoxAdapter(child: RepaintBoundary(child: PaharSection())),
+            // const SliverToBoxAdapter(child: SizedBox(height: 20)),
             SliverToBoxAdapter(
               child: RepaintBoundary(child: LuckInFavourSection()),
             ),

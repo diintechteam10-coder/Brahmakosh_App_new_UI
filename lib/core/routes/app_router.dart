@@ -1,3 +1,4 @@
+/*
 import 'package:brahmakosh/features/auth/controllers/mobile_controller.dart';
 import 'package:brahmakosh/features/auth/views/create_avtar.dart';
 import 'package:brahmakosh/features/auth/views/login.dart';
@@ -56,3 +57,4 @@ class AppRouter {
     ],
   );
 }
+*/

@@ -1,4 +1,5 @@
 import 'package:brahmakosh/features/auth/controllers/mobile_controller.dart';
+import 'package:brahmakosh/features/auth/views/landing.dart';
 import 'package:brahmakosh/features/auth/views/login.dart';
 import 'package:brahmakosh/features/auth/views/mobile_number_page.dart';
 import 'package:brahmakosh/features/brahm_bazar/brahm_bazar_view.dart';
@@ -29,14 +30,16 @@ import '../../features/splash/views/splash_view.dart';
 import '../constants/app_constants.dart';
 import '../services/storage_service.dart';
 import '../../features/walkthrough/views/walkthrough_view.dart';
+import 'package:brahmakosh/features/redeem/views/redeem_list_view.dart';
 
 class AppPages {
   static final List<GetPage> pages = [
     GetPage(name: AppConstants.routeSplash, page: () => const SplashView()),
     GetPage(name: AppConstants.routeIntro, page: () => const IntroView()),
+    GetPage(name: AppConstants.routeLogin, page: () => LandingView()),
     GetPage(
-      name: AppConstants.routeLogin,
-      page: () => LoginPhoneView(),
+      name: AppConstants.routeEmailLogin,
+      page: () => LoginView(),
       binding: BindingsBuilder(() {
         if (!Get.isRegistered<LoginController>()) {
           Get.put(LoginController());
@@ -140,5 +143,6 @@ class AppPages {
       name: AppConstants.routeWalkthrough,
       page: () => const WalkthroughView(),
     ),
+    GetPage(name: AppConstants.routeRedeem, page: () => const RedeemListView()),
   ];
 }

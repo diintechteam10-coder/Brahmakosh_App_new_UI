@@ -13,22 +13,27 @@ class SpiritualConfigurationController extends GetxController
   final configurations = <SpiritualConfiguration>[].obs;
 
   // Selected state
-  final selectedEmotion = Rxn<String>();
+  final selectedEmotion = Rxn<String>('Happy'); // Default
+  final selectedDuration = 1.obs; // Default 1 min
   final selectedConfig = Rxn<SpiritualConfiguration>();
-  final sliderValue = 0.0.obs;
 
   // Parameters passed from previous screen
   String? categoryId;
 
-  // Emotion mapping (Emoji map as requested)
+  // Available durations for slider/selector
+  final List<int> availableDurations = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+  // Emotion mapping
   final Map<String, String> emotionEmojis = {
-    'Happy': '😊',
-    'Sad': '😢',
-    'Angry': '😠',
-    'Afraid': '😨',
     'Loved': '🥰',
     'Surprised': '😲',
     'Calm': '😌',
+    'Happy': '😊',
+    'Stressed': '😣',
+    'Neutral': '😐',
+    'Sad': '😢',
+    'Angry': '😠',
+    'Afraid': '😨',
     'Disgusted': '🤢',
   };
 
@@ -39,7 +44,6 @@ class SpiritualConfigurationController extends GetxController
     if (categoryId != null) {
       fetchConfigurations();
     } else {
-      // Fallback or error handling
       isLoading.value = false;
     }
   }
@@ -47,27 +51,14 @@ class SpiritualConfigurationController extends GetxController
   Future<void> fetchConfigurations() async {
     try {
       isLoading.value = true;
-      print("🔍 CONTROLLER_DEBUG: Fetching for categoryId: $categoryId");
-
       final response = await getSpiritualConfigurations(this, categoryId!);
-      print("✅ CONTROLLER_DEBUG: Response received: ${response?.success}");
 
       if (response != null && response.success == true) {
         configResponse.value = response;
         if (response.data != null) {
-          print("✅ CONTROLLER_DEBUG: Data count: ${response.data!.length}");
           configurations.assignAll(response.data!);
-
-          // Set default selected config if available
-          if (configurations.isNotEmpty) {
-            // Find a default or just pick first
-            selectConfig(configurations.first);
-          }
-        } else {
-          print("⚠️ CONTROLLER_DEBUG: Response data is null");
+          _updateSelectedConfig();
         }
-      } else {
-        print("⚠️ CONTROLLER_DEBUG: Response not successful or null");
       }
     } catch (e) {
       print('❌ CONTROLLER_DEBUG: Error fetching configurations: $e');
@@ -76,77 +67,90 @@ class SpiritualConfigurationController extends GetxController
     }
   }
 
-  void selectConfig(SpiritualConfiguration config) {
-    selectedConfig.value = config;
-    // Set emotion from config if matches
-    if (config.emotion != null) {
-      // Capitalize first letter to match keys if needed, assuming backend sends lowercase
-      // Adjust matching logic as per actual API response values
-      final emotion = config.emotion!.toLowerCase();
-      // Find key that matches
-      final key = emotionEmojis.keys.firstWhere(
-        (k) => k.toLowerCase() == emotion,
-        orElse: () => '',
-      );
-      if (key.isNotEmpty) {
-        selectedEmotion.value = key;
-      }
-    }
-
-    // Parse duration string "X minutes" to double for slider
-    if (config.duration != null) {
-      final parts = config.duration!.split(' ');
-      if (parts.isNotEmpty) {
-        final minutes = double.tryParse(parts[0]);
-        if (minutes != null) {
-          sliderValue.value = minutes;
-        }
-      }
-    }
-  }
-
   void onEmotionSelected(String emotion) {
     selectedEmotion.value = emotion;
-    // Scroll to middle logic is handled in View via ScrollController usually,
-    // or we can manipulate the list order if "move to middle" means reordering.
-    // User request: "if we select any emoji my selected emotion emoji should move into middle"
-    // This implies UI scroll positioning.
-
-    // Also user said: "api should response according to emotion".
-    // Filter configurations by emotion if needed?
-    // "api should response according to emotion it will add from backend later" -> sounds like filtering logic might be future work or client side now.
-    // However, "api should response according to emotion" usually means we fetch *based* on emotion or filter.
-    // Since we fetched ALL by categoryId, we likely filter relevant configs?
-    // User: "if any emoji missing according to emotion please add"
-
-    // For now, let's just update selection.
-
-    // If we need to filter configs based on emotion:
-    final relevantConfig = configurations.firstWhereOrNull(
-      (c) => c.emotion?.toLowerCase() == emotion.toLowerCase(),
-    );
-    if (relevantConfig != null) {
-      selectConfig(relevantConfig);
-    }
+    _updateSelectedConfig();
   }
 
   void updateDuration(double value) {
-    sliderValue.value = value;
+    selectedDuration.value = value.toInt();
+    _updateSelectedConfig();
+  }
+
+  void selectDuration(int duration) {
+    selectedDuration.value = duration;
+    _updateSelectedConfig();
+  }
+
+  void _updateSelectedConfig() {
+    if (configurations.isEmpty) {
+      selectedConfig.value = null;
+      return;
+    }
+
+    // Attempt to find exact match
+    final exactMatch = configurations.firstWhereOrNull((c) {
+      // Check emotion match
+      final emotionMatch =
+          c.emotion?.toLowerCase() == selectedEmotion.value?.toLowerCase();
+
+      // Check duration match
+      // Duration string format usually "5 minutes" or "1 hour"
+      // We need to parse c.duration to compare with selectedDuration
+      bool durationMatch = false;
+      if (c.duration != null) {
+        final parsed = _parseDuration(c.duration!);
+        durationMatch = parsed == selectedDuration.value;
+      }
+
+      return emotionMatch && durationMatch;
+    });
+
+    if (exactMatch != null) {
+      selectedConfig.value = exactMatch;
+    } else {
+      // Fallback to first available config with same emotion to show metadata (Karma, etc)
+      // even if duration doesn't match exactly.
+      final fallback = configurations.firstWhereOrNull(
+        (c) => c.emotion?.toLowerCase() == selectedEmotion.value?.toLowerCase(),
+      );
+      selectedConfig.value = fallback;
+    }
+  }
+
+  int _parseDuration(String durationStr) {
+    final parts = durationStr.toLowerCase().split(' ');
+    if (parts.isEmpty) return 0;
+
+    double val = double.tryParse(parts[0]) ?? 0.0;
+    if (durationStr.contains('hour')) {
+      return (val * 60).toInt();
+    }
+    return val.toInt();
   }
 
   Future<void> startSession() async {
+    // If no config matches, what to do?
+    // Maybe try to find *any* config for the emotion as fallback?
     if (selectedConfig.value == null) {
-      Utils.showToast('Please select a configuration');
-      return;
+      // Try fallback to any config with same emotion
+      final fallback = configurations.firstWhereOrNull(
+        (c) => c.emotion?.toLowerCase() == selectedEmotion.value?.toLowerCase(),
+      );
+      if (fallback != null) {
+        selectedConfig.value = fallback;
+      } else {
+        // Fallback to first available if totally desperate, or show error
+        // But better to just show error if strict
+        Utils.showToast('No session found for this selection');
+        return;
+      }
     }
 
-    if (selectedConfig.value!.sId == null) {
+    if (selectedConfig.value?.sId == null) {
       Utils.showToast('Invalid configuration');
       return;
     }
-
-    // Indicate loading if you want, but api_services handles loader dialog usually if TickerProvider provided
-    // getClipsByConfigurationId uses showLoader: true with TickerProvider (this)
 
     try {
       final response = await getClipsByConfigurationId(
@@ -154,11 +158,10 @@ class SpiritualConfigurationController extends GetxController
         selectedConfig.value!.sId!,
       );
 
-      // Navigate regardless, passing data if available
       Get.toNamed(
         AppConstants.routeMeditationStart,
         arguments: {
-          'duration': sliderValue.value.toInt(),
+          'duration': selectedDuration.value, // User selected duration
           'config': selectedConfig.value,
           'clips': (response?.success == true && response?.data != null)
               ? response!.data
@@ -167,11 +170,11 @@ class SpiritualConfigurationController extends GetxController
       );
     } catch (e) {
       print('Error starting session: $e');
-      // Fallback navigation
+      // Fallback
       Get.toNamed(
         AppConstants.routeMeditationStart,
         arguments: {
-          'duration': sliderValue.value.toInt(),
+          'duration': selectedDuration.value,
           'config': selectedConfig.value,
           'clips': [],
         },

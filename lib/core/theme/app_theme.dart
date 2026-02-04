@@ -36,6 +36,11 @@ class AppTheme {
   static const Color textSecondary = Color(0xFF6B5B4F); // Medium Brown
   static const Color textLight = Color(0xFF8B7355); // Light Brown
 
+  // Landing Screen Colors
+  static const Color landingBackground = Color(0xFFF3DFCD);
+  static const Color landingButton = Color(0xFFB8905A);
+  static const Color redeemOrange = Color(0xFFF23900);
+
   // Gradient Colors
   static const LinearGradient goldGradient = LinearGradient(
     begin: Alignment.topLeft,

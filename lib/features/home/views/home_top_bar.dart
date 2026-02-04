@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:brahmakosh/common/api_services.dart';
-import 'package:brahmakosh/core/constants/app_constants.dart';
-import 'package:brahmakosh/core/services/storage_service.dart';
 import '../../../../core/common_imports.dart';
+import 'package:brahmakosh/features/home/controllers/home_controller.dart';
+import 'package:brahmakosh/common/models/user_complete_details_model.dart';
 
 class HomeTopBar extends StatefulWidget {
   const HomeTopBar({super.key});
@@ -20,32 +19,36 @@ class _HomeTopBarState extends State<HomeTopBar> with TickerProviderStateMixin {
     {"label": "Your Moon Sign", "value": "Loading..."},
     {"label": "Your Ascendant", "value": "Loading..."},
   ];
+  late Worker _worker;
 
   @override
   void initState() {
     super.initState();
-    _fetchData();
     _startAutoSlide();
+
+    // Initial update if data exists
+    final controller = Get.find<HomeController>();
+    if (controller.userCompleteDetails != null) {
+      _updateSigns(controller.userCompleteDetails);
+    }
+
+    // Listen for changes
+    _worker = ever(controller.userCompleteDetailsRx, (data) {
+      _updateSigns(data);
+    });
   }
 
-  Future<void> _fetchData() async {
-    final userId = StorageService.getString(AppConstants.keyUserId);
-    if (userId != null) {
-      final data = await getUserCompleteDetails(this, userId);
-      if (mounted && data?.data?.astrology?.astroDetails != null) {
-        final astro = data!.data!.astrology!.astroDetails!;
-        setState(() {
-          _signs = [
-            {"label": "Your Sign", "value": astro.sign ?? "-"},
-            {"label": "Your Sign Lord", "value": astro.signLord ?? "-"},
-            {"label": "Your Ascendant", "value": astro.ascendant ?? "-"},
-            {
-              "label": "Your Ascendant Lord",
-              "value": astro.ascendantLord ?? "-",
-            },
-          ];
-        });
-      }
+  void _updateSigns(UserCompleteDetailsModel? data) {
+    if (mounted && data?.data?.astrology?.astroDetails != null) {
+      final astro = data!.data!.astrology!.astroDetails!;
+      setState(() {
+        _signs = [
+          {"label": "Your Sign", "value": astro.sign ?? "-"},
+          {"label": "Your Sign Lord", "value": astro.signLord ?? "-"},
+          {"label": "Your Ascendant", "value": astro.ascendant ?? "-"},
+          {"label": "Your Ascendant Lord", "value": astro.ascendantLord ?? "-"},
+        ];
+      });
     }
   }
 
@@ -62,7 +65,7 @@ class _HomeTopBarState extends State<HomeTopBar> with TickerProviderStateMixin {
   @override
   void dispose() {
     _timer?.cancel();
-
+    _worker.dispose();
     super.dispose();
   }
 

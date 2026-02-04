@@ -9,6 +9,7 @@ class AppConstants {
   static const String routeSplash = '/';
   static const String routeIntro = '/intro';
   static const String routeLogin = '/login';
+  static const String routeEmailLogin = '/login-email';
   static const String routeDashboard = '/dashboard';
   static const String routeRegister = '/register';
   static const String mobileOtp = '/mobileOtp';
@@ -36,4 +37,11 @@ class AppConstants {
   static const String routeSpiritualConfiguration = '/spiritualConfiguration';
   static const int splashDuration = 1;
   static const String routeWalkthrough = '/walkthrough';
+  static const String routeRedeem = '/redeem';
+
+  // Cache Keys
+  static const String cachePanchangData = 'cache_panchang_data';
+  static const String cacheFounderMessage = 'cache_founder_message';
+  static const String cacheSponsors = 'cache_sponsors';
+  static const String cacheUserCompleteDetails = 'cache_user_complete_details';
 }

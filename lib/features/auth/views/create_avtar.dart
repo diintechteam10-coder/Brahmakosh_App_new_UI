@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:math' as math;
 
 class GenerateAvatarView extends StatelessWidget {
   GenerateAvatarView({super.key});
@@ -16,159 +17,210 @@ class GenerateAvatarView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffFDFDFD),
+      backgroundColor: AppTheme.landingBackground, // Light beige
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Color(0xff5D4037)),
           onPressed: Get.back,
         ),
-        title: Text(
-          "Upload Image",
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
-        ),
-        centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          children: [
-            const SizedBox(height: 40),
+      body: Stack(
+        children: [
+          // Background Bubbles
+          Positioned(top: 100, left: -20, child: _buildBubble(size: 60)),
+          Positioned(top: 150, right: 40, child: _buildBubble(size: 40)),
+          Positioned(top: 250, left: 30, child: _buildBubble(size: 80)),
+          Positioned(bottom: 200, right: -10, child: _buildBubble(size: 100)),
+          Positioned(bottom: 100, left: 50, child: _buildBubble(size: 50)),
+          Positioned(top: 300, right: 80, child: _buildBubble(size: 30)),
+          Positioned(bottom: 300, left: -30, child: _buildBubble(size: 90)),
 
-            /// IMAGE PICKER
-            Obx(
-              () => GestureDetector(
-                onTap: () => _showImageSourceSheet(context),
-                child: Container(
-                  width: 160,
-                  height: 160,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [
-                        AppTheme.primaryGold.withOpacity(0.9),
-                        AppTheme.primaryGold.withOpacity(0.6),
-                      ],
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.primaryGold.withOpacity(0.35),
-                        blurRadius: 25,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: Container(
-                      width: 140,
-                      height: 140,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                      ),
-                      child: controller.selectedImage.value != null
-                          ? ClipOval(
-                              child: Image.file(
-                                controller.selectedImage.value!,
-                                fit: BoxFit.cover,
-                              ),
-                            )
-                          : Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.add_a_photo,
-                                  size: 36,
-                                  color: Colors.grey,
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  "Upload Image",
-                                  style: GoogleFonts.inter(
-                                    fontSize: 12,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ],
-                            ),
+          // Main Content
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              children: [
+                const SizedBox(height: 10),
+
+                Center(
+                  child: Text(
+                    "One Last Thing",
+                    style: GoogleFonts.playfairDisplay(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xff5D4037),
                     ),
                   ),
                 ),
-              ),
-            ),
 
-            const SizedBox(height: 24),
+                const SizedBox(height: 12),
 
-            Text(
-              "Upload a clear face photo to generate your avatar",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(fontSize: 13, color: Colors.black54),
-            ),
-
-            const Spacer(),
-
-            /// GENERATE BUTTON
-            Obx(
-              () => GestureDetector(
-                onTap: controller.isLoading.value
-                    ? null
-                    : controller.generateAvatar,
-                child: Container(
-                  height: 54,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryGold,
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.primaryGold.withOpacity(0.35),
-                        blurRadius: 18,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
+                Text(
+                  "Add a photo to personalize your journey",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: const Color(0xff5D4037),
+                    height: 1.5,
                   ),
-                  child: Center(
-                    child: controller.isLoading.value
-                        ? const CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          )
-                        : Text(
-                            "Upload Image",
-                            style: GoogleFonts.inter(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                ),
+
+                const Spacer(flex: 2),
+
+                /// IMAGE PICKER (Dashed Circle with Outer Line)
+                Obx(
+                  () => GestureDetector(
+                    onTap: () => _showImageSourceSheet(context),
+                    child: Column(
+                      children: [
+                        // Outer Solid Circle
+                        Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: const Color(0xff5D4037).withOpacity(0.3),
+                              width: 1,
                             ),
                           ),
+                          child: CustomPaint(
+                            painter: DashedCirclePainter(
+                              color: const Color(0xff8D6E63),
+                              dashWidth: 8,
+                              dashSpace: 6,
+                              strokeWidth: 2,
+                            ),
+                            child: Container(
+                              width: 200,
+                              height: 200,
+                              padding: const EdgeInsets.all(12),
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.transparent, // Transparent inside
+                              ),
+                              child: controller.selectedImage.value != null
+                                  ? ClipOval(
+                                      child: Image.file(
+                                        controller.selectedImage.value!,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : Center(
+                                      child: Icon(
+                                        Icons.camera_alt_outlined,
+                                        size: 40,
+                                        color: const Color(0xff5D4037),
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          "UPLOAD PHOTO",
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xff5D4037),
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ),
 
-            const SizedBox(height: 16),
-            TextButton(
-              onPressed: controller.isLoading.value
-                  ? null
-                  : () => Get.offAllNamed(AppConstants.routeDashboard),
-              child: Text(
-                "Skip for now",
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black54,
+                const Spacer(flex: 3),
+
+                /// SUBMIT BUTTON
+                Obx(
+                  () => GestureDetector(
+                    onTap: controller.isLoading.value
+                        ? null
+                        : controller.generateAvatar,
+                    child: Container(
+                      height: 54,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: AppTheme.landingButton, // Flat brown
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: controller.isLoading.value
+                            ? const SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Text(
+                                "Submit",
+                                style: GoogleFonts.inter(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
 
-            const SizedBox(height: 70),
-          ],
-        ),
+                const SizedBox(height: 16),
+
+                // SKIP
+                GestureDetector(
+                  onTap: controller.isLoading.value
+                      ? null
+                      : () => Get.offAllNamed(AppConstants.routeDashboard),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Skip",
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xff5D4037),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(
+                        Icons.arrow_forward_ios,
+                        size: 14,
+                        color: Color(0xff5D4037),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 48),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBubble({required double size}) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: AppTheme.primaryGold.withOpacity(0.15),
+        shape: BoxShape.circle,
       ),
     );
   }
@@ -259,4 +311,49 @@ class GenerateAvatarView extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Custom Painter for Dashed Circle
+class DashedCirclePainter extends CustomPainter {
+  final Color color;
+  final double dashWidth;
+  final double dashSpace;
+  final double strokeWidth;
+
+  DashedCirclePainter({
+    required this.color,
+    this.dashWidth = 8,
+    this.dashSpace = 6,
+    this.strokeWidth = 2,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint paint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke;
+
+    final double radius = math.min(size.width, size.height) / 2;
+    final Offset center = Offset(size.width / 2, size.height / 2);
+    final double circumference = 2 * math.pi * radius;
+
+    double currentAngle = 0;
+    final double dashAngle = (dashWidth / circumference) * 2 * math.pi;
+    final double spaceAngle = (dashSpace / circumference) * 2 * math.pi;
+
+    while (currentAngle < 2 * math.pi) {
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        currentAngle,
+        dashAngle,
+        false,
+        paint,
+      );
+      currentAngle += dashAngle + spaceAngle;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

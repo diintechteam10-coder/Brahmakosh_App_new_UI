@@ -10,184 +10,514 @@ class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: AppTheme.backgroundLight,
-      child: Consumer<ProfileViewModel>(
-        builder: (context, viewModel, child) {
-          final profile = viewModel.profile;
+      backgroundColor: AppTheme.landingBackground,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Consumer<ProfileViewModel>(
+                  builder: (context, viewModel, child) {
+                    final profile = viewModel.profile;
+                    final user = profile?.profile;
 
-          return Column(
-            children: [
-              // Drawer Header
-              Container(
-                padding: const EdgeInsets.only(
-                  top: 60,
-                  bottom: 20,
-                  left: 20,
-                  right: 20,
-                ),
-                decoration: BoxDecoration(gradient: AppTheme.goldGradient),
-                child: Row(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
-                      ),
-                      child: CircleAvatar(
-                        radius: 30,
-                        backgroundColor: Colors.white,
-                        backgroundImage: profile?.profileImageUrl != null
-                            ? NetworkImage(profile!.profileImageUrl!)
-                            : null,
-                        child: profile?.profileImageUrl == null
-                            ? const Icon(
-                                Icons.person,
-                                size: 35,
-                                color: AppTheme.primaryGold,
-                              )
-                            : null,
-                      ),
-                    ),
-                    const SizedBox(width: 15),
-                    Expanded(
+                    return SafeArea(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            profile?.profile?.name ?? 'User',
-                            style: GoogleFonts.playfairDisplay(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.textPrimary,
+                          /// HEADER: Back Arrow & Title
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
                             ),
-                            overflow: TextOverflow.ellipsis,
+                            child: Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: () => Navigator.pop(context),
+                                  child: const Icon(
+                                    Icons.arrow_back,
+                                    color: Color(0xff5D4037),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Text(
+                                  "Profile",
+                                  style: GoogleFonts.playfairDisplay(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: const Color(0xff5D4037),
+                                  ),
+                                ),
+                                const Spacer(),
+                                // Edit Icon Moved Here
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    Get.to(() => const ProfileDetailsView());
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: const BoxDecoration(
+                                      color: Color.fromARGB(255, 255, 245, 245),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.edit_outlined,
+                                      size: 22, // Matched to text size
+                                      color: Color(0xff5D4037),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          Text(
-                            profile?.email ?? '',
-                            style: GoogleFonts.lora(
-                              fontSize: 12,
-                              color: AppTheme.textSecondary,
+
+                          const SizedBox(height: 20),
+
+                          /// PROFILE SECTION
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            child: Row(
+                              children: [
+                                // Profile Image
+                                Stack(
+                                  children: [
+                                    Container(
+                                      width: 70,
+                                      height: 70,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: Colors.white,
+                                          width: 2,
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(
+                                              0.1,
+                                            ),
+                                            blurRadius: 10,
+                                          ),
+                                        ],
+                                      ),
+                                      child: CircleAvatar(
+                                        radius: 35,
+                                        backgroundColor: Colors.grey[200],
+                                        backgroundImage:
+                                            profile?.profileImageUrl != null
+                                            ? NetworkImage(
+                                                profile!.profileImageUrl!,
+                                              )
+                                            : null,
+                                        child: profile?.profileImageUrl == null
+                                            ? const Icon(
+                                                Icons.person,
+                                                size: 35,
+                                                color: AppTheme.primaryGold,
+                                              )
+                                            : null,
+                                      ),
+                                    ),
+                                    Positioned(
+                                      bottom: 0,
+                                      right: 0,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(4),
+                                        decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.camera_alt_outlined,
+                                          size: 14,
+                                          color: Color(0xff5D4037),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(width: 16),
+                                // Info
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        user?.name ?? 'User',
+                                        style: GoogleFonts.playfairDisplay(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: const Color(0xff5D4037),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        profile?.email ?? '',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 13,
+                                          color: Colors.black54,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        profile?.mobile ?? '',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 13,
+                                          color: Colors.black54,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                            overflow: TextOverflow.ellipsis,
+                          ),
+
+                          const SizedBox(height: 30),
+                          const Divider(height: 1, color: Colors.black12),
+                          const SizedBox(height: 10),
+
+                          /// ITEMS LIST
+                          Flexible(
+                            fit: FlexFit.loose,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 0,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // PREFERENCES
+                                  _sectionHeader("Preferences"),
+                                  _menuItem(
+                                    icon: Icons.person_outline,
+                                    label: "My Profile",
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      Get.to(() => const ProfileDetailsView());
+                                    },
+                                  ),
+                                  _languageRow(),
+
+                                  const SizedBox(height: 16),
+
+                                  // KARMA POINTS
+                                  _karmaPointsCard(context),
+
+                                  const SizedBox(height: 16),
+
+                                  // OTHERS
+                                  _sectionHeader("Others"),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      _menuItem(
+                                        icon: Icons
+                                            .account_balance_wallet_outlined,
+                                        label: "My Kosh",
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                          Provider.of<DashboardViewModel>(
+                                            context,
+                                            listen: false,
+                                          ).changeTab(5);
+                                        },
+                                      ),
+                                      _menuItem(
+                                        icon: Icons.history,
+                                        label: "Consultation History",
+                                        onTap: () {},
+                                      ),
+                                      _menuItem(
+                                        icon: Icons.bookmark_outline,
+                                        label: "Saved Reports",
+                                        onTap: () {},
+                                      ),
+                                      _menuItem(
+                                        icon: Icons.face_unlock_outlined,
+                                        label: "Avatar Agent",
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                          Get.to(() => const AvatarAgentPage());
+                                        },
+                                      ),
+                                      _menuItem(
+                                        icon: Icons.settings_outlined,
+                                        label: "Settings",
+                                        onTap: () {},
+                                      ),
+                                      _menuItem(
+                                        icon: Icons.help_outline,
+                                        label: "Help & Support",
+                                        onTap: () {},
+                                      ),
+                                      _menuItem(
+                                        icon: Icons.info_outline,
+                                        label: "About Us",
+                                        onTap: () {},
+                                      ),
+                                    ],
+                                  ),
+
+                                  const Spacer(),
+
+                                  // ACCOUNT OPTION
+                                  _sectionHeader("Account Option"),
+                                  const SizedBox(height: 8),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      await StorageService.setBool(
+                                        AppConstants.keyIsLoggedIn,
+                                        false,
+                                      );
+                                      await StorageService.remove(
+                                        AppConstants.keyAuthToken,
+                                      );
+                                      await StorageService.remove(
+                                        AppConstants.keyUserId,
+                                      );
+                                      Get.offAllNamed(AppConstants.routeLogin);
+                                    },
+                                    child: Container(
+                                      height: 36,
+                                      width: 110, // Reduced width
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        color: AppTheme
+                                            .landingButton, // Updated color
+                                        borderRadius: BorderRadius.circular(8),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: AppTheme.landingButton
+                                                .withOpacity(0.3),
+                                            blurRadius: 6,
+                                            offset: const Offset(0, 3),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(
+                                            Icons.logout,
+                                            color: Colors.white,
+                                            size: 16,
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            "Logout",
+                                            style: GoogleFonts.inter(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                ],
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Drawer Items
-              Expanded(
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  children: [
-                    _drawerItem(
-                      icon: Icons.person_outline,
-                      label: 'My Profile',
-                      onTap: () {
-                        Navigator.pop(context);
-                        Get.to(() => const ProfileDetailsView());
-                      },
-                    ),
-                    _drawerItem(
-                      icon: Icons.account_balance_wallet_outlined,
-                      label: 'My Kosh',
-                      onTap: () {
-                        Navigator.pop(context);
-                        // MyKosh is at index 5 in Dashboard
-                        Provider.of<DashboardViewModel>(
-                          context,
-                          listen: false,
-                        ).changeTab(5);
-                      },
-                    ),
-                    _drawerItem(
-                      icon: Icons.history,
-                      label: 'Consultation History',
-                      onTap: () {},
-                    ),
-                    _drawerItem(
-                      icon: Icons.bookmark_outline,
-                      label: 'Saved Reports',
-                      onTap: () {},
-                    ),
-                    _drawerItem(
-                      icon: Icons.face_unlock_outlined,
-                      label: 'Avatar Agent',
-                      onTap: () {
-                        Navigator.pop(context);
-                        Get.to(() => const AvatarAgentPage());
-                      },
-                    ),
-                    const Divider(),
-                    _drawerItem(
-                      icon: Icons.settings_outlined,
-                      label: 'Settings',
-                      onTap: () {},
-                    ),
-                    _drawerItem(
-                      icon: Icons.help_outline,
-                      label: 'Help & Support',
-                      onTap: () {},
-                    ),
-                    _drawerItem(
-                      icon: Icons.info_outline,
-                      label: 'About Us',
-                      onTap: () {},
-                    ),
-                  ],
-                ),
-              ),
-
-              // Logout Button
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: ListTile(
-                  onTap: () async {
-                    await StorageService.setBool(
-                      AppConstants.keyIsLoggedIn,
-                      false,
                     );
-                    await StorageService.remove(AppConstants.keyAuthToken);
-                    await StorageService.remove(AppConstants.keyUserId);
-                    Get.offAllNamed(AppConstants.routeLogin);
                   },
-                  leading: const Icon(Icons.logout, color: Colors.red),
-                  title: Text(
-                    'Logout',
-                    style: GoogleFonts.cinzel(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.red,
-                    ),
-                  ),
                 ),
               ),
-              SizedBox(height: 30),
-            ],
+            ),
           );
         },
       ),
     );
   }
 
-  Widget _drawerItem({
+  Widget _sectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6, top: 4),
+      child: Text(
+        title,
+        style: GoogleFonts.playfairDisplay(
+          fontSize: 15, // Reduced font size
+          fontWeight: FontWeight.bold,
+          color: const Color(0xff5D4037),
+        ),
+      ),
+    );
+  }
+
+  Widget _menuItem({
     required IconData icon,
     required String label,
     required VoidCallback onTap,
   }) {
-    return ListTile(
-      leading: Icon(icon, color: AppTheme.primaryGold),
-      title: Text(
-        label,
-        style: GoogleFonts.cinzel(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: AppTheme.textPrimary,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6), // Reduced padding
+      child: InkWell(
+        onTap: onTap,
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: const Color(0xff5D4037),
+              size: 22,
+            ), // Reduced size
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: GoogleFonts.inter(
+                  fontSize: 15, // Reduced font size
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xff4E342E),
+                ),
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: Color(0xff8D6E63), size: 18),
+          ],
         ),
       ),
-      onTap: onTap,
+    );
+  }
+
+  Widget _languageRow() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6), // Reduced padding
+      child: Row(
+        children: [
+          const Icon(Icons.translate, color: Color(0xff5D4037), size: 18),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              "Change Language",
+              style: GoogleFonts.inter(
+                fontSize: 15, // Reduced font size
+                fontWeight: FontWeight.w500,
+                color: const Color(0xff4E342E),
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.grey.withOpacity(0.3)),
+            ),
+            child: Row(
+              children: [_langOption("En", true), _langOption("Hi", false)],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _langOption(String text, bool isSelected) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: isSelected ? const Color(0xffFFCC80) : Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Text(
+        text,
+        style: GoogleFonts.inter(
+          fontSize: 11, // Reduced font size
+          fontWeight: FontWeight.bold,
+          color: isSelected ? Colors.black87 : Colors.black54,
+        ),
+      ),
+    );
+  }
+
+  Widget _karmaPointsCard(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        // Future functionality
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 255, 245, 245),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xff5D4037).withOpacity(0.1)),
+        ),
+        child: Row(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Text Part
+                Text(
+                  "Your Karma Points",
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xff5D4037),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                // Number Part
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xff5D4037).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    "240", // Placeholder value
+                    style: GoogleFonts.playfairDisplay(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xff5D4037),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const Spacer(),
+            // Redeem Button
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context); // Close drawer
+                Get.toNamed(AppConstants.routeRedeem);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 233, 130, 11),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Text(
+                  "Redeem",
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
