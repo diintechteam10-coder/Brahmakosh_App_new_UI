@@ -1,299 +1,393 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-
-import 'package:brahmakosh/core/common_imports.dart';
 import 'package:brahmakosh/features/home/controllers/mantra_chanting_controller.dart';
 
-class MantraChantingView extends StatefulWidget {
+class MantraChantingView extends GetView<MantraChantingController> {
   const MantraChantingView({super.key});
 
   @override
-  State<MantraChantingView> createState() => _MantraChantingViewState();
-}
-
-class _MantraChantingViewState extends State<MantraChantingView> {
-  late final MantraChantingController controller;
-  late final PageController pageController;
-
-  @override
-  void initState() {
-    super.initState();
-    controller = Get.put(MantraChantingController());
-    pageController = PageController();
-
-    /// Sync tab change with PageView
-    ever<int>(controller.selectedIndex, (index) {
-      if (pageController.hasClients && pageController.page?.round() != index) {
-        pageController.animateToPage(
-          index,
-          duration: const Duration(milliseconds: 400),
-          curve: Curves.easeInOut,
-        );
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    pageController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Obx(() {
-        if (controller.isLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    if (!Get.isRegistered<MantraChantingController>()) {
+      Get.put(MantraChantingController());
+    }
 
-        if (controller.chantingMantras.isEmpty) {
-          return const Center(child: Text("No mantras available"));
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        final shouldPop = await _showExitConfirmation(context);
+        if (shouldPop == true) {
+          Get.back();
         }
-
-        return Column(
+      },
+      child: Scaffold(
+        body: Stack(
           children: [
-            /// 🔝 TOP BAR WITH DROPDOWN
+            // Background Image
+            Positioned.fill(
+              child: Image.asset(
+                'assets/images/chanting_backgroud.png',
+                fit: BoxFit.cover,
+              ),
+            ),
+
             SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 10,
-                ),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new),
-                      color: AppTheme.deepGold,
-                      onPressed: Get.back,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Obx(() {
-                        return SizedBox(
-                          height: 42,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: controller.chantingMantras.length,
-                            itemBuilder: (context, index) {
-                              final mantra = controller.chantingMantras[index];
-                              final isSelected =
-                                  controller.selectedIndex.value == index;
-
-                              return GestureDetector(
-                                onTap: () {
-                                  controller.selectMantra(index);
-                                },
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 250),
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 6,
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 18,
-                                    vertical: 8,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: isSelected
-                                        ? AppTheme.primaryGold
-                                        : Colors.white.withOpacity(0.25),
-                                    borderRadius: BorderRadius.circular(22),
-                                    border: Border.all(
-                                      color: isSelected
-                                          ? AppTheme.primaryGold
-                                          : AppTheme.deepGold.withOpacity(0.4),
-                                      width: 1.5,
-                                    ),
-                                    boxShadow: isSelected
-                                        ? [
-                                            BoxShadow(
-                                              color: AppTheme.primaryGold
-                                                  .withOpacity(0.4),
-                                              blurRadius: 8,
-                                              offset: const Offset(0, 4),
-                                            ),
-                                          ]
-                                        : [],
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      mantra.name ?? "Mantra",
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 14,
-                                        fontWeight: isSelected
-                                            ? FontWeight.w700
-                                            : FontWeight.w500,
-                                        color: isSelected
-                                            ? Colors.white
-                                            : AppTheme.deepGold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        );
-                      }),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            /// 📜 PAGE VIEW
-            Expanded(
-              child: PageView.builder(
-                controller: pageController,
-                itemCount: controller.chantingMantras.length,
-                onPageChanged: controller.selectMantra,
-                itemBuilder: (_, index) {
-                  final mantra = controller.chantingMantras[index];
-
-                  return GestureDetector(
-                    onTap: controller.incrementCount,
-                    child: SingleChildScrollView(
-                      child: _MantraBody(
-                        controller: controller,
-                        mantra: mantra,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-
-            /// 🔘 PAGE INDICATOR
-            Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: SmoothPageIndicator(
-                controller: pageController,
-                count: controller.chantingMantras.length,
-                effect: const ExpandingDotsEffect(
-                  activeDotColor: AppTheme.primaryGold,
-                  dotColor: AppTheme.lightGold,
-                  dotHeight: 8,
-                  dotWidth: 8,
-                ),
-                onDotClicked: (index) {
-                  pageController.animateToPage(
-                    index,
-                    duration: const Duration(milliseconds: 400),
-                    curve: Curves.easeInOut,
-                  );
-                },
+              child: Column(
+                children: [
+                  _buildHeader(context),
+                  //const Spacer(),
+                  const SizedBox(height: 15),
+                  _buildMantraDial(),
+                  const SizedBox(
+                    height: 20,
+                  ), // Reduced gap to keep controls near dial
+                  _buildStatusSection(),
+                  const SizedBox(height: 8),
+                  _buildChantButton(),
+                  const Spacer(), // Added Spacer to push content up towards middle
+                ],
               ),
             ),
           ],
-        );
-      }),
+        ),
+      ),
     );
   }
-}
 
-class _MantraBody extends StatelessWidget {
-  final MantraChantingController controller;
-  final dynamic mantra;
+  Future<bool?> _showExitConfirmation(BuildContext context) {
+    return Get.dialog<bool>(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: const Color(0xffFFF8E7), // Light beige
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.warning_amber_rounded,
+                size: 48,
+                color: Color(0xff5D4037),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                "End Chanting?",
+                style: GoogleFonts.merriweather(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xff5D4037),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                "Are you sure you want to end chanting? If you end now, you will not receive any Karma points.",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: const Color(0xff8D6E63),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Get.back(result: false),
+                      child: Text(
+                        "Cancel",
+                        style: GoogleFonts.poppins(
+                          color: const Color(0xff8D6E63),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Get.back(result: true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xff5D4037),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        "End",
+                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
-  const _MantraBody({required this.controller, required this.mantra});
-
-  @override
-  Widget build(BuildContext context) {
-    final total = mantra.malaCount ?? 108;
-
-    return Obx(() {
-      final progress = controller.chantCount.value / total;
-
-      return Column(
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
+      child: Column(
         children: [
-          const SizedBox(height: 24),
+          Row(
+            children: [
+              IconButton(
+                onPressed: () async {
+                  final shouldPop = await _showExitConfirmation(context);
+                  if (shouldPop == true) {
+                    Get.back();
+                  }
+                },
+                icon: const Icon(Icons.arrow_back, color: Color(0xff5D4037)),
+              ),
+            ],
+          ),
+          Text(
+            "Today' Chanting",
+            style: GoogleFonts.merriweather(
+              // Serif font like in design
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xff5D4037), // Dark Brown
+            ),
+          ),
+          const SizedBox(height: 8),
+          Obx(() {
+            final mantraName = controller.chantingMantra?.name ?? "ॐ नमः शिवाय";
+            return Text(
+              mantraName,
+              style: GoogleFonts.tiroDevanagariHindi(
+                fontSize: 18,
+                color: const Color(0xff5D4037),
+                fontWeight: FontWeight.w500,
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
 
-          /// 🕉 OM
-          ScaleTransition(
-            scale: controller.scaleAnimation,
-            child: Text(
-              "ॐ",
-              style: GoogleFonts.playfairDisplay(
-                fontSize: 90,
-                color: AppTheme.deepGold,
-                fontWeight: FontWeight.bold,
+  Widget _buildMantraDial() {
+    return SizedBox(
+      width: 300,
+      height: 300,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Layer 1: Layout Skeleton (keeps divider/counter in place)
+          Obx(() {
+            final total = controller.chantingMantra?.malaCount ?? 108;
+            final current = controller.chantCount.value;
+            // Ghost text to reserve space exactly matching the visible text
+            final mantraText = controller.chantingMantra?.name ?? "ॐ नमः शिवाय";
+
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Invisible Text Placeholder to maintain layout
+                Opacity(
+                  opacity: 0.0,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      mantraText,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.tiroDevanagariHindi(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  width: 120,
+                  height: 1,
+                  color: const Color(0xffFFD700).withOpacity(0.5),
+                ),
+                const SizedBox(height: 16),
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: "$current",
+                        style: GoogleFonts.poppins(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white, // Changing count is White
+                        ),
+                      ),
+                      TextSpan(
+                        text: " / $total",
+                        style: GoogleFonts.poppins(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xffFFD700), // Static part is Gold
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }),
+
+          // Layer 2: Animated Mantra Text (Projectile Animation)
+          // Uses Explicit AnimationController (moveController)
+          AnimatedBuilder(
+            animation: controller.moveController,
+            builder: (context, child) {
+              final mantraText =
+                  controller.chantingMantra?.name ?? "ॐ नमः शिवाय";
+
+              // If animation is dismissed (initial state) or completed (cycle done),
+              // show nothing or resetting state.
+              // Actually, we want to show the text at center if not animating?
+              // User said "mantra text... emerging from circle... only when we tap"
+              // The "loop" implies tap -> animates -> disappears -> wait for next tap.
+
+              // Let's render the text based on animation values.
+              return Align(
+                alignment: controller.moveAnimation.value,
+                child: Opacity(
+                  opacity: controller.moveOpacityAnimation.value,
+                  child: Transform.scale(
+                    scale: controller.moveScaleAnimation.value,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(
+                        mantraText,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.tiroDevanagariHindi(
+                          fontSize: 32,
+                          color: const Color(0xffFFD700), // Yellow/Gold text
+                          fontWeight: FontWeight.bold,
+                          shadows: [
+                            const Shadow(
+                              color: Colors.black45,
+                              offset: Offset(0, 2),
+                              blurRadius: 4,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusSection() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Obx(
+              () => Container(
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: controller.elapsedSeconds.value > 0
+                      ? const Color(0xffFF8C00) // Active Orange
+                      : Colors.grey,
+                ),
               ),
             ),
-          ),
-
-          const SizedBox(height: 20),
-
-          /// 📿 NAME
-          Text(
-            mantra.name ?? "Om Namah Shivaya",
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.deepGold,
+            const SizedBox(width: 15),
+            Text(
+              "Chanting in Progress",
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xff5D4037),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Obx(
+          () => Text(
+            "Time : ${controller.formattedTime}",
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              color: const Color(0xff8D6E63),
             ),
           ),
+        ),
+      ],
+    );
+  }
 
-          const SizedBox(height: 12),
-
-          /// 🔢 COUNTER (NOW REACTIVE ✅)
-          Text(
-            "${controller.chantCount.value} / $total",
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 46,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.primaryGold,
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          /// ⭕ PROGRESS (NOW REACTIVE ✅)
+  Widget _buildChantButton() {
+    return GestureDetector(
+      onTap: controller.incrementCount,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Progress Ring
           SizedBox(
-            height: 110,
-            width: 110,
-            child: CircularProgressIndicator(
-              value: progress.clamp(0.0, 1.0),
-              strokeWidth: 10,
-              valueColor: AlwaysStoppedAnimation(
-                controller.isCompleted.value
-                    ? Colors.green
-                    : AppTheme.primaryGold,
-              ),
-            ),
+            width: 100,
+            height: 100,
+            child: Obx(() {
+              final total = controller.chantingMantra?.malaCount ?? 108;
+              final progress = total > 0
+                  ? (controller.chantCount.value / total)
+                  : 0.0;
+              return CircularProgressIndicator(
+                value: progress,
+                strokeWidth: 4,
+                valueColor: const AlwaysStoppedAnimation(Color(0xffD4AF37)),
+                backgroundColor: const Color(0xffD4AF37).withOpacity(0.2),
+              );
+            }),
           ),
 
-          const SizedBox(height: 16),
-
-          /// 🧾 DESCRIPTION
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
+          // Button
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: const LinearGradient(
+                colors: [Color(0xff5D4037), Color(0xff3E2723)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              border: Border.all(color: const Color(0xffD4AF37), width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xff3E2723).withOpacity(0.5),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            alignment: Alignment.center,
             child: Text(
-              controller.isCompleted.value
-                  ? "🎉 Mala completed!"
-                  : mantra.description ?? "Tap anywhere to increase count",
+              "Tap to\nChant",
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: 14,
-                color: AppTheme.deepGold,
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
-
-          const SizedBox(height: 20),
-
-          /// 🔄 RESET
-          TextButton.icon(
-            onPressed: controller.resetCount,
-            icon: const Icon(Icons.refresh),
-            label: const Text("RESET"),
-          ),
-
-          const SizedBox(height: 30),
         ],
-      );
-    });
+      ),
+    );
   }
 }

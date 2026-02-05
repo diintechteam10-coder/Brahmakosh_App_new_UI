@@ -72,6 +72,8 @@ dependencies:
   url_launcher: ^6.2.2 # Added for opening sponsor websites
   smooth_page_indicator: ^1.1.0 # Added for page view indication
   geolocator: ^14.0.2
+  flutter_bloc: ^9.1.1
+  equatable: ^2.0.8
 
 dev_dependencies:
   flutter_test:

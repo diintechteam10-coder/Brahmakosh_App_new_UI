@@ -15,6 +15,16 @@ class SpiritualConfigurationResponse {
     }
     count = json['count'];
   }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['success'] = success;
+    data['count'] = count;
+    if (this.data != null) {
+      data['data'] = this.data!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
 }
 
 class SpiritualConfiguration {
@@ -71,5 +81,26 @@ class SpiritualConfiguration {
     iV = json['__v'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['_id'] = sId;
+    data['title'] = title;
+    data['description'] = description;
+    data['duration'] = duration;
+    data['type'] = type;
+    data['emotion'] = emotion;
+    data['karmaPoints'] = karmaPoints;
+    data['chantingType'] = chantingType;
+    data['customChantingType'] = customChantingType;
+    data['isActive'] = isActive;
+    data['isDeleted'] = isDeleted;
+    data['clientId'] = clientId;
+    data['categoryId'] = categoryId;
+    data['__v'] = iV;
+    data['createdAt'] = createdAt;
+    data['updatedAt'] = updatedAt;
+    return data;
   }
 }

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:video_player/video_player.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../common/models/avtar_list.dart';
 import 'ai_rashmi_service.dart';
@@ -35,12 +35,9 @@ class _RashmiAiView extends StatefulWidget {
 }
 
 class _RashmiAiViewState extends State<_RashmiAiView> {
-  VideoPlayerController? _vicontroller;
   final TextEditingController _controller = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  int _previousTabIndex = -1;
   final DeitySelectionService _deityService = DeitySelectionService();
-  bool _isInitialized = false;
   Data? _currentDeity;
 
   @override
@@ -66,40 +63,10 @@ class _RashmiAiViewState extends State<_RashmiAiView> {
       _deityService.setSelectedDeity(agentController.avatars.first);
     }
 
-    _currentDeity = _deityService.selectedDeity;
-    _initializeVideo();
-  }
-
-  Future<void> _initializeVideo() async {
-    final videoPath = _deityService.getVideoPath();
-    if (videoPath == null) {
-      _isInitialized = false;
-      if (mounted) setState(() {});
-      return;
-    }
-
-    // Dispose previous controller if exists
-    _vicontroller?.dispose();
-
-    if (videoPath.startsWith('http')) {
-      _vicontroller = VideoPlayerController.network(videoPath);
-    } else {
-      _vicontroller = VideoPlayerController.asset(videoPath);
-    }
-
-    try {
-      await _vicontroller!.initialize();
-      if (mounted) {
-        _vicontroller!.setLooping(false);
-        _vicontroller!.setVolume(1.0);
-        _isInitialized = true;
-        setState(() {});
-      }
-    } catch (error) {
-      print('Video initialization error: $error');
-      if (mounted) {
-        setState(() {});
-      }
+    if (mounted) {
+      setState(() {
+        _currentDeity = _deityService.selectedDeity;
+      });
     }
   }
 
@@ -107,98 +74,20 @@ class _RashmiAiViewState extends State<_RashmiAiView> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    // Check if we're on the AI Rashmi tab (index 2)
-    final dashboardViewModel = Provider.of<DashboardViewModel>(context);
-    final currentIndex = dashboardViewModel.currentIndex;
-
-    // If we just navigated to this tab (index 2)
-    if (currentIndex == 2 && _previousTabIndex != 2) {
-      // Check if deity has changed since last time
-      final selectedDeity = _deityService.selectedDeity;
-      if (selectedDeity != _currentDeity) {
-        // Deity has changed, reload video
-        _currentDeity = selectedDeity;
-        final newVideoPath = _deityService.getVideoPath();
-        if (newVideoPath != null) {
-          _reloadVideo(newVideoPath);
-        }
-      } else {
-        // Same deity, resume playing from where it was paused
-        if (_vicontroller != null &&
-            _vicontroller!.value.isInitialized &&
-            !_vicontroller!.value.isPlaying) {
-          _vicontroller!.play();
-        }
-      }
-    }
-
-    // If we're navigating away from this tab, pause the video
-    if (currentIndex != 2 && _previousTabIndex == 2) {
-      if (_vicontroller != null &&
-          _vicontroller!.value.isInitialized &&
-          _vicontroller!.value.isPlaying) {
-        _vicontroller!.pause();
-      }
-    }
-
-    _previousTabIndex = currentIndex;
-  }
-
-  /// Reload video when deity changes
-  Future<void> _reloadVideo(String? videoPath) async {
-    if (videoPath == null) return;
-    try {
-      // Pause and dispose the old controller
-      if (_vicontroller != null && _vicontroller!.value.isInitialized) {
-        await _vicontroller!.pause();
-      }
-      _vicontroller?.dispose(); // Use safe call
-
-      _isInitialized = false;
-      setState(() {});
-
-      // Update current deity tracking
-      _currentDeity = _deityService.selectedDeity;
-
-      // Create and initialize new controller
-      if (videoPath.startsWith('http')) {
-        _vicontroller = VideoPlayerController.network(videoPath);
-      } else {
-        _vicontroller = VideoPlayerController.asset(videoPath);
-      }
-      await _vicontroller!.initialize();
-
+    // Check if deity has changed since last time
+    final selectedDeity = _deityService.selectedDeity;
+    if (selectedDeity != _currentDeity) {
       if (mounted) {
-        _vicontroller!.setLooping(false);
-        _vicontroller!.setVolume(1.0);
-        _isInitialized = true;
-        setState(() {});
-
-        // Play from start after small delay
-        await Future.delayed(const Duration(milliseconds: 100));
-        _playVideoFromStart();
+        setState(() {
+          _currentDeity = selectedDeity;
+        });
       }
-    } catch (error) {
-      print('Video reload error: $error');
-      if (mounted) {
-        setState(() {});
-      }
-    }
-  }
-
-  void _playVideoFromStart() {
-    if (_vicontroller != null && _vicontroller!.value.isInitialized) {
-      _vicontroller!.seekTo(Duration.zero); // Reset to beginning
-      _vicontroller!.play();
-      setState(() {});
     }
   }
 
   @override
   void dispose() {
     _controller.dispose();
-    _vicontroller?.pause();
-    _vicontroller?.dispose();
     super.dispose();
   }
 
@@ -234,23 +123,29 @@ class _RashmiAiViewState extends State<_RashmiAiView> {
       onWillPop: _onWillPop,
       child: GetBuilder<AiRashmiController>(
         builder: (vm) {
-          final theme = Theme.of(context);
+          final imageUrl = _currentDeity?.imageUrl;
+
           return Scaffold(
             key: _scaffoldKey,
             drawer: _buildDrawer(vm),
             body: Stack(
               children: [
-                // Video Background - Using VideoPlayer widget
+                // Image Background instead of Video
                 Positioned.fill(
-                  child:
-                      (_vicontroller != null &&
-                          _vicontroller!.value.isInitialized)
-                      ? FittedBox(
+                  child: imageUrl != null && imageUrl.isNotEmpty
+                      ? CachedNetworkImage(
+                          imageUrl: imageUrl, // Uses network image from API
                           fit: BoxFit.cover,
-                          child: SizedBox(
-                            width: _vicontroller!.value.size.width,
-                            height: _vicontroller!.value.size.height,
-                            child: VideoPlayer(_vicontroller!),
+                          placeholder: (context, url) =>
+                              Container(color: Colors.black),
+                          errorWidget: (context, url, error) => Container(
+                            color: Colors.black,
+                            child: const Center(
+                              child: Icon(
+                                Icons.image_not_supported,
+                                color: Colors.white54,
+                              ),
+                            ),
                           ),
                         )
                       : Container(color: Colors.black),
@@ -281,16 +176,17 @@ class _RashmiAiViewState extends State<_RashmiAiView> {
                           // Change Deity Button
                           GestureDetector(
                             onTap: () async {
-                              _vicontroller?.pause();
-
                               // Navigate to Aradhya Selection
                               await Get.to(
                                 () => AradhyaSelectionView(
                                   onDeitySelected: () async {
-                                    // Reload video with new deity
-                                    final newVideoPath = _deityService
-                                        .getVideoPath();
-                                    await _reloadVideo(newVideoPath);
+                                    // Update state with new deity
+                                    if (mounted) {
+                                      setState(() {
+                                        _currentDeity =
+                                            _deityService.selectedDeity;
+                                      });
+                                    }
                                   },
                                 ),
                               );
@@ -349,9 +245,6 @@ class _RashmiAiViewState extends State<_RashmiAiView> {
                           IconButton(
                             icon: const Icon(Icons.close, color: Colors.white),
                             onPressed: () {
-                              // Stop and pause video
-                              _vicontroller?.pause();
-
                               // Navigate back to Home (index 0) in dashboard
                               final dashboardViewModel =
                                   Provider.of<DashboardViewModel>(
@@ -378,9 +271,6 @@ class _RashmiAiViewState extends State<_RashmiAiView> {
                       // Center "Click to Talk" Button
                       GestureDetector(
                         onTap: () {
-                          // Stop video before navigating
-                          _vicontroller?.pause();
-
                           // Pass the selected agent's ID to the talk page
                           final agentId = _deityService.selectedDeity?.agentId;
                           debugPrint(

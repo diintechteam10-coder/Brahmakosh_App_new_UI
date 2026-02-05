@@ -76,6 +76,18 @@ class Activities {
     route = json['route'];
     isActive = json['isActive'];
   }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['title'] = title;
+    data['desc'] = desc;
+    data['icon'] = icon;
+    data['image'] = image;
+    data['route'] = route;
+    data['isActive'] = isActive;
+    return data;
+  }
 }
 
 class Stats {

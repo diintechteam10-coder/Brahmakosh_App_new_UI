@@ -29,8 +29,7 @@ class ApiUrls {
   static const String testimonials = '$baseUrl/api/testimonials';
   static const String founderMessages = '$baseUrl/api/founder-messages';
   static const String sponsors = '$baseUrl/api/sponsors';
-  static const String chantings =
-      'https://backend-jfg8.onrender.com/api/chantings';
+  static const String chantings = '$baseUrl/api/chantings';
   static const String liveAvatars = '$baseUrl/api/live-avatars';
 
   ///Sadhna APIs

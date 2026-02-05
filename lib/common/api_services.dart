@@ -819,8 +819,8 @@ Future<SpiritualConfigurationResponse?> getSpiritualConfigurations(
   final token = StorageService.getString(AppConstants.keyAuthToken) ?? "";
   final url = "${ApiUrls.spiritualConfigurations}?categoryId=$categoryId";
 
-  print("🔍 DEBUG_SPIRITUAL: Requesting URL: $url");
-  print("🔍 DEBUG_SPIRITUAL: CategoryId: $categoryId");
+  print("🔍 DEBUG_SPIRITUAL_Configuration: Requesting URL: $url");
+  print("🔍 DEBUG_SPIRITUAL_Configuration: CategoryId: $categoryId");
 
   await callWebApiGet(
     tickerProvider,

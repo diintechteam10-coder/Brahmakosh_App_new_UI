@@ -2,13 +2,15 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:get/get.dart';
-import 'package:brahmakosh/common/api_services.dart';
+
 import 'package:brahmakosh/features/check_in/models/spiritual_session_model.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_configuration_model.dart';
 import 'package:brahmakosh/common/utils.dart';
-import 'package:brahmakosh/features/check_in/controllers/check_in_controller.dart';
 import 'package:brahmakosh/core/constants/app_constants.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_clip_model.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:brahmakosh/features/check_in/blocs/meditation_session/meditation_session_bloc.dart';
+import 'package:brahmakosh/features/check_in/repositories/spiritual_repository.dart';
 
 class MeditationStart extends StatefulWidget {
   const MeditationStart({super.key});
@@ -145,14 +147,14 @@ class _MeditationStartState extends State<MeditationStart>
         });
 
         // Save Session
-        _saveSession();
+        _triggerSaveSession();
       }
     });
 
     _startFlow();
   }
 
-  Future<void> _saveSession() async {
+  void _triggerSaveSession() {
     // Construct Request
     SpiritualSessionRequest request = SpiritualSessionRequest(
       type: _config?.type ?? "chanting",
@@ -170,24 +172,15 @@ class _MeditationStartState extends State<MeditationStart>
       configurationId: _config?.sId,
     );
 
-    await saveSpiritualSession(
-      this,
-      request,
-      onSuccess: (responseMap) {
-        if (mounted) {
-          _showCompletionDialog(context, responseMap);
-        }
-
-        // Refresh Check-in Data
-        if (Get.isRegistered<CheckInController>()) {
-          Get.find<CheckInController>().fetchCheckInData();
-        }
-      },
-      onError: (error) {
-        Utils.showToast(error);
-      },
-    );
+    // Dispatch Event
+    // We need context to access BLoC.
+    // Since this is called from initState->Listener, context IS available (StatefulWidget).
+    if (mounted) {
+      context.read<MeditationSessionBloc>().add(SaveSession(request));
+    }
   }
+
+  // Removed _saveSession manual call
 
   void _showCompletionDialog(
     BuildContext context,
@@ -436,337 +429,355 @@ class _MeditationStartState extends State<MeditationStart>
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          /// 🌌 Parallax Breathing Background
-          Positioned.fill(
-            child: AnimatedBuilder(
-              animation: _bgScaleAnimation,
-              builder: (context, child) {
-                return Transform.scale(
-                  scale: _bgScaleAnimation.value,
-                  child: child,
-                );
-              },
-              child: Image.asset(
-                'assets/images/medi_bg.png',
-                fit: BoxFit.cover,
+    return BlocProvider(
+      create: (context) =>
+          MeditationSessionBloc(repository: SpiritualRepository()),
+      child: BlocListener<MeditationSessionBloc, MeditationSessionState>(
+        listener: (context, state) {
+          if (state is SessionSaved) {
+            _showCompletionDialog(context, state.response);
+          }
+          if (state is SessionError) {
+            Utils.showToast(state.message);
+          }
+        },
+        child: Scaffold(
+          backgroundColor: Colors.black,
+          body: Stack(
+            children: [
+              /// 🌌 Parallax Breathing Background
+              Positioned.fill(
+                child: AnimatedBuilder(
+                  animation: _bgScaleAnimation,
+                  builder: (context, child) {
+                    return Transform.scale(
+                      scale: _bgScaleAnimation.value,
+                      child: child,
+                    );
+                  },
+                  child: Image.asset(
+                    'assets/images/medi_bg.png',
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
-            ),
-          ),
 
-          /// 🌌 Celestial Aurora Glow (Animated Mesh Glow)
-          const Positioned.fill(child: _AuroraGlow()),
+              /// 🌌 Celestial Aurora Glow (Animated Mesh Glow)
+              const Positioned.fill(child: _AuroraGlow()),
 
-          /// ✨ Magic Particles
-          for (int i = 0; i < 25; i++) _MagicParticle(index: i),
+              /// ✨ Magic Particles
+              for (int i = 0; i < 25; i++) _MagicParticle(index: i),
 
-          /// ✖️ Top Controls
-          Positioned(
-            top: 50,
-            left: 20,
-            right: 20,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                GestureDetector(
-                  onTap: () =>
-                      setState(() => _showSongSelection = !_showSongSelection),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black26,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white12),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.music_note,
-                          color: Colors.white70,
-                          size: 16,
+              /// ✖️ Top Controls
+              Positioned(
+                top: 50,
+                left: 20,
+                right: 20,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () => setState(
+                        () => _showSongSelection = !_showSongSelection,
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          _tracks[_selectedTrack],
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
+                        decoration: BoxDecoration(
+                          color: Colors.black26,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.white12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.music_note,
+                              color: Colors.white70,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              _tracks[_selectedTrack],
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            const Icon(
+                              Icons.keyboard_arrow_down,
+                              color: Colors.white70,
+                              size: 16,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    _CloseButton(onPressed: () => Navigator.pop(context)),
+                  ],
+                ),
+              ),
+
+              /// 🌠 DIVINE CENTER (Halo + Image + Breathing)
+              Align(
+                alignment: const Alignment(0, -0.25),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    /// 1. The Divine Halo (Rotating)
+                    RotationTransition(
+                      turns: _haloController,
+                      child: Container(
+                        width: size.width * 0.9,
+                        height: size.width * 0.9,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: RadialGradient(
+                            colors: [
+                              Colors.white.withOpacity(0.15),
+                              Colors.amber.withOpacity(0.05),
+                              Colors.transparent,
+                            ],
+                            stops: const [0.4, 0.7, 1.0],
                           ),
                         ),
-                        const SizedBox(width: 4),
-                        const Icon(
-                          Icons.keyboard_arrow_down,
-                          color: Colors.white70,
-                          size: 16,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                _CloseButton(onPressed: () => Navigator.pop(context)),
-              ],
-            ),
-          ),
-
-          /// 🌠 DIVINE CENTER (Halo + Image + Breathing)
-          Align(
-            alignment: const Alignment(0, -0.25),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                /// 1. The Divine Halo (Rotating)
-                RotationTransition(
-                  turns: _haloController,
-                  child: Container(
-                    width: size.width * 0.9,
-                    height: size.width * 0.9,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          Colors.white.withOpacity(0.15),
-                          Colors.amber.withOpacity(0.05),
-                          Colors.transparent,
-                        ],
-                        stops: const [0.4, 0.7, 1.0],
                       ),
                     ),
-                  ),
-                ),
 
-                /// 2. Zen Ripples (Only when playing)
-                if (_isPlaying)
-                  for (int i = 0; i < 3; i++)
-                    _ZenRipple(controller: _rippleController, index: i),
+                    /// 2. Zen Ripples (Only when playing)
+                    if (_isPlaying)
+                      for (int i = 0; i < 3; i++)
+                        _ZenRipple(controller: _rippleController, index: i),
 
-                /// 3. The Main Avatar (Breathing & Switching)
-                FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: ScaleTransition(
-                    scale: _scaleAnimation,
-                    child: ScaleTransition(
-                      scale: _pulseAnimation,
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 1600),
-                        switchInCurve: const _SafeCurve(Curves.elasticInOut),
-                        switchOutCurve: const _SafeCurve(Curves.easeIn),
-                        transitionBuilder: (child, animation) {
-                          if ((child.key as ValueKey).value == true) {
-                            animation.addStatusListener((status) {
-                              if (status == AnimationStatus.completed &&
-                                  !showPlayUI) {
-                                setState(() => showPlayUI = true);
-                              }
-                            });
-                            return ScaleTransition(
-                              scale: Tween<double>(begin: 0.5, end: 1.0)
-                                  .animate(
-                                    CurvedAnimation(
-                                      parent: animation,
-                                      curve: const _SafeCurve(
-                                        Curves.elasticOut,
+                    /// 3. The Main Avatar (Breathing & Switching)
+                    FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: ScaleTransition(
+                        scale: _scaleAnimation,
+                        child: ScaleTransition(
+                          scale: _pulseAnimation,
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 1600),
+                            switchInCurve: const _SafeCurve(
+                              Curves.elasticInOut,
+                            ),
+                            switchOutCurve: const _SafeCurve(Curves.easeIn),
+                            transitionBuilder: (child, animation) {
+                              if ((child.key as ValueKey).value == true) {
+                                animation.addStatusListener((status) {
+                                  if (status == AnimationStatus.completed &&
+                                      !showPlayUI) {
+                                    setState(() => showPlayUI = true);
+                                  }
+                                });
+                                return ScaleTransition(
+                                  scale: Tween<double>(begin: 0.5, end: 1.0)
+                                      .animate(
+                                        CurvedAnimation(
+                                          parent: animation,
+                                          curve: const _SafeCurve(
+                                            Curves.elasticOut,
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                  child: FadeTransition(
+                                    opacity: animation,
+                                    child: child,
                                   ),
-                              child: FadeTransition(
+                                );
+                              }
+                              return FadeTransition(
                                 opacity: animation,
                                 child: child,
-                              ),
-                            );
-                          }
-                          return FadeTransition(
-                            opacity: animation,
-                            child: child,
-                          );
-                        },
-                        child: Image.asset(
-                          showPlayImage
-                              ? 'assets/images/medi_play.png'
-                              : 'assets/images/medit_star.png',
-                          key: ValueKey(showPlayImage),
-                          width: size.width * 0.85,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          /// 🔘 ELEGANT CONTROLS
-          _BottomControls(
-            isVisible: showPlayUI && !_showSongSelection,
-            isStarted: _isStarted,
-            isPlaying: _isPlaying,
-            onToggle: _toggleMeditation,
-            timerController: _timerController,
-            totalDuration: _totalDuration,
-          ),
-
-          /// 🎵 SONG SELECTION GRID
-          if (_showSongSelection)
-            Positioned.fill(
-              child: GestureDetector(
-                onTap: () => setState(() => _showSongSelection = false),
-                child: TweenAnimationBuilder<double>(
-                  duration: const Duration(milliseconds: 400),
-                  tween: Tween(begin: 0.0, end: 1.0),
-                  builder: (context, value, child) {
-                    return Opacity(
-                      opacity: value,
-                      child: Container(
-                        color: Colors.black.withOpacity(0.6 * value),
-                        alignment: Alignment.center,
-                        child: Transform.scale(
-                          scale: 0.9 + (0.1 * value),
-                          child: GestureDetector(
-                            onTap: () {}, // Prevent tap through
-                            child: Container(
+                              );
+                            },
+                            child: Image.asset(
+                              showPlayImage
+                                  ? 'assets/images/medi_play.png'
+                                  : 'assets/images/medit_star.png',
+                              key: ValueKey(showPlayImage),
                               width: size.width * 0.85,
-                              padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[900]?.withOpacity(0.95),
-                                borderRadius: BorderRadius.circular(30),
-                                border: Border.all(
-                                  color: Colors.white12,
-                                  width: 1.5,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.5),
-                                    blurRadius: 40,
-                                    spreadRadius: 10,
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      const SizedBox(width: 24),
-                                      const Text(
-                                        "SELECT MUSIC",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w400,
-                                          letterSpacing: 3,
-                                        ),
-                                      ),
-                                      IconButton(
-                                        onPressed: () => setState(
-                                          () => _showSongSelection = false,
-                                        ),
-                                        icon: const Icon(
-                                          Icons.close,
-                                          color: Colors.white54,
-                                          size: 20,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16),
-                                  GridView.builder(
-                                    shrinkWrap: true,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    gridDelegate:
-                                        const SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: 2,
-                                          crossAxisSpacing: 16,
-                                          mainAxisSpacing: 16,
-                                          childAspectRatio: 1.8,
-                                        ),
-                                    itemCount: _tracks.length,
-                                    itemBuilder: (context, index) {
-                                      bool isSelected = _selectedTrack == index;
-                                      return GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            _selectedTrack = index;
-                                            _showSongSelection = false;
-                                          });
-                                        },
-                                        child: AnimatedContainer(
-                                          duration: const Duration(
-                                            milliseconds: 300,
-                                          ),
-                                          alignment: Alignment.center,
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: isSelected
-                                                ? Colors.white10
-                                                : Colors.white.withOpacity(
-                                                    0.04,
-                                                  ),
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                            border: Border.all(
-                                              color: isSelected
-                                                  ? Colors.amber.withOpacity(
-                                                      0.5,
-                                                    )
-                                                  : Colors.white12,
-                                              width: isSelected ? 2 : 1.2,
-                                            ),
-                                            boxShadow: isSelected
-                                                ? [
-                                                    BoxShadow(
-                                                      color: Colors.amber
-                                                          .withOpacity(0.15),
-                                                      blurRadius: 15,
-                                                      spreadRadius: 2,
-                                                    ),
-                                                  ]
-                                                : null,
-                                          ),
-                                          child: Text(
-                                            _tracks[index],
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: isSelected
-                                                  ? Colors.amber[200]
-                                                  : Colors.white.withOpacity(
-                                                      0.8,
-                                                    ),
-                                              fontSize: 13,
-                                              fontWeight: isSelected
-                                                  ? FontWeight.w700
-                                                  : FontWeight.w400,
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
+                              fit: BoxFit.contain,
                             ),
                           ),
                         ),
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
               ),
-            ),
-        ],
+
+              /// 🔘 ELEGANT CONTROLS
+              _BottomControls(
+                isVisible: showPlayUI && !_showSongSelection,
+                isStarted: _isStarted,
+                isPlaying: _isPlaying,
+                onToggle: _toggleMeditation,
+                timerController: _timerController,
+                totalDuration: _totalDuration,
+              ),
+
+              /// 🎵 SONG SELECTION GRID
+              if (_showSongSelection)
+                Positioned.fill(
+                  child: GestureDetector(
+                    onTap: () => setState(() => _showSongSelection = false),
+                    child: TweenAnimationBuilder<double>(
+                      duration: const Duration(milliseconds: 400),
+                      tween: Tween(begin: 0.0, end: 1.0),
+                      builder: (context, value, child) {
+                        return Opacity(
+                          opacity: value,
+                          child: Container(
+                            color: Colors.black.withOpacity(0.6 * value),
+                            alignment: Alignment.center,
+                            child: Transform.scale(
+                              scale: 0.9 + (0.1 * value),
+                              child: GestureDetector(
+                                onTap: () {}, // Prevent tap through
+                                child: Container(
+                                  width: size.width * 0.85,
+                                  padding: const EdgeInsets.all(24),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[900]?.withOpacity(0.95),
+                                    borderRadius: BorderRadius.circular(30),
+                                    border: Border.all(
+                                      color: Colors.white12,
+                                      width: 1.5,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.5),
+                                        blurRadius: 40,
+                                        spreadRadius: 10,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const SizedBox(width: 24),
+                                          const Text(
+                                            "SELECT MUSIC",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w400,
+                                              letterSpacing: 3,
+                                            ),
+                                          ),
+                                          IconButton(
+                                            onPressed: () => setState(
+                                              () => _showSongSelection = false,
+                                            ),
+                                            icon: const Icon(
+                                              Icons.close,
+                                              color: Colors.white54,
+                                              size: 20,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 16),
+                                      GridView.builder(
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        gridDelegate:
+                                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: 2,
+                                              crossAxisSpacing: 16,
+                                              mainAxisSpacing: 16,
+                                              childAspectRatio: 1.8,
+                                            ),
+                                        itemCount: _tracks.length,
+                                        itemBuilder: (context, index) {
+                                          bool isSelected =
+                                              _selectedTrack == index;
+                                          return GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                _selectedTrack = index;
+                                                _showSongSelection = false;
+                                              });
+                                            },
+                                            child: AnimatedContainer(
+                                              duration: const Duration(
+                                                milliseconds: 300,
+                                              ),
+                                              alignment: Alignment.center,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 8,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                color: isSelected
+                                                    ? Colors.white10
+                                                    : Colors.white.withOpacity(
+                                                        0.04,
+                                                      ),
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                border: Border.all(
+                                                  color: isSelected
+                                                      ? Colors.amber
+                                                            .withOpacity(0.5)
+                                                      : Colors.white12,
+                                                  width: isSelected ? 2 : 1.2,
+                                                ),
+                                                boxShadow: isSelected
+                                                    ? [
+                                                        BoxShadow(
+                                                          color: Colors.amber
+                                                              .withOpacity(
+                                                                0.15,
+                                                              ),
+                                                          blurRadius: 15,
+                                                          spreadRadius: 2,
+                                                        ),
+                                                      ]
+                                                    : null,
+                                              ),
+                                              child: Text(
+                                                _tracks[index],
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  color: isSelected
+                                                      ? Colors.amber[200]
+                                                      : Colors.white
+                                                            .withOpacity(0.8),
+                                                  fontSize: 13,
+                                                  fontWeight: isSelected
+                                                      ? FontWeight.w700
+                                                      : FontWeight.w400,
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

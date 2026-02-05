@@ -32,6 +32,8 @@ import '../services/storage_service.dart';
 import '../../features/walkthrough/views/walkthrough_view.dart';
 import 'package:brahmakosh/features/redeem/views/redeem_list_view.dart';
 
+import 'package:brahmakosh/features/check_in/views/chanting_configuration_view.dart';
+
 class AppPages {
   static final List<GetPage> pages = [
     GetPage(name: AppConstants.routeSplash, page: () => const SplashView()),
@@ -138,6 +140,10 @@ class AppPages {
     GetPage(
       name: AppConstants.routeSpiritualConfiguration,
       page: () => const SpiritualConfigurationView(),
+    ),
+    GetPage(
+      name: AppConstants.routeChantingConfiguration,
+      page: () => const ChantingConfigurationView(),
     ),
     GetPage(
       name: AppConstants.routeWalkthrough,

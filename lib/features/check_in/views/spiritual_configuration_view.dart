@@ -1,76 +1,146 @@
-import 'package:brahmakosh/features/check_in/controllers/spiritual_configuration_controller.dart';
-
+import 'package:brahmakosh/common/utils.dart';
+import 'package:brahmakosh/core/constants/app_constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:brahmakosh/features/check_in/blocs/spiritual_config/spiritual_config_bloc.dart';
+import 'package:brahmakosh/features/check_in/repositories/spiritual_repository.dart';
 
 class SpiritualConfigurationView extends StatelessWidget {
   const SpiritualConfigurationView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(SpiritualConfigurationController());
+    // Get arguments safely
+    final args = Get.arguments;
+    final categoryId = args is Map
+        ? args['categoryId']
+        : (args is String ? args : null);
+    final preFetchedData = args is Map ? args['preFetchedData'] : null;
 
-    return Scaffold(
-      backgroundColor: const Color(0xffFFF8E7), // Light beige background
-      body: SafeArea(
-        child: Obx(() {
-          if (controller.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
+    return BlocProvider(
+      create: (context) =>
+          SpiritualConfigBloc(repository: SpiritualRepository())..add(
+            LoadConfig(
+              categoryId: categoryId ?? '',
+              preFetchedData: preFetchedData,
+            ),
+          ),
+      child: BlocConsumer<SpiritualConfigBloc, SpiritualConfigState>(
+        listener: (context, state) {
+          if (state is SessionReady) {
+            // Navigate to MeditationStart
+            // We need to import MeditationStart or use route name.
+            // Assuming AppConstants.routeMeditationStart exists or using generic logic.
+            Get.toNamed(
+              AppConstants.routeMeditationStart,
+              arguments: state.navigationArgs,
+            );
+          }
+          if (state is ConfigError) {
+            Utils.showToast(state.message);
+          }
+        },
+        builder: (context, state) {
+          if (state is ConfigLoading) {
+            return const Scaffold(
+              backgroundColor: Color(0xffFFF8E7),
+              body: Center(child: CircularProgressIndicator()),
+            );
           }
 
-          return Column(
-            children: [
-              _buildHeader(),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 20),
-                      Text(
-                        'Mediate',
-                        style: GoogleFonts.poppins(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xff1E1E1E),
-                        ),
-                      ),
-                      const SizedBox(height: 30),
-                      Text(
-                        'How are you feeling today?',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          color: const Color(0xff1E1E1E),
-                        ),
-                      ),
-                      const SizedBox(height: 30),
-                      _buildEmotionSelector(controller),
-                      const SizedBox(height: 40),
-                      _buildDurationSelector(controller),
-                      const SizedBox(height: 40),
-                      _buildConfigurationSummary(controller),
-                      const SizedBox(height: 40),
-                      _buildStartButton(controller),
-                      const SizedBox(height: 20),
-                      Text(
-                        'You can stop anytime',
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                    ],
-                  ),
+          if (state is! ConfigLoaded) {
+            // Show Error/Empty State
+            return Scaffold(
+              backgroundColor: const Color(0xffFFF8E7),
+              appBar: AppBar(
+                backgroundColor: const Color(0xffFFF8E7),
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
+                  onPressed: () => Get.back(),
                 ),
               ),
-            ],
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Colors.red,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      "Unable to load configurations.",
+                      style: GoogleFonts.poppins(),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          // Current Loaded State
+          final loaded = state;
+
+          return Scaffold(
+            backgroundColor: const Color(0xffFFF8E7), // Light beige background
+            body: SafeArea(
+              child: Column(
+                children: [
+                  _buildHeader(),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 5),
+                          Text(
+                            'Mediate',
+                            style: GoogleFonts.poppins(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xff1E1E1E),
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            'How are you feeling today?',
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              color: const Color(0xff1E1E1E),
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          _buildEmotionSelector(context, loaded),
+                          const SizedBox(height: 30),
+                          _buildDurationSelector(context, loaded),
+                          const SizedBox(height: 15),
+                          _buildConfigurationSummary(loaded),
+                          const SizedBox(height: 15),
+                          _buildStartButton(context),
+                          const SizedBox(height: 10),
+                          Text(
+                            'You can stop anytime',
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           );
-        }),
+        },
       ),
     );
   }
@@ -96,14 +166,22 @@ class SpiritualConfigurationView extends StatelessWidget {
     );
   }
 
-  Widget _buildEmotionSelector(SpiritualConfigurationController controller) {
-    return SizedBox(height: 160, child: _EmotionList(controller: controller));
+  Widget _buildEmotionSelector(BuildContext context, ConfigLoaded state) {
+    return SizedBox(
+      height: 110,
+      child: _EmotionList(
+        selectedEmotion: state.selectedEmotion,
+        onSelect: (emotion) {
+          context.read<SpiritualConfigBloc>().add(SelectEmotion(emotion));
+        },
+      ),
+    );
   }
 
-  Widget _buildDurationSelector(SpiritualConfigurationController controller) {
+  Widget _buildDurationSelector(BuildContext context, ConfigLoaded state) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
@@ -136,74 +214,72 @@ class SpiritualConfigurationView extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 40),
-          Obx(() {
-            final durations = controller.availableDurations;
-            final currentIndex = durations
-                .indexOf(controller.selectedDuration.value)
-                .toDouble();
+          const SizedBox(height: 15),
+          Builder(
+            builder: (context) {
+              final bloc = context.read<SpiritualConfigBloc>();
+              final durations = bloc.availableDurations;
+              // Safe index calculation
+              int index = durations.indexOf(state.selectedDuration);
+              if (index == -1) index = 0;
+              final currentIndex = index.toDouble();
 
-            // Map slider value (index) to duration
-            return Column(
-              children: [
-                // Custom tooltip-like label logic could go here,
-                // but Slider doesn't support easy custom permanent tooltips above thumb.
-                // We'll trust the default label behaviour or just show the value.
-                // The design has a prominent bubble above the thumb.
-                // Flutter's Slider `label` shows on drag.
-
-                // Let's rely on standard Slider with nice colors.
-                SliderTheme(
-                  data: SliderTheme.of(Get.context!).copyWith(
-                    activeTrackColor: const Color(0xffFF9B44),
-                    inactiveTrackColor: Colors.orange.withOpacity(0.2),
-                    thumbColor: Colors.white,
-                    overlayColor: const Color(0xffFF9B44).withOpacity(0.1),
-                    valueIndicatorColor: const Color(0xffFF9B44),
-                    valueIndicatorTextStyle: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    thumbShape: const RoundSliderThumbShape(
-                      enabledThumbRadius: 12,
-                    ),
-                    trackHeight: 6,
-                  ),
-                  child: Slider(
-                    value: currentIndex < 0 ? 0 : currentIndex,
-                    min: 0,
-                    max: (durations.length - 1).toDouble(),
-                    divisions: durations.length - 1,
-                    label: _formatDuration(durations[currentIndex.toInt()]),
-                    onChanged: (value) {
-                      final index = value.toInt();
-                      if (index >= 0 && index < durations.length) {
-                        controller.selectDuration(durations[index]);
-                      }
-                    },
-                  ),
-                ),
-
-                // Labels below slider
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        _formatDuration(durations.first),
-                        style: GoogleFonts.poppins(color: Colors.grey),
+              return Column(
+                children: [
+                  SliderTheme(
+                    data: SliderTheme.of(Get.context!).copyWith(
+                      activeTrackColor: const Color(0xffFF9B44),
+                      inactiveTrackColor: Colors.orange.withOpacity(0.2),
+                      thumbColor: Colors.white,
+                      overlayColor: const Color(0xffFF9B44).withOpacity(0.1),
+                      valueIndicatorColor: const Color(0xffFF9B44),
+                      valueIndicatorTextStyle: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
-                      Text(
-                        _formatDuration(durations.last),
-                        style: GoogleFonts.poppins(color: Colors.grey),
+                      thumbShape: const RoundSliderThumbShape(
+                        enabledThumbRadius: 12,
                       ),
-                    ],
+                      trackHeight: 6,
+                    ),
+                    child: Slider(
+                      value: currentIndex < 0 ? 0 : currentIndex,
+                      min: 0,
+                      max: (durations.length - 1).toDouble(),
+                      divisions: durations.length > 1
+                          ? durations.length - 1
+                          : 1,
+                      label: _formatDuration(durations[index]),
+                      onChanged: (value) {
+                        final i = value.toInt();
+                        if (i >= 0 && i < durations.length) {
+                          bloc.add(SelectDuration(durations[i]));
+                        }
+                      },
+                    ),
                   ),
-                ),
-              ],
-            );
-          }),
+
+                  // Labels below slider
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          _formatDuration(durations.first),
+                          style: GoogleFonts.poppins(color: Colors.grey),
+                        ),
+                        Text(
+                          _formatDuration(durations.last),
+                          style: GoogleFonts.poppins(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
         ],
       ),
     );
@@ -219,9 +295,11 @@ class SpiritualConfigurationView extends StatelessWidget {
     return '$minutes Min';
   }
 
-  Widget _buildConfigurationSummary(
-    SpiritualConfigurationController controller,
-  ) {
+  Widget _buildConfigurationSummary(ConfigLoaded state) {
+    // Get emoji
+    final emoji =
+        SpiritualConfigBloc.emotionEmojis[state.selectedEmotion] ?? '😐';
+
     return Column(
       children: [
         Text(
@@ -236,24 +314,9 @@ class SpiritualConfigurationView extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Obx(
-              () => _summaryChip(
-                controller.selectedEmotion.value == null
-                    ? '😐'
-                    : controller.emotionEmojis[controller
-                              .selectedEmotion
-                              .value] ??
-                          '😐',
-                'Mood',
-              ),
-            ),
+            _summaryChip(emoji, 'Mood'),
             const SizedBox(width: 24),
-            Obx(
-              () => _summaryChip(
-                '🕒',
-                _formatDuration(controller.selectedDuration.value),
-              ),
-            ),
+            _summaryChip('🕒', _formatDuration(state.selectedDuration)),
           ],
         ),
         const SizedBox(height: 16),
@@ -269,19 +332,14 @@ class SpiritualConfigurationView extends StatelessWidget {
                 color: const Color(0xff1E1E1E),
               ),
             ),
-            Obx(() {
-              final points =
-                  controller.selectedConfig.value?.karmaPoints ??
-                  10; // Default 10 if null
-              return Text(
-                '+$points karma Points',
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xffFF9B44),
-                ),
-              );
-            }),
+            Text(
+              '+${state.selectedConfig?.karmaPoints ?? 10} karma Points',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xffFF9B44),
+              ),
+            ),
           ],
         ),
       ],
@@ -304,12 +362,14 @@ class SpiritualConfigurationView extends StatelessWidget {
     );
   }
 
-  Widget _buildStartButton(SpiritualConfigurationController controller) {
+  Widget _buildStartButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 56,
+      height: 48,
       child: ElevatedButton(
-        onPressed: () => controller.startSession(),
+        onPressed: () {
+          context.read<SpiritualConfigBloc>().add(StartSession());
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xffFF8C00), // Orange
           foregroundColor: Colors.white,
@@ -328,8 +388,10 @@ class SpiritualConfigurationView extends StatelessWidget {
 }
 
 class _EmotionList extends StatefulWidget {
-  final SpiritualConfigurationController controller;
-  const _EmotionList({required this.controller});
+  final String? selectedEmotion;
+  final Function(String) onSelect;
+
+  const _EmotionList({required this.selectedEmotion, required this.onSelect});
 
   @override
   State<_EmotionList> createState() => _EmotionListState();
@@ -337,6 +399,63 @@ class _EmotionList extends StatefulWidget {
 
 class _EmotionListState extends State<_EmotionList> {
   final ScrollController _scrollController = ScrollController();
+  // removed infinite count
+
+  // Cache emotions list to avoid static access repetition issues
+  final Map<String, String> _emotionsMap = SpiritualConfigBloc.emotionEmojis;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToSelected();
+    });
+  }
+
+  @override
+  void didUpdateWidget(_EmotionList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedEmotion != widget.selectedEmotion) {
+      // Optional: Auto-scroll on external change
+      _scrollToSelected();
+    }
+  }
+
+  void _scrollToSelected() {
+    final selectedEmotion = widget.selectedEmotion;
+    if (selectedEmotion == null) return;
+
+    final emotions = _emotionsMap.keys.toList();
+    final index = emotions.indexOf(selectedEmotion);
+
+    if (index != -1) {
+      final width = MediaQuery.of(context).size.width;
+      final itemWidth = width / 3;
+
+      // Center the item
+      final targetOffset = (index * itemWidth) - (width / 2) + (itemWidth / 2);
+
+      // Ensure within bounds (maxScrollExtent checks handled by animateTo usually but good to check)
+      // ListView handles bounds clamping automatically mostly, but let's be safe or just jump
+
+      // We need to wait for layout if it's init? addPostFrameCallback handles that.
+      if (_scrollController.hasClients) {
+        // Clamp to valid range
+        final maxScroll = _scrollController.position.maxScrollExtent;
+        final minScroll = _scrollController.position.minScrollExtent;
+
+        double finalOffset = targetOffset;
+        if (finalOffset < minScroll) finalOffset = minScroll;
+        if (finalOffset > maxScroll) finalOffset = maxScroll;
+
+        _scrollController.animateTo(
+          finalOffset,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -353,86 +472,74 @@ class _EmotionListState extends State<_EmotionList> {
       controller: _scrollController,
       scrollDirection: Axis.horizontal,
       physics: const BouncingScrollPhysics(),
-      padding: EdgeInsets.symmetric(horizontal: (width - itemWidth) / 2),
-      itemCount: widget.controller.emotionEmojis.length,
+      padding: EdgeInsets.zero,
+      itemCount: _emotionsMap.length, // Finite count
       itemBuilder: (context, index) {
-        final entry = widget.controller.emotionEmojis.entries.elementAt(index);
+        final entry = _emotionsMap.entries.elementAt(index);
         final emotion = entry.key;
         final emoji = entry.value;
+        final isSelected = widget.selectedEmotion == emotion;
 
         return SizedBox(
           width: itemWidth,
-          child: Obx(() {
-            final isSelected =
-                widget.controller.selectedEmotion.value == emotion;
-            return GestureDetector(
-              onTap: () {
-                widget.controller.onEmotionSelected(emotion);
+          child: GestureDetector(
+            onTap: () {
+              widget.onSelect(emotion);
+              // Scroll handled by didUpdateWidget or manual animate here
+              // Let's animate here for "immediate" feel
+              final target =
+                  (index * itemWidth) - (width / 2) + (itemWidth / 2);
+              if (_scrollController.hasClients) {
+                final maxScroll = _scrollController.position.maxScrollExtent;
+                // Note: maxScroll might not be accurate if items changed size, but here fixed.
+                // simpler:
                 _scrollController.animateTo(
-                  index * itemWidth,
+                  target.clamp(0.0, maxScroll), // simplified clamp
                   duration: const Duration(milliseconds: 500),
                   curve: Curves.easeOutCubic,
                 );
-              },
-              child: AnimatedScale(
-                scale: isSelected ? 1.3 : 0.8,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeOutBack,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 75,
-                      height: 75,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: isSelected
-                            ? const LinearGradient(
-                                colors: [Color(0xffFFD194), Color(0xffFF9B44)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              )
-                            : null,
-                        color: isSelected ? null : Colors.grey[200],
-                        boxShadow: isSelected
-                            ? [
-                                BoxShadow(
-                                  color: const Color(
-                                    0xffFF9B44,
-                                  ).withOpacity(0.4),
-                                  blurRadius: 15,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ]
-                            : null,
-                      ),
-                      child: Text(
-                        emoji,
-                        style: TextStyle(fontSize: isSelected ? 40 : 30),
+              }
+            },
+            child: AnimatedScale(
+              scale: isSelected ? 1.3 : 0.8,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutBack,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 55,
+                    height: 55,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.transparent,
+                    ),
+                    child: Text(
+                      emoji,
+                      style: TextStyle(fontSize: isSelected ? 30 : 22),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  AnimatedOpacity(
+                    duration: const Duration(milliseconds: 200),
+                    opacity: isSelected ? 1.0 : 0.6,
+                    child: Text(
+                      emotion,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        fontSize: isSelected ? 16 : 12,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.w500,
+                        color: const Color(0xff1E1E1E),
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    AnimatedOpacity(
-                      duration: const Duration(milliseconds: 200),
-                      opacity: isSelected ? 1.0 : 0.6,
-                      child: Text(
-                        emotion,
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
-                          fontSize: isSelected ? 16 : 12,
-                          fontWeight: isSelected
-                              ? FontWeight.bold
-                              : FontWeight.w500,
-                          color: const Color(0xff1E1E1E),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            );
-          }),
+            ),
+          ),
         );
       },
     );

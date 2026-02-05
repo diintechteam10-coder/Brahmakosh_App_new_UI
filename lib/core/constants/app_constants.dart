@@ -35,6 +35,7 @@ class AppConstants {
   static const String routeMantraChanting = '/mantraChanting';
   static const String routeMeditationStart = '/meditationStart';
   static const String routeSpiritualConfiguration = '/spiritualConfiguration';
+  static const String routeChantingConfiguration = '/chantingConfiguration';
   static const int splashDuration = 1;
   static const String routeWalkthrough = '/walkthrough';
   static const String routeRedeem = '/redeem';
@@ -44,4 +45,5 @@ class AppConstants {
   static const String cacheFounderMessage = 'cache_founder_message';
   static const String cacheSponsors = 'cache_sponsors';
   static const String cacheUserCompleteDetails = 'cache_user_complete_details';
+  static const String cacheSpiritualActivities = 'cache_spiritual_activities';
 }
