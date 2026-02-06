@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:brahmakosh/core/constants/app_constants.dart';
+import 'package:brahmakosh/core/services/storage_service.dart';
 import 'package:brahmakosh/common/api_services.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_configuration_model.dart';
 
@@ -42,6 +44,8 @@ class ChantingConfigurationController extends GetxController {
   // Hardcoded Category ID for "Chanting" from requirements
   final String chantingCategoryId = "69787dcbbeaf7e42675a2212";
 
+  final String _cacheKey = 'spiritual_configurations_cache';
+
   @override
   void onInit() {
     super.onInit();
@@ -51,22 +55,60 @@ class ChantingConfigurationController extends GetxController {
   Future<void> fetchConfigurations() async {
     isLoading.value = true;
     try {
+      // 1. Try to load from cache first
+      final cachedData = StorageService.getString(_cacheKey);
+      if (cachedData != null && cachedData.isNotEmpty) {
+        try {
+          final jsonList = (jsonDecode(cachedData) as List)
+              .cast<Map<String, dynamic>>();
+          final cachedConfigs = jsonList
+              .map((e) => SpiritualConfiguration.fromJson(e))
+              .toList();
+          if (cachedConfigs.isNotEmpty) {
+            allConfigurations.assignAll(cachedConfigs);
+            _initializeSelection();
+            // If we have cached data, we can stop loading for UI but still fetch fresh data
+            isLoading.value = false;
+          }
+        } catch (e) {
+          print("Error parsing cached chanting configurations: $e");
+        }
+      }
+
+      // 2. Fetch fresh data from API
       final response = await getSpiritualConfigurations(
         null,
         chantingCategoryId,
       );
+
       if (response != null &&
           response.success == true &&
           response.data != null &&
           response.data!.isNotEmpty) {
         allConfigurations.assignAll(response.data!);
-        _initializeSelection();
-      } else {
+
+        // 3. Update cache
+        final jsonList = response.data!.map((e) => e.toJson()).toList();
+        await StorageService.setString(_cacheKey, jsonEncode(jsonList));
+
+        // Re-initialize only if we didn't have data before or if selection is invalid
+        if (selectedConfiguration.value == null) {
+          _initializeSelection();
+        } else {
+          // Refresh filtered list based on current emotion
+          if (selectedEmotion.value != null) {
+            onEmotionSelected(selectedEmotion.value!);
+          }
+        }
+      } else if (allConfigurations.isEmpty) {
+        // Only fallback if we have NO data at all (neither cache nor api)
         _addFallbackMantra();
       }
     } catch (e) {
       print("Error fetching chanting configurations: $e");
-      _addFallbackMantra();
+      if (allConfigurations.isEmpty) {
+        _addFallbackMantra();
+      }
     } finally {
       isLoading.value = false;
     }
@@ -112,11 +154,15 @@ class ChantingConfigurationController extends GetxController {
     onEmotionSelected("Happy");
   }
 
-  void onEmotionSelected(String emotion) {
+  void onEmotionSelected(String? emotion) {
+    if (emotion == null) return;
     selectedEmotion.value = emotion;
 
     // Filter configurations based on emotion
+    // Logic: Show all mantras that match the selected emotion
     final filtered = allConfigurations.where((config) {
+      // Case-insensitive match.
+      // Note: The UI emojis keys are Capitalized (Happy, Stress etc), API might return lowercase or mixed.
       return config.emotion?.toLowerCase() == emotion.toLowerCase();
     }).toList();
 
@@ -128,6 +174,19 @@ class ChantingConfigurationController extends GetxController {
     } else {
       selectedConfiguration.value = null;
     }
+  }
+
+  // Helper to get display text
+  String getDisplayMantraText(SpiritualConfiguration config) {
+    if (config.chantingType != null &&
+        config.chantingType!.isNotEmpty &&
+        config.chantingType != "Other") {
+      return config.chantingType!;
+    } else if (config.customChantingType != null &&
+        config.customChantingType!.isNotEmpty) {
+      return config.customChantingType!;
+    }
+    return "Mantra";
   }
 
   void onConfigurationSelected(SpiritualConfiguration config) {

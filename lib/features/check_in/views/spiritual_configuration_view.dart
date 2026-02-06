@@ -7,18 +7,33 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:brahmakosh/features/check_in/blocs/spiritual_config/spiritual_config_bloc.dart';
 import 'package:brahmakosh/features/check_in/repositories/spiritual_repository.dart';
 
-class SpiritualConfigurationView extends StatelessWidget {
+class SpiritualConfigurationView extends StatefulWidget {
   const SpiritualConfigurationView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Get arguments safely
+  State<SpiritualConfigurationView> createState() =>
+      _SpiritualConfigurationViewState();
+}
+
+class _SpiritualConfigurationViewState
+    extends State<SpiritualConfigurationView> {
+  late final String? categoryId;
+  late final dynamic preFetchedData;
+  late final String? title;
+
+  @override
+  void initState() {
+    super.initState();
     final args = Get.arguments;
-    final categoryId = args is Map
+    categoryId = args is Map
         ? args['categoryId']
         : (args is String ? args : null);
-    final preFetchedData = args is Map ? args['preFetchedData'] : null;
+    preFetchedData = args is Map ? args['preFetchedData'] : null;
+    title = args is Map ? args['title'] : 'Spirituality';
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
           SpiritualConfigBloc(repository: SpiritualRepository())..add(
@@ -31,8 +46,6 @@ class SpiritualConfigurationView extends StatelessWidget {
         listener: (context, state) {
           if (state is SessionReady) {
             // Navigate to MeditationStart
-            // We need to import MeditationStart or use route name.
-            // Assuming AppConstants.routeMeditationStart exists or using generic logic.
             Get.toNamed(
               AppConstants.routeMeditationStart,
               arguments: state.navigationArgs,
@@ -43,6 +56,7 @@ class SpiritualConfigurationView extends StatelessWidget {
           }
         },
         builder: (context, state) {
+          // Explicit check for SessionReady to ensure it's treated as Loaded
           if (state is ConfigLoading) {
             return const Scaffold(
               backgroundColor: Color(0xffFFF8E7),
@@ -51,6 +65,11 @@ class SpiritualConfigurationView extends StatelessWidget {
           }
 
           if (state is! ConfigLoaded) {
+            String errorMessage = "Unable to load configurations.";
+            if (state is ConfigError) {
+              errorMessage = state.message;
+            }
+
             // Show Error/Empty State
             return Scaffold(
               backgroundColor: const Color(0xffFFF8E7),
@@ -71,10 +90,7 @@ class SpiritualConfigurationView extends StatelessWidget {
                       color: Colors.red,
                     ),
                     const SizedBox(height: 16),
-                    Text(
-                      "Unable to load configurations.",
-                      style: GoogleFonts.poppins(),
-                    ),
+                    Text(errorMessage, style: GoogleFonts.poppins()),
                   ],
                 ),
               ),
@@ -100,7 +116,7 @@ class SpiritualConfigurationView extends StatelessWidget {
                         children: [
                           const SizedBox(height: 5),
                           Text(
-                            'Mediate',
+                            title ?? 'Spirituality',
                             style: GoogleFonts.poppins(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,

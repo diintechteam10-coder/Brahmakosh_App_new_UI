@@ -127,7 +127,7 @@ class _WalkthroughViewState extends State<WalkthroughView> {
                   child: Container(
                     width: size.width > 600 ? 400 : size.width * 0.75,
                     padding: EdgeInsets.symmetric(
-                      vertical: size.height * 0.015,
+                      vertical: size.height * 0.020,
                       horizontal: size.width * 0.05,
                     ),
                     decoration: BoxDecoration(
@@ -151,7 +151,7 @@ class _WalkthroughViewState extends State<WalkthroughView> {
                           'Talk to Krishna',
                           style: TextStyle(
                             fontFamily: 'Serif',
-                            fontSize: 18,
+                            fontSize: 15,
                             fontWeight: FontWeight.bold,
                             color: const Color(0xFF5D2E18),
                           ),
@@ -224,7 +224,7 @@ class _WalkthroughViewState extends State<WalkthroughView> {
                         icon: Icons.settings_suggest_outlined,
                         title: 'Cosmic Alignment & Energies',
                         subtitle:
-                            'Learn Kundali, astrology, and sacred timings',
+                            'Learn Kundali,  Astrology, Numerology and Sacred Timings',
                         onTap: () {
                           Get.offAllNamed(AppConstants.routeDashboard);
                         },

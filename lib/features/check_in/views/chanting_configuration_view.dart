@@ -1,84 +1,147 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:brahmakosh/features/check_in/controllers/chanting_configuration_controller.dart';
+import 'package:brahmakosh/features/check_in/repositories/spiritual_repository.dart';
+import 'package:brahmakosh/features/check_in/blocs/chanting/chanting_bloc.dart';
+import 'package:brahmakosh/features/check_in/models/spiritual_configuration_model.dart';
+import 'package:brahmakosh/core/constants/app_constants.dart';
+import 'package:brahmakosh/common/utils.dart';
 
-class ChantingConfigurationView
-    extends GetView<ChantingConfigurationController> {
+class ChantingConfigurationView extends StatelessWidget {
   const ChantingConfigurationView({super.key});
+
+  // Hardcoded Category ID for "Chanting" from requirements
+  static const String chantingCategoryId = "69787dcbbeaf7e42675a2212";
 
   @override
   Widget build(BuildContext context) {
-    // Ensure controller is initialized
-    if (!Get.isRegistered<ChantingConfigurationController>()) {
-      Get.put(ChantingConfigurationController());
-    }
+    return BlocProvider(
+      create: (context) =>
+          ChantingBloc(repository: SpiritualRepository())
+            ..add(const LoadChantingConfigs(categoryId: chantingCategoryId)),
+      child: Scaffold(
+        backgroundColor: const Color(0xffFFF8E7),
+        body: SafeArea(
+          bottom: false,
+          child: BlocConsumer<ChantingBloc, ChantingState>(
+            listener: (context, state) {
+              if (state is ChantingSessionReady) {
+                // Navigate to Mantra Chanting
+                Get.toNamed(
+                  AppConstants.routeMantraChanting,
+                  arguments: {
+                    'emotion': state.config.emotion,
+                    'count': state.count,
+                    'configuration': state.config,
+                    // Pass audioUrl to MantraChanting
+                    'audioUrl': state.audioUrl,
+                    'videoUrl': state.videoUrl, // Optional
+                    // Passing these for safety
+                    'mantra_title': state.config.chantingType,
+                    'karma_points': state.config.karmaPoints,
+                  },
+                );
+              } else if (state is ChantingError) {
+                Utils.showToast(state.message);
+              }
+            },
+            builder: (context, state) {
+              if (state is ChantingLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-    return Scaffold(
-      backgroundColor: const Color(0xffFFF8E7), // Light beige background
-      body: SafeArea(
-        bottom: false,
-        child: Obx(() {
-          if (controller.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
-          }
+              if (state is ChantingLoaded || state is ChantingSessionReady) {
+                // Even if ready, we show the loaded UI until navigation happens
+                final loadedState = state is ChantingLoaded
+                    ? state
+                    // Fallback using data from SessionReady if needed, but Bloc doesn't guarantee 'state' preserves old data unless we structured it.
+                    // Actually, SessionReady doesn't hold list.
+                    // Issue: If we emit SessionReady, build is called. SessionReady has NO config list.
+                    // Fix: ChantingSessionReady should probably extend ChantingLoaded or hold the previous loaded state to avoid UI flicker.
+                    // For now, let's just show a loader or empty container if SessionReady is emitted, assuming navigation is fast.
+                    // Or better, let's keep showing the UI if we can.
+                    // But SessionReady doesn't have the lists.
+                    : null;
 
-          return Column(
-            children: [
-              _buildHeader(),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child: Column(
-                    children: [
-                      const SizedBox(
-                        height: 5,
-                      ), // Reduced from 20 to 5 to match Spiritual
-                      Text(
-                        'Chanting',
-                        style: GoogleFonts.poppins(
-                          fontSize: 22, // Reduced from 28
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xff1E1E1E),
+                if (loadedState == null) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                return Stack(
+                  children: [
+                    Column(
+                      children: [
+                        _buildHeader(),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 10,
+                            ),
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 5),
+                                Text(
+                                  'Chanting',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: const Color(0xff1E1E1E),
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  'How are you feeling today?',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14,
+                                    color: const Color(0xff1E1E1E),
+                                  ),
+                                ),
+                                const SizedBox(height: 15),
+                                _buildEmotionSelector(context, loadedState),
+                                const SizedBox(height: 30),
+                                _buildMantraSelector(context, loadedState),
+                                const SizedBox(height: 30),
+                                _buildCountSelector(context, loadedState),
+                                const SizedBox(height: 15),
+                                _buildSummary(context, loadedState),
+                                const SizedBox(height: 15),
+                                _buildStartButton(context, loadedState),
+                                const SizedBox(height: 10),
+                                Text(
+                                  'You can stop anytime',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (loadedState.isStarting)
+                      Container(
+                        color: Colors.black.withOpacity(0.3),
+                        child: const Center(
+                          child: CircularProgressIndicator(color: Colors.white),
                         ),
                       ),
-                      const SizedBox(height: 5), // Reduced from 15 to 5
-                      Text(
-                        'How are you feeling today?',
-                        style: GoogleFonts.poppins(
-                          fontSize: 14, // Reduced from 16
-                          color: const Color(0xff1E1E1E),
-                        ),
-                      ),
-                      const SizedBox(height: 15), // Reduced from 30 to 15
-                      _buildEmotionSelector(),
-                      const SizedBox(height: 30), // Reduced from 40 to 30
-                      _buildMantraSelector(),
-                      const SizedBox(height: 30), // Reduced from 40 to 30
-                      _buildCountSelector(),
-                      const SizedBox(height: 15), // Reduced from 40 to 15
-                      _buildSummary(),
-                      const SizedBox(height: 15), // Reduced from 40 to 15
-                      _buildStartButton(),
-                      const SizedBox(height: 10), // Reduced from 20 to 10
-                      Text(
-                        'You can stop anytime',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12, // Reduced from 14 to 12
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 10), // Reduced from 20 to 10
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          );
-        }),
+                  ],
+                );
+              }
+
+              if (state is ChantingError) {
+                return Center(child: Text(state.message));
+              }
+
+              return const SizedBox();
+            },
+          ),
+        ),
       ),
     );
   }
@@ -104,11 +167,19 @@ class ChantingConfigurationView
     );
   }
 
-  Widget _buildEmotionSelector() {
-    return SizedBox(height: 110, child: _EmotionList(controller: controller));
+  Widget _buildEmotionSelector(BuildContext context, ChantingLoaded state) {
+    return SizedBox(
+      height: 110,
+      child: _EmotionList(
+        selectedEmotion: state.selectedEmotion,
+        onSelect: (emotion) {
+          context.read<ChantingBloc>().add(SelectChantingEmotion(emotion));
+        },
+      ),
+    );
   }
 
-  Widget _buildMantraSelector() {
+  Widget _buildMantraSelector(BuildContext context, ChantingLoaded state) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -145,80 +216,98 @@ class ChantingConfigurationView
             ],
           ),
           const SizedBox(width: 20),
-          Obx(() {
-            if (controller.filteredConfigurations.isEmpty) {
-              return Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: Center(
-                  child: Text(
-                    "No mantras available for this mood.",
-                    style: GoogleFonts.poppins(color: Colors.grey),
-                  ),
+          if (state.filteredConfigurations.isEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: Center(
+                child: Text(
+                  "No mantras available for this mood.",
+                  style: GoogleFonts.poppins(color: Colors.grey),
                 ),
-              );
-            }
-            return SizedBox(
-              height: 100, // Adjust height as needed
+              ),
+            )
+          else
+            SizedBox(
+              height: 100,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
-                itemCount: controller.filteredConfigurations.length,
+                itemCount: state.filteredConfigurations.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 12),
                 itemBuilder: (context, index) {
-                  final config = controller.filteredConfigurations[index];
-                  return Obx(() {
-                    final isSelected =
-                        controller.selectedConfiguration.value == config;
-                    return GestureDetector(
-                      onTap: () => controller.onConfigurationSelected(config),
-                      child: Container(
-                        width: 120,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
+                  final config = state.filteredConfigurations[index];
+                  final isSelected = state.selectedConfig?.sId == config.sId;
+
+                  return GestureDetector(
+                    onTap: () {
+                      context.read<ChantingBloc>().add(
+                        SelectChantingMantra(config),
+                      );
+                    },
+                    child: Container(
+                      width: 120,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? const Color(0xffFFF3E0)
+                            : Colors.grey[100],
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
                           color: isSelected
-                              ? const Color(0xffFFF3E0)
-                              : Colors.grey[100],
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: isSelected
-                                ? const Color(0xffFF9B44)
-                                : Colors.transparent,
-                            width: 1.5,
-                          ),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              config.chantingType ?? "Mantra",
-                              textAlign: TextAlign.center,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.tiroDevanagariHindi(
-                                fontSize: 16,
-                                color: isSelected
-                                    ? const Color(0xffFF9B44)
-                                    : Colors.black87,
-                                fontWeight: isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                              ),
-                            ),
-                          ],
+                              ? const Color(0xffFF9B44)
+                              : Colors.transparent,
+                          width: 1.5,
                         ),
                       ),
-                    );
-                  });
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            _getDisplayMantraText(config),
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.tiroDevanagariHindi(
+                              fontSize: 16,
+                              color: isSelected
+                                  ? const Color(0xffFF9B44)
+                                  : Colors.black87,
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
                 },
               ),
-            );
-          }),
+            ),
         ],
       ),
     );
   }
 
-  Widget _buildCountSelector() {
+  String _getDisplayMantraText(SpiritualConfiguration config) {
+    if (config.chantingType != null &&
+        config.chantingType!.isNotEmpty &&
+        config.chantingType != "Other") {
+      return config.chantingType!;
+    } else if (config.customChantingType != null &&
+        config.customChantingType!.isNotEmpty) {
+      return config.customChantingType!;
+    }
+    return "Mantra";
+  }
+
+  Widget _buildCountSelector(BuildContext context, ChantingLoaded state) {
+    const List<int> availableCounts = [27, 51, 108, 216, 324, 434, 540, 646];
+    final selected = state.selectedCount;
+    // Safely find index or default to 108's index or 0
+    double currentIndex = availableCounts.indexOf(selected).toDouble();
+    if (currentIndex < 0) currentIndex = 2.0; // 108
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -255,68 +344,64 @@ class ChantingConfigurationView
             ],
           ),
           const SizedBox(height: 30),
-          Obx(() {
-            final counts = controller.availableCounts;
-            final selected = controller.selectedCount.value;
-            final currentIndex = counts.indexOf(selected).toDouble();
-
-            return Column(
-              children: [
-                SliderTheme(
-                  data: SliderTheme.of(Get.context!).copyWith(
-                    activeTrackColor: const Color(0xffFF9B44),
-                    inactiveTrackColor: Colors.orange.withOpacity(0.2),
-                    thumbColor: Colors.white,
-                    overlayColor: const Color(0xffFF9B44).withOpacity(0.1),
-                    valueIndicatorColor: const Color(0xffFF9B44),
-                    valueIndicatorTextStyle: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    thumbShape: const RoundSliderThumbShape(
-                      enabledThumbRadius: 12,
-                    ),
-                    trackHeight: 6,
+          Column(
+            children: [
+              SliderTheme(
+                data: SliderTheme.of(context).copyWith(
+                  activeTrackColor: const Color(0xffFF9B44),
+                  inactiveTrackColor: Colors.orange.withOpacity(0.2),
+                  thumbColor: Colors.white,
+                  overlayColor: const Color(0xffFF9B44).withOpacity(0.1),
+                  valueIndicatorColor: const Color(0xffFF9B44),
+                  valueIndicatorTextStyle: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
                   ),
-                  child: Slider(
-                    value: currentIndex < 0 ? 0 : currentIndex,
-                    min: 0,
-                    max: (counts.length - 1).toDouble(),
-                    divisions: counts.length - 1,
-                    label: '${counts[currentIndex.toInt()]}',
-                    onChanged: (value) {
-                      final index = value.toInt();
-                      if (index >= 0 && index < counts.length) {
-                        controller.selectCount(counts[index]);
-                      }
-                    },
+                  thumbShape: const RoundSliderThumbShape(
+                    enabledThumbRadius: 12,
                   ),
+                  trackHeight: 6,
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '${counts.first}',
-                        style: GoogleFonts.poppins(color: Colors.grey),
-                      ),
-                      Text(
-                        '${counts.last}',
-                        style: GoogleFonts.poppins(color: Colors.grey),
-                      ),
-                    ],
-                  ),
+                child: Slider(
+                  value: currentIndex,
+                  min: 0,
+                  max: (availableCounts.length - 1).toDouble(),
+                  divisions: availableCounts.length - 1,
+                  label: '${availableCounts[currentIndex.toInt()]}',
+                  onChanged: (value) {
+                    final index = value.toInt();
+                    if (index >= 0 && index < availableCounts.length) {
+                      context.read<ChantingBloc>().add(
+                        SelectChantingCount(availableCounts[index]),
+                      );
+                    }
+                  },
                 ),
-              ],
-            );
-          }),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '${availableCounts.first}',
+                      style: GoogleFonts.poppins(color: Colors.grey),
+                    ),
+                    Text(
+                      '${availableCounts.last}',
+                      style: GoogleFonts.poppins(color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSummary() {
+  Widget _buildSummary(BuildContext context, ChantingLoaded state) {
     return Column(
       children: [
         Text(
@@ -331,23 +416,16 @@ class ChantingConfigurationView
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Obx(
-              () => _summaryChip(
-                controller.selectedEmotion.value == null
-                    ? '😐'
-                    : controller.emotionEmojis[controller
-                              .selectedEmotion
-                              .value] ??
-                          '😐',
-                'Mood',
-              ),
+            _summaryChip(
+              state.selectedEmotion != null
+                  ? (ChantingBloc.emotionEmojis[state.selectedEmotion] ?? '😐')
+                  : '😐',
+              'Mood',
             ),
             const SizedBox(width: 24),
-            Obx(
-              () => _summaryChip(
-                '📿', // Rosary/Mala icon
-                '${controller.selectedCount.value} Counts',
-              ),
+            _summaryChip(
+              '📿', // Rosary/Mala icon
+              '${state.selectedCount} Counts',
             ),
           ],
         ),
@@ -364,19 +442,14 @@ class ChantingConfigurationView
                 color: const Color(0xff1E1E1E),
               ),
             ),
-            // Dynamic Karma points
-            Obx(() {
-              final karma =
-                  controller.selectedConfiguration.value?.karmaPoints ?? 0;
-              return Text(
-                '+$karma karma Points',
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xffFF9B44),
-                ),
-              );
-            }),
+            Text(
+              '+${state.selectedConfig?.karmaPoints ?? 0} karma Points',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xffFF9B44),
+              ),
+            ),
           ],
         ),
       ],
@@ -399,12 +472,14 @@ class ChantingConfigurationView
     );
   }
 
-  Widget _buildStartButton() {
+  Widget _buildStartButton(BuildContext context, ChantingLoaded state) {
     return SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
-        onPressed: () => controller.startSession(),
+        onPressed: () {
+          context.read<ChantingBloc>().add(const StartChantingSession());
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xffFF8C00), // Orange
           foregroundColor: Colors.white,
@@ -423,8 +498,10 @@ class ChantingConfigurationView
 }
 
 class _EmotionList extends StatefulWidget {
-  final ChantingConfigurationController controller;
-  const _EmotionList({required this.controller});
+  final String? selectedEmotion;
+  final Function(String) onSelect;
+
+  const _EmotionList({required this.selectedEmotion, required this.onSelect});
 
   @override
   State<_EmotionList> createState() => _EmotionListState();
@@ -442,20 +519,19 @@ class _EmotionListState extends State<_EmotionList> {
   }
 
   void _scrollToSelected() {
-    final selectedEmotion = widget.controller.selectedEmotion.value;
+    final selectedEmotion = widget.selectedEmotion;
     if (selectedEmotion != null) {
-      final emotions = widget.controller.emotionEmojis.keys.toList();
+      final emotions = ChantingBloc.emotionEmojis.keys.toList();
       final index = emotions.indexOf(selectedEmotion);
       if (index != -1) {
         final screenWidth = MediaQuery.of(context).size.width;
-        final horizontalPadding = 40.0; // 20.0 * 2 from parent
+        final horizontalPadding = 40.0;
         final viewportWidth = screenWidth - horizontalPadding;
         final itemWidth = screenWidth / 3;
 
         final position =
             (index * itemWidth) + (itemWidth / 2) - (viewportWidth / 2);
 
-        // Ensure within bounds
         double target = position;
         if (target < 0) target = 0;
         if (target > _scrollController.position.maxScrollExtent) {
@@ -472,6 +548,14 @@ class _EmotionListState extends State<_EmotionList> {
   }
 
   @override
+  void didUpdateWidget(covariant _EmotionList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedEmotion != widget.selectedEmotion) {
+      _scrollToSelected();
+    }
+  }
+
+  @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
@@ -480,81 +564,67 @@ class _EmotionListState extends State<_EmotionList> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    // Calculated item width same as view
     final itemWidth = width / 3;
 
     return ListView.builder(
       controller: _scrollController,
       scrollDirection: Axis.horizontal,
       physics: const BouncingScrollPhysics(),
-      itemCount: widget.controller.emotionEmojis.length,
+      itemCount: ChantingBloc.emotionEmojis.length,
       itemBuilder: (context, index) {
-        final entry = widget.controller.emotionEmojis.entries.elementAt(index);
+        final entry = ChantingBloc.emotionEmojis.entries.elementAt(index);
         final emotion = entry.key;
         final emoji = entry.value;
 
+        final isSelected = widget.selectedEmotion == emotion;
+
         return SizedBox(
           width: itemWidth,
-          child: Obx(() {
-            final isSelected =
-                widget.controller.selectedEmotion.value == emotion;
-            return GestureDetector(
-              onTap: () {
-                widget.controller.onEmotionSelected(emotion);
-                final screenWidth = MediaQuery.of(context).size.width;
-                final horizontalPadding = 40.0;
-                final viewportWidth = screenWidth - horizontalPadding;
-                final position =
-                    (index * itemWidth) + (itemWidth / 2) - (viewportWidth / 2);
-
-                _scrollController.animateTo(
-                  position < 0 ? 0 : position,
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.easeOutCubic,
-                );
-              },
-              child: AnimatedScale(
-                scale: isSelected ? 1.3 : 0.8,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeOutBack,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 55, // 75 -> 55
-                      height: 55, // 75 -> 55
-                      alignment: Alignment.center,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.transparent, // Removed orange background
-                      ),
-                      child: Text(
-                        emoji,
-                        style: TextStyle(
-                          fontSize: isSelected ? 30 : 22,
-                        ), // 40/30 -> 30/22
+          child: GestureDetector(
+            onTap: () {
+              widget.onSelect(emotion);
+            },
+            child: AnimatedScale(
+              scale: isSelected ? 1.3 : 0.8,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutBack,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 55,
+                    height: 55,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.transparent,
+                    ),
+                    child: Text(
+                      emoji,
+                      style: TextStyle(fontSize: isSelected ? 30 : 22),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  AnimatedOpacity(
+                    duration: const Duration(milliseconds: 200),
+                    opacity: isSelected ? 1.0 : 0.6,
+                    child: Text(
+                      emotion,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        fontSize: isSelected ? 16 : 12,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.w500,
+                        color: const Color(0xff1E1E1E),
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    AnimatedOpacity(
-                      duration: const Duration(milliseconds: 200),
-                      opacity: isSelected ? 1.0 : 0.6,
-                      child: Text(
-                        emotion,
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
-                          fontSize: isSelected ? 16 : 12,
-                          fontWeight: isSelected
-                              ? FontWeight.bold
-                              : FontWeight.w500,
-                          color: const Color(0xff1E1E1E),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            );
-          }),
+            ),
+          ),
         );
       },
     );

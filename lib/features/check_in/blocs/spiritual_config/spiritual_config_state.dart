@@ -59,11 +59,23 @@ class ConfigError extends SpiritualConfigState {
 
 class SessionStarting extends SpiritualConfigState {}
 
-class SessionReady extends SpiritualConfigState {
+class SessionReady extends ConfigLoaded {
   final Map<String, dynamic> navigationArgs;
 
-  const SessionReady(this.navigationArgs);
+  const SessionReady({
+    required this.navigationArgs,
+    required super.configurations,
+    super.selectedConfig,
+    super.selectedEmotion,
+    super.selectedDuration,
+  });
 
   @override
-  List<Object> get props => [navigationArgs];
+  List<Object?> get props => [
+    navigationArgs,
+    configurations,
+    selectedConfig,
+    selectedEmotion,
+    selectedDuration,
+  ];
 }

@@ -96,6 +96,7 @@ class CheckInBloc extends Bloc<CheckInEvent, CheckInState> {
           route: event.route,
           arguments: {
             'categoryId': event.activityId,
+            'title': event.title,
             'preFetchedData': _memoryCache[event.activityId],
           },
           previousState: currentState,
@@ -113,7 +114,11 @@ class CheckInBloc extends Bloc<CheckInEvent, CheckInState> {
       emit(
         CheckInNavigationAction(
           route: event.route,
-          arguments: {'categoryId': event.activityId, 'preFetchedData': cached},
+          arguments: {
+            'categoryId': event.activityId,
+            'title': event.title,
+            'preFetchedData': cached,
+          },
           previousState: currentState,
         ),
       );
@@ -136,6 +141,7 @@ class CheckInBloc extends Bloc<CheckInEvent, CheckInState> {
             route: event.route,
             arguments: {
               'categoryId': event.activityId,
+              'title': event.title,
               'preFetchedData': response,
             },
             previousState: currentState,

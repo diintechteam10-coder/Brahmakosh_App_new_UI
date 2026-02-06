@@ -11,6 +11,7 @@ import 'package:brahmakosh/features/check_in/repositories/spiritual_repository.d
 import 'package:brahmakosh/common/utils.dart';
 
 import 'dart:async';
+import 'package:intl/intl.dart';
 
 class CheckInView extends StatefulWidget {
   const CheckInView({super.key});
@@ -45,6 +46,36 @@ class _CheckInViewState extends State<CheckInView>
   void dispose() {
     _timer?.cancel();
     super.dispose();
+  }
+
+  String _formatDateTimeFull(String? iso) {
+    if (iso == null) return "";
+    try {
+      final dt = DateTime.parse(iso).toLocal();
+      return DateFormat('h:mm a d.MM.yyyy').format(dt);
+    } catch (e) {
+      return "";
+    }
+  }
+
+  String _formatDate(String? iso) {
+    if (iso == null) return "";
+    try {
+      final dt = DateTime.parse(iso).toLocal();
+      return DateFormat('yyyy-MM-dd').format(dt);
+    } catch (e) {
+      return "";
+    }
+  }
+
+  String _formatTime(String? iso) {
+    if (iso == null) return "";
+    try {
+      final dt = DateTime.parse(iso).toLocal();
+      return DateFormat('h:mm a').format(dt);
+    } catch (e) {
+      return "";
+    }
   }
 
   @override
@@ -255,7 +286,7 @@ class _CheckInViewState extends State<CheckInView>
                         ),
                       ),
                     ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 1)),
+                    const SliverToBoxAdapter(child: SizedBox(height: 20)),
                   ],
 
                   // Overview Stats
@@ -266,9 +297,12 @@ class _CheckInViewState extends State<CheckInView>
                         child: Column(
                           children: [
                             Text(
-                              'Last Check-In 2.30PM 2.02.2026',
+                              (data.recentActivities != null &&
+                                      data.recentActivities!.isNotEmpty)
+                                  ? 'Last Check-In ${_formatDateTimeFull(data.recentActivities!.first.createdAt)}'
+                                  : 'No Recent Check-Ins',
                               style: GoogleFonts.lora(
-                                fontSize: 12,
+                                fontSize: 10,
                                 fontWeight: FontWeight.w600,
                                 color: const Color(0xff7B4A12),
                               ),
@@ -378,7 +412,7 @@ class _CheckInViewState extends State<CheckInView>
           children: [
             Expanded(
               child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 2500),
+                duration: const Duration(milliseconds: 2000),
                 transitionBuilder: (Widget child, Animation<double> animation) {
                   return FadeTransition(
                     opacity: animation,
@@ -398,20 +432,14 @@ class _CheckInViewState extends State<CheckInView>
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             //_statItem('Days', '${stats.days}'),
-                            _statItem(
-                              'Your Total Check-In',
-                              '${stats.sessions}',
-                            ),
+                            _statItem('Your Check-In', '${stats.sessions}'),
                           ],
                         )
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             //_statItem('Minutes', '${stats.minutes}'),
-                            _statItem(
-                              'Your Total Karma Points',
-                              '${stats.points}',
-                            ),
+                            _statItem('Your Karma Points', '${stats.points}'),
                           ],
                         ),
                 ),
@@ -603,9 +631,7 @@ class _CheckInViewState extends State<CheckInView>
                             ),
                           ),
                           Text(
-                            activity.createdAt != null
-                                ? activity.createdAt!.split('T')[0]
-                                : '',
+                            "${_formatDate(activity.createdAt)}   ${_formatTime(activity.createdAt)}",
                             style: GoogleFonts.lora(
                               fontSize: 12,
                               color: Colors.black54,
@@ -614,25 +640,43 @@ class _CheckInViewState extends State<CheckInView>
                         ],
                       ),
                     ),
-                    if (activity.karmaPoints != null)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xffC9A24D).withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '+${activity.karmaPoints} Karma',
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        if (activity.karmaPoints != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xffC9A24D).withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              '+${activity.karmaPoints} Karma',
+                              style: GoogleFonts.lora(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xff7B4A12),
+                              ),
+                            ),
+                          ),
+                        const SizedBox(height: 4),
+                        Text(
+                          activity.status == 'completed'
+                              ? 'Completed'
+                              : 'Incomplete',
                           style: GoogleFonts.lora(
-                            fontSize: 11,
+                            fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xff7B4A12),
+                            color: activity.status == 'completed'
+                                ? Colors.green
+                                : Colors.red,
                           ),
                         ),
-                      ),
+                      ],
+                    ),
                   ],
                 ),
               );

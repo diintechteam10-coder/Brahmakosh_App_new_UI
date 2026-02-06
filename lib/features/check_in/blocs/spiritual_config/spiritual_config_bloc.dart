@@ -242,28 +242,36 @@ class SpiritualConfigBloc
       final response = await repository.getClips(current.selectedConfig!.sId!);
 
       emit(
-        SessionReady({
-          'duration': current.selectedDuration,
-          'config': current.selectedConfig,
-          'clips': (response?.success == true && response?.data != null)
-              ? response!.data
-              : [],
-        }),
+        SessionReady(
+          navigationArgs: {
+            'duration': current.selectedDuration,
+            'config': current.selectedConfig,
+            'clips': (response?.success == true && response?.data != null)
+                ? response!.data
+                : [],
+          },
+          configurations: current.configurations,
+          selectedConfig: current.selectedConfig,
+          selectedEmotion: current.selectedEmotion,
+          selectedDuration: current.selectedDuration,
+        ),
       );
 
-      // After navigation, we might want to reset to Loaded?
-      // The BLoC instance persists? Usually View is popped?
-      // If View is popped and re-pushed, BLoC is recreated (if provided by View).
-      // If provided above, it persists.
-      // Assuming provided in View as per plan.
+      // No explicit reset needed as SessionReady is now a valid Loaded state.
     } catch (e) {
       // Handle error
       emit(
-        SessionReady({
-          'duration': current.selectedDuration,
-          'config': current.selectedConfig,
-          'clips': [],
-        }),
+        SessionReady(
+          navigationArgs: {
+            'duration': current.selectedDuration,
+            'config': current.selectedConfig,
+            'clips': [],
+          },
+          configurations: current.configurations,
+          selectedConfig: current.selectedConfig,
+          selectedEmotion: current.selectedEmotion,
+          selectedDuration: current.selectedDuration,
+        ),
       );
     }
   }

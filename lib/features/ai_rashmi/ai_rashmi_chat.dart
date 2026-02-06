@@ -11,6 +11,7 @@ import 'package:brahmakosh/features/agent/controllers/agent_controller.dart';
 import 'krishna_category_selection_view.dart';
 import 'rashmi_category_selection_view.dart'; // New Import
 import 'widgets/deity_selection_widget.dart'; // New Import
+import '../gita/views/gita_chapter_screen.dart';
 
 class RashmiChat extends StatelessWidget {
   final String? backgroundImage;
@@ -496,7 +497,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
               Icons.auto_awesome,
               Colors.orange,
               () {
-                vm.sendMessage("Teach me a Gita Shloak");
+                Get.to(() => const GitaChapterScreen());
               },
             ),
             const SizedBox(height: 12),
