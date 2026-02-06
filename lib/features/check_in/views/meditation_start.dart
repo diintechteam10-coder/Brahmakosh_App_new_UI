@@ -63,6 +63,7 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
   // 🔹 Audio Player
   final AudioPlayer _audioPlayer = AudioPlayer();
   String? _currentAudioUrl;
+  String? _currentVideoUrl; // Added to store video URL from API
   bool _isAudioInitialized = false;
 
   // 🔹 Video Player
@@ -177,7 +178,10 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
 
   void _initVideo() {
     _videoController =
-        VideoPlayerController.asset('assets/images/Transition.mp4')
+        VideoPlayerController.asset(
+            'assets/images/Transition.mp4',
+            videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+          )
           ..initialize().then((_) {
             setState(() {
               _isVideoInitialized = true;
@@ -205,7 +209,10 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
     });
 
     _videoController =
-        VideoPlayerController.asset('assets/images/Meditation_video.mp4')
+        VideoPlayerController.asset(
+            'assets/images/Meditation_video.mp4',
+            videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+          )
           ..initialize().then((_) {
             _videoController.setLooping(true);
             _videoController.setVolume(0);
@@ -219,20 +226,36 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
           });
   }
 
-  void _triggerSaveSession() {
+  void _triggerSaveSession({
+    String status = "completed",
+    int karmaPoints = -1, // -1 sentinel to use config default
+    int? actualDurationSeconds,
+    int completionPercentage = 100,
+  }) {
+    int durationMins = _totalDuration ~/ 60;
+    int actDuration = actualDurationSeconds != null
+        ? (actualDurationSeconds ~/ 60)
+        : durationMins;
+    // ensure at least 0
+    if (actDuration < 0) actDuration = 0;
+
+    int finalKarma = karmaPoints != -1
+        ? karmaPoints
+        : (_config?.karmaPoints ?? 0);
+
     // Construct Request
     SpiritualSessionRequest request = SpiritualSessionRequest(
       type: _config?.type ?? "chanting",
       title: _config?.title ?? "Meditation Session",
-      targetDuration: _totalDuration ~/ 60,
-      actualDuration: _totalDuration ~/ 60,
+      targetDuration: durationMins,
+      actualDuration: actDuration,
       chantingName: _config?.title ?? "Meditation",
       chantCount: 108,
-      karmaPoints: _config?.karmaPoints ?? 0,
+      karmaPoints: finalKarma,
       emotion: _config?.emotion ?? "neutral",
-      status: "completed",
-      completionPercentage: 100,
-      videoUrl: "",
+      status: status,
+      completionPercentage: completionPercentage,
+      videoUrl: _currentVideoUrl ?? "",
       audioUrl: _currentAudioUrl ?? "",
       configurationId: _config?.sId,
     );
@@ -395,6 +418,7 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
       List? clips = args != null ? args['clips'] : null;
 
       String sourceUrl = "";
+      String? videoSourceUrl; // Temp var for video
       bool isNetwork = false;
 
       if (clips != null && clips.isNotEmpty) {
@@ -410,17 +434,27 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
             sourceUrl = clip.fileUrl!;
             isNetwork = true;
           }
+          // capture video url
+          if (clip.videoUrl != null && clip.videoUrl!.isNotEmpty) {
+            videoSourceUrl = clip.videoUrl;
+          }
         }
         // Handle Map (JSON)
         else if (clip is Map) {
           final audio = clip['audioUrl'];
           final file = clip['url'] ?? clip['fileUrl'];
+          final video = clip['videoUrl'];
+
           if (audio != null && audio.toString().isNotEmpty) {
             sourceUrl = audio.toString();
             isNetwork = true;
           } else if (file != null && file.toString().isNotEmpty) {
             sourceUrl = file.toString();
             isNetwork = true;
+          }
+
+          if (video != null && video.toString().isNotEmpty) {
+            videoSourceUrl = video.toString();
           }
         }
         // Final fallback (Dynamic access)
@@ -435,11 +469,18 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
               sourceUrl = c.fileUrl;
               isNetwork = true;
             }
+
+            if (c.videoUrl != null && c.videoUrl.isNotEmpty) {
+              videoSourceUrl = c.videoUrl;
+            }
           } catch (e) {
             print("Error accessing clip properties: $e");
           }
         }
       }
+
+      // Assign video url to state
+      _currentVideoUrl = videoSourceUrl;
 
       if (sourceUrl.isEmpty) {
         // Default music fallback
@@ -462,6 +503,11 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
 
       _isAudioInitialized = true;
       print("✅ Audio Initialized Successfully");
+
+      // Fix: Ensure video continues playing if it was impacted by audio init
+      if (_isVideoInitialized && !_videoController.value.isPlaying) {
+        _videoController.play();
+      }
     } catch (e) {
       print("❌ Error initializing audio: $e");
     }
@@ -481,7 +527,7 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
     super.dispose();
   }
 
-  void _toggleMeditation() {
+  Future<void> _toggleMeditation() async {
     if (!_isStarted) {
       setState(() {
         _isStarted = true;
@@ -490,7 +536,13 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
       _timerController.forward();
       _breathingController.repeat(reverse: true);
       _rippleController.repeat();
-      if (_isAudioInitialized) _audioPlayer.resume();
+      if (_isAudioInitialized) {
+        try {
+          await _audioPlayer.resume();
+        } catch (e) {
+          print("Error resuming audio: $e");
+        }
+      }
       // Ensure video plays
       if (_isVideoInitialized && !_videoController.value.isPlaying) {
         _videoController.play();
@@ -502,7 +554,13 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
       _timerController.stop();
       _breathingController.stop();
       _rippleController.stop();
-      if (_isAudioInitialized) _audioPlayer.pause();
+      if (_isAudioInitialized) {
+        try {
+          await _audioPlayer.pause();
+        } catch (e) {
+          print("Error pausing audio: $e");
+        }
+      }
       // Pause video if user pauses meditation
       if (_isVideoInitialized) _videoController.pause();
     } else {
@@ -512,7 +570,14 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
       _timerController.forward();
       _breathingController.repeat(reverse: true);
       _rippleController.repeat();
-      if (_isAudioInitialized) _audioPlayer.resume();
+      if (_isAudioInitialized) {
+        try {
+          // Explicit resume - player should maintain position
+          await _audioPlayer.resume();
+        } catch (e) {
+          print("Error resuming audio (2): $e");
+        }
+      }
       if (_isVideoInitialized) _videoController.play();
     }
   }
@@ -532,7 +597,7 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
           style: TextStyle(color: Colors.white),
         ),
         content: const Text(
-          "Are you sure you want to exit?",
+          "Are you sure you want to exit?\nYou will receive 0 Karma points.",
           style: TextStyle(color: Colors.white70),
         ),
         actions: [
@@ -551,6 +616,24 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
           TextButton(
             onPressed: () {
               Navigator.pop(context); // Close dialog
+
+              // Calculate partial stats
+              double elapsedSeconds =
+                  _timerController.value *
+                  _timerController.duration!.inSeconds.toDouble();
+              int actualSec = elapsedSeconds.toInt();
+              int percent = ((elapsedSeconds / _totalDuration) * 100)
+                  .toInt()
+                  .clamp(0, 100);
+
+              // Save as incomplete with 0 karma
+              _triggerSaveSession(
+                status: "incomplete",
+                karmaPoints: 0,
+                actualDurationSeconds: actualSec,
+                completionPercentage: percent,
+              );
+
               // Navigate to CheckIn screen (Dashboard Index 1)
               Get.offAllNamed(AppConstants.routeDashboard, arguments: 1);
             },

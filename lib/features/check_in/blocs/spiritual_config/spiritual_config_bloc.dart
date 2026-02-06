@@ -260,6 +260,7 @@ class SpiritualConfigBloc
       // No explicit reset needed as SessionReady is now a valid Loaded state.
     } catch (e) {
       // Handle error
+      print("❌ SpiritualConfigBloc: Error starting session/fetching clips: $e");
       emit(
         SessionReady(
           navigationArgs: {
