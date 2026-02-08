@@ -242,6 +242,8 @@ class Astrology {
   List<Planets>? planetsExtended;
   BirthChart? birthChart;
   BirthExtendedChart? birthExtendedChart;
+  Doshas? doshas;
+  Dashas? dashas;
   String? lastCalculated;
   String? calculationSource;
 
@@ -252,6 +254,8 @@ class Astrology {
     this.planetsExtended,
     this.birthChart,
     this.birthExtendedChart,
+    this.doshas,
+    this.dashas,
     this.lastCalculated,
     this.calculationSource,
   });
@@ -281,6 +285,8 @@ class Astrology {
     birthExtendedChart = json['birthExtendedChart'] != null
         ? BirthExtendedChart.fromJson(json['birthExtendedChart'])
         : null;
+    doshas = json['doshas'] != null ? Doshas.fromJson(json['doshas']) : null;
+    dashas = json['dashas'] != null ? Dashas.fromJson(json['dashas']) : null;
     lastCalculated = json['lastCalculated'];
     calculationSource = json['calculationSource'];
   }
@@ -306,6 +312,12 @@ class Astrology {
     }
     if (birthExtendedChart != null) {
       data['birthExtendedChart'] = birthExtendedChart!.toJson();
+    }
+    if (doshas != null) {
+      data['doshas'] = doshas!.toJson();
+    }
+    if (dashas != null) {
+      data['dashas'] = dashas!.toJson();
     }
     data['lastCalculated'] = lastCalculated;
     data['calculationSource'] = calculationSource;
@@ -387,6 +399,8 @@ class AstroDetails {
   String? tatva;
   String? nameAlphabet;
   String? paya;
+  String? luckyColor;
+  String? luckyNumber;
 
   AstroDetails({
     this.ascendant,
@@ -408,15 +422,17 @@ class AstroDetails {
     this.tatva,
     this.nameAlphabet,
     this.paya,
+    this.luckyColor,
+    this.luckyNumber,
   });
 
   AstroDetails.fromJson(Map<String, dynamic> json) {
     ascendant = json['ascendant'];
-    ascendantLord = json['ascendantLord'];
+    ascendantLord = json['ascendantLord'] ?? json['ascendant_lord'];
     sign = json['sign'];
-    signLord = json['signLord'];
+    signLord = json['signLord'] ?? json['sign_lord'];
     nakshatra = json['nakshatra'];
-    nakshatraLord = json['nakshatraLord'];
+    nakshatraLord = json['nakshatraLord'] ?? json['nakshatra_lord'];
     charan = json['charan'];
     varna = json['varna'];
     vashya = json['vashya'];
@@ -428,18 +444,22 @@ class AstroDetails {
     karan = json['karan'];
     yunja = json['yunja'];
     tatva = json['tatva'];
-    nameAlphabet = json['nameAlphabet'];
+    nameAlphabet = json['nameAlphabet'] ?? json['name_alphabet'];
     paya = json['paya'];
+    luckyColor = json['luckyColor'] ?? json['lucky_color'];
+    luckyNumber = json['luckyNumber'] != null
+        ? json['luckyNumber'].toString()
+        : json['lucky_number']?.toString();
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['ascendant'] = ascendant;
-    data['ascendantLord'] = ascendantLord;
+    data['ascendant_lord'] = ascendantLord;
     data['sign'] = sign;
-    data['signLord'] = signLord;
+    data['sign_lord'] = signLord;
     data['nakshatra'] = nakshatra;
-    data['nakshatraLord'] = nakshatraLord;
+    data['nakshatra_lord'] = nakshatraLord;
     data['charan'] = charan;
     data['varna'] = varna;
     data['vashya'] = vashya;
@@ -451,8 +471,10 @@ class AstroDetails {
     data['karan'] = karan;
     data['yunja'] = yunja;
     data['tatva'] = tatva;
-    data['nameAlphabet'] = nameAlphabet;
+    data['name_alphabet'] = nameAlphabet;
     data['paya'] = paya;
+    data['lucky_color'] = luckyColor;
+    data['lucky_number'] = luckyNumber;
     return data;
   }
 }
@@ -685,6 +707,790 @@ class HousesExtended {
     data['10'] = house10;
     data['11'] = house11;
     data['12'] = house12;
+    return data;
+  }
+}
+
+class Doshas {
+  Manglik? manglik;
+  Kalsarpa? kalsarpa;
+  SadeSatiCurrent? sadeSatiCurrent;
+  SadeSatiLife? sadeSatiLife;
+  Pitra? pitra;
+
+  Doshas({
+    this.manglik,
+    this.kalsarpa,
+    this.sadeSatiCurrent,
+    this.sadeSatiLife,
+    this.pitra,
+  });
+
+  Doshas.fromJson(Map<String, dynamic> json) {
+    manglik = json['manglik'] != null
+        ? Manglik.fromJson(json['manglik'])
+        : null;
+    sadeSatiCurrent = json['sadeSatiCurrent'] != null
+        ? SadeSatiCurrent.fromJson(json['sadeSatiCurrent'])
+        : (json['sade_sati_current'] != null
+              ? SadeSatiCurrent.fromJson(json['sade_sati_current'])
+              : null);
+    sadeSatiLife = json['sadeSatiLife'] != null
+        ? SadeSatiLife.fromJson(json['sadeSatiLife'])
+        : (json['sade_sati_life'] != null
+              ? SadeSatiLife.fromJson(json['sade_sati_life'])
+              : null);
+    pitra = json['pitra'] != null ? Pitra.fromJson(json['pitra']) : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (manglik != null) {
+      data['manglik'] = manglik!.toJson();
+    }
+    if (kalsarpa != null) {
+      data['kalsarpa'] = kalsarpa!.toJson();
+    }
+    if (sadeSatiCurrent != null) {
+      data['sade_sati_current'] = sadeSatiCurrent!.toJson();
+    }
+    if (sadeSatiLife != null) {
+      data['sade_sati_life'] = sadeSatiLife!.toJson();
+    }
+    if (pitra != null) {
+      data['pitra'] = pitra!.toJson();
+    }
+    return data;
+  }
+}
+
+class Manglik {
+  bool? present;
+  String? status;
+  // ignore: prefer_void_to_null
+  Null percentage;
+  // ignore: prefer_void_to_null
+  Null description;
+  RawManglik? raw;
+
+  Manglik({
+    this.present,
+    this.status,
+    this.percentage,
+    this.description,
+    this.raw,
+  });
+
+  Manglik.fromJson(Map<String, dynamic> json) {
+    present = json['present'];
+    status = json['status'];
+    percentage = json['percentage'];
+    description = json['description'];
+    raw = json['raw'] != null ? RawManglik.fromJson(json['raw']) : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['present'] = present;
+    data['status'] = status;
+    data['percentage'] = percentage;
+    data['description'] = description;
+    if (raw != null) {
+      data['raw'] = raw!.toJson();
+    }
+    return data;
+  }
+}
+
+class RawManglik {
+  ManglikPresentRule? manglikPresentRule;
+  List<String>? manglikCancelRule;
+  bool? isMarsManglikCancelled;
+  String? manglikStatus;
+  double? percentageManglikPresent;
+  double? percentageManglikAfterCancellation;
+  String? manglikReport;
+  bool? isPresent;
+
+  RawManglik({
+    this.manglikPresentRule,
+    this.manglikCancelRule,
+    this.isMarsManglikCancelled,
+    this.manglikStatus,
+    this.percentageManglikPresent,
+    this.percentageManglikAfterCancellation,
+    this.manglikReport,
+    this.isPresent,
+  });
+
+  RawManglik.fromJson(Map<String, dynamic> json) {
+    manglikPresentRule = json['manglik_present_rule'] != null
+        ? ManglikPresentRule.fromJson(json['manglik_present_rule'])
+        : null;
+    if (json['manglik_cancel_rule'] != null) {
+      manglikCancelRule = json['manglik_cancel_rule'].cast<String>();
+    }
+    isMarsManglikCancelled = json['is_mars_manglik_cancelled'];
+    manglikStatus = json['manglik_status'];
+    percentageManglikPresent = (json['percentage_manglik_present'] as num?)
+        ?.toDouble();
+    percentageManglikAfterCancellation =
+        (json['percentage_manglik_after_cancellation'] as num?)?.toDouble();
+    manglikReport = json['manglik_report'];
+    isPresent = json['is_present'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (manglikPresentRule != null) {
+      data['manglik_present_rule'] = manglikPresentRule!.toJson();
+    }
+    data['manglik_cancel_rule'] = manglikCancelRule;
+    data['is_mars_manglik_cancelled'] = isMarsManglikCancelled;
+    data['manglik_status'] = manglikStatus;
+    data['percentage_manglik_present'] = percentageManglikPresent;
+    data['percentage_manglik_after_cancellation'] =
+        percentageManglikAfterCancellation;
+    data['manglik_report'] = manglikReport;
+    data['is_present'] = isPresent;
+    return data;
+  }
+}
+
+class ManglikPresentRule {
+  List<String>? basedOnAspect;
+  List<String>? basedOnHouse;
+
+  ManglikPresentRule({this.basedOnAspect, this.basedOnHouse});
+
+  ManglikPresentRule.fromJson(Map<String, dynamic> json) {
+    basedOnAspect = json['based_on_aspect']?.cast<String>();
+    basedOnHouse = json['based_on_house']?.cast<String>();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['based_on_aspect'] = basedOnAspect;
+    data['based_on_house'] = basedOnHouse;
+    return data;
+  }
+}
+
+class Kalsarpa {
+  bool? present;
+  // ignore: prefer_void_to_null
+  Null status;
+  // ignore: prefer_void_to_null
+  Null type;
+  // ignore: prefer_void_to_null
+  Null description;
+  RawKalsarpa? raw;
+
+  Kalsarpa({this.present, this.status, this.type, this.description, this.raw});
+
+  Kalsarpa.fromJson(Map<String, dynamic> json) {
+    present = json['present'];
+    status = json['status'];
+    type = json['type'];
+    description = json['description'];
+    raw = json['raw'] != null ? RawKalsarpa.fromJson(json['raw']) : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['present'] = present;
+    data['status'] = status;
+    data['type'] = type;
+    data['description'] = description;
+    if (raw != null) {
+      data['raw'] = raw!.toJson();
+    }
+    return data;
+  }
+}
+
+class RawKalsarpa {
+  bool? present;
+  String? oneLine;
+
+  RawKalsarpa({this.present, this.oneLine});
+
+  RawKalsarpa.fromJson(Map<String, dynamic> json) {
+    present = json['present'];
+    oneLine = json['one_line'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['present'] = present;
+    data['one_line'] = oneLine;
+    return data;
+  }
+}
+
+class SadeSatiCurrent {
+  bool? present;
+  String? status;
+  String? considerationDate;
+  bool? isUndergoing;
+  RawSadeSatiCurrent? raw;
+
+  SadeSatiCurrent({
+    this.present,
+    this.status,
+    this.considerationDate,
+    this.isUndergoing,
+    this.raw,
+  });
+
+  SadeSatiCurrent.fromJson(Map<String, dynamic> json) {
+    present = json['present'];
+    status = json['status'];
+    considerationDate = json['considerationDate'];
+    isUndergoing = json['isUndergoing'];
+    raw = json['raw'] != null ? RawSadeSatiCurrent.fromJson(json['raw']) : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['present'] = present;
+    data['status'] = status;
+    data['considerationDate'] = considerationDate;
+    data['isUndergoing'] = isUndergoing;
+    if (raw != null) {
+      data['raw'] = raw!.toJson();
+    }
+    return data;
+  }
+}
+
+class RawSadeSatiCurrent {
+  String? considerationDate;
+  bool? isSaturnRetrograde;
+  String? moonSign;
+  String? saturnSign;
+  String? isUndergoingSadhesati;
+  bool? sadhesatiStatus;
+  String? whatIsSadhesati;
+
+  RawSadeSatiCurrent({
+    this.considerationDate,
+    this.isSaturnRetrograde,
+    this.moonSign,
+    this.saturnSign,
+    this.isUndergoingSadhesati,
+    this.sadhesatiStatus,
+    this.whatIsSadhesati,
+  });
+
+  RawSadeSatiCurrent.fromJson(Map<String, dynamic> json) {
+    considerationDate = json['consideration_date'];
+    isSaturnRetrograde = json['is_saturn_retrograde'];
+    moonSign = json['moon_sign'];
+    saturnSign = json['saturn_sign'];
+    isUndergoingSadhesati = json['is_undergoing_sadhesati'];
+    sadhesatiStatus = json['sadhesati_status'];
+    whatIsSadhesati = json['what_is_sadhesati'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['consideration_date'] = considerationDate;
+    data['is_saturn_retrograde'] = isSaturnRetrograde;
+    data['moon_sign'] = moonSign;
+    data['saturn_sign'] = saturnSign;
+    data['is_undergoing_sadhesati'] = isUndergoingSadhesati;
+    data['sadhesati_status'] = sadhesatiStatus;
+    data['what_is_sadhesati'] = whatIsSadhesati;
+    return data;
+  }
+}
+
+class SadeSatiLife {
+  bool? present;
+  String? status;
+  // ignore: prefer_void_to_null
+  Null considerationDate;
+  bool? isUndergoing;
+  List<RawSadeSati>? raw;
+
+  SadeSatiLife({
+    this.present,
+    this.status,
+    this.considerationDate,
+    this.isUndergoing,
+    this.raw,
+  });
+
+  SadeSatiLife.fromJson(Map<String, dynamic> json) {
+    present = json['present'];
+    status = json['status'];
+    considerationDate = json['considerationDate'];
+    isUndergoing = json['isUndergoing'];
+    if (json['raw'] != null) {
+      raw = <RawSadeSati>[];
+      json['raw'].forEach((v) {
+        raw!.add(RawSadeSati.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['present'] = present;
+    data['status'] = status;
+    data['considerationDate'] = considerationDate;
+    data['isUndergoing'] = isUndergoing;
+    if (raw != null) {
+      data['raw'] = raw!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class RawSadeSati {
+  String? moonSign;
+  String? saturnSign;
+  bool? isSaturnRetrograde;
+  String? type;
+  String? millisecond;
+  String? date;
+  String? summary;
+
+  RawSadeSati({
+    this.moonSign,
+    this.saturnSign,
+    this.isSaturnRetrograde,
+    this.type,
+    this.millisecond,
+    this.date,
+    this.summary,
+  });
+
+  RawSadeSati.fromJson(Map<String, dynamic> json) {
+    moonSign = json['moon_sign'];
+    saturnSign = json['saturn_sign'];
+    isSaturnRetrograde = json['is_saturn_retrograde'];
+    type = json['type'];
+    millisecond = json['millisecond'];
+    date = json['date'];
+    summary = json['summary'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['moon_sign'] = moonSign;
+    data['saturn_sign'] = saturnSign;
+    data['is_saturn_retrograde'] = isSaturnRetrograde;
+    data['type'] = type;
+    data['millisecond'] = millisecond;
+    data['date'] = date;
+    data['summary'] = summary;
+    return data;
+  }
+}
+
+class Pitra {
+  bool? present;
+  // ignore: prefer_void_to_null
+  Null oneLine;
+  // ignore: prefer_void_to_null
+  Null description;
+  RawPitra? raw;
+
+  Pitra({this.present, this.oneLine, this.description, this.raw});
+
+  Pitra.fromJson(Map<String, dynamic> json) {
+    present = json['present'];
+    oneLine = json['oneLine'];
+    description = json['description'];
+    raw = json['raw'] != null ? RawPitra.fromJson(json['raw']) : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['present'] = present;
+    data['oneLine'] = oneLine;
+    data['description'] = description;
+    if (raw != null) {
+      data['raw'] = raw!.toJson();
+    }
+    return data;
+  }
+}
+
+class RawPitra {
+  String? whatIsPitriDosha;
+  bool? isPitriDoshaPresent;
+  List<String>? rulesMatched;
+  String? conclusion;
+  List<String>? remedies;
+  List<String>? effects;
+
+  RawPitra({
+    this.whatIsPitriDosha,
+    this.isPitriDoshaPresent,
+    this.rulesMatched,
+    this.conclusion,
+    this.remedies,
+    this.effects,
+  });
+
+  RawPitra.fromJson(Map<String, dynamic> json) {
+    whatIsPitriDosha = json['what_is_pitri_dosha'];
+    isPitriDoshaPresent = json['is_pitri_dosha_present'];
+    rulesMatched = json['rules_matched']?.cast<String>();
+    conclusion = json['conclusion'];
+    remedies = json['remedies']?.cast<String>();
+    effects = json['effects']?.cast<String>();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['what_is_pitri_dosha'] = whatIsPitriDosha;
+    data['is_pitri_dosha_present'] = isPitriDoshaPresent;
+    data['rules_matched'] = rulesMatched;
+    data['conclusion'] = conclusion;
+    data['remedies'] = remedies;
+    data['effects'] = effects;
+    return data;
+  }
+}
+
+class Dashas {
+  CurrentYogini? currentYogini;
+  CurrentChardasha? currentChardasha;
+  List<MajorChardasha>? majorChardasha;
+
+  Dashas({this.currentYogini, this.currentChardasha, this.majorChardasha});
+
+  Dashas.fromJson(Map<String, dynamic> json) {
+    currentYogini = json['currentYogini'] != null
+        ? CurrentYogini.fromJson(json['currentYogini'])
+        : (json['current_yogini_dasha'] != null
+              ? CurrentYogini.fromJson(json['current_yogini_dasha'])
+              : null);
+    currentChardasha = json['currentChardasha'] != null
+        ? CurrentChardasha.fromJson(json['currentChardasha'])
+        : (json['current_chardasha'] != null
+              ? CurrentChardasha.fromJson(json['current_chardasha'])
+              : null);
+    if (json['majorChardasha'] != null) {
+      majorChardasha = <MajorChardasha>[];
+      json['majorChardasha'].forEach((v) {
+        majorChardasha!.add(MajorChardasha.fromJson(v));
+      });
+    } else if (json['major_chardasha'] != null) {
+      majorChardasha = <MajorChardasha>[];
+      json['major_chardasha'].forEach((v) {
+        majorChardasha!.add(MajorChardasha.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (currentYogini != null) {
+      data['current_yogini_dasha'] = currentYogini!.toJson();
+    }
+    if (currentChardasha != null) {
+      data['current_chardasha'] = currentChardasha!.toJson();
+    }
+    if (majorChardasha != null) {
+      data['major_chardasha'] = majorChardasha!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class CurrentYogini {
+  MajorDasha? majorDasha;
+  SubDasha? subDasha;
+  SubSubDasha? subSubDasha;
+
+  CurrentYogini({this.majorDasha, this.subDasha, this.subSubDasha});
+
+  CurrentYogini.fromJson(Map<String, dynamic> json) {
+    majorDasha = json['major_dasha'] != null
+        ? MajorDasha.fromJson(json['major_dasha'])
+        : null;
+    subDasha = json['sub_dasha'] != null
+        ? SubDasha.fromJson(json['sub_dasha'])
+        : null;
+    subSubDasha = json['sub_sub_dasha'] != null
+        ? SubSubDasha.fromJson(json['sub_sub_dasha'])
+        : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (majorDasha != null) {
+      data['major_dasha'] = majorDasha!.toJson();
+    }
+    if (subDasha != null) {
+      data['sub_dasha'] = subDasha!.toJson();
+    }
+    if (subSubDasha != null) {
+      data['sub_sub_dasha'] = subSubDasha!.toJson();
+    }
+    return data;
+  }
+}
+
+class MajorDasha {
+  int? dashaId;
+  String? dashaName;
+  String? duration;
+  String? startDate;
+  String? endDate;
+
+  MajorDasha({
+    this.dashaId,
+    this.dashaName,
+    this.duration,
+    this.startDate,
+    this.endDate,
+  });
+
+  MajorDasha.fromJson(Map<String, dynamic> json) {
+    dashaId = json['dasha_id'];
+    dashaName = json['dasha_name'];
+    duration = json['duration'];
+    startDate = json['start_date'];
+    endDate = json['end_date'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['dasha_id'] = dashaId;
+    data['dasha_name'] = dashaName;
+    data['duration'] = duration;
+    data['start_date'] = startDate;
+    data['end_date'] = endDate;
+    return data;
+  }
+}
+
+class SubDasha {
+  int? dashaId;
+  String? dashaName;
+  String? startDate;
+  String? endDate;
+
+  SubDasha({this.dashaId, this.dashaName, this.startDate, this.endDate});
+
+  SubDasha.fromJson(Map<String, dynamic> json) {
+    dashaId = json['dasha_id'];
+    dashaName = json['dasha_name'];
+    startDate = json['start_date'];
+    endDate = json['end_date'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['dasha_id'] = dashaId;
+    data['dasha_name'] = dashaName;
+    data['start_date'] = startDate;
+    data['end_date'] = endDate;
+    return data;
+  }
+}
+
+class SubSubDasha {
+  int? dashaId;
+  String? dashaName;
+  String? startDate;
+  String? endDate;
+
+  SubSubDasha({this.dashaId, this.dashaName, this.startDate, this.endDate});
+
+  SubSubDasha.fromJson(Map<String, dynamic> json) {
+    dashaId = json['dasha_id'];
+    dashaName = json['dasha_name'];
+    startDate = json['start_date'];
+    endDate = json['end_date'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['dasha_id'] = dashaId;
+    data['dasha_name'] = dashaName;
+    data['start_date'] = startDate;
+    data['end_date'] = endDate;
+    return data;
+  }
+}
+
+class CurrentChardasha {
+  String? dashaDate;
+  MajorChardashaSign? majorDasha;
+  SubChardashaSign? subDasha;
+  SubSubChardashaSign? subSubDasha;
+
+  CurrentChardasha({
+    this.dashaDate,
+    this.majorDasha,
+    this.subDasha,
+    this.subSubDasha,
+  });
+
+  CurrentChardasha.fromJson(Map<String, dynamic> json) {
+    dashaDate = json['dasha_date'];
+    majorDasha = json['major_dasha'] != null
+        ? MajorChardashaSign.fromJson(json['major_dasha'])
+        : null;
+    subDasha = json['sub_dasha'] != null
+        ? SubChardashaSign.fromJson(json['sub_dasha'])
+        : null;
+    subSubDasha = json['sub_sub_dasha'] != null
+        ? SubSubChardashaSign.fromJson(json['sub_sub_dasha'])
+        : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['dasha_date'] = dashaDate;
+    if (majorDasha != null) {
+      data['major_dasha'] = majorDasha!.toJson();
+    }
+    if (subDasha != null) {
+      data['sub_dasha'] = subDasha!.toJson();
+    }
+    if (subSubDasha != null) {
+      data['sub_sub_dasha'] = subSubDasha!.toJson();
+    }
+    return data;
+  }
+}
+
+class MajorChardashaSign {
+  int? signId;
+  String? signName;
+  String? duration;
+  String? startDate;
+  String? endDate;
+
+  MajorChardashaSign({
+    this.signId,
+    this.signName,
+    this.duration,
+    this.startDate,
+    this.endDate,
+  });
+
+  MajorChardashaSign.fromJson(Map<String, dynamic> json) {
+    signId = json['sign_id'];
+    signName = json['sign_name'];
+    duration = json['duration'];
+    startDate = json['start_date'];
+    endDate = json['end_date'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['sign_id'] = signId;
+    data['sign_name'] = signName;
+    data['duration'] = duration;
+    data['start_date'] = startDate;
+    data['end_date'] = endDate;
+    return data;
+  }
+}
+
+class SubChardashaSign {
+  int? signId;
+  String? signName;
+  String? duration;
+  String? startDate;
+  String? endDate;
+
+  SubChardashaSign({
+    this.signId,
+    this.signName,
+    this.duration,
+    this.startDate,
+    this.endDate,
+  });
+
+  SubChardashaSign.fromJson(Map<String, dynamic> json) {
+    signId = json['sign_id'];
+    signName = json['sign_name'];
+    duration = json['duration'];
+    startDate = json['start_date'];
+    endDate = json['end_date'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['sign_id'] = signId;
+    data['sign_name'] = signName;
+    data['duration'] = duration;
+    data['start_date'] = startDate;
+    data['end_date'] = endDate;
+    return data;
+  }
+}
+
+class SubSubChardashaSign {
+  int? signId;
+  String? signName;
+  String? startDate;
+  String? endDate;
+
+  SubSubChardashaSign({
+    this.signId,
+    this.signName,
+    this.startDate,
+    this.endDate,
+  });
+
+  SubSubChardashaSign.fromJson(Map<String, dynamic> json) {
+    signId = json['sign_id'];
+    signName = json['sign_name'];
+    startDate = json['start_date'];
+    endDate = json['end_date'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['sign_id'] = signId;
+    data['sign_name'] = signName;
+    data['start_date'] = startDate;
+    data['end_date'] = endDate;
+    return data;
+  }
+}
+
+class MajorChardasha {
+  int? signId;
+  String? signName;
+  String? duration;
+  String? startDate;
+  String? endDate;
+
+  MajorChardasha({
+    this.signId,
+    this.signName,
+    this.duration,
+    this.startDate,
+    this.endDate,
+  });
+
+  MajorChardasha.fromJson(Map<String, dynamic> json) {
+    signId = json['sign_id'];
+    signName = json['sign_name'];
+    duration = json['duration'];
+    startDate = json['start_date'];
+    endDate = json['end_date'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['sign_id'] = signId;
+    data['sign_name'] = signName;
+    data['duration'] = duration;
+    data['start_date'] = startDate;
+    data['end_date'] = endDate;
     return data;
   }
 }

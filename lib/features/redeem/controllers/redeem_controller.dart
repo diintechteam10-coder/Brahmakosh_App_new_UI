@@ -1,15 +1,22 @@
+import 'dart:convert';
+import 'package:brahmakosh/common/api_services.dart';
+import 'package:brahmakosh/common/api_urls.dart';
+import 'package:brahmakosh/core/constants/app_constants.dart';
+import 'package:brahmakosh/core/services/storage_service.dart';
 import 'package:brahmakosh/features/redeem/models/redeem_item_model.dart';
 import 'package:get/get.dart';
 
 class RedeemController extends GetxController {
   var selectedCategory = 'All'.obs;
   var redeemItems = <RedeemItemModel>[].obs;
-  var userPoints = 4182.obs; // Mock user points
+  var userPoints = 0.obs;
+  var isLoading = true.obs;
+  var categories = <String>['All'].obs;
 
   @override
   void onInit() {
     super.onInit();
-    loadMockData();
+    fetchRewards();
   }
 
   void filterByCategory(String category) {
@@ -25,62 +32,61 @@ class RedeemController extends GetxController {
         .toList();
   }
 
-  void loadMockData() {
-    redeemItems.value = [
-      RedeemItemModel(
-        id: '1',
-        title: 'Feed a Cow (Gau Seva)',
-        description: 'Show your compassion to the sacred.',
-        category: 'Seva',
-        requiredPoints: 699,
-        imagePath: 'assets/images/gau_seva.png', // Placeholder
-        detailedDescription:
-            'In Hindu tradition, the cow symbolizes abundance and purity. Feeding a sacred cow is an act of seva that nurtures compassion, humility, and spiritual merit.',
-        devoteesRedeemed: 1248,
-      ),
-      RedeemItemModel(
-        id: '2',
-        title: 'Char Dham Online Puja',
-        description:
-            'Perform sacred rites remotely at holy temples, where traditional rituals are performed on your behalf.',
-        category: 'Puja',
-        requiredPoints: 500,
-        imagePath: 'assets/images/char_dham.png', // Placeholder
-        detailedDescription:
-            'Participate in the sacred Char Dham yatra remotely through online puja. Experienced priests will perform rituals on your behalf, bringing blessings directly to you.',
-        devoteesRedeemed: 856,
-      ),
-      RedeemItemModel(
-        id: '3',
-        title: 'Ganga Aarti Sponsorship',
-        description:
-            'Sponsor the evening Aarti at the banks of the holy Ganges.',
-        category: 'Puja',
-        requiredPoints: 1200,
-        imagePath: 'assets/images/ganga_aarti.png', // Placeholder
-        detailedDescription:
-            'Be a part of the divine Ganga Aarti. Your sponsorship supports the daily rituals and maintenance of the ghats.',
-        devoteesRedeemed: 432,
-      ),
-      RedeemItemModel(
-        id: '4',
-        title: 'Visit Kashi Vishwanath',
-        description: 'A guided spiritual tour to the city of Lord Shiva.',
-        category: 'Yatra',
-        requiredPoints: 2500,
-        imagePath: 'assets/images/kashi.png', // Placeholder
-        detailedDescription:
-            'Experience the divinity of Kashi Vishwanath temple with a guided tour properly arranged for your comfort and spiritual gain.',
-        devoteesRedeemed: 120,
-      ),
-    ];
+  Future<void> fetchRewards() async {
+    isLoading.value = true;
+    try {
+      final token = StorageService.getString(AppConstants.keyAuthToken) ?? "";
+      await callWebApiGet(
+        null, // No ticker provider for now
+        ApiUrls.spiritualRewards,
+        token: token,
+        onResponse: (response) {
+          final body = jsonDecode(response.body);
+          if (body['success'] == true) {
+            final List data = body['data'];
+            redeemItems.value = data
+                .map((e) => RedeemItemModel.fromJson(e))
+                .toList();
+
+            // Update user points
+            if (body['userKarmaPoints'] != null) {
+              userPoints.value = body['userKarmaPoints'];
+            }
+
+            // Extract unique categories
+            final uniqueCategories = <String>{'All'};
+            for (var item in redeemItems) {
+              if (item.category.isNotEmpty) {
+                uniqueCategories.add(item.category);
+              }
+            }
+            categories.value = uniqueCategories.toList();
+
+            // If selected category is no longer valid, reset to All
+            if (!categories.contains(selectedCategory.value)) {
+              selectedCategory.value = 'All';
+            }
+          }
+        },
+        onError: (error) {
+          print("Error fetching spiritual rewards: $error");
+        },
+        showLoader: false,
+        shouldLogoutOn401: false, // Prevent logout if this API fails
+      );
+    } catch (e) {
+      print("Exception fetching spiritual rewards: $e");
+    } finally {
+      isLoading.value = false;
+    }
   }
 
-  void redeemItem(int cost) {
-    // Mock deduction
-    if (userPoints.value >= cost) {
-      // logic to deduct would go here in real app
-      // userPoints.value -= cost;
+  void redeemItem(item) {
+    // Implement redeem logic if API available, currently just mock deduction in UI or handled by view
+    // The prompt only asked to integrate the listing API.
+    // However, if we need to deduct locally for immediate feedback:
+    if (userPoints.value >= item.requiredPoints) {
+      // logic to deduct would go here or call an API
     }
   }
 }

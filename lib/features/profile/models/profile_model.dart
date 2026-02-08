@@ -13,6 +13,8 @@ class ProfileModel {
   final String? profileImage;
   final String? profileImageUrl;
   final String role;
+  final int credits;
+  final int karmaPoints;
 
   /// 👇 ADD THIS
   final UserProfile? profile;
@@ -32,6 +34,8 @@ class ProfileModel {
     this.profileImage,
     this.profileImageUrl,
     required this.role,
+    this.credits = 0,
+    this.karmaPoints = 0,
     this.profile,
   });
 
@@ -40,7 +44,7 @@ class ProfileModel {
       id: json['_id'] ?? '',
       email: json['email'] ?? '',
       authMethod: json['authMethod'] ?? '',
-      registrationStep: json['registrationStep'] ?? 0,
+      registrationStep: (json['registrationStep'] as num?)?.toInt() ?? 0,
       emailVerified: json['emailVerified'] ?? false,
       mobileVerified: json['mobileVerified'] ?? false,
       isActive: json['isActive'] ?? false,
@@ -51,6 +55,8 @@ class ProfileModel {
       profileImage: json['profileImage'],
       profileImageUrl: json['profileImageUrl'],
       role: json['role'] ?? 'user',
+      credits: (json['credits'] as num?)?.toInt() ?? 0,
+      karmaPoints: (json['karmaPoints'] as num?)?.toInt() ?? 0,
 
       /// 👇 MAP PROFILE SAFELY
       profile: json['profile'] != null
@@ -59,6 +65,7 @@ class ProfileModel {
     );
   }
 }
+
 class UserProfile {
   final String? name;
   final String? dob;
@@ -94,4 +101,3 @@ class UserProfile {
     };
   }
 }
-

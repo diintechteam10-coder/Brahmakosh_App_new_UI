@@ -41,6 +41,8 @@ class PanchangDetailsView extends StatelessWidget {
         final basic = panchang.basicPanchang;
         final advanced = panchang.advancedPanchang;
         final chaughadiya = panchang.chaughadiyaMuhurta;
+        final dailyNakshatra = panchang.dailyNakshatraPrediction;
+        final numeroPrediction = panchang.numeroDailyPrediction;
 
         return SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -158,6 +160,76 @@ class PanchangDetailsView extends StatelessWidget {
               ]),
 
               const SizedBox(height: 20),
+
+              if (dailyNakshatra != null) ...[
+                _buildSectionTitle("Daily Nakshatra Prediction"),
+                _buildInfoCard([
+                  _buildInfoRow(
+                    "Birth Moon Sign",
+                    dailyNakshatra.birthMoonSign ?? "-",
+                  ),
+                  _buildInfoRow(
+                    "Birth Moon Nakshatra",
+                    dailyNakshatra.birthMoonNakshatra ?? "-",
+                  ),
+                  if (dailyNakshatra.prediction != null) ...[
+                    _buildInfoRow(
+                      "Health",
+                      dailyNakshatra.prediction?.health ?? "-",
+                    ),
+                    _buildInfoRow(
+                      "Emotions",
+                      dailyNakshatra.prediction?.emotions ?? "-",
+                    ),
+                    _buildInfoRow(
+                      "Profession",
+                      dailyNakshatra.prediction?.profession ?? "-",
+                    ),
+                    _buildInfoRow(
+                      "Luck",
+                      dailyNakshatra.prediction?.luck ?? "-",
+                    ),
+                    _buildInfoRow(
+                      "Personal Life",
+                      dailyNakshatra.prediction?.personalLife ?? "-",
+                    ),
+                    _buildInfoRow(
+                      "Travel",
+                      dailyNakshatra.prediction?.travel ?? "-",
+                    ),
+                  ],
+                  _buildInfoRow("Mood", dailyNakshatra.mood ?? "-"),
+                  _buildInfoRow(
+                    "Lucky Colors",
+                    dailyNakshatra.luckyColor?.join(", ") ?? "-",
+                  ),
+                  _buildInfoRow(
+                    "Lucky Numbers",
+                    dailyNakshatra.luckyNumber?.join(", ") ?? "-",
+                  ),
+                  _buildInfoRow("Lucky Time", dailyNakshatra.luckyTime ?? "-"),
+                ]),
+                const SizedBox(height: 20),
+              ],
+
+              if (numeroPrediction != null) ...[
+                _buildSectionTitle("Numerology Prediction"),
+                _buildInfoCard([
+                  _buildInfoRow(
+                    "Prediction",
+                    numeroPrediction.prediction ?? "-",
+                  ),
+                  _buildInfoRow(
+                    "Lucky Color",
+                    numeroPrediction.luckyColor ?? "-",
+                  ),
+                  _buildInfoRow(
+                    "Lucky Number",
+                    numeroPrediction.luckyNumber ?? "-",
+                  ),
+                ]),
+                const SizedBox(height: 20),
+              ],
 
               if (chaughadiya != null) ...[
                 _buildSectionTitle("Chaughadiya Muhurat (Day)"),

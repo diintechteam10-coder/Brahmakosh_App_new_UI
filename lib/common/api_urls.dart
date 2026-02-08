@@ -53,4 +53,7 @@ class ApiUrls {
   static const String gitaChapters = '$baseUrl/api/chapters';
   static const String gitaVerses = '$baseUrl/api/shlokas/chapter';
   static const String gitaVerseDetail = '$baseUrl/api/shlokas';
+
+  /// 🔹 Spiritual Rewards
+  static const String spiritualRewards = '$baseUrl/api/spiritual-rewards';
 }

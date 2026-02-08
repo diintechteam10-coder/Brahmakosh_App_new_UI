@@ -29,6 +29,7 @@ class PanchangData {
   AdvancedPanchang? advancedPanchang;
   ChaughadiyaMuhurta? chaughadiyaMuhurta;
   DailyNakshatraPrediction? dailyNakshatraPrediction;
+  NumeroDailyPrediction? numeroDailyPrediction;
   String? lastCalculated;
   String? calculationSource;
 
@@ -40,6 +41,7 @@ class PanchangData {
     this.advancedPanchang,
     this.chaughadiyaMuhurta,
     this.dailyNakshatraPrediction,
+    this.numeroDailyPrediction,
     this.lastCalculated,
     this.calculationSource,
   });
@@ -64,6 +66,9 @@ class PanchangData {
             json['dailyNakshatraPrediction'],
           )
         : null;
+    numeroDailyPrediction = json['numeroDailyPrediction'] != null
+        ? new NumeroDailyPrediction.fromJson(json['numeroDailyPrediction'])
+        : null;
     lastCalculated = json['lastCalculated'];
     calculationSource = json['calculationSource'];
   }
@@ -87,6 +92,9 @@ class PanchangData {
     if (this.dailyNakshatraPrediction != null) {
       data['dailyNakshatraPrediction'] = this.dailyNakshatraPrediction!
           .toJson();
+    }
+    if (this.numeroDailyPrediction != null) {
+      data['numeroDailyPrediction'] = this.numeroDailyPrediction!.toJson();
     }
     data['lastCalculated'] = this.lastCalculated;
     data['calculationSource'] = this.calculationSource;
@@ -594,6 +602,8 @@ class DailyNakshatraPrediction {
   String? mood;
   String? moodPercentage;
   String? luckyTime;
+  List<String>? luckyColor;
+  List<String>? luckyNumber;
 
   DailyNakshatraPrediction({
     this.birthMoonSign,
@@ -605,6 +615,8 @@ class DailyNakshatraPrediction {
     this.mood,
     this.moodPercentage,
     this.luckyTime,
+    this.luckyColor,
+    this.luckyNumber,
   });
 
   DailyNakshatraPrediction.fromJson(Map<String, dynamic> json) {
@@ -619,6 +631,12 @@ class DailyNakshatraPrediction {
     mood = json['mood'];
     moodPercentage = json['mood_percentage'];
     luckyTime = json['lucky_time'];
+    if (json['lucky_color'] != null) {
+      luckyColor = json['lucky_color'].cast<String>();
+    }
+    if (json['lucky_number'] != null) {
+      luckyNumber = json['lucky_number'].cast<String>();
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -634,6 +652,38 @@ class DailyNakshatraPrediction {
     data['mood'] = this.mood;
     data['mood_percentage'] = this.moodPercentage;
     data['lucky_time'] = this.luckyTime;
+    data['lucky_color'] = this.luckyColor;
+    data['lucky_number'] = this.luckyNumber;
+    return data;
+  }
+}
+
+class NumeroDailyPrediction {
+  String? prediction;
+  String? luckyColor;
+  String? luckyNumber;
+  String? predictionDate;
+
+  NumeroDailyPrediction({
+    this.prediction,
+    this.luckyColor,
+    this.luckyNumber,
+    this.predictionDate,
+  });
+
+  NumeroDailyPrediction.fromJson(Map<String, dynamic> json) {
+    prediction = json['prediction'];
+    luckyColor = json['lucky_color'];
+    luckyNumber = json['lucky_number'];
+    predictionDate = json['prediction_date'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['prediction'] = this.prediction;
+    data['lucky_color'] = this.luckyColor;
+    data['lucky_number'] = this.luckyNumber;
+    data['prediction_date'] = this.predictionDate;
     return data;
   }
 }

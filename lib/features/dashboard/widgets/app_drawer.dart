@@ -207,7 +207,18 @@ class AppDrawer extends StatelessWidget {
                                   const SizedBox(height: 16),
 
                                   // KARMA POINTS
-                                  _karmaPointsCard(context),
+                                  _karmaPointsCard(
+                                    context,
+                                    profile?.karmaPoints ?? 0,
+                                  ),
+
+                                  const SizedBox(height: 16),
+
+                                  // CREDIT WALLET
+                                  _creditWalletCard(
+                                    context,
+                                    profile?.credits ?? 0,
+                                  ),
 
                                   const SizedBox(height: 16),
 
@@ -230,23 +241,23 @@ class AppDrawer extends StatelessWidget {
                                         },
                                       ),
                                       _menuItem(
-                                        icon: Icons.history,
-                                        label: "Consultation History",
+                                        icon: Icons.shopping_cart_outlined,
+                                        label: "Orders",
                                         onTap: () {},
                                       ),
-                                      _menuItem(
-                                        icon: Icons.bookmark_outline,
-                                        label: "Saved Reports",
-                                        onTap: () {},
-                                      ),
-                                      _menuItem(
-                                        icon: Icons.face_unlock_outlined,
-                                        label: "Avatar Agent",
-                                        onTap: () {
-                                          Navigator.pop(context);
-                                          Get.to(() => const AvatarAgentPage());
-                                        },
-                                      ),
+                                      // _menuItem(
+                                      //   icon: Icons.bookmark_outline,
+                                      //   label: "My Reports",
+                                      //   onTap: () {},
+                                      // ),
+                                      // _menuItem(
+                                      //   icon: Icons.face_unlock_outlined,
+                                      //   label: "Avatar Agent",
+                                      //   onTap: () {
+                                      //     Navigator.pop(context);
+                                      //     Get.to(() => const AvatarAgentPage());
+                                      //   },
+                                      // ),
                                       _menuItem(
                                         icon: Icons.settings_outlined,
                                         label: "Settings",
@@ -268,7 +279,7 @@ class AppDrawer extends StatelessWidget {
                                   const Spacer(),
 
                                   // ACCOUNT OPTION
-                                  _sectionHeader("Account Option"),
+                                  //_sectionHeader("Account Option"),
                                   const SizedBox(height: 8),
                                   GestureDetector(
                                     onTap: () async {
@@ -439,7 +450,7 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  Widget _karmaPointsCard(BuildContext context) {
+  Widget _karmaPointsCard(BuildContext context, int points) {
     return InkWell(
       onTap: () {
         // Future functionality
@@ -454,13 +465,14 @@ class AppDrawer extends StatelessWidget {
           border: Border.all(color: const Color(0xff5D4037).withOpacity(0.1)),
         ),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Text Part
                 Text(
-                  "Your Karma Points",
+                  "Karma Wallet",
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -479,12 +491,20 @@ class AppDrawer extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    "240", // Placeholder value
+                    "$points", // Display real points
                     style: GoogleFonts.playfairDisplay(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xff5D4037),
                     ),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "Your Karma Points",
+                  style: GoogleFonts.inter(
+                    fontSize: 10,
+                    color: const Color(0xff5D4037).withOpacity(0.8),
                   ),
                 ),
               ],
@@ -507,6 +527,101 @@ class AppDrawer extends StatelessWidget {
                 ),
                 child: Text(
                   "Redeem",
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _creditWalletCard(BuildContext context, int credits) {
+    return InkWell(
+      onTap: () {
+        // Future functionality
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(
+            255,
+            245,
+            255,
+            245,
+          ), // Slightly different background for distinction
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xff5D4037).withOpacity(0.1)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Text Part
+                Text(
+                  "Credit Wallet",
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xff5D4037),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                // Number Part
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xff5D4037).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    "$credits", // Display real credits
+                    style: GoogleFonts.playfairDisplay(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xff5D4037),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "Your Credit Points",
+                  style: GoogleFonts.inter(
+                    fontSize: 10,
+                    color: const Color(0xff5D4037).withOpacity(0.8),
+                  ),
+                ),
+              ],
+            ),
+            const Spacer(),
+            // Redeem Button
+            GestureDetector(
+              onTap: () {
+                // Navigate to credit related screen
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xff4CAF50), // Green for credits
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Text(
+                  "Add Credit",
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,

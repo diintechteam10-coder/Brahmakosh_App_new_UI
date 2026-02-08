@@ -2,6 +2,7 @@ import 'package:brahmakosh/core/theme/app_theme.dart';
 import 'package:brahmakosh/features/redeem/controllers/redeem_controller.dart';
 import 'package:brahmakosh/features/redeem/models/redeem_item_model.dart';
 import 'package:brahmakosh/features/redeem/widgets/redeem_widgets.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -82,16 +83,26 @@ class RedeemDetailView extends StatelessWidget {
             // Large Image
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              child: Image.asset(
-                item.imagePath,
+              child: CachedNetworkImage(
+                imageUrl: item.imagePath,
                 width: double.infinity,
                 height: 200,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
+                placeholder: (context, url) => Container(
                   width: double.infinity,
                   height: 200,
                   color: Colors.grey[300],
-                  child: const Icon(Icons.image, size: 50, color: Colors.grey),
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+                errorWidget: (context, url, error) => Container(
+                  width: double.infinity,
+                  height: 200,
+                  color: Colors.grey[300],
+                  child: const Icon(
+                    Icons.image_not_supported,
+                    size: 50,
+                    color: Colors.grey,
+                  ),
                 ),
               ),
             ),

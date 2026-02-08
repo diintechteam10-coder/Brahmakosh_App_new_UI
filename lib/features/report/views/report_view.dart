@@ -1,4 +1,6 @@
 import '../../../../core/common_imports.dart';
+import '../../../../common/colors.dart';
+import '../../dashboard/viewmodels/dashboard_viewmodel.dart';
 
 class ReportView extends StatelessWidget {
   const ReportView({super.key});
@@ -6,7 +8,21 @@ class ReportView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: CustomColors.lightPinkColor,
       appBar: AppBar(
+        backgroundColor: CustomColors.lightPinkColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          color: AppTheme.textPrimary,
+          onPressed: () {
+            // Navigate back to Home tab (index 0)
+            Provider.of<DashboardViewModel>(
+              context,
+              listen: false,
+            ).changeTab(0);
+          },
+        ),
         title: Text(
           'My Kosh',
           style: GoogleFonts.playfairDisplay(

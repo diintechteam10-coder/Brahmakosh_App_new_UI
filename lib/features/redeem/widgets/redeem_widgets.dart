@@ -35,12 +35,20 @@ class RedeemCard extends StatelessWidget {
             // Image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                item.imagePath,
-                width: 80, // Reduced from 100
-                height: 100, // Reduced from 120
+              child: CachedNetworkImage(
+                imageUrl: item.imagePath,
+                width: 80,
+                height: 100,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
+                placeholder: (context, url) => Container(
+                  width: 80,
+                  height: 100,
+                  color: Colors.grey[200],
+                  child: const Center(
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
+                errorWidget: (context, url, error) => Container(
                   width: 80,
                   height: 100,
                   color: Colors.grey[200],

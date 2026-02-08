@@ -1,9 +1,12 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:brahmakosh/common/api_services.dart';
 import 'package:brahmakosh/common/models/user_complete_details_model.dart';
 import 'package:brahmakosh/core/constants/app_constants.dart';
 import 'package:brahmakosh/core/services/storage_service.dart';
+import 'package:brahmakosh/features/home/views/planet_positions_screen.dart';
+import 'package:brahmakosh/features/home/widgets/astrology_tabs.dart';
 
 class AstrologyDetailsScreen extends StatefulWidget {
   const AstrologyDetailsScreen({super.key});
@@ -13,37 +16,82 @@ class AstrologyDetailsScreen extends StatefulWidget {
 }
 
 class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   bool _isLoading = true;
   UserCompleteDetailsModel? _data;
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 5, vsync: this);
     _fetchData();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchData() async {
     final userId = StorageService.getString(AppConstants.keyUserId);
-    if (userId != null) {
-      final data = await getUserCompleteDetails(this, userId);
-      if (mounted) {
-        setState(() {
-          _data = data;
-          _isLoading = false;
-        });
-      }
-    } else {
+    if (userId == null) {
       if (mounted) {
         setState(() {
           _isLoading = false;
         });
       }
+      return;
+    }
+
+    // Check local storage first
+    final cachedData = StorageService.getString('astrology_data_$userId');
+    if (cachedData != null) {
+      try {
+        final jsonMap = jsonDecode(cachedData);
+        final data = UserCompleteDetailsModel.fromJson(jsonMap);
+        if (mounted) {
+          setState(() {
+            _data = data;
+            _isLoading = false;
+          });
+        }
+        return;
+      } catch (e) {
+        debugPrint("Error parsing cached astrology data: $e");
+      }
+    }
+
+    // Fetch from API if not cached or error parsing
+    final data = await getUserCompleteDetails(this, userId);
+
+    if (data != null) {
+      // Cache the data
+      // Note: Assuming getUserCompleteDetails returns the model directly.
+      // If we want to cache the raw JSON, we might need to adjust the service or serialize the model back to JSON.
+      try {
+        StorageService.setString(
+          'astrology_data_$userId',
+          jsonEncode(data.toJson()),
+        );
+      } catch (e) {
+        debugPrint("Error caching astrology data: $e");
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _data = data;
+        _isLoading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final astro = _data?.data?.astrology;
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFFBF5),
       appBar: AppBar(
@@ -61,243 +109,289 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
             color: const Color(0xFF6D3A0C),
           ),
         ),
+        centerTitle: true,
       ),
       body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(color: Color(0xFF6D3A0C)),
             )
-          : _data?.data?.astrology == null
-          ? Center(
-              child: Text(
-                "No Data Available",
-                style: GoogleFonts.lora(color: const Color(0xFF6D3A0C)),
-              ),
-            )
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSectionTitle("Birth Details"),
-                  _buildBirthDetails(_data!.data!.astrology!.birthDetails!),
-                  const SizedBox(height: 24),
-                  _buildSectionTitle("Astro Details"),
-                  _buildAstroDetails(_data!.data!.astrology!.astroDetails!),
-                  const SizedBox(height: 24),
-                  _buildSectionTitle("Planetary Positions"),
-                  _buildPlanetsList(_data!.data!.astrology!.planets!),
-                ],
-              ),
+          : astro == null
+          ? Center(child: Text("No Data", style: GoogleFonts.lora()))
+          : Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                  child: _buildSummaryCard(astro),
+                ),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: const Color(0xFFD4A373).withOpacity(0.3),
+                    ),
+                  ),
+                  child: TabBar(
+                    controller: _tabController,
+                    labelColor: Colors.white,
+                    unselectedLabelColor: const Color(0xFF6D3A0C),
+                    indicator: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      color: const Color(0xFFD4A373), // Goldish Brown
+                    ),
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    isScrollable: true,
+                    labelStyle: GoogleFonts.lora(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 10,
+                    ),
+                    dividerColor: Colors.transparent,
+                    tabs: const [
+                      Tab(text: "Basic Info"),
+                      Tab(text: "Planets"),
+                      Tab(text: "Birth Chart"),
+                      Tab(text: "Doshas"),
+                      Tab(text: "Dashas"),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      BasicInfoTab(
+                        astroDetails: astro.astroDetails ?? AstroDetails(),
+                      ),
+                      PlanetsTab(
+                        planets: astro.planets ?? [],
+                        onViewAllTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PlanetPositionsScreen(
+                                planets: astro.planets ?? [],
+                                planetsExtended: astro.planetsExtended ?? [],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      BirthChartTab(
+                        birthChart: astro.birthChart!,
+                        birthExtendedChart: astro.birthExtendedChart,
+                      ),
+                      DoshasTab(doshas: astro.doshas ?? Doshas()),
+                      DashasTab(dashas: astro.dashas ?? Dashas()),
+                    ],
+                  ),
+                ),
+              ],
             ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: Text(
-        title,
-        style: GoogleFonts.playfairDisplay(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: const Color(0xFF874101),
-        ),
-      ),
-    );
-  }
+  Widget _buildSummaryCard(Astrology astro) {
+    final astroDetails = astro.astroDetails;
+    final birthDetails = astro.birthDetails;
+    // Attempt to get name from data, default to "Personal Horoscope" if null
+    final userName = _data?.data?.user?.profile?.name ?? "User";
 
-  Widget _buildBirthDetails(BirthDetails details) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: const Color(0xFFFFF0D9), // Light pastel orange/beige
+        borderRadius: BorderRadius.circular(24),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFF0D9), Color(0xFFFFE0B2)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.orange.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
         ],
-      ),
-      child: Column(
-        children: [
-          _buildDetailRow(
-            "Date of Birth",
-            "${details.day}-${details.month}-${details.year}",
-          ),
-          _buildDetailRow("Time of Birth", "${details.hour}:${details.minute}"),
-          _buildDetailRow(
-            "Location",
-            "Lat: ${details.latitude}, Lon: ${details.longitude}",
-          ),
-          _buildDetailRow("Sunrise", "${details.sunrise}"),
-          _buildDetailRow("Sunset", "${details.sunset}"),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAstroDetails(AstroDetails details) {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      childAspectRatio: 2.5,
-      crossAxisSpacing: 12,
-      mainAxisSpacing: 12,
-      children: [
-        _buildInfoCard("Ascendant", details.ascendant ?? "-"),
-        _buildInfoCard("Sign", details.sign ?? "-"),
-        _buildInfoCard("Nakshatra", details.nakshatra ?? "-"),
-        _buildInfoCard("Yog", details.yog ?? "-"),
-        _buildInfoCard("Karan", details.karan ?? "-"),
-        _buildInfoCard("Tithi", details.tithi ?? "-"),
-      ],
-    );
-  }
-
-  Widget _buildInfoCard(String label, String value) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFDECB6).withOpacity(0.5),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFFDECB6)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            label,
+            userName,
             style: GoogleFonts.lora(
-              fontSize: 12,
-              color: const Color(0xFF874101).withOpacity(0.7),
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF5D4037),
             ),
           ),
-          const SizedBox(height: 2),
           Text(
-            value,
+            "Personal Horoscope",
             style: GoogleFonts.lora(
               fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF6D3A0C),
+              color: const Color(0xFF8D6E63),
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPlanetsList(List<Planets> planets) {
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: planets.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final planet = planets[index];
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFEEE5D5)),
-          ),
-          child: Row(
+          const SizedBox(height: 20),
+          Row(
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFDECB6),
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Text(
-                    planet.name?.substring(0, 2) ?? "Pl",
-                    style: GoogleFonts.lora(
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF874101),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      planet.name ?? "-",
-                      style: GoogleFonts.lora(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF6D3A0C),
-                      ),
-                    ),
-                    Text(
-                      "${planet.sign} (${planet.signLord})",
-                      style: GoogleFonts.lora(
-                        fontSize: 12,
-                        color: const Color(0xFF596072),
-                      ),
-                    ),
-                  ],
+                child: _buildSummaryItem(
+                  icon: Icons.nightlight_round,
+                  title: "Moon Sign",
+                  value: astroDetails?.sign ?? "-",
+                  color: const Color(0xFF5E35B1), // Deep Purple
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    "${planet.normDegree?.toStringAsFixed(2)}°",
-                    style: GoogleFonts.lora(
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF6D3A0C),
-                    ),
-                  ),
-                  Text(
-                    "House: ${planet.house}",
-                    style: GoogleFonts.lora(
-                      fontSize: 12,
-                      color: const Color(0xFF596072),
-                    ),
-                  ),
-                ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildSummaryItem(
+                  icon: Icons.star, // Placeholder for Virgo-like symbol
+                  title:
+                      "Sun Sign", // Assuming Virgo refers to Sun/Ascendant or just another sign data
+                  value:
+                      astroDetails?.ascendant ??
+                      "-", // Using Ascendant as secondary important sign
+                  color: const Color(0xFF546E7A), // Blue Grey
+                ),
               ),
             ],
           ),
-        );
-      },
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildSummaryItem(
+                  icon: Icons.auto_awesome,
+                  title: "Nakshatra",
+                  value: astroDetails?.nakshatra ?? "-",
+                  color: const Color(0xFFFFB74D), // Orange
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildSummaryItem(
+                  icon: Icons.public,
+                  title: "Ruling Planet",
+                  value:
+                      astroDetails?.signLord ??
+                      "-", // Usually sign lord is considered ruling
+                  color: const Color(0xFFE57373), // Red
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              const Icon(
+                Icons.calendar_today,
+                size: 14,
+                color: Color(0xFF8D6E63),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                "${birthDetails?.day} ${_getMonthName(birthDetails?.month)} ${birthDetails?.year}, ${birthDetails?.hour}:${birthDetails?.minute}, ${birthDetails?.latitude}, ${birthDetails?.longitude}",
+                style: GoogleFonts.lora(
+                  fontSize: 12,
+                  color: const Color(0xFF8D6E63),
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              const Icon(Icons.location_on, size: 14, color: Color(0xFF8D6E63)),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  "Lat: ${birthDetails?.latitude}, Lon: ${birthDetails?.longitude}",
+                  style: GoogleFonts.lora(
+                    fontSize: 12,
+                    color: const Color(0xFF8D6E63),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+  Widget _buildSummaryItem({
+    required IconData icon,
+    required String title,
+    required String value,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: GoogleFonts.lora(
-              fontSize: 14,
-              color: const Color(0xFF596072),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              shape: BoxShape.circle,
             ),
+            child: Icon(icon, color: color, size: 20),
           ),
-          Text(
-            value,
-            style: GoogleFonts.lora(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF6D3A0C),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.lora(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                Text(
+                  value,
+                  style: GoogleFonts.lora(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF333333),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  String _getMonthName(int? month) {
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    if (month != null && month >= 1 && month <= 12) {
+      return months[month - 1];
+    }
+    return "";
   }
 }

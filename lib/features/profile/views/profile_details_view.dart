@@ -1,4 +1,5 @@
 import '../../../../core/common_imports.dart';
+import '../../../../common/colors.dart';
 import '../models/profile_model.dart';
 import '../viewmodels/profile_viewmodel.dart';
 
@@ -16,20 +17,45 @@ class ProfileDetailsView extends StatelessWidget {
       child: Consumer<ProfileViewModel>(
         builder: (context, vm, _) {
           return Scaffold(
-            backgroundColor: AppTheme.backgroundLight,
+            backgroundColor: CustomColors.lightPinkColor,
             appBar: AppBar(
-              title: const Text('My Profile'),
+              title: Text(
+                'My Profile',
+                style: GoogleFonts.cinzel(
+                  fontSize: 20, // Adjusted font size
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textPrimary,
+                ),
+              ),
               centerTitle: true,
-              backgroundColor: Colors.white,
+              backgroundColor: CustomColors.lightPinkColor,
               elevation: 0,
               foregroundColor: AppTheme.textPrimary,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.of(context).pop(),
+                color: AppTheme.textPrimary,
+              ),
+              actions: [
+                IconButton(
+                  onPressed: () {},
+                  icon: Icon(
+                    Icons.edit_outlined,
+                    size: 20,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+              ],
             ),
             body: vm.isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : RefreshIndicator(
                     onRefresh: vm.refreshProfile,
                     child: ListView(
-                      padding: const EdgeInsets.only(bottom: 24),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 24,
+                      ),
                       children: [
                         _heroHeader(vm.profile),
                         const SizedBox(height: 20),
@@ -37,61 +63,67 @@ class ProfileDetailsView extends StatelessWidget {
                           title: 'Personal Information',
                           children: [
                             _infoTile(
-                              Icons.person,
+                              Icons.person_outline,
                               'Name',
                               vm.profile?.profile?.name,
                             ),
-                            _infoTile(Icons.email, 'Email', vm.profile?.email),
+                            // _infoTile(
+                            //   Icons.email_outlined,
+                            //   'Email',
+                            //   vm.profile?.email,
+                            // ),
                             _infoTile(
-                              Icons.phone,
+                              Icons.phone_outlined,
                               'Mobile',
                               vm.profile?.mobile,
                             ),
+                            // Mobile number moved to header
                           ],
                         ),
                         _sectionCard(
                           title: 'Birth Details',
                           children: [
                             _infoTile(
-                              Icons.cake,
+                              Icons.calendar_today_outlined,
                               'Date of Birth',
-                              vm.profile?.profile?.dob,
+                              vm.profile?.profile?.dob?.split('T').first,
                             ),
                             _infoTile(
-                              Icons.schedule,
+                              Icons.access_time,
                               'Time of Birth',
                               vm.profile?.profile?.timeOfBirth,
                             ),
                             _infoTile(
-                              Icons.place,
+                              Icons.place_outlined,
                               'Place of Birth',
                               vm.profile?.profile?.placeOfBirth,
                             ),
                             _infoTile(
-                              Icons.auto_awesome,
-                              'Gowthra',
+                              Icons.auto_awesome_outlined,
+                              'Profession',
                               vm.profile?.profile?.gowthra,
                             ),
                           ],
                         ),
-                        _sectionCard(
-                          title: 'Account Status',
-                          children: [
-                            _statusTile(
-                              'Email Verified',
-                              vm.profile?.emailVerified,
-                            ),
-                            _statusTile(
-                              'Mobile Verified',
-                              vm.profile?.mobileVerified,
-                            ),
-                            _infoTile(
-                              Icons.admin_panel_settings,
-                              'Role',
-                              vm.profile?.role,
-                            ),
-                          ],
-                        ),
+
+                        // _sectionCard(
+                        //   title: 'Account Status',
+                        //   children: [
+                        //     _statusTile(
+                        //       'Email Verified',
+                        //       vm.profile?.emailVerified,
+                        //     ),
+                        //     _statusTile(
+                        //       'Mobile Verified',
+                        //       vm.profile?.mobileVerified,
+                        //     ),
+                        //     _infoTile(
+                        //       Icons.admin_panel_settings_outlined,
+                        //       'Role',
+                        //       vm.profile?.role,
+                        //     ),
+                        //   ],
+                        // ),
                       ],
                     ),
                   ),
@@ -105,19 +137,41 @@ class ProfileDetailsView extends StatelessWidget {
 
   Widget _heroHeader(ProfileModel? profile) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      color: Colors.white,
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      color: CustomColors.lightPinkColor,
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          CircleAvatar(
-            radius: 32,
-            backgroundColor: AppTheme.backgroundLight,
-            backgroundImage: profile?.profileImageUrl != null
-                ? NetworkImage(profile!.profileImageUrl!)
-                : null,
-            child: profile?.profileImageUrl == null
-                ? Icon(Icons.person, size: 32, color: AppTheme.textSecondary)
-                : null,
+          Stack(
+            children: [
+              CircleAvatar(
+                radius: 40,
+                backgroundColor: Colors.grey.shade300,
+                backgroundImage: profile?.profileImageUrl != null
+                    ? NetworkImage(profile!.profileImageUrl!)
+                    : null,
+                child: profile?.profileImageUrl == null
+                    ? Icon(Icons.person, size: 40, color: Colors.grey.shade600)
+                    : null,
+              ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                  child: const Icon(
+                    Icons.camera_alt_outlined,
+                    size: 16,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -126,16 +180,48 @@ class ProfileDetailsView extends StatelessWidget {
               children: [
                 Text(
                   profile?.profile?.name ?? '—',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                  style: GoogleFonts.cinzel(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   profile?.email ?? '',
-                  style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: AppTheme.textSecondary,
+                  ),
                 ),
+
+                // Row(
+                //   mainAxisSize: MainAxisSize.min,
+                //   children: [
+                //     // Icon(
+                //     //   Icons.phone_outlined,
+                //     //   size: 14,
+                //     //   color: AppTheme.textPrimary,
+                //     // ),
+                //     // const SizedBox(width: 8),
+                //     // Text(
+                //     //   'Mobile :',
+                //     //   style: GoogleFonts.inter(
+                //     //     fontSize: 12,
+                //     //     color: AppTheme.textSecondary,
+                //     //   ),
+                //     // ),
+                //     const SizedBox(width: 4),
+                //     Text(
+                //       profile?.mobile ?? '—',
+                //       style: GoogleFonts.inter(
+                //         fontSize: 12,
+                //         fontWeight: FontWeight.w600,
+                //         color: AppTheme.textPrimary,
+                //       ),
+                //     ),
+                //   ],
+                // ),
               ],
             ),
           ),
@@ -148,16 +234,16 @@ class ProfileDetailsView extends StatelessWidget {
 
   Widget _sectionCard({required String title, required List<Widget> children}) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.all(16), // Reduced card padding
       decoration: BoxDecoration(
-        color: AppTheme.cardBackground,
+        color: AppTheme.cardBackground, // Keep card background as requested
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -167,12 +253,12 @@ class ProfileDetailsView extends StatelessWidget {
           Text(
             title,
             style: GoogleFonts.cinzel(
-              fontSize: 15,
+              fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: AppTheme.textPrimary,
+              color: AppTheme.textPrimary, // Keep text color as requested
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 12), // Reduced vertical spacing below title
           ...children,
         ],
       ),
@@ -183,17 +269,23 @@ class ProfileDetailsView extends StatelessWidget {
 
   Widget _infoTile(IconData icon, String label, String? value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        vertical: 6,
+      ), // Reduced vertical padding
       child: Row(
         children: [
-          Icon(icon, size: 18, color: AppTheme.primaryGold),
-          const SizedBox(width: 12),
+          Icon(
+            icon,
+            size: 20,
+            color: AppTheme.textPrimary,
+          ), // Updated icon color to brown/primary
+          const SizedBox(width: 16),
           Expanded(
             child: Text(
               label,
               style: GoogleFonts.inter(
-                fontSize: 13,
-                color: AppTheme.textSecondary,
+                fontSize: 15,
+                color: AppTheme.textSecondary, // Brown color for label
               ),
             ),
           ),
@@ -202,9 +294,9 @@ class ProfileDetailsView extends StatelessWidget {
               value?.isNotEmpty == true ? value! : '—',
               textAlign: TextAlign.right,
               style: GoogleFonts.inter(
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.textPrimary,
+                color: AppTheme.textPrimary, // Darker color for value
               ),
             ),
           ),
@@ -217,20 +309,22 @@ class ProfileDetailsView extends StatelessWidget {
 
   Widget _statusTile(String label, bool? status) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        vertical: 6,
+      ), // Reduced vertical padding
       child: Row(
         children: [
           Icon(
             status == true ? Icons.check_circle : Icons.cancel,
-            size: 18,
+            size: 20,
             color: status == true ? Colors.green : Colors.redAccent,
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           Expanded(
             child: Text(
               label,
               style: GoogleFonts.inter(
-                fontSize: 13,
+                fontSize: 15,
                 color: AppTheme.textSecondary,
               ),
             ),
@@ -240,7 +334,7 @@ class ProfileDetailsView extends StatelessWidget {
               status == true ? 'Verified' : 'Not Verified',
               textAlign: TextAlign.right,
               style: GoogleFonts.inter(
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.textPrimary,
               ),

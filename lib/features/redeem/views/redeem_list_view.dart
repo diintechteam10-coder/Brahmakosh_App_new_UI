@@ -113,16 +113,17 @@ class RedeemListView extends StatelessWidget {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-                _buildFilterChip("All", controller),
-                const SizedBox(width: 12),
-                _buildFilterChip("Seva", controller),
-                const SizedBox(width: 12),
-                _buildFilterChip("Puja", controller),
-                const SizedBox(width: 12),
-                _buildFilterChip("Yatra", controller),
-              ],
+            child: Obx(
+              () => Row(
+                children: controller.categories
+                    .map(
+                      (category) => Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: _buildFilterChip(category, controller),
+                      ),
+                    )
+                    .toList(),
+              ),
             ),
           ),
 
@@ -131,6 +132,9 @@ class RedeemListView extends StatelessWidget {
           // List
           Expanded(
             child: Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
               final items = controller.filteredItems;
               if (items.isEmpty) {
                 return const Center(child: Text("No items found"));
