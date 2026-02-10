@@ -15,7 +15,8 @@ import '../../../core/theme/app_theme.dart';
 import '../../astrology/models/chat_session_model.dart'; // Import ChatSession model
 
 extension StringExtension on String {
-  String capitalizeFirstLetter() {   // ← changed name
+  String capitalizeFirstLetter() {
+    // ← changed name
     if (isEmpty) return this;
     return this[0].toUpperCase() + substring(1).toLowerCase();
   }
@@ -31,7 +32,8 @@ class AstrologyChatController extends GetxController {
   final TextEditingController messageController = TextEditingController();
   final ScrollController scrollController = ScrollController();
 
-  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>(); // Added Scaffold key
+  final GlobalKey<ScaffoldState> scaffoldKey =
+      GlobalKey<ScaffoldState>(); // Added Scaffold key
   final messages = <Map<String, dynamic>>[].obs;
   final showSuggestions = true.obs;
   final selectedTopic = Rxn<Topic>();
@@ -76,7 +78,8 @@ class AstrologyChatController extends GetxController {
         onResponse: (response) {
           try {
             final responseBody = json.decode(response.body);
-            if (responseBody['success'] == true && responseBody['data'] != null) {
+            if (responseBody['success'] == true &&
+                responseBody['data'] != null) {
               final userData = responseBody['data']['user'];
               final profile = userData['profile'];
 
@@ -87,7 +90,9 @@ class AstrologyChatController extends GetxController {
                 _placeOfBirth = profile['placeOfBirth'];
                 _gowthra = profile['gowthra'];
 
-                Utils.print('✅ Birth details loaded: Name=$_name, DOB=$_dob, Time=$_timeOfBirth, Place=$_placeOfBirth, Gowthra=$_gowthra');
+                Utils.print(
+                  '✅ Birth details loaded: Name=$_name, DOB=$_dob, Time=$_timeOfBirth, Place=$_placeOfBirth, Gowthra=$_gowthra',
+                );
               }
             }
           } catch (e) {
@@ -137,19 +142,25 @@ class AstrologyChatController extends GetxController {
         id: currentChatId!,
         expertId: expert.id,
         topic: topic,
-        messages: List<Map<String, dynamic>>.from(messages), // Deep copy messages
+        messages: List<Map<String, dynamic>>.from(
+          messages,
+        ), // Deep copy messages
         timestamp: DateTime.now(),
       );
       chatSessions.add(newSession);
     } else {
       // Update existing chat session
-      final existingIndex = chatSessions.indexWhere((session) => session.id == currentChatId);
+      final existingIndex = chatSessions.indexWhere(
+        (session) => session.id == currentChatId,
+      );
       if (existingIndex != -1) {
         chatSessions[existingIndex] = ChatSession(
           id: currentChatId!,
           expertId: expert.id,
           topic: topic, // Topic might change if user asks different questions
-          messages: List<Map<String, dynamic>>.from(messages), // Update messages
+          messages: List<Map<String, dynamic>>.from(
+            messages,
+          ), // Update messages
           timestamp: DateTime.now(), // Update timestamp
         );
       }
@@ -161,7 +172,9 @@ class AstrologyChatController extends GetxController {
   // New: Load a previous chat session
   void loadChatSession(ChatSession session) {
     currentChatId = session.id;
-    messages.assignAll(session.messages); // Load messages from the selected session
+    messages.assignAll(
+      session.messages,
+    ); // Load messages from the selected session
     selectedTopic.value = null; // Reset selected topic when loading a past chat
     showSuggestions.value = false;
     _scrollToBottom();
@@ -186,8 +199,17 @@ class AstrologyChatController extends GetxController {
         expertId: expert.id,
         topic: 'Career Forecast',
         messages: [
-          {"text": "Hello, I need a career forecast.", "isUser": true, "time": DateTime.now().subtract(const Duration(days: 2))},
-          {"text": "Certainly! Please provide your birth details for an accurate reading.", "isUser": false, "time": DateTime.now().subtract(const Duration(days: 2))},
+          {
+            "text": "Hello, I need a career forecast.",
+            "isUser": true,
+            "time": DateTime.now().subtract(const Duration(days: 2)),
+          },
+          {
+            "text":
+                "Certainly! Please provide your birth details for an accurate reading.",
+            "isUser": false,
+            "time": DateTime.now().subtract(const Duration(days: 2)),
+          },
         ],
         timestamp: DateTime.now().subtract(const Duration(days: 2)),
       ),
@@ -196,8 +218,17 @@ class AstrologyChatController extends GetxController {
         expertId: expert.id,
         topic: 'Relationship Advice',
         messages: [
-          {"text": "My relationship is facing some challenges.", "isUser": true, "time": DateTime.now().subtract(const Duration(hours: 10))},
-          {"text": "I understand. Let's explore the planetary influences on your relationship.", "isUser": false, "time": DateTime.now().subtract(const Duration(hours: 10))},
+          {
+            "text": "My relationship is facing some challenges.",
+            "isUser": true,
+            "time": DateTime.now().subtract(const Duration(hours: 10)),
+          },
+          {
+            "text":
+                "I understand. Let's explore the planetary influences on your relationship.",
+            "isUser": false,
+            "time": DateTime.now().subtract(const Duration(hours: 10)),
+          },
         ],
         timestamp: DateTime.now().subtract(const Duration(hours: 10)),
       ),
@@ -211,20 +242,12 @@ class AstrologyChatController extends GetxController {
 
     // If this is the first message in a new session, save it.
     if (currentChatId == null || messages.isEmpty) {
-      messages.add({
-        "text": text,
-        "isUser": true,
-        "time": DateTime.now(),
-      });
+      messages.add({"text": text, "isUser": true, "time": DateTime.now()});
       _saveCurrentChatSession(); // Save new session
     } else {
       // For existing sessions, just add the message.
-      messages.add({
-        "text": text,
-        "isUser": true,
-        "time": DateTime.now(),
-      });
-       _saveCurrentChatSession(); // Update session with new message
+      messages.add({"text": text, "isUser": true, "time": DateTime.now()});
+      _saveCurrentChatSession(); // Update session with new message
     }
 
     messageController.clear();
@@ -261,14 +284,15 @@ class AstrologyChatController extends GetxController {
       // Remove typing indicator and show error message
       messages.removeLast();
       messages.add({
-        "text": "Some planetary energies are unclear right now. Please try again shortly.",
+        "text":
+            "Some planetary energies are unclear right now. Please try again shortly.",
         "isUser": false,
         "time": DateTime.now(),
       });
     }
 
     _scrollToBottom();
-     // After receiving a reply, update the current chat session
+    // After receiving a reply, update the current chat session
     _saveCurrentChatSession();
   }
 
@@ -328,85 +352,144 @@ class AstrologyChatController extends GetxController {
     });
   }
 
- void showEndChatDialog(String title, String message) {
-  Get.dialog(
-    AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      title: Text(
-        title,
-        style: GoogleFonts.cinzel(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: AppTheme.textPrimary,
-        ),
-      ),
-      content: Text(
-        message,
-        style: GoogleFonts.lora(
-          fontSize: 14,
-          color: AppTheme.textSecondary,
-        ),
-      ),
-      actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      actions: [
-        Row(
-          children: [
-            // Cancel Button
-            Expanded(
-              child: OutlinedButton(
-                onPressed: Get.back,
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: AppTheme.lightGold),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
+  void showEndChatDialog(String title, String message) {
+    Get.dialog(
+      Dialog(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Icon
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: const Color(
+                        0xFFFAF3E0,
+                      ), // Light beige background for icon
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.chat_bubble,
+                      color: Color(0xFF8D6E63), // Brown icon
+                      size: 28,
+                    ),
                   ),
+                  Positioned(
+                    right: 14,
+                    bottom: 14,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.close,
+                        size: 14,
+                        color: Color(0xFF8D6E63),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Title
+              Text(
+                "End Conversation?",
+                style: GoogleFonts.cinzel(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
                 ),
-                child: Text(
-                  "Cancel",
-                  style: GoogleFonts.lora(
-                    color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.w500,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+
+              // Subtitle
+              Text(
+                "Are you sure you want to end your session with ${expert.name}?",
+                style: GoogleFonts.inter(
+                  // Keep body text clean
+                  fontSize: 14,
+                  color: const Color(0xFF8D6E63), // Brown text
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+
+              // End Chat Button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Get.back();
+                    // Add actual end chat logic here (e.g., call API, navigation)
+                    Get.back(); // Navigate back to previous screen
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(
+                      0xFFA1887F,
+                    ), // Muted Brown/Gold
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    "End Chat",
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(width: 12),
+              const SizedBox(height: 12),
 
-            // End Session Button
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () {
-                  Get.back();
-                  // 👉 your end chat logic here
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.chakraRed.withOpacity(0.9),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
+              // Continue Button
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: Get.back, // Close dialog
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    side: const BorderSide(
+                      color: Color(0xFF8D6E63),
+                    ), // Brown border
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                  elevation: 2,
-                ),
-                child: Text(
-                  "End",
-                  style: GoogleFonts.lora(
-                    // color: AppTheme.,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14
+                  child: Text(
+                    "Continue",
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF8D6E63), // Brown text
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ],
-    ),
-  );
-}
+      ),
+      barrierDismissible: false,
+    );
+  }
 
-
-   String formatTime(int seconds) {
+  String formatTime(int seconds) {
     int minutes = seconds ~/ 60;
     int remainingSeconds = seconds % 60;
     return "$minutes:${remainingSeconds.toString().padLeft(2, '0')}";

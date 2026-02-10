@@ -16,105 +16,62 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
     Get.put(AstrologyChatController(expert: expert), tag: expert.id);
 
     return Scaffold(
-      key: controller.scaffoldKey, // Assign the GlobalKey to Scaffold
-      extendBodyBehindAppBar: true,
+      key: controller.scaffoldKey,
+      backgroundColor: const Color(0xFFFFF3E0), // Peach/Beige background
       appBar: _buildAppBar(context),
-      drawer: Drawer(
-        backgroundColor: AppTheme.backgroundLight,
-        child: ListView(
-          padding: EdgeInsets.zero,
+      body: SafeArea(
+        child: Column(
           children: [
-           Container(
-  height: 120,
-  decoration: const BoxDecoration(
-    gradient: AppTheme.goldGradient,
-  ),
-  child: Padding(
-    padding: const EdgeInsets.only(left: 20),
-    child: Align(
-      alignment: Alignment.centerLeft,
-      child: Text(
-        'Chat with ${expert.name}',
-        style: GoogleFonts.cinzel(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-          color: AppTheme.textPrimary,
-        ),
-      ),
-    ),
-  ),
-),
+            // Main content: messages + suggestions/topics/questions
+            Expanded(
+              child: Stack(
+                children: [
+                  // Chat messages
+                  Obx(() {
+                    if (controller.messages.isEmpty)
+                      return const SizedBox.shrink();
+                    return ListView.builder(
+                      controller: controller.scrollController,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 20,
+                      ),
+                      itemCount: controller.messages.length,
+                      itemBuilder: (context, index) {
+                        final msg = controller.messages[index];
+                        return _buildChatBubble(
+                          msg["text"],
+                          msg["isUser"],
+                          msg["time"],
+                        );
+                      },
+                    );
+                  }),
 
-            Obx(() => Column(
-                  children: controller.chatSessions
-                      .map((session) => ListTile(
-                            leading: const Icon(Icons.chat_bubble_outline, color: AppTheme.textSecondary),
-                            title: Text(
-                              session.topic,
-                              style: GoogleFonts.lora(color: AppTheme.textPrimary),
-                            ),
-                            subtitle: Text(
-                              '${session.timestamp.day}/${session.timestamp.month}/${session.timestamp.year}, ${session.timestamp.hour}:${session.timestamp.minute.toString().padLeft(2, '0')}',
-                              style: GoogleFonts.lora(fontSize: 10, color: AppTheme.textSecondary),
-                            ),
-                            onTap: () => controller.loadChatSession(session),
-                          ))
-                      .toList(),
-                )),
-          ],
-        ),
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppTheme.lightGoldGradient,
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              // Removed Security banner
+                  // Topics / Questions overlay
+                  Obx(() {
+                    if (!controller.showSuggestions.value ||
+                        controller.messages.isNotEmpty) {
+                      return const SizedBox.shrink();
+                    }
 
-              // Main content: messages + suggestions/topics/questions
-              Expanded(
-                child: Stack(
-                  children: [
-                    // Chat messages
-                    Obx(() {
-                      if (controller.messages.isEmpty) return const SizedBox.shrink();
-                      return ListView.builder(
-                        controller: controller.scrollController,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                        itemCount: controller.messages.length,
-                        itemBuilder: (context, index) {
-                          final msg = controller.messages[index];
-                          return _buildChatBubble(msg["text"], msg["isUser"], msg["time"]);
-                        },
-                      );
-                    }),
-
-                    // Topics / Questions overlay
-                    Obx(() {
-                      if (!controller.showSuggestions.value || controller.messages.isNotEmpty) {
-                        return const SizedBox.shrink();
-                      }
-
-                      // Display questions directly on the chat screen if a topic is selected
-                      if (controller.selectedTopic.value != null) {
-                        return _buildQuestionList(controller.selectedTopic.value!); // Show questions
-                      }
-                      return Center(
-                        child: SingleChildScrollView(
-                          child: _buildTopicCards(context),
-                        ),
-                      );
-                    }),
-                  ],
-                ),
+                    // Display questions directly on the chat screen if a topic is selected
+                    if (controller.selectedTopic.value != null) {
+                      return _buildQuestionList(
+                        controller.selectedTopic.value!,
+                      ); // Show questions
+                    }
+                    return SingleChildScrollView(
+                      child: _buildTopicCards(context),
+                    );
+                  }),
+                ],
               ),
+            ),
 
-              // Input area
-              _buildInputBar(),
-            ],
-          ),
+            // Input area
+            _buildInputBar(),
+          ],
         ),
       ),
     );
@@ -122,72 +79,105 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
 
   AstrologyChatController get controller => _getController();
 
-  AstrologyChatController _getController() => Get.find<AstrologyChatController>(tag: expert.id);
+  AstrologyChatController _getController() =>
+      Get.find<AstrologyChatController>(tag: expert.id);
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
       elevation: 0,
-      backgroundColor: Colors.transparent,
-      flexibleSpace: Container(
-        decoration: const BoxDecoration(
-          gradient: AppTheme.goldGradient,
-        ),
-      ),
-      leading: Builder(
-        builder: (BuildContext context) {
-          return IconButton(
-            icon: const Icon(Icons.menu, color: AppTheme.textPrimary, size: 24), // Drawer icon
-            onPressed: () => Scaffold.of(context).openDrawer(), // Open the drawer
-          );
-        },
+      backgroundColor: const Color(0xFFFFF3E0), // Match Scaffold background
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: Color(0xFF5D4037)),
+        onPressed: () => Get.back(),
       ),
       titleSpacing: 0,
       title: Row(
         children: [
-          CircleAvatar(
-            radius: 18,
-            backgroundImage: NetworkImage(expert.image),
-            backgroundColor: AppTheme.cardBackground,
+          Stack(
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundImage: NetworkImage(expert.image),
+                backgroundColor: AppTheme.cardBackground,
+              ),
+              Positioned(
+                right: 0,
+                top: 0,
+                child: Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1.5),
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  expert.name,
-                  style: GoogleFonts.cinzel(
+                  expert.name.toUpperCase(),
+                  style: GoogleFonts.inter(
                     fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF3E2723),
                   ),
                   maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
+                const SizedBox(height: 2),
                 Row(
                   children: [
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: AppTheme.successGreen,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow( // Subtle shadow for online indicator
-                            color: AppTheme.successGreen.withOpacity(0.5),
-                            blurRadius: 4,
-                            spreadRadius: 1,
-                          ),
-                        ],
+                    Text(
+                      "ONLINE",
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.green,
                       ),
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 4),
                     Text(
-                      "Online",
-                      style: GoogleFonts.lora( // Use Lora for body text
+                      "• Vedic Astrology", // Hardcoded or from expert.expertise
+                      style: GoogleFonts.inter(
                         fontSize: 10,
-                        color: AppTheme.textSecondary, // Secondary text color
-                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF5D4037),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.access_time,
+                      size: 10,
+                      color: const Color(0xFF5D4037),
+                    ),
+                    const SizedBox(width: 2),
+                    Text(
+                      "15/Min", // Hardcoded or use expert.charge
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF5D4037),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Obx(
+                      () => Text(
+                        "•  ${_getController().formatTime(_getController().secondsRemaining.value)}",
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF8B4513),
+                        ),
                       ),
                     ),
                   ],
@@ -198,141 +188,144 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
         ],
       ),
       actions: [
-        Container(
-          margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 6),
-          decoration: BoxDecoration(
-            color: AppTheme.cardBackground.withOpacity(0.9), // Card background with slight opacity
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppTheme.lightGold, width: 1), // Light gold border
-          ),
+        Padding(
+          padding: const EdgeInsets.only(right: 16),
           child: Center(
-            child: Obx(() => Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.timer_outlined, size: 14, color: AppTheme.textPrimary),
-                    const SizedBox(width: 6),
-                    Text(
-                      _getController().formatTime(_getController().secondsRemaining.value),
-                      style: GoogleFonts.cinzel( // Use Cinzel for bold text
-                        color: AppTheme.textPrimary, // Primary text color
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                )),
-          ),
-        ),
-        IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: AppTheme.errorRed.withOpacity(0.15), // Error red with opacity
-              shape: BoxShape.circle,
-              border: Border.all(color: AppTheme.errorRed.withOpacity(0.5), width: 1), // Error red border
+            child: SizedBox(
+              height: 28,
+              child: OutlinedButton(
+                onPressed: () => _getController().showEndChatDialog(
+                  "End Chat?",
+                  "Are you sure you want to end this session?",
+                ),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  side: const BorderSide(color: Colors.red, width: 1),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  backgroundColor: Colors.white,
+                ),
+                child: Text(
+                  "END",
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
+                  ),
+                ),
+              ),
             ),
-            child: const Icon(Icons.call_end, color: AppTheme.errorRed, size: 18), // Error red icon
           ),
-          onPressed: () => _getController().showEndChatDialog("End Chat?", "Are you sure you want to end this session?"),
         ),
-        const SizedBox(width: 8),
       ],
     );
   }
 
-  // ─── Initial Topic Cards ──────────────────────────────────────────────────
+  // ─── Vertical Topic Cards ──────────────────────────────────────────────────
   Widget _buildTopicCards(BuildContext context) {
-    final topics = [
-      {"emoji": "💼", "label": "Career", "topic": Topic.career},
-      {"emoji": "❤️", "label": "Relationship", "topic": Topic.relationship},
-      {"emoji": "💰", "label": "Finance", "topic": Topic.finance},
-      {"emoji": "🧠", "label": "Health", "topic": Topic.health},
-    ];
+    // Mapping specific colors from design for icons backgrounds
 
-    final screenWidth = MediaQuery.of(context).size.width;
-    // Adjusted cardWidth to prevent overflow
-    final cardWidth = ((screenWidth - 24 - 32) / 2).clamp(90.0, 110.0); 
-    
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
-
-             Text(
-          "How can I guide you today?",
-          style: GoogleFonts.cinzel(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppTheme.textPrimary,
+          Text(
+            "WHAT YOU WOULD LIKE TO DISCUS?",
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF9E9E9E), // Grey text
+              letterSpacing: 0.5,
+            ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
-        ),
+          const SizedBox(height: 24),
 
-        const SizedBox(height: 20),
-        
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: topics.take(2).map((t) => _buildTopicCard(t, cardWidth)).toList(),
+          _buildVerticalTopicCard(
+            context,
+            icon: Icons.trending_up,
+            iconColor: Colors.orange,
+            bgIconColor: const Color(0xFFFFE0B2),
+            label: "Career Growth",
+            topic: Topic.career,
           ),
-          const SizedBox(height: 12), // Reduced vertical spacing further
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: topics.skip(2).map((t) => _buildTopicCard(t, cardWidth)).toList(),
+          const SizedBox(height: 12),
+          _buildVerticalTopicCard(
+            context,
+            icon: Icons.favorite,
+            iconColor: Colors.pink,
+            bgIconColor: const Color(0xFFF8BBD0),
+            label: "Relationship Advice",
+            topic: Topic.relationship,
+          ),
+          const SizedBox(height: 12),
+          _buildVerticalTopicCard(
+            context,
+            icon: Icons.spa,
+            iconColor: Colors.green,
+            bgIconColor: const Color(0xFFC8E6C9),
+            label: "Health & Wellness",
+            topic: Topic.health,
+          ),
+          const SizedBox(height: 12),
+          _buildVerticalTopicCard(
+            context,
+            icon: Icons.account_balance_wallet,
+            iconColor: Colors.blue,
+            bgIconColor: const Color(0xFFBBDEFB),
+            label: "Financial Stability", // Swapped position to match design
+            topic: Topic.finance,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildTopicCard(Map<String, dynamic> topicData, double cardWidth) { // Added context
-    final topic = topicData["topic"] as Topic;
-    final emoji = topicData["emoji"] as String;
-    final label = topicData["label"] as String;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4), // Reduced horizontal padding
-      child: InkWell(
-        onTap: () => controller.selectTopic(topic),
-        borderRadius: BorderRadius.circular(14), // Smaller border radius
-        child: Container(
-          width: cardWidth,
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10), // Smaller padding
-          decoration: BoxDecoration(
-            color: AppTheme.cardBackground, // Use app theme card background
-            borderRadius: BorderRadius.circular(14), // Match InkWell radius
-            border: Border.all(color: AppTheme.lightGold, width: 1), // Light gold border
-            boxShadow: [
-              BoxShadow(
-                color: AppTheme.lightGold.withOpacity(0.2), // Subtle shadow
-                blurRadius: 6,
-                offset: const Offset(0, 3),
+  Widget _buildVerticalTopicCard(
+    BuildContext context, {
+    required IconData icon,
+    required Color iconColor,
+    required Color bgIconColor,
+    required String label,
+    required Topic topic,
+  }) {
+    return InkWell(
+      onTap: () => controller.selectTopic(topic),
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: bgIconColor.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(12),
               ),
-            ],
-          ),
-          child: Row( // Changed to Row for icon and text in same row
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                emoji,
-                style: const TextStyle(fontSize: 16), // Smaller emoji
+              child: Icon(icon, color: iconColor, size: 20),
+            ),
+            const SizedBox(width: 16),
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF212121),
               ),
-              const SizedBox(width: 4), // Reduced spacing between emoji and text
-              Expanded(
-                child: Text(
-                  label,
-                  style: GoogleFonts.cinzel( // Use Cinzel for titles
-                    fontSize: 10, // Smaller font size
-                    fontWeight: FontWeight.w500,
-                    color: AppTheme.textPrimary, // Use app theme text color
-                  ),
-                  overflow: TextOverflow.ellipsis, // Added ellipsis for overflow
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -344,7 +337,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
     final topicName = topic.toString().split('.').last.capitalizeFirstLetter();
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16), // Adjusted vertical padding
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -353,11 +346,15 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
           Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.textSecondary, size: 20),
+                icon: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: AppTheme.textSecondary,
+                  size: 20,
+                ),
                 onPressed: controller.goBackToTopics,
               ),
               const SizedBox(width: 8),
-              Text( // Question title style
+              Text(
                 "$topicName Questions",
                 style: GoogleFonts.cinzel(
                   fontSize: 16,
@@ -370,39 +367,55 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
           const SizedBox(height: 24),
 
           // Questions
-          ...questions.map((qMap) {
-            final question = qMap["q"]!;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 10), // Reduced vertical spacing
-              child: InkWell(
-                onTap: () => controller.selectQuestion(question),
-                borderRadius: BorderRadius.circular(16), // Smaller border radius
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14), // Smaller padding
-                  decoration: BoxDecoration(
-                    color: AppTheme.cardBackground, // Use app theme card background
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppTheme.lightGold, width: 1), // Light gold border
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          question,
-                          style: GoogleFonts.lora(
-                            fontSize: 14, // Smaller font size
-                            color: AppTheme.textPrimary, // Use app theme text color
-                            height: 1.4,
+          Center(
+            child: SingleChildScrollView(
+              child: Column(
+                children: questions.map((qMap) {
+                  final question = qMap["q"]!;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: InkWell(
+                      onTap: () => controller.selectQuestion(question),
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: AppTheme.lightGold,
+                            width: 1,
                           ),
                         ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                question,
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  color: AppTheme.textPrimary,
+                                  height: 1.4,
+                                ),
+                              ),
+                            ),
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 16,
+                              color: AppTheme.textSecondary,
+                            ),
+                          ],
+                        ),
                       ),
-                      const Icon(Icons.arrow_forward_ios_rounded, size: 18, color: AppTheme.textSecondary),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                }).toList(),
               ),
-            );
-          }).toList(),
+            ),
+          ),
         ],
       ),
     );
@@ -414,59 +427,43 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
       child: Container(
         constraints: BoxConstraints(maxWidth: Get.width * 0.75),
         margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: isUser
+              ? const Color(0xFF8D6E63)
+              : Colors.white, // Brown for user, White for expert
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(16),
+            topRight: const Radius.circular(16),
+            bottomLeft: Radius.circular(isUser ? 16 : 4),
+            bottomRight: Radius.circular(isUser ? 4 : 16),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Column(
-          crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start, // Align bubble to right for user, left for expert
-          children: [ // Text + time inside bubble
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                gradient: isUser
-                    ? const LinearGradient(
-                        begin: Alignment.topLeft, // Same gold gradient for user
-                        end: Alignment.bottomRight,
-                        colors: [AppTheme.primaryGold, AppTheme.darkGold],
-                      )
-                    : null, // No gradient for expert
-                color: isUser ? null : AppTheme.cardBackground, // Card background for expert
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(16), // Consistent border radius
-                  topRight: const Radius.circular(16),
-                  bottomLeft: Radius.circular(isUser ? 16 : 4), // Small tail for user's bubble
-                  bottomRight: Radius.circular(isUser ? 4 : 16), // Small tail for expert's bubble
-                ),
-                border: Border.all( // Consistent border color
-                  color: isUser ? AppTheme.primaryGold : AppTheme.lightGold,
-                  width: 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.primaryGold.withOpacity(0.2), // Subtle shadow for user's bubble
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              text,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: isUser ? Colors.white : const Color(0xFF3E2723),
+                height: 1.4,
               ),
-              child: Column(
-                crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    text,
-                    style: GoogleFonts.lora(
-                      fontSize: 14,
-                      color: AppTheme.textPrimary, // Primary text color
-                      height: 1.4,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    "${time.hour}:${time.minute.toString().padLeft(2, '0')}",
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: AppTheme.textSecondary, // Secondary text color
-                      fontWeight: FontWeight.w500, // Medium font weight
-                    ),
-                  ),
-                ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              "${time.hour}:${time.minute.toString().padLeft(2, '0')}",
+              style: GoogleFonts.inter(
+                fontSize: 10,
+                color: isUser ? Colors.white70 : Colors.grey,
               ),
             ),
           ],
@@ -477,41 +474,58 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
 
   Widget _buildInputBar() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-      decoration: BoxDecoration(
-        color: AppTheme.cardBackground, // Card background for input bar
-        border: Border(top: BorderSide(color: AppTheme.lightGold, width: 1)), // Light gold top border
-      ),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+      color: Colors.transparent,
       child: SafeArea(
         top: false,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // Plus Button
+            Container(
+              width: 44,
+              height: 44,
+              decoration: const BoxDecoration(
+                color: Color(0xFFFFF3E0), // Slightly darker or same as bg
+                shape: BoxShape.circle,
+              ),
+              // Use a slight elevation or just icon
+              child: IconButton(
+                onPressed: () {}, // Add attachment logic if needed
+                icon: const Icon(Icons.add, color: Color(0xFF8D6E63)),
+              ),
+            ),
+            const SizedBox(width: 8),
+
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: AppTheme.cardBackground, // Card background for text field
-                  borderRadius: BorderRadius.circular(28),
-                  border: Border.all(
-                    color: AppTheme.lightGold, // Light gold border
-                    width: 1,
-                  ),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: Colors.transparent),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: TextField(
                   controller: controller.messageController,
-                  style: GoogleFonts.lora( // Lora for input text
-                    fontSize: 15,
-                    color: AppTheme.textPrimary, // Primary text color
-                  ),
-                  cursorColor: AppTheme.primaryGold, // Primary gold cursor
+                  style: GoogleFonts.inter(fontSize: 15, color: Colors.black87),
+                  cursorColor: const Color(0xFF8D6E63),
                   decoration: InputDecoration(
-                    hintText: "Ask anything...",
-                    hintStyle: GoogleFonts.lora( // Lora for hint text
-                      color: AppTheme.textSecondary, // Secondary text color
+                    hintText: "Ask about your........",
+                    hintStyle: GoogleFonts.inter(
+                      color: Colors.grey[400],
                       fontSize: 14,
                     ),
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
                   ),
                   onChanged: (value) {
                     controller.showSuggestions.value = value.trim().isEmpty;
@@ -524,20 +538,17 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
             GestureDetector(
               onTap: controller.sendMessage,
               child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [AppTheme.primaryGold, AppTheme.darkGold], // Gold gradient for send button
-                  ),
+                width: 44,
+                height: 44,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF8D6E63), // Brown send button
                   shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(color: AppTheme.primaryGold.withOpacity(0.35), blurRadius: 8, offset: Offset(0, 2)), // Subtle shadow
-                  ],
                 ),
-                child: const Icon(Icons.send_rounded, color: AppTheme.textPrimary, size: 18), // Primary text color for icon
+                child: const Icon(
+                  Icons.play_arrow,
+                  color: Colors.white,
+                  size: 20,
+                ),
               ),
             ),
           ],

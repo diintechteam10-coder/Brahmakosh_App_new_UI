@@ -1,5 +1,6 @@
 import 'package:brahmakosh/core/theme/app_theme.dart';
 import 'package:brahmakosh/features/redeem/controllers/redeem_controller.dart';
+import 'package:brahmakosh/features/redeem/views/redemption_history_view.dart';
 import 'package:brahmakosh/features/redeem/widgets/redeem_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -82,6 +83,12 @@ class RedeemListView extends StatelessWidget {
                 ],
               ),
             ),
+          ),
+          IconButton(
+            onPressed: () {
+              Get.to(() => const RedemptionHistoryView());
+            },
+            icon: const Icon(Icons.history, color: Color(0xff5D4037)),
           ),
         ],
       ),

@@ -250,14 +250,14 @@ class AppDrawer extends StatelessWidget {
                                       //   label: "My Reports",
                                       //   onTap: () {},
                                       // ),
-                                      // _menuItem(
-                                      //   icon: Icons.face_unlock_outlined,
-                                      //   label: "Avatar Agent",
-                                      //   onTap: () {
-                                      //     Navigator.pop(context);
-                                      //     Get.to(() => const AvatarAgentPage());
-                                      //   },
-                                      // ),
+                                      _menuItem(
+                                        icon: Icons.face_unlock_outlined,
+                                        label: "Avatar Agent",
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                          Get.to(() => const AvatarAgentPage());
+                                        },
+                                      ),
                                       _menuItem(
                                         icon: Icons.settings_outlined,
                                         label: "Settings",

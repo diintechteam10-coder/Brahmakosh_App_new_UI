@@ -2,6 +2,7 @@ import 'package:brahmakosh/features/home/controllers/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class LuckInFavourSection extends StatelessWidget {
   const LuckInFavourSection({super.key});
@@ -27,49 +28,68 @@ class LuckInFavourSection extends StatelessWidget {
           Obx(() {
             final prediction =
                 homeController.panchangData?.numeroDailyPrediction;
+            final nakshatraPrediction =
+                homeController.panchangData?.dailyNakshatraPrediction;
 
             // Default to '--' and empty/grey if API response is null or loading
             final luckyNumber = prediction?.luckyNumber ?? '';
             final luckyColor = prediction?.luckyColor ?? '';
+            final dayEnergy =
+                nakshatraPrediction?.mood ?? 'Moderate'; // Default
 
             return Row(
               children: [
                 Expanded(
                   child: _buildCard(
-                    title: "Lucky Number",
-                    frontImagePath: 'assets/images/yourLuckyNumber_card.png',
-                    backImagePath:
-                        'assets/images/YourLuckyNumberVisible_card.png',
+                    title: "Lucky No.",
+                    frontImagePath: 'assets/images/YourLuckyNumber_outside.png',
+                    backImagePath: 'assets/images/YourLuckyNumber_inside.png',
                     backContent: Text(
                       luckyNumber,
                       style: GoogleFonts.playfairDisplay(
-                        fontSize: 64, // Larger font as per example
+                        fontSize: 48, // Reduced from 64
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF6D3A0C), // Dark brown/gold
+                        color: const Color(0xFF6D3A0C),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 8), // Reduced spacing
                 Expanded(
                   child: _buildCard(
                     title: "Lucky Color",
-                    frontImagePath: 'assets/images/yourLuckyColor_card.png',
-                    backImagePath:
-                        'assets/images/yourLuckyColorVisible_card.png',
+                    frontImagePath: 'assets/images/YourLuckyColor_outside.png',
+                    backImagePath: 'assets/images/YourLuckyColor_inside.png',
                     backContent: Container(
-                      width: 80,
-                      height: 80,
+                      width: 60, // Reduced from 80
+                      height: 60, // Reduced from 80
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: _parseColor(luckyColor).withOpacity(0.6),
                         boxShadow: [
                           BoxShadow(
                             color: _parseColor(luckyColor).withOpacity(0.4),
-                            blurRadius: 20,
-                            spreadRadius: 5,
+                            blurRadius: 15,
+                            spreadRadius: 3,
                           ),
                         ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8), // Reduced spacing
+                Expanded(
+                  child: _buildCard(
+                    title: "Day Energy",
+                    frontImagePath: 'assets/images/YourDayEnergy_outside.png',
+                    backImagePath: 'assets/images/YourDayEnergy_inside.png',
+                    backContent: Text(
+                      dayEnergy,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.playfairDisplay(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF6D3A0C),
                       ),
                     ),
                   ),
@@ -123,70 +143,99 @@ class LuckInFavourSection extends StatelessWidget {
     required String backImagePath,
     required Widget backContent,
   }) {
-    return _FlipCard(
-      front: _buildFrontCard(frontImagePath),
-      back: _buildBackCard(title, backImagePath, backContent),
+    return Column(
+      children: [
+        _FlipCard(
+          front: _buildFrontCard(frontImagePath),
+          back: _buildBackCard(frontImagePath, backImagePath, backContent),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.lora(
+            fontSize: 12, // Reduced font size
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF6D3A0C),
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildFrontCard(String imagePath) {
     return Container(
-      height: 300,
+      height: 180, // Reduced from 300
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(16), // Reduced radius
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: _buildAssetImage(imagePath, height: 180, width: double.infinity),
+      ),
+    );
+  }
+
+  Widget _buildBackCard(String frontPath, String imagePath, Widget content) {
+    return Container(
+      height: 180, // Reduced from 300
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Image.asset(
-          imagePath,
-          fit: BoxFit.fill,
-          height: 300,
-          width: double.infinity,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBackCard(String title, String imagePath, Widget content) {
-    return Container(
-      height: 300,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(16),
         child: Stack(
           children: [
             // Background Image
-            Positioned.fill(child: Image.asset(imagePath, fit: BoxFit.fill)),
+            Positioned.fill(child: _buildAssetImage(imagePath)),
             // Content
             Center(
               child: Padding(
-                padding: const EdgeInsets.only(
-                  bottom: 40.0,
-                ), // Adjust for text position
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
                 child: content,
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildAssetImage(String path, {double? height, double? width}) {
+    if (path.toLowerCase().endsWith('.svg')) {
+      return SvgPicture.asset(
+        path,
+        fit: BoxFit.fill,
+        height: height,
+        width: width,
+        placeholderBuilder: (context) =>
+            const Center(child: CircularProgressIndicator()),
+      );
+    }
+    return Image.asset(
+      path,
+      fit: BoxFit.fill,
+      height: height,
+      width: width,
+      errorBuilder: (context, error, stackTrace) {
+        return const Center(child: Icon(Icons.error, color: Colors.red));
+      },
     );
   }
 }

@@ -13,6 +13,7 @@ import '../../services/controllers/services_controller.dart';
 import '../../report/views/report_view.dart';
 import '../../check_in/views/check_in_view.dart';
 import '../../astrology/views/astrology_experts_view.dart';
+import '../../remedies/views/remedies_web_view.dart';
 
 class DashboardView extends StatelessWidget {
   const DashboardView({super.key});
@@ -103,7 +104,10 @@ class _DashboardLayoutState extends State<DashboardLayout>
               CheckInView(),
               RashmiAi(),
               AstrologyExpertsView(screenTitle: "Connect"),
-              ComingSoonView(title: 'Remedies'),
+              // Only load WebView when active to prevent crashes/memory issues
+              viewModel.currentIndex == 4
+                  ? RemediesWebView(onBack: () => viewModel.changeTab(0))
+                  : const SizedBox(),
               ReportView(), // Keeping ReportView for My Kosh (Drawer navigation)
             ],
           );
@@ -111,8 +115,8 @@ class _DashboardLayoutState extends State<DashboardLayout>
       ),
       bottomNavigationBar: Consumer<DashboardViewModel>(
         builder: (context, viewModel, child) {
-          // Hide bottom navigation bar when on RashmiAi (index 2)
-          if (viewModel.currentIndex == 2) {
+          // Hide bottom navigation bar when on RashmiAi (index 2) or Remedies (index 4)
+          if (viewModel.currentIndex == 2 || viewModel.currentIndex == 4) {
             return const SizedBox.shrink();
           }
           return CustomBottomNavBar(

@@ -1,5 +1,6 @@
 import 'package:brahmakosh/core/theme/app_theme.dart';
 import 'package:brahmakosh/features/redeem/controllers/redeem_controller.dart';
+import 'package:brahmakosh/features/redeem/views/redemption_history_view.dart';
 import 'package:brahmakosh/features/redeem/models/redeem_item_model.dart';
 import 'package:brahmakosh/features/redeem/widgets/redeem_widgets.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -72,6 +73,12 @@ class RedeemDetailView extends StatelessWidget {
                 ],
               ),
             ),
+          ),
+          IconButton(
+            onPressed: () {
+              Get.to(() => const RedemptionHistoryView());
+            },
+            icon: const Icon(Icons.history, color: Color(0xff5D4037)),
           ),
         ],
       ),
@@ -249,10 +256,30 @@ class RedeemDetailView extends StatelessWidget {
                           builder: (context) => ConfirmationPopup(
                             item: item,
                             onConfirm: () {
-                              // Show Success
-                              showDialog(
-                                context: context,
-                                builder: (context) => const SuccessPopup(),
+                              controller.redeemReward(
+                                item.id,
+                                onSuccess: () {
+                                  // Show Success
+                                  Get.dialog(const SuccessPopup());
+                                },
+                                onError: (error) {
+                                  Get.snackbar(
+                                    "Error",
+                                    error,
+                                    snackPosition: SnackPosition.BOTTOM,
+                                    margin: const EdgeInsets.only(
+                                      top: 20,
+                                      left: 10,
+                                      right: 10,
+                                      bottom: 10,
+                                    ),
+                                    backgroundColor: Colors.red.withOpacity(
+                                      0.8,
+                                    ),
+                                    colorText: Colors.white,
+                                    duration: const Duration(seconds: 2),
+                                  );
+                                },
                               );
                             },
                           ),

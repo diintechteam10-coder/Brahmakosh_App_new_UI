@@ -129,7 +129,12 @@ class AstrologyExpertsView extends StatelessWidget {
                 }
 
                 return ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+                  padding: EdgeInsets.only(
+                    left: 16,
+                    top: 8,
+                    right: 16, // Fixed indentation
+                    bottom: 20 + MediaQuery.of(context).padding.bottom,
+                  ),
                   itemCount: list.length,
                   itemBuilder: (context, index) {
                     return _buildExpertCard(context, list[index], controller);
@@ -234,29 +239,43 @@ class AstrologyExpertsView extends StatelessWidget {
   ) {
     final imageUrl =
         expert.profilePhoto ?? 'https://randomuser.me/api/portraits/men/1.jpg';
-    final isOnline = expert.status?.toLowerCase() == 'online';
-    final isBusy = expert.status?.toLowerCase() == 'busy';
+    // Use lowercase for comparison to be safe
+    final status = expert.status?.toLowerCase() ?? 'offline';
+    final isOnline = status == 'online';
+    final isBusy = status == 'busy';
 
-    // Status Color
+    // Status Color & Text
     Color statusColor = Colors.grey;
-    if (isOnline) statusColor = Colors.green;
-    if (isBusy) statusColor = Colors.orange;
+    String statusText = "Offline";
 
+    if (isOnline) {
+      statusColor = Colors.green;
+      statusText = "Available";
+    } else if (isBusy) {
+      statusColor = Colors.orange;
+      statusText = "Busy";
+    }
+
+    // Skills processing
     final skills = expert.expertise != null && expert.expertise!.isNotEmpty
-        ? expert.expertise!.split(',').map((e) => e.trim()).take(2).join(" • ")
+        ? expert.expertise!
+              .split(',')
+              .map((e) => "• ${e.trim()}")
+              .take(2)
+              .join("   ")
         : "";
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: const Color(0xFFFFF8F0), // Light cream card background
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppTheme.lightGold.withOpacity(0.5)),
+        border: Border.all(color: AppTheme.lightGold.withOpacity(0.3)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -268,31 +287,32 @@ class AstrologyExpertsView extends StatelessWidget {
           borderRadius: BorderRadius.circular(24),
           child: Padding(
             padding: const EdgeInsets.all(16),
-            child: Column(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                // Left Column: Avatar + Status
+                Column(
                   children: [
-                    // Avatar
                     Stack(
                       children: [
                         Container(
-                          width: 60,
-                          height: 60,
+                          width: 64,
+                          height: 64,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             image: DecorationImage(
                               image: NetworkImage(imageUrl),
                               fit: BoxFit.cover,
                             ),
+                            border: Border.all(color: Colors.white, width: 2),
                           ),
                         ),
                         Positioned(
                           right: 0,
                           top: 0,
                           child: Container(
-                            width: 16,
-                            height: 16,
+                            width: 14,
+                            height: 14,
                             decoration: BoxDecoration(
                               color: statusColor,
                               shape: BoxShape.circle,
@@ -302,70 +322,84 @@ class AstrologyExpertsView extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(width: 12),
-
-                    // Info
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            expert.name ?? 'Astrologer',
-                            style: GoogleFonts.inter(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "${expert.experience ?? '0'} Years Exp.",
-                            style: GoogleFonts.inter(
-                              fontSize: 13,
-                              color: AppTheme.textSecondary,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            "• $skills",
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: AppTheme.textPrimary,
-                            ),
-                          ),
-                        ],
+                    const SizedBox(height: 6),
+                    Text(
+                      statusText,
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF5D4037),
                       ),
                     ),
                   ],
                 ),
+                const SizedBox(width: 16),
 
-                const SizedBox(height: 16),
+                // Right Column: Details + Buttons
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        expert.name ?? 'Astrologer',
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "${expert.experience ?? '0'} Years Exp.",
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: AppTheme.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        skills,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: AppTheme.textPrimary,
+                        ),
+                      ),
 
-                // Action Buttons
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildActionButton(
-                      icon: Icons.chat_bubble_outline,
-                      price: expert.chatCharge?.toString() ?? "20",
-                      onTap: () => controller.startChat(expert),
-                    ),
-                    const SizedBox(width: 8),
-                    _buildActionButton(
-                      icon: Icons.phone_outlined,
-                      price: expert.voiceCharge?.toString() ?? "20",
-                      onTap: () {}, // Add call logic
-                    ),
-                    const SizedBox(width: 8),
-                    _buildActionButton(
-                      icon: Icons.videocam_outlined,
-                      price: expert.videoCharge?.toString() ?? "20",
-                      onTap: () {}, // Add video call logic
-                    ),
-                  ],
+                      const SizedBox(height: 12),
+
+                      // Action Buttons Row
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildActionButton(
+                              icon: Icons.chat_bubble_outline,
+                              price: expert.chatCharge?.toString() ?? "20",
+                              onTap: () => controller.startChat(expert),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: _buildActionButton(
+                              icon: Icons.phone_outlined,
+                              price: expert.voiceCharge?.toString() ?? "20",
+                              onTap: () {}, // Add call logic
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: _buildActionButton(
+                              icon: Icons.videocam_outlined,
+                              price: expert.videoCharge?.toString() ?? "20",
+                              onTap: () {}, // Add video call logic
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -380,32 +414,38 @@ class AstrologyExpertsView extends StatelessWidget {
     required String price,
     required VoidCallback onTap,
   }) {
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-
-          decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFF8B6914), width: 1),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 16, color: const Color(0xFF8B6914)),
-              const SizedBox(width: 2),
-              Text(
-                "₹$price/min",
-                style: GoogleFonts.inter(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF8B6914),
-                ),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: const Color(0xFFA67C00),
+            width: 1,
+          ), // Gold/Brown border
+          borderRadius: BorderRadius.circular(20),
+          color: const Color.fromARGB(
+            0,
+            255,
+            255,
+            255,
+          ), // Transparant or very light fill
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 14, color: const Color(0xFFA67C00)),
+            const SizedBox(width: 4),
+            Text(
+              "₹$price/min",
+              style: GoogleFonts.inter(
+                fontSize: 9,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFFA67C00),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

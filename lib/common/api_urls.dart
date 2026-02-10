@@ -56,4 +56,7 @@ class ApiUrls {
 
   /// 🔹 Spiritual Rewards
   static const String spiritualRewards = '$baseUrl/api/spiritual-rewards';
+  static const String redeemReward = '$baseUrl/api/reward-redemptions/redeem';
+  static const String redemptionHistory =
+      '$baseUrl/api/reward-redemptions/history';
 }

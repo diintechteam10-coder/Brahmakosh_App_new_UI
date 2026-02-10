@@ -14,9 +14,9 @@ class Utils {
   static void showToast(String text, [Color? bgColor]) {
     Fluttertoast.showToast(
       msg: text,
-      toastLength: Toast.LENGTH_LONG,
+      toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.SNACKBAR,
-      timeInSecForIosWeb: 1,
+      timeInSecForIosWeb: 2,
       backgroundColor: Colors.grey.shade900,
       textColor: Colors.white,
       fontSize: 16.0,

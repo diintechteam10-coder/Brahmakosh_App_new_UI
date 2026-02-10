@@ -158,237 +158,247 @@ class _CheckInViewState extends State<CheckInView>
                   ],
                 ),
               ),
-              child: CustomScrollView(
-                physics: const BouncingScrollPhysics(
-                  parent: AlwaysScrollableScrollPhysics(),
-                ),
-                slivers: [
-                  // Header row
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 0,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            icon: const Icon(
-                              Icons.history,
-                              color: Color(0xff7B4A12),
-                            ),
-                            onPressed: () {},
-                          ),
-                          Text(
-                            'BRAHMAKOSH',
-                            style: GoogleFonts.lora(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 2,
-                              color: const Color(0xff7B4A12),
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.share,
-                              color: Color(0xff7B4A12),
-                            ),
-                            onPressed: () {},
-                          ),
-                        ],
-                      ),
-                    ),
+              child: RefreshIndicator(
+                color: const Color(0xff7B4A12),
+                onRefresh: () async {
+                  final completer = Completer<void>();
+                  context.read<CheckInBloc>().add(RefreshCheckIn(completer));
+                  return completer.future;
+                },
+                child: CustomScrollView(
+                  physics: const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics(),
                   ),
-
-                  // Main title & Subtitle
-                  SliverToBoxAdapter(
-                    child: Column(
-                      children: [
-                        Text(
-                          '#AreYouSpiritual',
-                          style: GoogleFonts.playfairDisplay(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xff7B4A12),
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Take a moment for yourself',
-                          style: GoogleFonts.lora(
-                            fontSize: 16,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Check-In Options
-                  if (data.activities != null &&
-                      data.activities!.isNotEmpty) ...[
-                    const SliverToBoxAdapter(child: SizedBox(height: 16)),
-                    SliverToBoxAdapter(
-                      child: Center(
-                        child: Text(
-                          'CHECK-IN OPTIONS',
-                          style: GoogleFonts.cinzel(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xff7B4A12),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                  slivers: [
+                    // Header row
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 56),
-                        child: GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: data.activities!.length,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 24,
-                                mainAxisSpacing: 24,
-                                childAspectRatio: 0.8,
-                              ),
-                          itemBuilder: (ctx, index) {
-                            // context shadowed? use ctx
-                            final activity = data!.activities![index];
-                            return _card(
-                              image: activity.image,
-                              title: activity.title?.toUpperCase() ?? '',
-                              onTap: () {
-                                if (activity.route != null) {
-                                  if (activity.title == 'Chanting') {
-                                    Get.toNamed(
-                                      AppConstants.routeChantingConfiguration,
-                                    );
-                                  } else if (activity.id != null) {
-                                    // BLoC Navigation Trigger
-                                    context.read<CheckInBloc>().add(
-                                      SelectActivity(
-                                        activityId: activity.id!,
-                                        route: AppConstants
-                                            .routeSpiritualConfiguration,
-                                        title: activity.title,
-                                      ),
-                                    );
-                                  }
-                                }
-                              },
-                            );
-                          },
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 0,
                         ),
-                      ),
-                    ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 20)),
-                  ],
-
-                  // Overview Stats
-                  if (data.stats != null) ...[
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Column(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              (data.recentActivities != null &&
-                                      data.recentActivities!.isNotEmpty)
-                                  ? 'Last Check-In ${_formatDateTimeFull(data.recentActivities!.first.createdAt)}'
-                                  : 'No Recent Check-Ins',
-                              style: GoogleFonts.lora(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                                color: const Color(0xff7B4A12),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.history,
+                                color: Color(0xff7B4A12),
                               ),
-                              textAlign: TextAlign.center,
+                              onPressed: () {},
                             ),
-                            const SizedBox(height: 8),
                             Text(
-                              'With Each Check-In Earn Karma Points',
+                              'BRAHMAKOSH',
                               style: GoogleFonts.lora(
-                                fontSize: 14,
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
+                                letterSpacing: 2,
                                 color: const Color(0xff7B4A12),
                               ),
-                              textAlign: TextAlign.center,
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.share,
+                                color: Color(0xff7B4A12),
+                              ),
+                              onPressed: () {},
                             ),
                           ],
                         ),
                       ),
                     ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 20)),
-                    SliverToBoxAdapter(
-                      child: RepaintBoundary(
-                        child: _buildOverviewStats(data.stats!),
-                      ),
-                    ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 32)),
-                  ],
 
-                  // Category Progress
-                  if (data.categoryStats != null) ...[
+                    // Main title & Subtitle
                     SliverToBoxAdapter(
-                      child: RepaintBoundary(
-                        child: _buildCategoryStats(data.categoryStats!),
-                      ),
-                    ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 32)),
-                  ],
-
-                  // Recent Activities
-                  if (data.recentActivities != null &&
-                      data.recentActivities!.isNotEmpty) ...[
-                    SliverToBoxAdapter(
-                      child: RepaintBoundary(
-                        child: _buildRecentActivities(data.recentActivities!),
-                      ),
-                    ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 36)),
-                  ],
-
-                  // Karma & Motivation
-                  SliverToBoxAdapter(
-                    child: Column(
-                      children: [
-                        if (data.motivation?.emoji != null)
+                      child: Column(
+                        children: [
                           Text(
-                            data.motivation!.emoji!,
-                            style: const TextStyle(fontSize: 40),
-                          ),
-                        const SizedBox(height: 12),
-                        Text(
-                          'Earn Karma points',
-                          style: GoogleFonts.lora(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xff7B4A12),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        if (data.motivation?.text != null)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 32),
-                            child: Text(
-                              data.motivation!.text!,
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.lora(
-                                fontSize: 14,
-                                color: Colors.black54,
-                                fontStyle: FontStyle.italic,
-                              ),
+                            '#AreYouSpiritual',
+                            style: GoogleFonts.playfairDisplay(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xff7B4A12),
                             ),
                           ),
-                      ],
+                          const SizedBox(height: 2),
+                          Text(
+                            'Take a moment for yourself',
+                            style: GoogleFonts.lora(
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SliverToBoxAdapter(child: SizedBox(height: 48)),
-                ],
+
+                    // Check-In Options
+                    if (data.activities != null &&
+                        data.activities!.isNotEmpty) ...[
+                      const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                      SliverToBoxAdapter(
+                        child: Center(
+                          child: Text(
+                            'CHECK-IN OPTIONS',
+                            style: GoogleFonts.cinzel(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xff7B4A12),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 56),
+                          child: GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: data.activities!.length,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 24,
+                                  mainAxisSpacing: 24,
+                                  childAspectRatio: 0.8,
+                                ),
+                            itemBuilder: (ctx, index) {
+                              // context shadowed? use ctx
+                              final activity = data!.activities![index];
+                              return _card(
+                                image: activity.image,
+                                title: activity.title?.toUpperCase() ?? '',
+                                onTap: () {
+                                  if (activity.route != null) {
+                                    if (activity.title == 'Chanting') {
+                                      Get.toNamed(
+                                        AppConstants.routeChantingConfiguration,
+                                      );
+                                    } else if (activity.id != null) {
+                                      // BLoC Navigation Trigger
+                                      context.read<CheckInBloc>().add(
+                                        SelectActivity(
+                                          activityId: activity.id!,
+                                          route: AppConstants
+                                              .routeSpiritualConfiguration,
+                                          title: activity.title,
+                                        ),
+                                      );
+                                    }
+                                  }
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 20)),
+                    ],
+
+                    // Overview Stats
+                    if (data.stats != null) ...[
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            children: [
+                              Text(
+                                (data.recentActivities != null &&
+                                        data.recentActivities!.isNotEmpty)
+                                    ? 'Last Check-In ${_formatDateTimeFull(data.recentActivities!.first.createdAt)}'
+                                    : 'No Recent Check-Ins',
+                                style: GoogleFonts.lora(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xff7B4A12),
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'With Each Check-In Earn Karma Points',
+                                style: GoogleFonts.lora(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xff7B4A12),
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 20)),
+                      SliverToBoxAdapter(
+                        child: RepaintBoundary(
+                          child: _buildOverviewStats(data.stats!),
+                        ),
+                      ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                    ],
+
+                    // Category Progress
+                    if (data.categoryStats != null) ...[
+                      SliverToBoxAdapter(
+                        child: RepaintBoundary(
+                          child: _buildCategoryStats(data.categoryStats!),
+                        ),
+                      ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                    ],
+
+                    // Recent Activities
+                    if (data.recentActivities != null &&
+                        data.recentActivities!.isNotEmpty) ...[
+                      SliverToBoxAdapter(
+                        child: RepaintBoundary(
+                          child: _buildRecentActivities(data.recentActivities!),
+                        ),
+                      ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 36)),
+                    ],
+
+                    // Karma & Motivation
+                    SliverToBoxAdapter(
+                      child: Column(
+                        children: [
+                          if (data.motivation?.emoji != null)
+                            Text(
+                              data.motivation!.emoji!,
+                              style: const TextStyle(fontSize: 40),
+                            ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Earn Karma points',
+                            style: GoogleFonts.lora(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xff7B4A12),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          if (data.motivation?.text != null)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32,
+                              ),
+                              child: Text(
+                                data.motivation!.text!,
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.lora(
+                                  fontSize: 14,
+                                  color: Colors.black54,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 48)),
+                  ],
+                ),
               ),
             ),
           );

@@ -23,3 +23,12 @@ class SelectActivity extends CheckInEvent {
   @override
   List<Object?> get props => [activityId, route, title];
 }
+
+class RefreshCheckIn extends CheckInEvent {
+  final Completer<void> completer;
+
+  const RefreshCheckIn(this.completer);
+
+  @override
+  List<Object?> get props => [completer];
+}

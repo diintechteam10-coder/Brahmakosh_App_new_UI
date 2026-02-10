@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_checkin_model.dart';
@@ -12,7 +13,39 @@ class CheckInBloc extends Bloc<CheckInEvent, CheckInState> {
 
   CheckInBloc({required this.repository}) : super(CheckInInitial()) {
     on<LoadCheckIn>(_onLoadCheckIn);
+    on<RefreshCheckIn>(_onRefreshCheckIn);
     on<SelectActivity>(_onSelectActivity);
+  }
+
+  Future<void> _onRefreshCheckIn(
+    RefreshCheckIn event,
+    Emitter<CheckInState> emit,
+  ) async {
+    try {
+      final response = await repository.getCheckIn();
+      if (response != null &&
+          response.success == true &&
+          response.data != null) {
+        final data = response.data!;
+        emit(CheckInLoaded(data: data));
+
+        // Background Pre-fetch logic
+        if (data.activities != null) {
+          for (final activity in data.activities!) {
+            if (activity.id != null) {
+              _fetchConfigBackground(activity.id!);
+            }
+          }
+        }
+      } else {
+        // Optionally show toast or handle error silently?
+        // We don't want to replace the current state with Error view.
+      }
+    } catch (e) {
+      // Handle error silently or via toast
+    } finally {
+      event.completer.complete();
+    }
   }
 
   Future<void> _onLoadCheckIn(

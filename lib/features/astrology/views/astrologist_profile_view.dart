@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:brahmakosh/common/models/astrologist_model.dart';
 import 'package:brahmakosh/core/theme/app_theme.dart';
-import 'expert_app_bar.dart';
 
 class AstrologistProfileView extends StatelessWidget {
   final AstrologistItem expert;
@@ -16,7 +15,7 @@ class AstrologistProfileView extends StatelessWidget {
     final AstrologyController controller = Get.find<AstrologyController>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFBE6D0),
+      backgroundColor: const Color(0xFFFBE6D0), // Peach/Beige background
       appBar: AppBar(
         backgroundColor: const Color(0xFFFBE6D0),
         elevation: 0,
@@ -26,7 +25,7 @@ class AstrologistProfileView extends StatelessWidget {
         ),
         title: Text(
           "Details",
-          style: GoogleFonts.cinzel(
+          style: GoogleFonts.lora(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: AppTheme.textPrimary,
@@ -41,356 +40,277 @@ class AstrologistProfileView extends StatelessWidget {
           const SizedBox(width: 8),
         ],
       ),
-      body: Container(
-        decoration: const BoxDecoration(color: Color(0xFFFBE6D0)),
-        child: SafeArea(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              const SizedBox(height: 16),
-              _buildExpertProfileCard(
-                context,
-                controller,
-              ), // Pass context and controller
-              // Removed _buildConsultationOptions(controller),
-              const SizedBox(height: 16),
-              _buildClientReviews(),
-              const SizedBox(height: 100),
-            ],
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header Section
+                  _buildHeader(),
+                  const SizedBox(height: 24),
+
+                  // About Section
+                  Text(
+                    expert.profileSummary ??
+                        "${expert.name} is a Vedic Astrologer with ${expert.experience ?? 0} years of experience. Expert in Kundli analysis, career & marriage guidance, and dosha remedies.",
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      height: 1.5,
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Rating Row
+                  Row(
+                    children: [
+                      Row(
+                        children: List.generate(5, (index) {
+                          return const Icon(
+                            Icons.star,
+                            color: Color(0xFFFFC107), // Amber/Gold
+                            size: 18,
+                          );
+                        }),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        "4.0", // Hardcoded rating as strictly per design screenshot example or use expert.rating if available
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  const Divider(color: Color(0xFFE0C09C), thickness: 1),
+                  const SizedBox(height: 24),
+
+                  // Details Sections
+                  _buildDetailSection(
+                    "Expertise",
+                    expert.expertise ?? "Vedic Astrology • Kundli Analysis",
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDetailSection(
+                    "Languages",
+                    (expert.languages ?? ['Hindi', 'English']).join(", "),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDetailSection(
+                    "Response Time",
+                    "Usually replies within 5 mins",
+                  ),
+
+                  const SizedBox(height: 24),
+                  const Divider(color: Color(0xFFE0C09C), thickness: 1),
+                  const SizedBox(height: 24),
+
+                  // Reviews Section
+                  _buildReviewsSection(),
+                  const SizedBox(height: 100), // Space for bottom bar
+                ],
+              ),
+            ),
           ),
-        ),
+
+          // Bottom Action Bar
+          _buildBottomActionBar(context, controller),
+        ],
       ),
     );
   }
 
-  // ── EXPERT PROFILE CARD ────────────────────────────────────────────────
-  Widget _buildExpertProfileCard(
-    BuildContext context,
-    AstrologyController controller,
-  ) {
-    // Helper methods to get parsed values
-    List<String> getSkills() {
-      if (expert.expertise != null && expert.expertise!.isNotEmpty) {
-        return expert.expertise!.split(',').map((e) => e.trim()).toList();
-      }
-      return ['Vedic']; // Default skill
-    }
-
-    int getExperienceYears() {
-      if (expert.experience != null && expert.experience!.isNotEmpty) {
-        try {
-          return int.parse(
-            expert.experience!.replaceAll(RegExp(r'[^0-9]'), ''),
-          );
-        } catch (e) {
-          return 0;
-        }
-      }
-      return 0;
-    }
-
-    bool getIsOnline() {
-      final status = expert.status?.toLowerCase() ?? '';
-      return status == 'online' || status == 'available';
-    }
-
-    final skills = getSkills();
-    final experienceYears = getExperienceYears();
-    final isOnline = getIsOnline();
-    final languages = expert.languages ?? ['Hindi', 'English'];
+  Widget _buildHeader() {
     final imageUrl =
         expert.profilePhoto ?? 'https://randomuser.me/api/portraits/men/1.jpg';
-    final bio = expert.profileSummary ?? 'Experienced astrologer';
-    final totalConsultations = expert.reviews ?? 0;
+    final status = expert.status?.toLowerCase() ?? 'offline';
+    final isOnline = status == 'online';
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        color: AppTheme.cardBackground,
-        border: Border.all(color: AppTheme.lightGold, width: 1.2),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.lightGold.withOpacity(0.35),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+    // Consults count (mock logic if not in model, or use 15k+ as placeholder per design consistency if data missing)
+    final consults = "15K+ Consults";
+    final exp = "${expert.experience ?? 0} Years Exp";
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Big Avatar
+        Container(
+          width: 100,
+          height: 100,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            image: DecorationImage(
+              image: NetworkImage(imageUrl),
+              fit: BoxFit.cover,
+            ),
+            border: Border.all(color: Colors.white, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+        ),
+        const SizedBox(width: 16),
+
+        // Info Side
+        Expanded(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Avatar left side + small availability
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircleAvatar(
-                    radius: 40,
-                    backgroundImage: NetworkImage(imageUrl),
-                  ),
-                  const SizedBox(height: 6),
-                  const SizedBox(height: 12),
-                  Text(
-                    "SKILLS:",
-                    style: GoogleFonts.cinzel(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Container(
-                    width: 130,
-                    child: Wrap(
-                      spacing: 4,
-                      runSpacing: 6,
-                      alignment: WrapAlignment.center,
-                      children: skills.map((skill) {
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: AppTheme.lightGold,
-                              width: 1.1,
-                            ),
-                          ),
-                          child: Text(
-                            skill,
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.lora(
-                              fontSize: 10,
-                              color: AppTheme.textPrimary,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ],
+              Text(
+                (expert.name ?? "Astrologer").toUpperCase(),
+                style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textPrimary,
+                ),
               ),
+              const SizedBox(height: 4),
+              Text(
+                expert.expertise?.split(',').firstOrNull ?? "Vedic Astrology",
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: AppTheme.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 12),
 
-              const SizedBox(width: 16),
+              // Stats Pill
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: AppTheme.lightGold.withOpacity(0.3),
+                  ),
+                ),
+                child: Text(
+                  "$consults  •  $exp",
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
 
-              // Right side - all text content
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              // Status Pill
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: AppTheme.lightGold.withOpacity(0.3),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: isOnline ? Colors.green : Colors.grey,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
                     Text(
-                      expert.name ?? 'Astrologer',
-                      style: GoogleFonts.cinzel(
-                        fontSize: 18,
+                      isOnline ? "Available" : "Offline",
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: AppTheme.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 4),
-
-                    if (skills.isNotEmpty)
-                      Text(
-                        skills.first,
-                        style: GoogleFonts.lora(
-                          fontSize: 14,
-                          color: AppTheme.textSecondary,
-                        ),
-                      ),
-
-                    const SizedBox(height: 12),
-
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: isOnline
-                                ? AppTheme.successGreen
-                                : AppTheme.textSecondary,
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          isOnline ? "Available" : "Offline",
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: isOnline
-                                ? AppTheme.successGreen
-                                : AppTheme.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 8),
                   ],
                 ),
               ),
             ],
           ),
-
-          const SizedBox(height: 16),
-
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "LANGUAGES:",
-                style: GoogleFonts.cinzel(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
-                ),
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  languages.join(", "),
-                  style: GoogleFonts.lora(
-                    fontSize: 10,
-                    color: AppTheme.textPrimary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Text("Description:", style: _sectionTitleStyle),
-          const SizedBox(height: 4),
-          Text(
-            bio,
-            style: GoogleFonts.lora(
-              fontSize: 12,
-              height: 1.5,
-              color: AppTheme.textSecondary,
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatCard(
-                  Icons.school_outlined,
-                  "Experience",
-                  "${experienceYears} Years",
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _buildStatCard(
-                  Icons.people_outline,
-                  "Clients",
-                  totalConsultations > 1000
-                      ? "${(totalConsultations / 1000).toStringAsFixed(1)}K+"
-                      : "$totalConsultations+",
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _buildStatCard(
-                  Icons.workspace_premium_outlined,
-                  "Awards",
-                  "15+",
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 24),
-
-          _buildConsultationButtons(controller),
-        ],
-      ),
-    );
-  }
-
-  // ── Consultation Buttons ───────────────────────────────────────────────
-  Widget _buildConsultationButtons(AstrologyController controller) {
-    final videoCharge = expert.videoCharge ?? 50;
-    final voiceCharge = expert.voiceCharge ?? 30;
-    final chatCharge = expert.chatCharge ?? 15;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Consultation Options",
-          style: GoogleFonts.cinzel(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppTheme.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 12),
-        _buildConsultationRow(
-          Icons.chat_bubble_outline,
-          "Live Chat",
-          "RS.$chatCharge/min",
-          () => controller.startChat(expert),
-        ),
-        const SizedBox(height: 10),
-        _buildConsultationRow(
-          Icons.phone,
-          "Audio Call",
-          "RS.$voiceCharge/min",
-          () {},
-        ),
-        const SizedBox(height: 10),
-        _buildConsultationRow(
-          Icons.videocam,
-          "Video Call",
-          "RS.$videoCharge/min",
-          () {},
         ),
       ],
     );
   }
 
-  Widget _buildConsultationRow(
-    IconData icon,
-    String title,
-    String price,
-    VoidCallback onTap,
-  ) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppTheme.lightGold, width: 1.1),
-          color: AppTheme.cardBackground,
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.lightGold.withOpacity(0.25),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+  Widget _buildDetailSection(String title, String content) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF5D4037),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          content,
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            color: const Color(0xFF795548),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildReviewsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Reviews",
+              style: GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.textPrimary,
+              ),
+            ),
+            Text(
+              "View All",
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF8B6914), // Dark Gold
+                decoration: TextDecoration.underline,
+              ),
             ),
           ],
         ),
-        child: Row(
+        const SizedBox(height: 16),
+        // Mock Review Item
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: AppTheme.lightGold,
-                borderRadius: BorderRadius.circular(10),
+            const CircleAvatar(
+              radius: 20,
+              backgroundImage: NetworkImage(
+                'https://randomuser.me/api/portraits/men/32.jpg',
               ),
-              child: Icon(icon, color: AppTheme.textPrimary, size: 24),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -398,246 +318,284 @@ class AstrologistProfileView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    title,
-                    style: GoogleFonts.cinzel(
+                    "Rahul Sharma",
+                    style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 4),
                   Text(
-                    price,
-                    style: GoogleFonts.cinzel(
+                    "The consultation was very helpful and accurate. The guidance was clear, practical, and easy to understand.",
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
                       fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
+                      color: AppTheme.textSecondary,
+                      height: 1.4,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(
-              Icons.arrow_forward_ios,
-              color: AppTheme.textSecondary,
-              size: 16,
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBottomActionBar(
+    BuildContext context,
+    AstrologyController controller,
+  ) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        16,
+        20,
+        16,
+        10 + MediaQuery.of(context).padding.bottom,
+      ),
+      decoration: const BoxDecoration(
+        color: Color(0xFFFFF8F0), // Cream/White
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10,
+            offset: Offset(0, -2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildActionButton(
+              icon: Icons.chat_bubble,
+              label: "Chat",
+              price: "₹${expert.chatCharge ?? 15}/min",
+              onTap: () {
+                _showChatConfirmationBottomSheet(context, controller);
+              },
             ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _buildActionButton(
+              icon: Icons.call,
+              label: "Call",
+              price: "₹${expert.voiceCharge ?? 20}/min",
+              onTap: () {},
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _buildActionButton(
+              icon: Icons.videocam,
+              label: "Video",
+              price: "₹${expert.videoCharge ?? 50}/min",
+              onTap: () {},
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showChatConfirmationBottomSheet(
+    BuildContext context,
+    AstrologyController controller,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: Color(0xFFFFE0B2), // Light Peach/Orange background
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Chat Icon Box
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.chat_bubble,
+                color: Colors.black87,
+                size: 24,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Title
+            Text(
+              "STAR CHAT CONSULTATION",
+              style: GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            Text(
+              "You're about to start a live chat session with your chosen Expert.",
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: Colors.black87,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Divider(color: Colors.black12, thickness: 1),
+            const SizedBox(height: 16),
+
+            // Description
+            Text(
+              "Connect with an astrologer or guru through live chat and end the session at any time - credits are deducted only for the minutes used, so please ensure a stable internet connection for a smooth experience.",
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                color: Colors.black87,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Price Warning
+            Text(
+              "This session will deduct ₹${expert.chatCharge ?? 15} per minute",
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF8B4513), // Saddle Brown
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            Text(
+              "Would you like to continue?",
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Buttons
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      side: const BorderSide(color: Color(0xFF8B6914)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                    ),
+                    child: Text(
+                      "CANCEL",
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF8B6914),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Close sheet
+                      controller.startChat(expert); // Start chat
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      backgroundColor: const Color(
+                        0xFFA67C00,
+                      ), // Dark Gold/Brown
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      "CONTINUE",
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
           ],
         ),
       ),
     );
   }
 
-  // ── Reusable small widgets ─────────────────────────────────────────────
-  static const TextStyle _sectionTitleStyle = TextStyle(
-    fontSize: 12,
-    fontWeight: FontWeight.w500,
-    color: AppTheme.textPrimary,
-    fontFamily: 'Inter',
-  );
-
-  Widget _buildStatCard(IconData icon, String label, String value) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: AppTheme.cardBackground,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppTheme.lightGold, width: 1),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: AppTheme.primaryGold, size: 32),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: GoogleFonts.cinzel(
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required String price,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        height: 56,
+        decoration: BoxDecoration(
+          color: const Color(
+            0xFFFFE0B2,
+          ), // Light Orange/Gold background matches screenshot
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 16, color: Colors.black87),
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
             ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: GoogleFonts.lora(fontSize: 9, color: AppTheme.textSecondary),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── CLIENT REVIEWS ─────────────────────────────────────────────────────
-  Widget _buildClientReviews() {
-    // AstrologistItem doesn't have reviews list, so we'll show empty state
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryGold,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: const Icon(
-                  Icons.local_fire_department,
-                  color: AppTheme.textPrimary,
-                  size: 16,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                "Clients Review",
-                style: GoogleFonts.cinzel(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.textPrimary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
-              color: AppTheme.cardBackground,
-              border: Border.all(color: AppTheme.lightGold, width: 1.1),
-            ),
-            child: const Center(
-              child: Text(
-                "No reviews yet",
-                style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+            const SizedBox(height: 2),
+            Text(
+              price,
+              style: GoogleFonts.inter(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
-  }
-
-  Widget _buildReviewCard(AstrologistReview review) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.lightGold, width: 1.1),
-        color: AppTheme.cardBackground,
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.lightGold.withOpacity(0.25),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Avatar (left side only)
-              CircleAvatar(
-                radius: 25,
-                backgroundColor: AppTheme.cardBackground,
-                backgroundImage: review.userImage != null
-                    ? NetworkImage(review.userImage!)
-                    : null,
-                child: review.userImage == null
-                    ? Text(
-                        review.userName[0].toUpperCase(),
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: AppTheme.textPrimary,
-                        ),
-                      )
-                    : null,
-              ),
-              const SizedBox(width: 12),
-
-              // Name + Stars column (text starts from here)
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Name + Stars in one line
-                    Row(
-                      children: [
-                        Text(
-                          review.userName,
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: AppTheme.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: List.generate(
-                            5,
-                            (i) => Icon(
-                              Icons.star,
-                              size: 12,
-                              color: i < review.rating.toInt()
-                                  ? AppTheme.primaryGold
-                                  : AppTheme.textSecondary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    // Comment – starts directly below name + stars
-                    Text(
-                      review.comment,
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        height: 1.4,
-                        color: AppTheme.textPrimary,
-                      ),
-                    ),
-
-                    const SizedBox(height: 6),
-
-                    // Time ago – directly below comment (same starting point as name)
-                    Text(
-                      _getTimeAgo(review.date),
-                      style: GoogleFonts.inter(
-                        fontSize: 10,
-                        color: AppTheme.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _getTimeAgo(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inDays > 0)
-      return "${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago";
-    if (difference.inHours > 0)
-      return "${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago";
-    if (difference.inMinutes > 0)
-      return "${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago";
-    return "Just now";
   }
 }
