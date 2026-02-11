@@ -11,8 +11,12 @@ class HomeTopBar extends StatefulWidget {
   @override
   State<HomeTopBar> createState() => _HomeTopBarState();
 }
+enum DayPhase { morning, afternoon, night }
 
 class _HomeTopBarState extends State<HomeTopBar> with TickerProviderStateMixin {
+  DayPhase _currentPhase = DayPhase.morning;
+  Timer? _dayPhaseTimer;
+
   int _currentPage = 0;
   Timer? _timer;
   List<Map<String, String>> _signs = [
@@ -25,6 +29,9 @@ class _HomeTopBarState extends State<HomeTopBar> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _startAutoSlide();
+   // _startDayPhaseWatcher();
+    _startDayPhaseRotation();
+
 
     // Initial update if data exists
     final controller = Get.find<HomeController>();
@@ -37,6 +44,71 @@ class _HomeTopBarState extends State<HomeTopBar> with TickerProviderStateMixin {
       _updateSigns(data);
     });
   }
+  String get _backgroundImage {
+    switch (_currentPhase) {
+      case DayPhase.morning:
+        return 'assets/images/morning_background2.png';
+      case DayPhase.afternoon:
+        return 'assets/images/top_background.png';
+      case DayPhase.night:
+        return 'assets/images/night_image(3).png';
+    }
+  }
+  // DayPhase _getDayPhaseFromTime() {
+  //   final hour = DateTime.now().hour;
+  //
+  //   if (hour >= 5 && hour < 12) {
+  //     return DayPhase.morning;
+  //   } else if (hour >= 12 && hour < 18) {
+  //     return DayPhase.afternoon;
+  //   } else {
+  //     return DayPhase.night;
+  //   }
+  // }
+
+  String get _greetingText {
+    switch (_currentPhase) {
+      case DayPhase.morning:
+        return 'Good Morning';
+      case DayPhase.afternoon:
+        return 'Good Afternoon';
+      case DayPhase.night:
+        return 'Good Night';
+    }
+  }
+
+  void _startDayPhaseRotation() {
+    _dayPhaseTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+      if (!mounted) return;
+
+      setState(() {
+        if (_currentPhase == DayPhase.morning) {
+          _currentPhase = DayPhase.afternoon;
+        } else if (_currentPhase == DayPhase.afternoon) {
+          _currentPhase = DayPhase.night;
+        } else {
+          _currentPhase = DayPhase.morning;
+        }
+      });
+    });
+  }
+  // void _startDayPhaseWatcher() {
+  //   // Set initial phase
+  //   _currentPhase = _getDayPhaseFromTime();
+  //
+  //   _dayPhaseTimer = Timer.periodic(const Duration(minutes: 1), (_) {
+  //     if (!mounted) return;
+  //
+  //     final newPhase = _getDayPhaseFromTime();
+  //     if (newPhase != _currentPhase) {
+  //       setState(() {
+  //         _currentPhase = newPhase;
+  //       });
+  //     }
+  //   });
+  // }
+
+
 
   void _updateSigns(UserCompleteDetailsModel? data) {
     if (mounted && data?.data?.astrology?.astroDetails != null) {
@@ -65,17 +137,19 @@ class _HomeTopBarState extends State<HomeTopBar> with TickerProviderStateMixin {
   @override
   void dispose() {
     _timer?.cancel();
+    _dayPhaseTimer?.cancel();
     _worker.dispose();
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
+      decoration:  BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/images/top_background.png'),
+          image: AssetImage(_backgroundImage),
           fit: BoxFit.cover,
           alignment: Alignment.topCenter,
         ),
@@ -195,7 +269,7 @@ class _HomeTopBarState extends State<HomeTopBar> with TickerProviderStateMixin {
               ),
               const SizedBox(height: 20),
               Text(
-                "Good Morning",
+                _greetingText,
                 style: GoogleFonts.lora(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

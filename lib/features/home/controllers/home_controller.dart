@@ -152,6 +152,7 @@ class HomeController extends GetxController {
           jsonEncode(data),
         );
         print("✅ Panchang Data Parsed & Stored");
+        print("✅ Panchang Data ${data}");
       } else {
         print("⚠️ Panchang API returned failure or null");
       }

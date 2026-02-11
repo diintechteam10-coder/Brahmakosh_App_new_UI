@@ -4,13 +4,14 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../../core/theme/app_theme.dart';
+
 class LuckInFavourSection extends StatelessWidget {
   const LuckInFavourSection({super.key});
 
   @override
   Widget build(BuildContext context) {
     final HomeController homeController = Get.find<HomeController>();
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
@@ -34,8 +35,7 @@ class LuckInFavourSection extends StatelessWidget {
             // Default to '--' and empty/grey if API response is null or loading
             final luckyNumber = prediction?.luckyNumber ?? '';
             final luckyColor = prediction?.luckyColor ?? '';
-            final dayEnergy =
-                nakshatraPrediction?.mood ?? 'Moderate'; // Default
+            final dayEnergy = prediction?.prediction ?? ''; // Default
 
             return Row(
               children: [
@@ -60,21 +60,15 @@ class LuckInFavourSection extends StatelessWidget {
                     title: "Lucky Color",
                     frontImagePath: 'assets/images/YourLuckyColor_outside.png',
                     backImagePath: 'assets/images/YourLuckyColor_inside.png',
-                    backContent: Container(
-                      width: 60, // Reduced from 80
-                      height: 60, // Reduced from 80
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _parseColor(luckyColor).withOpacity(0.6),
-                        boxShadow: [
-                          BoxShadow(
-                            color: _parseColor(luckyColor).withOpacity(0.4),
-                            blurRadius: 15,
-                            spreadRadius: 3,
-                          ),
-                        ],
+                    backContent: Text(
+                      luckyColor,
+                      style: GoogleFonts.playfairDisplay(
+                        fontSize: 16, // Reduced from 64
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF6D3A0C),
                       ),
                     ),
+
                   ),
                 ),
                 const SizedBox(width: 8), // Reduced spacing
@@ -83,22 +77,164 @@ class LuckInFavourSection extends StatelessWidget {
                     title: "Day Energy",
                     frontImagePath: 'assets/images/YourDayEnergy_outside.png',
                     backImagePath: 'assets/images/YourDayEnergy_inside.png',
-                    backContent: Text(
-                      dayEnergy,
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.playfairDisplay(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF6D3A0C),
+                    backContent: Padding(
+                      padding: const EdgeInsets.only(top: 12),
+                      child: GestureDetector(
+                        onTap: () => _showReadMoreDialog(context, dayEnergy),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              child: Text(
+                                dayEnergy,
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.playfairDisplay(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFF6D3A0C),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Read more',
+                              style: GoogleFonts.lora(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF874101),
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
+
                   ),
                 ),
               ],
             );
           }),
+
+          Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children:  [
+                Icon(
+                  Icons.touch_app,
+                  color: AppTheme.textSecondary,
+                  size: 16,
+                ),
+                SizedBox(width: 6),
+                Text(
+                  "Tap to reveal",
+                  style: GoogleFonts.lora(
+                    fontSize: 14,
+                    color: AppTheme.textSecondary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+
+          ),
         ],
       ),
+    );
+  }
+  void _showReadMoreDialog(BuildContext context, String fullText) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return Dialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(22),
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(22),
+              color: const Color(0xFFFFF6E5), // warm spiritual background
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 🌟 Header
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xFFFFD89B),
+                        Color(0xFFFFC67A),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(22),
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Today’s Energy',
+                      style: GoogleFonts.playfairDisplay(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF6D3A0C),
+                      ),
+                    ),
+                  ),
+                ),
+
+                // 📜 Content
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: SingleChildScrollView(
+                    child: Text(
+                      fullText,
+                      style: GoogleFonts.lora(
+                        fontSize: 14,
+                        color: const Color(0xFF596072),
+                        height: 1.5,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const Divider(height: 1),
+
+                // 🔘 Action
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        'Close',
+                        style: GoogleFonts.lora(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF6D3A0C),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -150,15 +286,15 @@ class LuckInFavourSection extends StatelessWidget {
           back: _buildBackCard(frontImagePath, backImagePath, backContent),
         ),
         const SizedBox(height: 8),
-        Text(
-          title,
-          textAlign: TextAlign.center,
-          style: GoogleFonts.lora(
-            fontSize: 12, // Reduced font size
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFF6D3A0C),
-          ),
-        ),
+        // Text(
+        //   title,
+        //   textAlign: TextAlign.center,
+        //   style: GoogleFonts.lora(
+        //     fontSize: 12, // Reduced font size
+        //     fontWeight: FontWeight.bold,
+        //     color: const Color(0xFF6D3A0C),
+        //   ),
+        // ),
       ],
     );
   }
@@ -179,7 +315,11 @@ class LuckInFavourSection extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
-        child: _buildAssetImage(imagePath, height: 180, width: double.infinity),
+        child: _buildAssetImage(
+          imagePath,
+          height: 180,
+          width: double.infinity,
+        ),
       ),
     );
   }

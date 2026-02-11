@@ -7,6 +7,8 @@ import '../data/models/verse_model.dart';
 import '../bloc/verse/gita_verse_bloc.dart';
 import '../bloc/verse/gita_verse_event.dart';
 import '../bloc/verse/gita_verse_state.dart';
+import '../widgets/decorative_divider.dart';
+import '../widgets/header.dart';
 import 'gita_shloka_detail_screen.dart';
 
 class GitaVerseListScreen extends StatelessWidget {
@@ -34,24 +36,23 @@ class _GitaVerseListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFF5E6),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
+
       extendBodyBehindAppBar: true,
       body: SafeArea(
         bottom: false,
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: _buildHeaderCard(context),
+            GitaHeader(
+              title:  chapter.name ?? '',
+              subtitle:  'Chapters ${chapter.chapterNumber}  ${chapter.shlokaCount} Verses',
+              backgroundImage: '',
+
+              onBack: () => Navigator.pop(context), onMenu: () {  },
             ),
-            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: DecorativeDivider(),
+            ),
             Expanded(
               child: BlocBuilder<GitaVerseBloc, GitaVerseState>(
                 builder: (context, state) {
@@ -81,65 +82,6 @@ class _GitaVerseListView extends StatelessWidget {
     );
   }
 
-  Widget _buildHeaderCard(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        image: const DecorationImage(
-          image: AssetImage('assets/images/header_bg.png'), // Reuse image
-          fit: BoxFit.cover,
-          opacity: 0.2, // Subtle bg
-        ),
-        color: const Color(0xFFFFF0D6),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.orange.withOpacity(0.2)),
-      ),
-      child: Column(
-        children: [
-          Text(
-            chapter.name ?? '',
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF8B4513),
-              fontFamily: 'Serif',
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Chapters ${chapter.chapterNumber}',
-            style: TextStyle(
-              fontSize: 16,
-              color: Color(0xFF8B4513).withOpacity(0.8),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 12),
-          const Divider(thickness: 0.5, color: Colors.grey),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Total - ${chapter.shlokaCount} Verses',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const Text(
-                '10 mins read', // Placeholder
-                style: TextStyle(color: Colors.black54),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildVerseCard(
     BuildContext context,
     dynamic verse,
@@ -164,7 +106,7 @@ class _GitaVerseListView extends StatelessWidget {
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -194,20 +136,27 @@ class _GitaVerseListView extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-            Text(
-              verse.sanskritShloka ?? '',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF5D4037),
-                height: 1.6,
-              ),
-              textAlign: TextAlign.center,
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  verse.sanskritShloka ?? '',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF5D4037),
+                    height: 1.6,
+                  ),
+                  textAlign: TextAlign.left,
+                ),
+                Icon(Icons.arrow_forward_ios,
+                    color: Color(0xFF8B4513), size: 20),
+              ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             const Divider(thickness: 0.5),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -219,24 +168,24 @@ class _GitaVerseListView extends StatelessWidget {
                     fontStyle: FontStyle.italic,
                   ),
                 ),
-                Row(
-                  children: const [
-                    Text(
-                      'View Details',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF8B4513),
-                      ),
-                    ),
-                    SizedBox(width: 4),
-                    Icon(
-                      Icons.arrow_forward,
-                      size: 14,
-                      color: Color(0xFF8B4513),
-                    ),
-                  ],
-                ),
+                // Row(
+                //   children: const [
+                //     Text(
+                //       'View Details',
+                //       style: TextStyle(
+                //         fontSize: 12,
+                //         fontWeight: FontWeight.bold,
+                //         color: Color(0xFF8B4513),
+                //       ),
+                //     ),
+                //     SizedBox(width: 4),
+                //     Icon(
+                //       Icons.arrow_forward,
+                //       size: 14,
+                //       color: Color(0xFF8B4513),
+                //     ),
+                //   ],
+                // ),
               ],
             ),
           ],

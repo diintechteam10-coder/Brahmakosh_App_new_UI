@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
+import '../../ai_rashmi/ai_rashmi_chat.dart';
 import '../data/repositories/gita_repository.dart';
 import '../bloc/chapter/gita_chapter_bloc.dart';
 import '../bloc/chapter/gita_chapter_event.dart';
@@ -55,98 +56,108 @@ class _GitaChapterView extends StatelessWidget {
                 },
               ),
             ),
+
           ],
         ),
+
       ),
+
     );
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Stack(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Background Image (Top section)
-        Container(
-          height: 250,
-          width: double.infinity,
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/images/geeta_background.png'),
-              fit: BoxFit.cover,
-            ),
-          ),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.transparent,
-                  const Color(0xFFFFF5E6).withOpacity(0.8),
-                  const Color(0xFFFFF5E6),
-                ],
+        // Top Image
+        Stack(
+          children: [
+            Container(
+              height: 220,
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/geeta_background.png'),
+                  fit: BoxFit.cover,
+                ),
+                borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20)
+                )
               ),
             ),
-          ),
-        ),
-
-        Positioned(
-          top: 10,
-          left: 10,
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black87),
-            onPressed: () => Navigator.pop(context),
-          ),
+            Positioned(
+              top: 12,
+              left: 12,
+              child: _roundIcon(Icons.arrow_back_ios_new_outlined, () => Navigator.pop(context)),
+            ),
+            Positioned(
+              top: 12,
+              right: 12,
+              child: _roundIcon(Icons.menu, () {}),
+            ),
+          ],
         ),
 
         Padding(
-          padding: const EdgeInsets.fromLTRB(20, 160, 20, 0),
-          child: Column(
+          padding: const EdgeInsets.only(left: 16, bottom: 16, top: 16),
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
+             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Bhagavad Gita',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF8B4513), // Brownish text
-                  fontFamily: 'Serif', // Or project font
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Bhagavad Gita',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF8B4513),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    '18 Chapters',
+                    style: TextStyle(fontSize: 14, color: Color(0xFF8B4513),fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
-              const SizedBox(height: 4),
-              const Text(
-                '18 Chapters',
-                style: TextStyle(fontSize: 16, color: Color(0xFF8B4513)),
-              ),
-              const SizedBox(height: 20),
-              // "Continue Reading" Button (Static or Dynamic)
+              // Continue Card
               Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 14),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: Colors.orange,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.orange.withOpacity(0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  color: const Color(0xFFFF9F2D),
+                    borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(20),
+                        topLeft: Radius.circular(20)
+                    )
                 ),
-                child: Column(
+                child: Row(
                   children: const [
-                    Text(
-                      'Continue Reading Chapter 1',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Continue',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          'Last read: Ch.01 Verse 1.3',
+                          style: TextStyle(
+                              color: Color(0xFF8B4513),
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ],
                     ),
-                    Text(
-                      'Last read: Verse 1.3',
-                      style: TextStyle(color: Colors.white70, fontSize: 12),
-                    ),
+                    // Icon(Icons.arrow_forward_ios,
+                    //     color: Colors.white, size: 14),
                   ],
                 ),
               ),
@@ -157,114 +168,127 @@ class _GitaChapterView extends StatelessWidget {
     );
   }
 
+  Widget _roundIcon(IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 36,
+        width: 36,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.9),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, size: 18),
+      ),
+    );
+  }
+
   Widget _buildChapterCard(BuildContext context, dynamic chapter, int index) {
     return GestureDetector(
       onTap: () {
         Get.to(() => GitaVerseListScreen(chapter: chapter));
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 14),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Chapter Number Box
+            // Index
             Container(
-              width: 50,
-              height: 50,
+              width: 42,
+              height: 42,
               decoration: BoxDecoration(
-                color: const Color(0xFFFFF5E6),
+                color: const Color(0xFFFFF1DE),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
                 child: Text(
                   index.toString().padLeft(2, '0'),
                   style: const TextStyle(
-                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF8B4513),
                   ),
                 ),
               ),
             ),
-            const SizedBox(width: 16),
-            // Title and Subtitle
+
+            const SizedBox(width: 14),
+
+            // Content
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          chapter.name ?? '',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF5D4037),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.orange,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Text(
-                          'Read',
-                          style: TextStyle(color: Colors.white, fontSize: 10),
-                        ),
-                      ),
-                    ],
+                  Text(
+                    chapter.name ?? '',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF5D4037),
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     '${chapter.shlokaCount ?? 0} Verses',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                   const SizedBox(height: 8),
-                  // Progress Bar (Fake for now as per design)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: LinearProgressIndicator(
-                      value: 0.0, // TODO: Intergate progress
-                      backgroundColor: Colors.grey.shade200,
-                      valueColor: const AlwaysStoppedAnimation<Color>(
-                        Colors.orange,
+
+                  // Progress
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: 3 / (chapter.shlokaCount ?? 1),
+                            minHeight: 4,
+                            backgroundColor: Colors.grey.shade200,
+                            valueColor: const AlwaysStoppedAnimation(
+                              Color(0xFFFF9F2D),
+                            ),
+                          ),
+                        ),
                       ),
-                      minHeight: 4,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      '0%',
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: Colors.grey.shade500,
+                      const SizedBox(width: 8),
+                      Text(
+                        '3/${chapter.shlokaCount ?? 0}',
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey,
+                        ),
                       ),
-                    ),
+
+                    ],
                   ),
+
+
+                  // Align(
+                  //   alignment: Alignment.centerRight,
+                  //   child: Text(
+                  //     '3/${chapter.shlokaCount ?? 0}',
+                  //     style: const TextStyle(
+                  //       fontSize: 10,
+                  //       color: Colors.grey,
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),
+            const SizedBox(width: 14),
+        Icon(Icons.arrow_forward_ios,
+            color: Color(0xFF8B4513), size: 14),
           ],
         ),
       ),

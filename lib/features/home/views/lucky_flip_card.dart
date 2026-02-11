@@ -162,7 +162,7 @@ class LuckyFlipCard extends StatelessWidget {
           const SizedBox(height: 6),
           Flexible(
             child: Text(
-              title,
+               title,
               style: GoogleFonts.cinzel(
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
