@@ -1,7 +1,7 @@
 import 'package:brahmakosh/common/api_services.dart';
 import 'package:brahmakosh/common/utils.dart';
 import 'package:brahmakosh/core/services/storage_service.dart';
-import 'package:brahmakosh/features/numerology/models/numerology_history_model.dart';
+import 'package:brahmakosh/features/numerology/models/numerology_detail_model.dart';
 import 'package:brahmakosh/core/constants/app_constants.dart';
 
 import 'package:get/get.dart';
@@ -9,15 +9,15 @@ import 'package:get/get.dart';
 class NumerologyController extends GetxController
     with GetSingleTickerProviderStateMixin {
   var isLoading = false.obs;
-  var numerologyHistory = <NumerologyHistoryItem>[].obs;
+  var userNumerology = Rxn<NumerologyDetailData>();
 
   @override
   void onInit() {
     super.onInit();
-    fetchNumerologyHistory();
+    fetchNumerologyDetail();
   }
 
-  void fetchNumerologyHistory() async {
+  void fetchNumerologyDetail() async {
     isLoading.value = true;
     try {
       String? userId = StorageService.getString(AppConstants.keyUserId);
@@ -27,7 +27,7 @@ class NumerologyController extends GetxController
         return;
       }
 
-      NumerologyHistoryResponse? response = await getNumerologyHistory(
+      NumerologyDetailResponse? response = await getNumerologyDetail(
         this,
         userId,
       );
@@ -35,14 +35,12 @@ class NumerologyController extends GetxController
       if (response != null &&
           response.success == true &&
           response.data != null) {
-        if (response.data!.history != null) {
-          numerologyHistory.assignAll(response.data!.history!);
-        }
+        userNumerology.value = response.data;
       } else {
-        Utils.showToast("Failed to fetch numerology history");
+        Utils.showToast("Failed to fetch numerology details");
       }
     } catch (e) {
-      Utils.print("Error in fetchNumerologyHistory: $e");
+      Utils.print("Error in fetchNumerologyDetail: $e");
       Utils.showToast("Something went wrong");
     } finally {
       isLoading.value = false;

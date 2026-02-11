@@ -24,6 +24,7 @@ import 'package:brahmakosh/features/check_in/models/spiritual_configuration_mode
 import 'package:brahmakosh/features/check_in/models/spiritual_clip_model.dart';
 import 'package:brahmakosh/common/models/user_complete_details_model.dart';
 import 'package:brahmakosh/features/numerology/models/numerology_history_model.dart';
+import 'package:brahmakosh/features/numerology/models/numerology_detail_model.dart';
 
 const bool allowInsecureDevFallback = false;
 
@@ -1022,6 +1023,35 @@ Future<NumerologyHistoryResponse?> getNumerologyHistory(
     },
     onError: (error) {
       Utils.print("❌ NUMEROLOGY HISTORY API ERROR: $error");
+    },
+    showLoader: false,
+    shouldLogoutOn401: false,
+  );
+  return responseModel;
+}
+
+Future<NumerologyDetailResponse?> getNumerologyDetail(
+  TickerProvider? tickerProvider,
+  String userId,
+) async {
+  NumerologyDetailResponse? responseModel;
+  final token = StorageService.getString(AppConstants.keyAuthToken) ?? "";
+  final url = "${ApiUrls.numerologyDetail}/$userId/numerology";
+
+  Utils.print("🔮 NUMEROLOGY DETAIL API REQUEST URL: $url");
+
+  await callWebApiGet(
+    tickerProvider,
+    url,
+    token: token,
+    onResponse: (response) {
+      Utils.print("✅ NUMEROLOGY DETAIL API RESPONSE: ${response.body}");
+      responseModel = NumerologyDetailResponse.fromJson(
+        jsonDecode(response.body),
+      );
+    },
+    onError: (error) {
+      Utils.print("❌ NUMEROLOGY DETAIL API ERROR: $error");
     },
     showLoader: false,
     shouldLogoutOn401: false,

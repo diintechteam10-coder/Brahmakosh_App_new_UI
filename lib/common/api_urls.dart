@@ -48,6 +48,7 @@ class ApiUrls {
   static const String panchang = '$baseUrl/api/client/users';
   static const String completeUserDetails = '$baseUrl/api/client/users';
   static const String numerologyHistory = '$baseUrl/api/client/users';
+  static const String numerologyDetail = '$baseUrl/api/client/users';
 
   /// 🔹 Gita APIs
   static const String gitaChapters = '$baseUrl/api/chapters';
