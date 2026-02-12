@@ -2,8 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:uuid/uuid.dart'; // For generating unique IDs
-import '../../../common/gemini_service.dart';
 import '../../../common/api_services.dart';
 import '../../../common/api_urls.dart';
 import '../../../common/models/astrologist_model.dart';
@@ -11,12 +9,11 @@ import '../../../common/utils.dart';
 import '../../../common_imports.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/services/storage_service.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../astrology/models/chat_session_model.dart'; // Import ChatSession model
+import '../../astrology/models/chat_models.dart';
+import '../../../core/services/socket_service.dart';
 
 extension StringExtension on String {
   String capitalizeFirstLetter() {
-    // ← changed name
     if (isEmpty) return this;
     return this[0].toUpperCase() + substring(1).toLowerCase();
   }
@@ -26,274 +23,323 @@ enum Topic { career, relationship, finance, health }
 
 class AstrologyChatController extends GetxController {
   final Astrologist expert;
+  final SocketService _socketService = SocketService();
 
   AstrologyChatController({required this.expert});
 
   final TextEditingController messageController = TextEditingController();
   final ScrollController scrollController = ScrollController();
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-  final GlobalKey<ScaffoldState> scaffoldKey =
-      GlobalKey<ScaffoldState>(); // Added Scaffold key
-  final messages = <Map<String, dynamic>>[].obs;
+  final messages = <ChatMessage>[].obs;
+  // Use a Set for O(1) lookups and to track processed IDs across async gaps
+  final _processedMessageIds = <String>{};
+
   final showSuggestions = true.obs;
   final selectedTopic = Rxn<Topic>();
+  // ...
+  void _onNewMessage(dynamic data) {
+    try {
+      Utils.print("📥 [${hashCode}] Raw Message Data: $data");
+      final messageData = data['message'];
+      if (messageData != null) {
+        final message = ChatMessage.fromJson(messageData);
 
-  // New: Chat history management
-  final chatSessions = <ChatSession>[].obs;
-  String? currentChatId; // To keep track of the current chat session
-  final Uuid uuid = const Uuid();
+        // Check if this message is from us (the user)
+        bool isFromMe = message.senderId != expert.id;
 
+        if (isFromMe) {
+          // Find if we have a temporary message with same content
+          final tempIndex = messages.indexWhere(
+            (m) =>
+                m.messageId.startsWith('temp_') &&
+                m.content.trim() == message.content.trim(),
+          );
+
+          if (tempIndex != -1) {
+            messages[tempIndex] = message;
+            _processedMessageIds.add(message.messageId); // Add real ID
+            Utils.print(
+              "✅ [${hashCode}] Replaced temp message with real ID: ${message.messageId}",
+            );
+            messages.refresh();
+            return;
+          }
+        }
+
+        // Robust duplicate check
+        if (_processedMessageIds.contains(message.messageId) ||
+            messages.any((m) => m.messageId == message.messageId)) {
+          Utils.print(
+            "⚠️ [${hashCode}] Ignored duplicate message: ${message.messageId}",
+          );
+          return;
+        }
+
+        messages.add(message);
+        _processedMessageIds.add(message.messageId);
+        _scrollToBottom();
+
+        // Mark as read if from partner
+        if (!isFromMe) {
+          markMessagesAsRead();
+        }
+      }
+    } catch (e) {
+      Utils.print("❌ Error parsing incoming message: $e");
+    }
+  }
+
+  // ...
+  Future<void> _fetchMessages() async {
+    if (_conversationId == null) return;
+    isLoadingMessages.value = true;
+    try {
+      final token = StorageService.getString(AppConstants.keyAuthToken) ?? "";
+      final url = "${ApiUrls.getChatMessages}/${_conversationId!}/messages";
+
+      await callWebApiGet(
+        null,
+        url,
+        token: token,
+        showLoader: false,
+        onResponse: (response) {
+          final data = jsonDecode(response.body);
+          if (data['success'] == true && data['data'] != null) {
+            final List<dynamic> msgList = data['data']['messages'];
+            final loadedMessages = msgList
+                .map((m) => ChatMessage.fromJson(m))
+                .toList();
+
+            messages.assignAll(loadedMessages);
+
+            // Rebuild the Set from source of truth
+            _processedMessageIds.clear();
+            _processedMessageIds.addAll(loadedMessages.map((m) => m.messageId));
+
+            // Sort by date if backend doesn't guarantee order
+            messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+            _scrollToBottom();
+
+            // Mark conversation as read on open
+            markMessagesAsRead();
+          }
+        },
+        onError: (e) => Utils.print("❌ Error fetching messages: $e"),
+      );
+    } catch (e) {
+      Utils.print("❌ Exception fetching messages: $e");
+    } finally {
+      isLoadingMessages.value = false;
+    }
+  }
+
+  final isLoadingMessages = false.obs;
+  final isTyping = false.obs;
+
+  String? _conversationId;
   Timer? _timer;
   final secondsRemaining = 300.obs;
-
-  // Birth details from profile
-  String? _name;
-  String? _dob;
-  String? _timeOfBirth;
-  String? _placeOfBirth;
-  String? _gowthra;
+  final onlineStatus = "OFFLINE".obs;
 
   @override
   void onInit() {
     super.onInit();
-    _startTimer();
-    _fetchUserProfile();
-    _loadChatSessions(); // Load existing chat sessions
+    Utils.print("🟢 [${hashCode}] Controller Init for ${expert.name}");
+    final token = StorageService.getString(AppConstants.keyAuthToken);
+    Utils.print("🔥 DEBUG: Partner Token: $token");
+    Utils.print("🔥 DEBUG: Partner ID: ${expert.id}");
+    // Initialize with expert's status if available, or default
+    onlineStatus.value = expert.isOnline ? "ONLINE" : "OFFLINE";
+    _initializeChat();
   }
 
-  Future<void> _fetchUserProfile() async {
+  Future<void> _initializeChat() async {
+    await _createConversation();
+    if (_conversationId != null) {
+      await _connectSocket();
+      _fetchMessages();
+      _startTimer();
+    } else {
+      Get.snackbar(
+        "Error",
+        "Could not start chat session",
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  Future<void> _createConversation() async {
     try {
       final token = StorageService.getString(AppConstants.keyAuthToken);
-      if (token == null || token.isEmpty) {
-        Utils.print('No auth token found for profile fetch');
-        return;
-      }
+      if (token == null) return;
 
-      await callWebApiGet(
-        null,
-        ApiUrls.getProfile,
+      final body = {
+        "partnerId": expert.id,
+        // Add birth details if needed
+      };
+
+      await callWebApi(
+        null, // No ticker provider needed for silent background call usually, or pass if needed
+        ApiUrls.createConversation,
+        body,
         token: token,
-        showLoader: false,
-        hideLoader: false,
+        showLoader: true,
         onResponse: (response) {
-          try {
-            final responseBody = json.decode(response.body);
-            if (responseBody['success'] == true &&
-                responseBody['data'] != null) {
-              final userData = responseBody['data']['user'];
-              final profile = userData['profile'];
-
-              if (profile != null) {
-                _name = profile['name'];
-                _dob = profile['dob'];
-                _timeOfBirth = profile['timeOfBirth'];
-                _placeOfBirth = profile['placeOfBirth'];
-                _gowthra = profile['gowthra'];
-
-                Utils.print(
-                  '✅ Birth details loaded: Name=$_name, DOB=$_dob, Time=$_timeOfBirth, Place=$_placeOfBirth, Gowthra=$_gowthra',
-                );
-              }
-            }
-          } catch (e) {
-            Utils.print('❌ Error parsing profile: $e');
+          final data = jsonDecode(response.body);
+          if (data['success'] == true) {
+            _conversationId = data['data']['conversationId'];
+            Utils.print("✅ Conversation Created: $_conversationId");
+          } else {
+            Utils.print("❌ Failed to create conversation: ${data['message']}");
           }
         },
-        onError: (error) {
-          Utils.print('❌ Profile fetch error: $error');
-        },
+        onError: (error) => Utils.print("❌ API Error: $error"),
       );
     } catch (e) {
-      Utils.print('❌ Exception fetching profile: $e');
+      Utils.print("❌ Exception creating conversation: $e");
     }
   }
 
-  void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (secondsRemaining.value > 0) {
-        secondsRemaining.value--;
-      } else {
-        timer.cancel();
-        showEndChatDialog("Time Over", "Your consultation session has ended.");
+  Future<void> _connectSocket() async {
+    await _socketService.initSocket();
+
+    // Join conversation room
+    if (_conversationId != null) {
+      _socketService.joinConversation(_conversationId!);
+    }
+
+    // Register listeners
+    // Safety check: remove old ones first
+    _socketService.offNewMessage(_onNewMessage);
+    _socketService.offTypingStatus(_onTypingStatus);
+    _socketService.offPartnerStatusChanged(_onPartnerStatusChanged);
+    _socketService.offMessageDelivered(_onMessageDelivered);
+    _socketService.offMessageRead(_onMessageRead);
+
+    _socketService.onNewMessage(_onNewMessage);
+    _socketService.onTypingStatus(_onTypingStatus);
+    _socketService.onPartnerStatusChanged(_onPartnerStatusChanged);
+    _socketService.onMessageDelivered(_onMessageDelivered);
+    _socketService.onMessageRead(_onMessageRead);
+  }
+
+  void _onTypingStatus(dynamic data) {
+    try {
+      Utils.print("Typing Event: $data");
+      final isPeerTyping = data['isTyping'] ?? false;
+      final userId = data['userId'];
+      if (userId == expert.id) {
+        isTyping.value = isPeerTyping;
       }
-    });
-  }
-
-  // New: Generate a concise topic for the chat
-  String _generateChatTopic(String firstMessage) {
-    if (selectedTopic.value != null) {
-      return "${selectedTopic.value!.toString().split('.').last.capitalizeFirstLetter()} Chat";
-    } else {
-      final words = firstMessage.split(' ');
-      return words.take(3).join(' ').capitalizeFirstLetter();
+    } catch (e) {
+      Utils.print("Error parsing typing status: $e");
     }
   }
 
-  // New: Save the current chat session
-  void _saveCurrentChatSession() {
-    if (messages.isEmpty) return; // Only save if there are messages
-
-    final topic = _generateChatTopic(messages.first['text']);
-
-    if (currentChatId == null) {
-      // New chat session
-      currentChatId = uuid.v4();
-      final newSession = ChatSession(
-        id: currentChatId!,
-        expertId: expert.id,
-        topic: topic,
-        messages: List<Map<String, dynamic>>.from(
-          messages,
-        ), // Deep copy messages
-        timestamp: DateTime.now(),
-      );
-      chatSessions.add(newSession);
-    } else {
-      // Update existing chat session
-      final existingIndex = chatSessions.indexWhere(
-        (session) => session.id == currentChatId,
-      );
-      if (existingIndex != -1) {
-        chatSessions[existingIndex] = ChatSession(
-          id: currentChatId!,
-          expertId: expert.id,
-          topic: topic, // Topic might change if user asks different questions
-          messages: List<Map<String, dynamic>>.from(
-            messages,
-          ), // Update messages
-          timestamp: DateTime.now(), // Update timestamp
-        );
+  void _onPartnerStatusChanged(dynamic data) {
+    try {
+      Utils.print("Partner Status Event: $data");
+      final partnerId = data['partnerId'];
+      final status = data['status'];
+      if (partnerId == expert.id && status != null) {
+        onlineStatus.value = status.toString().toUpperCase();
       }
+    } catch (e) {
+      Utils.print("Error parsing partner status: $e");
     }
-    // For persistence, you would save chatSessions to local storage here.
-    // Example: StorageService.setString('chat_sessions_${expert.id}', json.encode(chatSessions.toJson()));
   }
 
-  // New: Load a previous chat session
-  void loadChatSession(ChatSession session) {
-    currentChatId = session.id;
-    messages.assignAll(
-      session.messages,
-    ); // Load messages from the selected session
-    selectedTopic.value = null; // Reset selected topic when loading a past chat
-    showSuggestions.value = false;
-    _scrollToBottom();
-    Get.back(); // Close the drawer
+  void _onMessageDelivered(dynamic data) {
+    try {
+      Utils.print("Message Delivered Event: $data");
+      final messageId = data['messageId'];
+      final conversationId = data['conversationId'];
+
+      if (messageId != null) {
+        final index = messages.indexWhere((m) => m.messageId == messageId);
+        if (index != -1) {
+          messages[index] = messages[index].copyWith(isDelivered: true);
+          messages.refresh();
+        }
+      } else if (conversationId == _conversationId) {
+        bool changed = false;
+        for (int i = 0; i < messages.length; i++) {
+          if (isMessageFromMe(messages[i]) && !messages[i].isDelivered) {
+            messages[i] = messages[i].copyWith(isDelivered: true);
+            changed = true;
+          }
+        }
+        if (changed) messages.refresh();
+      }
+    } catch (e) {
+      Utils.print("Error parsing delivery status: $e");
+    }
   }
 
-  // New: Placeholder for loading chat sessions from storage
-  void _loadChatSessions() {
-    // In a real app, you would load these from persistent storage.
-    // For now, let's mock some past sessions.
-    // Example:
-    // final storedSessionsJson = StorageService.getString('chat_sessions_${expert.id}');
-    // if (storedSessionsJson != null) {
-    //   final List<dynamic> decoded = json.decode(storedSessionsJson);
-    //   chatSessions.assignAll(decoded.map((json) => ChatSession.fromJson(json)).toList());
-    // }
+  void _onMessageRead(dynamic data) {
+    try {
+      Utils.print("Message Read Event: $data");
+      final messageId = data['messageId'];
+      final conversationId = data['conversationId'];
 
-    // Mock data for demonstration
-    chatSessions.assignAll([
-      ChatSession(
-        id: uuid.v4(),
-        expertId: expert.id,
-        topic: 'Career Forecast',
-        messages: [
-          {
-            "text": "Hello, I need a career forecast.",
-            "isUser": true,
-            "time": DateTime.now().subtract(const Duration(days: 2)),
-          },
-          {
-            "text":
-                "Certainly! Please provide your birth details for an accurate reading.",
-            "isUser": false,
-            "time": DateTime.now().subtract(const Duration(days: 2)),
-          },
-        ],
-        timestamp: DateTime.now().subtract(const Duration(days: 2)),
-      ),
-      ChatSession(
-        id: uuid.v4(),
-        expertId: expert.id,
-        topic: 'Relationship Advice',
-        messages: [
-          {
-            "text": "My relationship is facing some challenges.",
-            "isUser": true,
-            "time": DateTime.now().subtract(const Duration(hours: 10)),
-          },
-          {
-            "text":
-                "I understand. Let's explore the planetary influences on your relationship.",
-            "isUser": false,
-            "time": DateTime.now().subtract(const Duration(hours: 10)),
-          },
-        ],
-        timestamp: DateTime.now().subtract(const Duration(hours: 10)),
-      ),
-    ]);
+      bool changed = false;
+
+      if (messageId != null) {
+        final index = messages.indexWhere((m) => m.messageId == messageId);
+        if (index != -1) {
+          messages[index] = messages[index].copyWith(
+            isRead: true,
+            isDelivered: true,
+          );
+          changed = true;
+        }
+      } else if (conversationId == _conversationId) {
+        for (int i = 0; i < messages.length; i++) {
+          if (isMessageFromMe(messages[i]) && !messages[i].isRead) {
+            messages[i] = messages[i].copyWith(isRead: true, isDelivered: true);
+            changed = true;
+          }
+        }
+      }
+
+      if (changed) {
+        messages.refresh();
+      }
+    } catch (e) {
+      Utils.print("Error parsing read status: $e");
+    }
   }
 
-  // 🔥 MAIN SEND MESSAGE (NOW GEMINI)
   Future<void> sendMessage() async {
     final text = messageController.text.trim();
-    if (text.isEmpty) return;
+    if (text.isEmpty || _conversationId == null) return;
 
-    // If this is the first message in a new session, save it.
-    if (currentChatId == null || messages.isEmpty) {
-      messages.add({"text": text, "isUser": true, "time": DateTime.now()});
-      _saveCurrentChatSession(); // Save new session
-    } else {
-      // For existing sessions, just add the message.
-      messages.add({"text": text, "isUser": true, "time": DateTime.now()});
-      _saveCurrentChatSession(); // Update session with new message
-    }
+    // Emit via socket
+    _socketService.sendMessage(_conversationId!, text);
+
+    // Optimistic UI Update
+    final tempMsg = ChatMessage(
+      messageId: "temp_${DateTime.now().millisecondsSinceEpoch}",
+      senderId: "user_me", // Placeholder, logic in view handles alignment
+      content: text,
+      messageType: 'text',
+      createdAt: DateTime.now(),
+      isRead: false,
+    );
+    messages.add(tempMsg);
 
     messageController.clear();
     showSuggestions.value = false;
     _scrollToBottom();
+  }
 
-    // typing indicator
-    messages.add({
-      "text": "Typing...",
-      "isUser": false,
-      "time": DateTime.now(),
-      "loading": true,
-    });
-
-    _scrollToBottom();
-
-    try {
-      final reply = await GeminiService.askAstrologer(
-        userMessage: text,
-        name: _name,
-        dob: _dob,
-        timeOfBirth: _timeOfBirth,
-        placeOfBirth: _placeOfBirth,
-        gowthra: _gowthra,
-      );
-
-      messages.removeLast(); // remove typing
-      messages.add({
-        "text": reply.trim(),
-        "isUser": false,
-        "time": DateTime.now(),
-      });
-    } catch (e) {
-      // Remove typing indicator and show error message
-      messages.removeLast();
-      messages.add({
-        "text":
-            "Some planetary energies are unclear right now. Please try again shortly.",
-        "isUser": false,
-        "time": DateTime.now(),
-      });
-    }
-
-    _scrollToBottom();
-    // After receiving a reply, update the current chat session
-    _saveCurrentChatSession();
+  // Helper to determine if message is from current user
+  bool isMessageFromMe(ChatMessage msg) {
+    // If msg.senderId is equal to expert.id, it's incoming.
+    // Otherwise it's outgoing (assuming only 2 participants).
+    return msg.senderId != expert.id;
   }
 
   void selectTopic(Topic topic) {
@@ -303,7 +349,6 @@ class AstrologyChatController extends GetxController {
   void selectQuestion(String question) {
     messageController.text = question;
     sendMessage();
-    // selectedTopic.value = null; // Removed this line to keep the topic selected
   }
 
   void goBackToTopics() {
@@ -341,15 +386,18 @@ class AstrologyChatController extends GetxController {
   }
 
   void _scrollToBottom() {
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (scrollController.hasClients) {
-        scrollController.animateTo(
-          scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
-    });
+    if (scrollController.hasClients) {
+      // Small delay to allow list build
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (scrollController.hasClients) {
+          scrollController.animateTo(
+            scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    }
   }
 
   void showEndChatDialog(String title, String message) {
@@ -363,7 +411,6 @@ class AstrologyChatController extends GetxController {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Icon
               Stack(
                 alignment: Alignment.center,
                 children: [
@@ -371,14 +418,12 @@ class AstrologyChatController extends GetxController {
                     width: 60,
                     height: 60,
                     decoration: BoxDecoration(
-                      color: const Color(
-                        0xFFFAF3E0,
-                      ), // Light beige background for icon
+                      color: const Color(0xFFFAF3E0),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
                       Icons.chat_bubble,
-                      color: Color(0xFF8D6E63), // Brown icon
+                      color: Color(0xFF8D6E63),
                       size: 28,
                     ),
                   ),
@@ -400,8 +445,6 @@ class AstrologyChatController extends GetxController {
                 ],
               ),
               const SizedBox(height: 16),
-
-              // Title
               Text(
                 "End Conversation?",
                 style: GoogleFonts.cinzel(
@@ -412,38 +455,29 @@ class AstrologyChatController extends GetxController {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
-
-              // Subtitle
               Text(
                 "Are you sure you want to end your session with ${expert.name}?",
                 style: GoogleFonts.inter(
-                  // Keep body text clean
                   fontSize: 14,
-                  color: const Color(0xFF8D6E63), // Brown text
+                  color: const Color(0xFF8D6E63),
                   height: 1.4,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
-
-              // End Chat Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
                     Get.back();
-                    // Add actual end chat logic here (e.g., call API, navigation)
-                    Get.back(); // Navigate back to previous screen
+                    _endChat(); // Call End Chat API
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(
-                      0xFFA1887F,
-                    ), // Muted Brown/Gold
+                    backgroundColor: const Color(0xFFA1887F),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    elevation: 0,
                   ),
                   child: Text(
                     "End Chat",
@@ -456,17 +490,13 @@ class AstrologyChatController extends GetxController {
                 ),
               ),
               const SizedBox(height: 12),
-
-              // Continue Button
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
-                  onPressed: Get.back, // Close dialog
+                  onPressed: Get.back,
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    side: const BorderSide(
-                      color: Color(0xFF8D6E63),
-                    ), // Brown border
+                    side: const BorderSide(color: Color(0xFF8D6E63)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -476,7 +506,7 @@ class AstrologyChatController extends GetxController {
                     style: GoogleFonts.inter(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF8D6E63), // Brown text
+                      color: const Color(0xFF8D6E63),
                     ),
                   ),
                 ),
@@ -489,15 +519,82 @@ class AstrologyChatController extends GetxController {
     );
   }
 
+  void _endChat() {
+    if (_conversationId == null) {
+      Get.back();
+      return;
+    }
+
+    final token = StorageService.getString(AppConstants.keyAuthToken) ?? "";
+    // Use patch for end chat
+    callWebApiPatch(
+      null,
+      "${ApiUrls.endConversation}/${_conversationId!}/end",
+      {},
+      token: token,
+      onResponse: (_) {
+        Utils.print("Chat ended successfully");
+      },
+    );
+
+    _socketService.disconnect();
+    Get.back();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (secondsRemaining.value > 0) {
+        secondsRemaining.value--;
+      } else {
+        timer.cancel();
+        showEndChatDialog("Time Over", "Your consultation session has ended.");
+      }
+    });
+
+    // Also check balance via API periodically or rely on socket events?
+    // User mentioned "Stop chat when balance reaches zero" via API 11.
+    // Implementation detail: we could poll or wait for backend to cut us off.
+  }
+
   String formatTime(int seconds) {
     int minutes = seconds ~/ 60;
     int remainingSeconds = seconds % 60;
     return "$minutes:${remainingSeconds.toString().padLeft(2, '0')}";
   }
 
+  Future<void> markMessagesAsRead() async {
+    if (_conversationId == null) return;
+    try {
+      final token = StorageService.getString(AppConstants.keyAuthToken) ?? "";
+      final url = "${ApiUrls.markConversationRead}/${_conversationId!}/read";
+
+      await callWebApiPatch(
+        null,
+        url,
+        {}, // Empty body
+        token: token,
+        onResponse: (response) {
+          Utils.print("✅ Messages marked as read for $_conversationId");
+        },
+        onError: (e) => Utils.print("❌ Error marking read: $e"),
+      );
+    } catch (e) {
+      Utils.print("❌ Exception marking read: $e");
+    }
+  }
+
   @override
   void onClose() {
     _timer?.cancel();
+
+    // Unregister listeners to avoid duplication
+    _socketService.offNewMessage(_onNewMessage);
+    _socketService.offTypingStatus(_onTypingStatus);
+    _socketService.offPartnerStatusChanged(_onPartnerStatusChanged);
+    _socketService.offMessageDelivered(_onMessageDelivered);
+    _socketService.offMessageRead(_onMessageRead);
+
+    _socketService.disconnect();
     messageController.dispose();
     scrollController.dispose();
     super.onClose();

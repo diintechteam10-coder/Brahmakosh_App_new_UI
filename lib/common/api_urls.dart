@@ -5,6 +5,8 @@ class ApiUrls {
 
   /// 🔹 Common API path
   static const String apiUrl = '$baseUrl/api/mobile';
+  static const String chatApiUrl = '$baseUrl/api/chat';
+  static const String socketUrl = '$baseUrl/';
 
   /// 🔹 Auth APIs
   static const String register = '$apiUrl/user/register';
@@ -60,4 +62,16 @@ class ApiUrls {
   static const String redeemReward = '$baseUrl/api/reward-redemptions/redeem';
   static const String redemptionHistory =
       '$baseUrl/api/reward-redemptions/history';
+
+  /// 🔹 Chat & Socket APIs
+  static const String chatPartners = '$chatApiUrl/partners';
+  static const String createConversation = '$chatApiUrl/conversations';
+  static const String getConversations = '$chatApiUrl/conversations';
+  static const String getChatMessages =
+      '$chatApiUrl/conversations'; // /{conversationId}/messages
+  static const String endConversation =
+      '$chatApiUrl/conversations'; // /{conversationId}/end
+  static const String userCreditBalance = '$chatApiUrl/credits/balance/user';
+  static const String markConversationRead =
+      '$chatApiUrl/conversations'; // /{conversationId}/read
 }
