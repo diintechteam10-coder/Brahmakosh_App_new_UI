@@ -315,6 +315,85 @@ Future<dynamic> callWebApiPut(
   }
 }
 
+Future<dynamic> callWebApiPatch(
+  TickerProvider? tickerProvider,
+  String url,
+  Map data, {
+  required Function onResponse,
+  Function? onError,
+  String token = "",
+  bool showLoader = true,
+  bool hideLoader = true,
+  String authPrefix = "Bearer",
+  bool shouldLogoutOn401 = true,
+}) async {
+  if (showLoader && tickerProvider != null)
+    Utils.showLoaderDialogNew(tickerProvider);
+  try {
+    Utils.print('request url: ' + url);
+    Utils.print('request data: ' + json.encode(data).toString());
+
+    Map<String, String> headers = <String, String>{
+      'Content-Type': 'application/json',
+      'clientId': AppConstants.clientId,
+    };
+    headers.addIf(token.isNotEmpty, "Authorization", "$authPrefix $token");
+    Utils.print('headers: ' + json.encode(headers));
+
+    final http.Response response = await http
+        .patch(Uri.parse(url), headers: headers, body: json.encode(data))
+        .timeout(const Duration(seconds: 30));
+
+    return await _returnResponse(
+      response,
+      onResponse,
+      onError,
+      hideLoader,
+      shouldLogoutOn401,
+    );
+  } on SocketException catch (e) {
+    Utils.print('SocketException: ${e.toString()}');
+    if (onError != null) {
+      onError(e);
+    }
+    Utils.showToast('No Internet Connection');
+    if (hideLoader) Utils.hideLoader();
+    return;
+  } on TimeoutException catch (e) {
+    Utils.print('TimeoutException: ${e.toString()}');
+    if (onError != null) {
+      onError(e);
+    }
+    Utils.showToast('Server is taking too long to respond. Please try again.');
+    if (hideLoader) Utils.hideLoader();
+    return;
+  } on http.ClientException catch (e) {
+    Utils.print('ClientException: ${e.toString()}');
+    if (onError != null) {
+      onError(e);
+    }
+    if (e.message.contains('Failed host lookup') ||
+        e.message.contains('No address associated')) {
+      Utils.showToast('No Internet Connection');
+    } else {
+      Utils.showToast('Connection Error: ${e.message}');
+    }
+    if (hideLoader) Utils.hideLoader();
+    return;
+  } catch (e) {
+    if (onError != null) {
+      onError(e);
+    }
+    if (e is! UnauthorisedException) {
+      Utils.print('Error: ${e.toString()}');
+      Utils.showToast(
+        'We are facing some technical issues. Please try again later.',
+      );
+    }
+    if (hideLoader) Utils.hideLoader();
+  }
+}
+
 Future<dynamic> callWebApiDelete(
   TickerProvider? tickerProvider,
   String url, {

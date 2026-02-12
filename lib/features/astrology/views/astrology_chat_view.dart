@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 
 import '../../../common/models/astrologist_model.dart';
 import '../controllers/astrology_chat_controller.dart';
-import '../models/chat_session_model.dart'; // Import ChatSession model
+import '../models/chat_models.dart';
 
 class AstrologyChatView extends GetView<AstrologyChatController> {
   final Astrologist expert;
@@ -40,9 +40,8 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                       itemBuilder: (context, index) {
                         final msg = controller.messages[index];
                         return _buildChatBubble(
-                          msg["text"],
-                          msg["isUser"],
-                          msg["time"],
+                          msg,
+                          controller.isMessageFromMe(msg),
                         );
                       },
                     );
@@ -134,14 +133,34 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                 const SizedBox(height: 2),
                 Row(
                   children: [
-                    Text(
-                      "ONLINE",
-                      style: GoogleFonts.inter(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.green,
-                      ),
-                    ),
+                    Obx(() {
+                      final isTyping = _getController().isTyping.value;
+                      final status = _getController().onlineStatus.value;
+
+                      if (isTyping) {
+                        return Text(
+                          "TYPING...",
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(
+                              0xFF8D6E63,
+                            ), // Brownish for typing
+                          ),
+                        );
+                      }
+
+                      return Text(
+                        status,
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: status == "ONLINE"
+                              ? Colors.green
+                              : Colors.grey,
+                        ),
+                      );
+                    }),
                     const SizedBox(width: 4),
                     Text(
                       "• Vedic Astrology", // Hardcoded or from expert.expertise
@@ -421,7 +440,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
     );
   }
 
-  Widget _buildChatBubble(String text, bool isUser, DateTime time) {
+  Widget _buildChatBubble(ChatMessage msg, bool isUser) {
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -451,7 +470,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              text,
+              msg.content,
               style: GoogleFonts.inter(
                 fontSize: 14,
                 color: isUser ? Colors.white : const Color(0xFF3E2723),
@@ -459,12 +478,29 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
               ),
             ),
             const SizedBox(height: 4),
-            Text(
-              "${time.hour}:${time.minute.toString().padLeft(2, '0')}",
-              style: GoogleFonts.inter(
-                fontSize: 10,
-                color: isUser ? Colors.white70 : Colors.grey,
-              ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "${msg.createdAt.hour}:${msg.createdAt.minute.toString().padLeft(2, '0')}",
+                  style: GoogleFonts.inter(
+                    fontSize: 10,
+                    color: isUser ? Colors.white70 : Colors.grey,
+                  ),
+                ),
+                if (isUser) ...[
+                  const SizedBox(width: 4),
+                  Icon(
+                    msg.isRead
+                        ? Icons.done_all
+                        : msg.isDelivered
+                        ? Icons.done_all
+                        : Icons.check,
+                    size: 14,
+                    color: msg.isRead ? Colors.blue : Colors.white70,
+                  ),
+                ],
+              ],
             ),
           ],
         ),
