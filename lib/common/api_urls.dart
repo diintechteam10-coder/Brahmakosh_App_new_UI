@@ -65,6 +65,8 @@ class ApiUrls {
 
   /// 🔹 Chat & Socket APIs
   static const String chatPartners = '$chatApiUrl/partners';
+  static const String chatHistory =
+      '$chatApiUrl/partner/requests'; // Added for history
   static const String createConversation = '$chatApiUrl/conversations';
   static const String getConversations = '$chatApiUrl/conversations';
   static const String getChatMessages =
@@ -74,4 +76,5 @@ class ApiUrls {
   static const String userCreditBalance = '$chatApiUrl/credits/balance/user';
   static const String markConversationRead =
       '$chatApiUrl/conversations'; // /{conversationId}/read
+  static const String unreadCount = '$chatApiUrl/unread-count';
 }

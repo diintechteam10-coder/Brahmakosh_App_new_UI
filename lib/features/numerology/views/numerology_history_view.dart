@@ -1,8 +1,12 @@
 import 'package:brahmakosh/features/numerology/controllers/numerology_controller.dart';
 import 'package:brahmakosh/features/numerology/models/numerology_detail_model.dart';
+import 'package:brahmakosh/common/api_urls.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../../../core/common_imports.dart';
+import '../../profile/viewmodels/profile_viewmodel.dart';
 
 class NumerologyHistoryView extends StatefulWidget {
   const NumerologyHistoryView({super.key});
@@ -19,6 +23,10 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    // Refresh numerology data to reflect recent profile changes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Get.put(NumerologyController()).fetchNumerologyDetail();
+    });
   }
 
   @override
@@ -30,6 +38,7 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(NumerologyController());
+
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8E7),
@@ -99,6 +108,7 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
   }
 
   Widget _buildProfileHeader(NumerologyDetailData data) {
+    final profileVM = context.watch<ProfileViewModel>();
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
@@ -118,11 +128,11 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
         children: [
           Row(
             children: [
-              const CircleAvatar(
+               CircleAvatar(
                 radius: 24, // Reduced radius
                 backgroundColor: Colors.grey,
                 backgroundImage: NetworkImage(
-                  'https://i.pravatar.cc/150?img=11',
+                  profileVM.profile?.profileImageUrl ?? 'https://i.pravatar.cc/150?img=11',
                 ), // Placeholder
               ),
               const SizedBox(width: 12),
@@ -130,7 +140,7 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    data.name ?? "User Name",
+                    profileVM.profile?.profile?.name ?? data.name ?? "User Name",
                     style: GoogleFonts.merriweather(
                       fontSize: 16, // Reduced font size
                       fontWeight: FontWeight.bold,
@@ -138,7 +148,7 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
                     ),
                   ),
                   Text(
-                    "${data.year}-${data.month}-${data.day}",
+                    profileVM.profile?.profile?.dob?.split('T').first ?? "${data.year}-${data.month}-${data.day}",
                     style: GoogleFonts.lora(
                       fontSize: 12, // Reduced font size
                       color: const Color(0xFF6D3A0C).withOpacity(0.7),

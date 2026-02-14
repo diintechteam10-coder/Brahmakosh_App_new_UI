@@ -20,14 +20,15 @@ class GitaHeader extends StatelessWidget {
     this.onContinue,
 
     this.continueSubtitle = '',
-    this.height = 200,
+    this.height = 220,
   });
 
   Widget _roundIcon(IconData icon, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(8),
+        height: 36,
+        width: 36,
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.9),
           shape: BoxShape.circle,
@@ -62,7 +63,7 @@ class GitaHeader extends StatelessWidget {
 
             /// Back
             Positioned(
-              top: 12,
+              top: 25,
               left: 12,
               child: _roundIcon(
                 Icons.arrow_back_ios_new_outlined,
@@ -72,7 +73,7 @@ class GitaHeader extends StatelessWidget {
 
             /// Menu
             Positioned(
-              top: 12,
+              top: 25,
               right: 12,
               child: _roundIcon(Icons.menu, onMenu),
             ),
@@ -137,7 +138,7 @@ class GitaHeader extends StatelessWidget {
                         ),
                         SizedBox(height: 2),
                         Text(
-                          'Last read:Verse 1.3',
+                          continueSubtitle,
                           style: TextStyle(
                               color: Color(0xFF8B4513),
                               fontSize: 11,

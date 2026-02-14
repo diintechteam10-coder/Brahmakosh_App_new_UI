@@ -49,7 +49,8 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
 
                   // Topics / Questions overlay
                   Obx(() {
-                    if (!controller.showSuggestions.value ||
+                    if (!controller.isRequestAccepted.value ||
+                        !controller.showSuggestions.value ||
                         controller.messages.isNotEmpty) {
                       return const SizedBox.shrink();
                     }
@@ -191,7 +192,9 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                     const SizedBox(width: 8),
                     Obx(
                       () => Text(
-                        "•  ${_getController().formatTime(_getController().secondsRemaining.value)}",
+                        controller.isRequestAccepted.value
+                            ? "•  ${_getController().formatTime(_getController().chatDuration.value)}"
+                            : "•  Waiting...",
                         style: GoogleFonts.inter(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
@@ -509,87 +512,125 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
   }
 
   Widget _buildInputBar() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
-      color: Colors.transparent,
-      child: SafeArea(
-        top: false,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Plus Button
-            Container(
-              width: 44,
-              height: 44,
-              decoration: const BoxDecoration(
-                color: Color(0xFFFFF3E0), // Slightly darker or same as bg
-                shape: BoxShape.circle,
-              ),
-              // Use a slight elevation or just icon
-              child: IconButton(
-                onPressed: () {}, // Add attachment logic if needed
-                icon: const Icon(Icons.add, color: Color(0xFF8D6E63)),
-              ),
-            ),
-            const SizedBox(width: 8),
-
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.transparent),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: TextField(
-                  controller: controller.messageController,
-                  style: GoogleFonts.inter(fontSize: 15, color: Colors.black87),
-                  cursorColor: const Color(0xFF8D6E63),
-                  decoration: InputDecoration(
-                    hintText: "Ask about your........",
-                    hintStyle: GoogleFonts.inter(
-                      color: Colors.grey[400],
-                      fontSize: 14,
-                    ),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
-                    ),
+    return Obx(() {
+      if (!controller.isRequestAccepted.value) {
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+          color: Colors.white,
+          child: SafeArea(
+            top: false,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
                   ),
-                  onChanged: (value) {
-                    controller.showSuggestions.value = value.trim().isEmpty;
-                  },
-                  onSubmitted: (_) => controller.sendMessage(),
                 ),
-              ),
+                const SizedBox(width: 12),
+                Text(
+                  "Waiting for expert to accept...",
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 12),
-            GestureDetector(
-              onTap: controller.sendMessage,
-              child: Container(
+          ),
+        );
+      }
+
+      return Container(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+        color: Colors.transparent,
+        child: SafeArea(
+          top: false,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Plus Button
+              Container(
                 width: 44,
                 height: 44,
                 decoration: const BoxDecoration(
-                  color: Color(0xFF8D6E63), // Brown send button
+                  color: Color(0xFFFFF3E0), // Slightly darker or same as bg
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.play_arrow,
-                  color: Colors.white,
-                  size: 20,
+                // Use a slight elevation or just icon
+                child: IconButton(
+                  onPressed: () {}, // Add attachment logic if needed
+                  icon: const Icon(Icons.add, color: Color(0xFF8D6E63)),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(width: 8),
+
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: Colors.transparent),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    controller: controller.messageController,
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      color: Colors.black87,
+                    ),
+                    cursorColor: const Color(0xFF8D6E63),
+                    decoration: InputDecoration(
+                      hintText: "Ask about your........",
+                      hintStyle: GoogleFonts.inter(
+                        color: Colors.grey[400],
+                        fontSize: 14,
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                    ),
+                    onChanged: (value) {
+                      controller.showSuggestions.value = value.trim().isEmpty;
+                    },
+                    onSubmitted: (_) => controller.sendMessage(),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              GestureDetector(
+                onTap: controller.sendMessage,
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF8D6E63), // Brown send button
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.play_arrow,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

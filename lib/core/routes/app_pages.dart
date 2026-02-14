@@ -141,10 +141,10 @@ class AppPages {
       name: AppConstants.routeSpiritualConfiguration,
       page: () => const SpiritualConfigurationView(),
     ),
-    GetPage(
-      name: AppConstants.routeChantingConfiguration,
-      page: () => const ChantingConfigurationView(),
-    ),
+    // GetPage(
+    //   name: AppConstants.routeChantingConfiguration,
+    //   page: () => ChantingConfigurationView(),
+    // ),
     GetPage(
       name: AppConstants.routeWalkthrough,
       page: () => const WalkthroughView(),

@@ -4,12 +4,19 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../common/models/astrologist_model.dart';
+import 'package:brahmakosh/common/models/astrologist_model.dart';
+import 'package:brahmakosh/features/profile/viewmodels/profile_viewmodel.dart';
+import 'package:provider/provider.dart';
 
 class AstrologyExpertsView extends StatelessWidget {
   final String? screenTitle;
+  final ScrollController? scrollController;
 
-  const AstrologyExpertsView({super.key, this.screenTitle});
+  const AstrologyExpertsView({
+    super.key,
+    this.screenTitle,
+    this.scrollController,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +26,7 @@ class AstrologyExpertsView extends StatelessWidget {
         : Get.put(AstrologyController(), permanent: true);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFBE6D0), // Matches screenshot background
+      backgroundColor: const Color(0xFFFBE6D0), // Gold background
       appBar: AppBar(
         backgroundColor: const Color(0xFFFBE6D0),
         elevation: 0,
@@ -129,6 +136,7 @@ class AstrologyExpertsView extends StatelessWidget {
                 }
 
                 return ListView.builder(
+                  controller: scrollController,
                   padding: EdgeInsets.only(
                     left: 16,
                     top: 8,
@@ -377,7 +385,11 @@ class AstrologyExpertsView extends StatelessWidget {
                             child: _buildActionButton(
                               icon: Icons.chat_bubble_outline,
                               price: expert.chatCharge?.toString() ?? "20",
-                              onTap: () => controller.startChat(expert),
+                              onTap: () => _showChatConfirmationBottomSheet(
+                                context,
+                                expert,
+                                controller,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -385,7 +397,7 @@ class AstrologyExpertsView extends StatelessWidget {
                             child: _buildActionButton(
                               icon: Icons.phone_outlined,
                               price: expert.voiceCharge?.toString() ?? "20",
-                              onTap: () {}, // Add call logic
+                              onTap: () => _showComingSoonSheet(context),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -393,7 +405,7 @@ class AstrologyExpertsView extends StatelessWidget {
                             child: _buildActionButton(
                               icon: Icons.videocam_outlined,
                               price: expert.videoCharge?.toString() ?? "20",
-                              onTap: () {}, // Add video call logic
+                              onTap: () => _showComingSoonSheet(context),
                             ),
                           ),
                         ],
@@ -445,6 +457,244 @@ class AstrologyExpertsView extends StatelessWidget {
                 color: const Color(0xFFA67C00),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showChatConfirmationBottomSheet(
+    BuildContext context,
+    AstrologistItem expert,
+    AstrologyController controller,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: Color(0xFFFFE0B2),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.chat_bubble,
+                color: Colors.black87,
+                size: 24,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "STAR CHAT CONSULTATION",
+              style: GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "You're about to start a live chat session with ${expert.name ?? 'your chosen Expert'}.",
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: Colors.black87,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Divider(color: Colors.black12, thickness: 1),
+            const SizedBox(height: 16),
+            Text(
+              "Connect with an astrologer or guru through live chat and end the session at any time - credits are deducted only for the minutes used, so please ensure a stable internet connection for a smooth experience.",
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                color: Colors.black87,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "This session will deduct ₹${expert.chatCharge ?? 15} per minute",
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF8B4513),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Would you like to continue?",
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      side: const BorderSide(color: Color(0xFF8B6914)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                    ),
+                    child: Text(
+                      "CANCEL",
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF8B6914),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Consumer<ProfileViewModel>(
+                  builder: (context, profileVM, child) {
+                    if (profileVM.isLoading) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Color(0xFFA67C00),
+                          ),
+                        ),
+                      );
+                    }
+                    return ElevatedButton(
+                      onPressed: () {
+                        // Read credits BEFORE dismissing the sheet
+                        final credits = profileVM.profile?.credits ?? 0;
+                        final minRequired =
+                            (expert.chatCharge ?? 15) *
+                            5; // Enforce 5 mins minimum
+
+                        Navigator.pop(context);
+
+                        if (credits >= minRequired) {
+                          controller.startChat(expert);
+                        } else {
+                          // Optional: Show snackbar explaining why
+                          Get.snackbar(
+                            "Insufficient Credits",
+                            "You need at least ₹$minRequired for a 5-minute session with this expert.",
+                            backgroundColor: Colors.redAccent,
+                            colorText: Colors.white,
+                          );
+                          controller.showRechargeBottomSheet(context);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        backgroundColor: const Color(0xFFA67C00),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        "CONTINUE",
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showComingSoonSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: Color(0xFFFFE0B2),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.rocket_launch_rounded,
+                color: Color(0xFFA67C00),
+                size: 28,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "Coming Soon!",
+              style: GoogleFonts.inter(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "This feature will be available soon. Stay tuned!",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: Colors.black87,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  backgroundColor: const Color(0xFFA67C00),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  "OK",
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
           ],
         ),
       ),

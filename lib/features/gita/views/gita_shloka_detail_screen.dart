@@ -1,12 +1,15 @@
 import 'package:brahmakosh/common/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
+import '../../ai_rashmi/ai_rashmi_chat.dart';
 import '../data/repositories/gita_repository.dart';
 import '../data/models/verse_model.dart';
 import '../bloc/detail/gita_detail_bloc.dart';
 import '../bloc/detail/gita_detail_event.dart';
 import '../bloc/detail/gita_detail_state.dart';
 import '../widgets/decorative_divider.dart';
+import 'package:brahmakosh/core/services/storage_service.dart';
 
 class GitaShlokaDetailScreen extends StatefulWidget {
   final String verseId;
@@ -35,6 +38,21 @@ class _GitaShlokaDetailScreenState extends State<GitaShlokaDetailScreen> {
     _currentVerseId = widget.verseId;
     _currentVerse = widget.verse;
     _updateIndex();
+    _saveLastRead(_currentVerse);
+  }
+
+  /// Persist last-read chapter and verse to local storage
+  void _saveLastRead(VerseModel? verse) {
+    if (verse == null) return;
+    if (verse.chapterNumber != null) {
+      StorageService.setInt('gita_last_chapter_number', verse.chapterNumber!);
+    }
+    if (verse.chapterName != null) {
+      StorageService.setString('gita_last_chapter_name', verse.chapterName!);
+    }
+    if (verse.shlokaNumber != null) {
+      StorageService.setString('gita_last_verse_number', verse.shlokaNumber!);
+    }
   }
 
   void _updateIndex() {
@@ -55,9 +73,7 @@ class _GitaShlokaDetailScreenState extends State<GitaShlokaDetailScreen> {
         _currentIndex = newIndex;
         _currentVerse = nextVerse; // Optimistic update
       });
-      // Context will trigger rebuild with new ID in BlocProvider key logic.
-      // The BlocProvider with ValueKey will handle recreation and event addition.
-      // context.read<GitaDetailBloc>().add(FetchGitaVerseDetail(_currentVerseId));
+      _saveLastRead(nextVerse);
     }
   }
 
@@ -110,8 +126,42 @@ class _GitaDetailView extends StatelessWidget {
       //     onPressed: () => Navigator.pop(context),
       //   ),
       // ),
+      floatingActionButton: FloatingActionButton.extended(
+        extendedPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+        backgroundColor: const Color(0xFFFF9800),
+        onPressed: () => Get.to(
+          () => const RashmiChat(
+            backgroundImage: 'assets/images/Krishna_chat.png',
+            hideLearnGita: true,
+          ),
+        ),
+        icon: Container(
+          width: 35, // Size of the circular container
+          height: 35,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white, // Background of the circle
+            image: DecorationImage(
+              image: AssetImage('assets/images/Krishna_chat.png'),
+              fit: BoxFit.cover, // Keeps the whole figure visible
+              alignment: Alignment.topCenter, // Forces centering
+              scale: 1.5, // Adjust this number (0.5 to 1.5) to zoom in/out
+            ),
+          ),
+        ),
+        label: Text(
+          "ASK KRISHNA",
+          style: TextStyle(
+            color: Color(0xFF8B4513),
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       extendBodyBehindAppBar: true,
       body: SafeArea(
+        top: false,
         child: BlocBuilder<GitaDetailBloc, GitaDetailState>(
           builder: (context, state) {
             VerseModel? displayVerse = verse;
@@ -133,12 +183,11 @@ class _GitaDetailView extends StatelessWidget {
             }
 
             return SingleChildScrollView(
-
               child: Column(
                 children: [
                   _buildHeader(context, displayVerse),
-                  // _buildNavigationButtons(),
 
+                  // _buildNavigationButtons(),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30),
                     child: DecorativeDivider(
@@ -152,7 +201,9 @@ class _GitaDetailView extends StatelessWidget {
                     ),
                   ),
                   _buildContentCard(
-                    backgroundColor: CustomColors.gradientBlueStart.withOpacity(0.3),
+                    backgroundColor: CustomColors.gradientBlueStart.withOpacity(
+                      0.3,
+                    ),
                     displayVerse.sanskritShloka,
                     isSanskrit: true,
                   ),
@@ -182,9 +233,10 @@ class _GitaDetailView extends StatelessWidget {
                     ),
                   ),
                   _buildContentCard(
-                      backgroundColor: CustomColors.dayStart.withOpacity(0.3),
-                      // 'EXPLANATION',
-                      displayVerse.explanation),
+                    backgroundColor: CustomColors.dayStart.withOpacity(0.3),
+                    // 'EXPLANATION',
+                    displayVerse.explanation,
+                  ),
                   const SizedBox(height: 20),
                 ],
               ),
@@ -194,6 +246,7 @@ class _GitaDetailView extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildHeader(BuildContext context, VerseModel verse) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,23 +258,26 @@ class _GitaDetailView extends StatelessWidget {
               height: 220,
               width: double.infinity,
               decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/geeta_background.png'),
-                    fit: BoxFit.cover,
-                  ),
-                  // borderRadius: BorderRadius.only(
-                  //     bottomLeft: Radius.circular(20),
-                  //     bottomRight: Radius.circular(20)
-                  // )
+                image: DecorationImage(
+                  image: AssetImage('assets/images/geeta_background.png'),
+                  fit: BoxFit.cover,
+                ),
+                // borderRadius: BorderRadius.only(
+                //     bottomLeft: Radius.circular(20),
+                //     bottomRight: Radius.circular(20)
+                // )
               ),
             ),
             Positioned(
-              top: 12,
+              top: 25,
               left: 12,
-              child: _roundIcon(Icons.arrow_back_ios_new_outlined, () => Navigator.pop(context)),
+              child: _roundIcon(
+                Icons.arrow_back_ios_new_outlined,
+                () => Navigator.pop(context),
+              ),
             ),
             Positioned(
-              top: 12,
+              top: 25,
               right: 12,
               child: _roundIcon(Icons.menu, () {}),
             ),
@@ -229,7 +285,7 @@ class _GitaDetailView extends StatelessWidget {
         ),
 
         Padding(
-          padding:  EdgeInsets.only( left: 16,bottom: 8,right: 20,top: 16),
+          padding: EdgeInsets.only(left: 16, bottom: 8, right: 20, top: 16),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -237,7 +293,7 @@ class _GitaDetailView extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                   Text(
+                  Text(
                     verse.chapterName ?? '',
                     style: TextStyle(
                       fontSize: 20,
@@ -246,9 +302,13 @@ class _GitaDetailView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                   Text(
+                  Text(
                     'Chapter ${verse.chapterNumber}',
-                    style: TextStyle(fontSize: 14, color: Color(0xFF8B4513),fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF8B4513),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -258,7 +318,7 @@ class _GitaDetailView extends StatelessWidget {
                   Text(
                     'Verse ${verse.shlokaNumber}', // Should be 1.1 etc format if possible?
                     style: const TextStyle(
-                      fontSize: 20,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF8B4513),
                     ),
@@ -269,7 +329,7 @@ class _GitaDetailView extends StatelessWidget {
                         Icons.arrow_back_ios_new_outlined,
                         hasPrev ? onPrev : () {},
                         backgroundColor: Colors.orange.withOpacity(0.3),
-                        size: 35,
+                        size: 30,
                         iconSize: 18,
                       ),
                       SizedBox(width: 20),
@@ -277,7 +337,7 @@ class _GitaDetailView extends StatelessWidget {
                         Icons.arrow_forward_ios_outlined,
                         hasNext ? onNext : () {},
                         backgroundColor: Colors.orange,
-                        size: 35,
+                        size: 30,
                         iconSize: 18,
                       ),
                     ],
@@ -292,14 +352,15 @@ class _GitaDetailView extends StatelessWidget {
   }
 
   Widget _roundIcon(
-      IconData icon,
-      VoidCallback onTap,
-      {
-        Color backgroundColor = const Color(0xE6FFFFFF), // ≈ Colors.white.withOpacity(0.9)
-        Color iconColor = Colors.black,
-        double size = 36,
-        double iconSize = 18,
-      }) {
+    IconData icon,
+    VoidCallback onTap, {
+    Color backgroundColor = const Color(
+      0xE6FFFFFF,
+    ), // ≈ Colors.white.withOpacity(0.9)
+    Color iconColor = Colors.black,
+    double size = 36,
+    double iconSize = 18,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -309,11 +370,7 @@ class _GitaDetailView extends StatelessWidget {
           color: backgroundColor,
           shape: BoxShape.circle,
         ),
-        child: Icon(
-          icon,
-          size: iconSize,
-          color: iconColor,
-        ),
+        child: Icon(icon, size: iconSize, color: iconColor),
       ),
     );
   }
@@ -410,7 +467,7 @@ class _GitaDetailView extends StatelessWidget {
   Widget _buildContentCard(
     String? content, {
     bool isSanskrit = false,
-        Color backgroundColor =  const Color(0xFFE8DCCA),
+    Color backgroundColor = const Color(0xFFE8DCCA),
   }) {
     if (content == null || content.isEmpty) return const SizedBox.shrink();
 
@@ -419,7 +476,7 @@ class _GitaDetailView extends StatelessWidget {
       margin: const EdgeInsets.all(14),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color:backgroundColor,
+        color: backgroundColor,
         // Different colors for cards
         borderRadius: BorderRadius.circular(
           20,
@@ -450,7 +507,7 @@ class _GitaDetailView extends StatelessWidget {
               content,
               style: TextStyle(
                 fontSize: 16,
-                color:isSanskrit ?Color(0xFF8B4513): Colors.black87,
+                color: isSanskrit ? Color(0xFF8B4513) : Colors.black87,
                 height: 1.5,
                 fontWeight: isSanskrit ? FontWeight.bold : FontWeight.normal,
               ),

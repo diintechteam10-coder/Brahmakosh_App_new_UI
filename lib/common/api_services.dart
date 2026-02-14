@@ -1064,9 +1064,26 @@ Future<UserCompleteDetailsModel?> getUserCompleteDetails(
     url,
     token: token,
     onResponse: (response) {
-      userDetails = UserCompleteDetailsModel.fromJson(
-        jsonDecode(response.body),
-      );
+      debugPrint('************************************************');
+      debugPrint('🚀 ASTROLOGY DATA RESPONSE (Complete Details):');
+      // Print in chunks to avoid console truncation
+      final pattern = RegExp('.{1,1000}');
+      pattern
+          .allMatches(response.body)
+          .forEach((match) => debugPrint(match.group(0)));
+      debugPrint('************************************************');
+
+      try {
+        userDetails = UserCompleteDetailsModel.fromJson(
+          jsonDecode(response.body),
+        );
+        debugPrint('✅ Parsed UserCompleteDetailsModel successfully');
+        debugPrint('   - Has Doshas: ${userDetails?.data?.doshas != null}');
+        debugPrint('   - Has Dashas: ${userDetails?.data?.dashas != null}');
+      } catch (e, stack) {
+        debugPrint('❌ ERROR parsing UserCompleteDetailsModel: $e');
+        debugPrint(stack.toString());
+      }
     },
     onError: (error) {
       Utils.print('Error fetching user complete details: $error');

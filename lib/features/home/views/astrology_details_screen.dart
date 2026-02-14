@@ -45,7 +45,7 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
       return;
     }
 
-    // Check local storage first
+    /* // Temporarily bypass cache for debugging
     final cachedData = StorageService.getString('astrology_data_$userId');
     if (cachedData != null) {
       try {
@@ -62,6 +62,7 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
         debugPrint("Error parsing cached astrology data: $e");
       }
     }
+    */
 
     // Fetch from API if not cached or error parsing
     final data = await getUserCompleteDetails(this, userId);
@@ -90,6 +91,18 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("ASTROLOGY_DEBUG: _data != null: ${_data != null}");
+    debugPrint("ASTROLOGY_DEBUG: _data.data != null: ${_data?.data != null}");
+    debugPrint(
+      "ASTROLOGY_DEBUG: _data.data.astrology != null: ${_data?.data?.astrology != null}",
+    );
+    debugPrint(
+      "ASTROLOGY_DEBUG: _data.data.doshas != null: ${_data?.data?.doshas != null}",
+    );
+    debugPrint(
+      "ASTROLOGY_DEBUG: _data.data.dashas != null: ${_data?.data?.dashas != null}",
+    );
+
     final astro = _data?.data?.astrology;
 
     return Scaffold(
@@ -138,10 +151,12 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
                     unselectedLabelColor: const Color(0xFF6D3A0C),
                     indicator: BoxDecoration(
                       borderRadius: BorderRadius.circular(24),
-                      color: const Color(0xFFD4A373), // Goldish Brown
+                      color: const Color(0xFFD4A373),
                     ),
                     indicatorSize: TabBarIndicatorSize.tab,
-                    isScrollable: true,
+                    isScrollable: false,
+                    labelPadding: const EdgeInsets.symmetric(horizontal: 2),
+                    padding: EdgeInsets.zero,
                     labelStyle: GoogleFonts.lora(
                       fontWeight: FontWeight.bold,
                       fontSize: 10,
@@ -181,9 +196,10 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
                       BirthChartTab(
                         birthChart: astro.birthChart!,
                         birthExtendedChart: astro.birthExtendedChart,
+                        astroDetails: astro.astroDetails,
                       ),
-                      DoshasTab(doshas: astro.doshas ?? Doshas()),
-                      DashasTab(dashas: astro.dashas ?? Dashas()),
+                      DoshasTab(doshas: _data?.data?.doshas ?? Doshas()),
+                      DashasTab(dashas: _data?.data?.dashas ?? Dashas()),
                     ],
                   ),
                 ),
@@ -293,7 +309,7 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
               ),
               const SizedBox(width: 6),
               Text(
-                "${birthDetails?.day} ${_getMonthName(birthDetails?.month)} ${birthDetails?.year}, ${birthDetails?.hour}:${birthDetails?.minute}, ${birthDetails?.latitude}, ${birthDetails?.longitude}",
+                "${birthDetails?.day} ${_getMonthName(birthDetails?.month)} ${birthDetails?.year}, ${birthDetails?.hour}:${birthDetails?.minute}",
                 style: GoogleFonts.lora(
                   fontSize: 12,
                   color: const Color(0xFF8D6E63),

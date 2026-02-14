@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import '../../ai_rashmi/ai_rashmi_chat.dart';
 import '../data/repositories/gita_repository.dart';
+import '../data/models/chapter_model.dart';
 import '../bloc/chapter/gita_chapter_bloc.dart';
 import '../bloc/chapter/gita_chapter_event.dart';
 import '../bloc/chapter/gita_chapter_state.dart';
 import 'gita_verse_list_screen.dart';
+import 'package:brahmakosh/core/services/storage_service.dart';
 
 class GitaChapterScreen extends StatelessWidget {
   const GitaChapterScreen({super.key});
@@ -22,14 +24,63 @@ class GitaChapterScreen extends StatelessWidget {
   }
 }
 
-class _GitaChapterView extends StatelessWidget {
+class _GitaChapterView extends StatefulWidget {
   const _GitaChapterView();
+
+  @override
+  State<_GitaChapterView> createState() => _GitaChapterViewState();
+}
+
+class _GitaChapterViewState extends State<_GitaChapterView> {
+  int? _lastChapter;
+  String? _lastVerse;
+
+  @override
+  void initState() {
+    super.initState();
+    _lastChapter = StorageService.getInt('gita_last_chapter_number');
+    _lastVerse = StorageService.getString('gita_last_verse_number');
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFF5E6), // Light orange/cream background
+      floatingActionButton: FloatingActionButton.extended(
+        extendedPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+        backgroundColor: const Color(0xFFFF9800),
+        onPressed: () => Get.to(
+          () => const RashmiChat(
+            backgroundImage: 'assets/images/Krishna_chat.png',
+            hideLearnGita: true,
+          ),
+        ),
+        icon: Container(
+          width: 35, // Size of the circular container
+          height: 35,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white, // Background of the circle
+            image: DecorationImage(
+              image: AssetImage('assets/images/Krishna_chat.png'),
+              fit: BoxFit.cover, // Keeps the whole figure visible
+              alignment: Alignment.topCenter, // Forces centering
+              scale: 1.5, // Adjust this number (0.5 to 1.5) to zoom in/out
+            ),
+          ),
+        ),
+        label: Text(
+          "ASK KRISHNA",
+          style: TextStyle(
+            color: Color(0xFF8B4513),
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: SafeArea(
+        top: false,
         child: Column(
           children: [
             _buildHeader(context),
@@ -56,16 +107,22 @@ class _GitaChapterView extends StatelessWidget {
                 },
               ),
             ),
-
           ],
         ),
-
       ),
-
     );
   }
 
   Widget _buildHeader(BuildContext context) {
+    // Build dynamic "last read" label
+    final String lastReadLabel;
+    if (_lastChapter != null && _lastVerse != null) {
+      final chLabel = _lastChapter.toString().padLeft(2, '0');
+      lastReadLabel = 'Last read: Ch.$chLabel Verse $_lastVerse';
+    } else {
+      lastReadLabel = 'Start reading';
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -81,18 +138,21 @@ class _GitaChapterView extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
                 borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20)
-                )
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
               ),
             ),
             Positioned(
-              top: 12,
+              top: 25,
               left: 12,
-              child: _roundIcon(Icons.arrow_back_ios_new_outlined, () => Navigator.pop(context)),
+              child: _roundIcon(
+                Icons.arrow_back_ios_new_outlined,
+                () => Navigator.pop(context),
+              ),
             ),
             Positioned(
-              top: 12,
+              top: 25,
               right: 12,
               child: _roundIcon(Icons.menu, () {}),
             ),
@@ -103,7 +163,7 @@ class _GitaChapterView extends StatelessWidget {
           padding: const EdgeInsets.only(left: 16, bottom: 16, top: 16),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
-             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,46 +179,78 @@ class _GitaChapterView extends StatelessWidget {
                   const SizedBox(height: 4),
                   const Text(
                     '18 Chapters',
-                    style: TextStyle(fontSize: 14, color: Color(0xFF8B4513),fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF8B4513),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
-              // Continue Card
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFF9F2D),
+              // Continue Card — navigates to last-read chapter
+              GestureDetector(
+                onTap: () async {
+                  if (_lastChapter != null) {
+                    // Find the matching chapter from the BLoC state
+                    final state = context.read<GitaChapterBloc>().state;
+                    if (state is GitaChapterLoaded) {
+                      final match = state.chapters
+                          .cast<ChapterModel?>()
+                          .firstWhere(
+                            (c) => c?.chapterNumber == _lastChapter,
+                            orElse: () => null,
+                          );
+                      if (match != null) {
+                        await Get.to(() => GitaVerseListScreen(chapter: match));
+                        setState(() {
+                          _lastChapter = StorageService.getInt(
+                            'gita_last_chapter_number',
+                          );
+                          _lastVerse = StorageService.getString(
+                            'gita_last_verse_number',
+                          );
+                        });
+                      }
+                    }
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF9F2D),
                     borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(20),
-                        topLeft: Radius.circular(20)
-                    )
-                ),
-                child: Row(
-                  children: const [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Continue',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 2),
-                        Text(
-                          'Last read: Ch.01 Verse 1.3',
-                          style: TextStyle(
-                              color: Color(0xFF8B4513),
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold
-                          ),
-                        ),
-                      ],
+                      bottomLeft: Radius.circular(20),
+                      topLeft: Radius.circular(20),
                     ),
-                    // Icon(Icons.arrow_forward_ios,
-                    //     color: Colors.white, size: 14),
-                  ],
+                  ),
+                  child: Row(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Continue',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            lastReadLabel,
+                            style: TextStyle(
+                              color: Color(0xFF8B4513),
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -185,8 +277,13 @@ class _GitaChapterView extends StatelessWidget {
 
   Widget _buildChapterCard(BuildContext context, dynamic chapter, int index) {
     return GestureDetector(
-      onTap: () {
-        Get.to(() => GitaVerseListScreen(chapter: chapter));
+      onTap: () async {
+        await Get.to(() => GitaVerseListScreen(chapter: chapter));
+        // Refresh state after returning
+        setState(() {
+          _lastChapter = StorageService.getInt('gita_last_chapter_number');
+          _lastVerse = StorageService.getString('gita_last_verse_number');
+        });
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 14),
@@ -268,10 +365,8 @@ class _GitaChapterView extends StatelessWidget {
                           color: Colors.grey,
                         ),
                       ),
-
                     ],
                   ),
-
 
                   // Align(
                   //   alignment: Alignment.centerRight,
@@ -287,8 +382,7 @@ class _GitaChapterView extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 14),
-        Icon(Icons.arrow_forward_ios,
-            color: Color(0xFF8B4513), size: 14),
+            Icon(Icons.arrow_forward_ios, color: Color(0xFF8B4513), size: 14),
           ],
         ),
       ),

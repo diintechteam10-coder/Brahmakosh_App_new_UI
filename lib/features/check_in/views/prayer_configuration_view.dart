@@ -3,69 +3,77 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:brahmakosh/features/check_in/repositories/spiritual_repository.dart';
-import 'package:brahmakosh/features/check_in/blocs/chanting/chanting_bloc.dart';
+import 'package:brahmakosh/features/check_in/blocs/prayer/prayer_bloc.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_configuration_model.dart';
 import 'package:brahmakosh/core/constants/app_constants.dart';
 import 'package:brahmakosh/common/utils.dart';
 
-class ChantingConfigurationView extends StatelessWidget {
-  const ChantingConfigurationView({super.key, required this.chantingCategoryId});
-  final String chantingCategoryId;
-
-  // Hardcoded Category ID for "Chanting" from requirements
-//  static const String chantingCategoryId = "69787dcbbeaf7e42675a2212";
+class PrayerConfigurationView extends StatelessWidget {
+  const PrayerConfigurationView({super.key, required this.prayerCategoryId});
+  final String prayerCategoryId;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          ChantingBloc(repository: SpiritualRepository())
-            ..add( LoadChantingConfigs(categoryId: chantingCategoryId)),
+          PrayerBloc(repository: SpiritualRepository())
+            ..add(LoadPrayerConfigs(categoryId: prayerCategoryId)),
       child: Scaffold(
         backgroundColor: const Color(0xffFFF8E7),
         body: SafeArea(
           bottom: false,
-          child: BlocConsumer<ChantingBloc, ChantingState>(
+          child: BlocConsumer<PrayerBloc, PrayerState>(
             listener: (context, state) {
-              if (state is ChantingSessionReady) {
-                // Navigate to Mantra Chanting
+              if (state is PrayerSessionReady) {
+                // Navigate to Mantra/Prayer Session
+                // Assuming we use the same route or a new one.
+                // Plan said verify navigation. Using existing route for now.
+                int durationMins = 10; // Default
+                if (state.config.duration != null) {
+                  final digits = state.config.duration!.replaceAll(
+                    RegExp(r'[^0-9]'),
+                    '',
+                  );
+                  if (digits.isNotEmpty) {
+                    durationMins = int.tryParse(digits) ?? 10;
+                  }
+                }
+
                 Get.toNamed(
-                  AppConstants.routeMantraChanting,
+                  AppConstants.routeMeditationStart,
                   arguments: {
-                    'emotion': state.config.emotion,
-                    'count': state.count,
-                    'configuration': state.config,
-                    // Pass audioUrl to MantraChanting
-                    'audioUrl': state.audioUrl,
-                    'videoUrl': state.videoUrl, // Optional
-                    // Passing these for safety
-                    'mantra_title': state.config.chantingType,
-                    'karma_points': state.config.karmaPoints,
+                    'duration': durationMins,
+                    'config': state.config,
+                    'clips': [
+                      {'audioUrl': state.audioUrl, 'videoUrl': state.videoUrl},
+                    ],
                   },
                 );
-              } else if (state is ChantingError) {
+              } else if (state is PrayerError) {
                 Utils.showToast(state.message);
               }
             },
             builder: (context, state) {
-              if (state is ChantingLoading) {
+              if (state is PrayerLoading) {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              if (state is ChantingLoaded || state is ChantingSessionReady) {
+              if (state is PrayerLoaded || state is PrayerSessionReady) {
                 // Even if ready, we show the loaded UI until navigation happens
-                final loadedState = state is ChantingLoaded
+                final loadedState = state is PrayerLoaded
                     ? state
                     // Fallback using data from SessionReady if needed, but Bloc doesn't guarantee 'state' preserves old data unless we structured it.
                     // Actually, SessionReady doesn't hold list.
                     // Issue: If we emit SessionReady, build is called. SessionReady has NO config list.
-                    // Fix: ChantingSessionReady should probably extend ChantingLoaded or hold the previous loaded state to avoid UI flicker.
+                    // Fix: PrayerSessionReady should probably extend PrayerLoaded or hold the previous loaded state to avoid UI flicker.
                     // For now, let's just show a loader or empty container if SessionReady is emitted, assuming navigation is fast.
                     // Or better, let's keep showing the UI if we can.
                     // But SessionReady doesn't have the lists.
                     : null;
 
                 if (loadedState == null) {
+                  // If session ready doesn't hold data, just show loader or empty
+                  // Ideally PrayerSessionReady should extend Loaded or hold it
                   return const Center(child: CircularProgressIndicator());
                 }
 
@@ -84,7 +92,7 @@ class ChantingConfigurationView extends StatelessWidget {
                               children: [
                                 const SizedBox(height: 5),
                                 Text(
-                                  'Chanting',
+                                  "Prayer",
                                   style: GoogleFonts.poppins(
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold,
@@ -102,9 +110,7 @@ class ChantingConfigurationView extends StatelessWidget {
                                 const SizedBox(height: 15),
                                 _buildEmotionSelector(context, loadedState),
                                 const SizedBox(height: 30),
-                                _buildMantraSelector(context, loadedState),
-                                const SizedBox(height: 30),
-                                _buildCountSelector(context, loadedState),
+                                _buildPrayerSelector(context, loadedState),
                                 const SizedBox(height: 15),
                                 _buildSummary(context, loadedState),
                                 const SizedBox(height: 15),
@@ -135,7 +141,7 @@ class ChantingConfigurationView extends StatelessWidget {
                 );
               }
 
-              if (state is ChantingError) {
+              if (state is PrayerError) {
                 return Center(child: Text(state.message));
               }
 
@@ -168,19 +174,19 @@ class ChantingConfigurationView extends StatelessWidget {
     );
   }
 
-  Widget _buildEmotionSelector(BuildContext context, ChantingLoaded state) {
+  Widget _buildEmotionSelector(BuildContext context, PrayerLoaded state) {
     return SizedBox(
       height: 110,
       child: _EmotionList(
         selectedEmotion: state.selectedEmotion,
         onSelect: (emotion) {
-          context.read<ChantingBloc>().add(SelectChantingEmotion(emotion));
+          context.read<PrayerBloc>().add(SelectPrayerEmotion(emotion));
         },
       ),
     );
   }
 
-  Widget _buildMantraSelector(BuildContext context, ChantingLoaded state) {
+  Widget _buildPrayerSelector(BuildContext context, PrayerLoaded state) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -201,13 +207,13 @@ class ChantingConfigurationView extends StatelessWidget {
           Row(
             children: [
               const Icon(
-                Icons.music_note_outlined,
+                Icons.spa_outlined, // Changed icon for Prayer
                 size: 20,
                 color: Colors.black87,
               ),
               const SizedBox(width: 8),
               Text(
-                'Mantra',
+                'Prayer',
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -222,7 +228,7 @@ class ChantingConfigurationView extends StatelessWidget {
               padding: const EdgeInsets.only(top: 20),
               child: Center(
                 child: Text(
-                  "No mantras available for this mood.",
+                  "No prayers available for this mood.",
                   style: GoogleFonts.poppins(color: Colors.grey),
                 ),
               ),
@@ -241,8 +247,8 @@ class ChantingConfigurationView extends StatelessWidget {
 
                   return GestureDetector(
                     onTap: () {
-                      context.read<ChantingBloc>().add(
-                        SelectChantingMantra(config),
+                      context.read<PrayerBloc>().add(
+                        SelectPrayerMantra(config),
                       );
                     },
                     child: Container(
@@ -264,7 +270,7 @@ class ChantingConfigurationView extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            _getDisplayMantraText(config),
+                            _getDisplayPrayerText(config),
                             textAlign: TextAlign.center,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -290,7 +296,11 @@ class ChantingConfigurationView extends StatelessWidget {
     );
   }
 
-  String _getDisplayMantraText(SpiritualConfiguration config) {
+  String _getDisplayPrayerText(SpiritualConfiguration config) {
+    if (config.prayerType != null && config.prayerType!.isNotEmpty) {
+      return config.prayerType!;
+    }
+    // Fallback to chanting logic if prayerType missing
     if (config.chantingType != null &&
         config.chantingType!.isNotEmpty &&
         config.chantingType != "Other") {
@@ -299,110 +309,10 @@ class ChantingConfigurationView extends StatelessWidget {
         config.customChantingType!.isNotEmpty) {
       return config.customChantingType!;
     }
-    return "Mantra";
+    return "Prayer";
   }
 
-  Widget _buildCountSelector(BuildContext context, ChantingLoaded state) {
-    const List<int> availableCounts = [27, 51, 108, 216, 324, 434, 540, 646];
-    final selected = state.selectedCount;
-    // Safely find index or default to 108's index or 0
-    double currentIndex = availableCounts.indexOf(selected).toDouble();
-    if (currentIndex < 0) currentIndex = 2.0; // 108
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.check_circle_outline,
-                size: 20,
-                color: Colors.black87,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Select Count',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 30),
-          Column(
-            children: [
-              SliderTheme(
-                data: SliderTheme.of(context).copyWith(
-                  activeTrackColor: const Color(0xffFF9B44),
-                  inactiveTrackColor: Colors.orange.withOpacity(0.2),
-                  thumbColor: Colors.white,
-                  overlayColor: const Color(0xffFF9B44).withOpacity(0.1),
-                  valueIndicatorColor: const Color(0xffFF9B44),
-                  valueIndicatorTextStyle: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  thumbShape: const RoundSliderThumbShape(
-                    enabledThumbRadius: 12,
-                  ),
-                  trackHeight: 6,
-                ),
-                child: Slider(
-                  value: currentIndex,
-                  min: 0,
-                  max: (availableCounts.length - 1).toDouble(),
-                  divisions: availableCounts.length - 1,
-                  label: '${availableCounts[currentIndex.toInt()]}',
-                  onChanged: (value) {
-                    final index = value.toInt();
-                    if (index >= 0 && index < availableCounts.length) {
-                      context.read<ChantingBloc>().add(
-                        SelectChantingCount(availableCounts[index]),
-                      );
-                    }
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '${availableCounts.first}',
-                      style: GoogleFonts.poppins(color: Colors.grey),
-                    ),
-                    Text(
-                      '${availableCounts.last}',
-                      style: GoogleFonts.poppins(color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSummary(BuildContext context, ChantingLoaded state) {
+  Widget _buildSummary(BuildContext context, PrayerLoaded state) {
     return Column(
       children: [
         Text(
@@ -419,15 +329,11 @@ class ChantingConfigurationView extends StatelessWidget {
           children: [
             _summaryChip(
               state.selectedEmotion != null
-                  ? (ChantingBloc.emotionEmojis[state.selectedEmotion] ?? '😐')
+                  ? (PrayerBloc.emotionEmojis[state.selectedEmotion] ?? '😐')
                   : '😐',
               'Mood',
             ),
-            const SizedBox(width: 24),
-            _summaryChip(
-              '📿', // Rosary/Mala icon
-              '${state.selectedCount} Counts',
-            ),
+            // Removed Count chip
           ],
         ),
         const SizedBox(height: 16),
@@ -473,13 +379,13 @@ class ChantingConfigurationView extends StatelessWidget {
     );
   }
 
-  Widget _buildStartButton(BuildContext context, ChantingLoaded state) {
+  Widget _buildStartButton(BuildContext context, PrayerLoaded state) {
     return SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
         onPressed: () {
-          context.read<ChantingBloc>().add(const StartChantingSession());
+          context.read<PrayerBloc>().add(const StartPrayerSession());
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xffFF8C00), // Orange
@@ -522,7 +428,7 @@ class _EmotionListState extends State<_EmotionList> {
   void _scrollToSelected() {
     final selectedEmotion = widget.selectedEmotion;
     if (selectedEmotion != null) {
-      final emotions = ChantingBloc.emotionEmojis.keys.toList();
+      final emotions = PrayerBloc.emotionEmojis.keys.toList();
       final index = emotions.indexOf(selectedEmotion);
       if (index != -1) {
         final screenWidth = MediaQuery.of(context).size.width;
@@ -572,9 +478,9 @@ class _EmotionListState extends State<_EmotionList> {
       controller: _scrollController,
       scrollDirection: Axis.horizontal,
       physics: const BouncingScrollPhysics(),
-      itemCount: ChantingBloc.emotionEmojis.length,
+      itemCount: PrayerBloc.emotionEmojis.length,
       itemBuilder: (context, index) {
-        final entry = ChantingBloc.emotionEmojis.entries.elementAt(index);
+        final entry = PrayerBloc.emotionEmojis.entries.elementAt(index);
         final emotion = entry.key;
         final emoji = entry.value;
 

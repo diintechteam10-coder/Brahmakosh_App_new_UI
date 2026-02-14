@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:brahmakosh/common/models/user_complete_details_model.dart';
-import 'package:brahmakosh/features/home/views/astrology_details_screen.dart'; // For styles if needed, or just copy
+import 'package:brahmakosh/features/home/views/astrology_details_screen.dart';
 
 class DoshaDetailScreen extends StatelessWidget {
   final String title;
@@ -50,22 +50,18 @@ class DoshaDetailScreen extends StatelessWidget {
       case 'kalsarpa':
         return _buildKalsarpaContent(data as RawKalsarpa?);
       case 'sadesati':
-        // Sade Sati usually has current status and potentially a life chart
-        // Here we handle if we passed the specific sub-object or a wrapper
-        if (data is SadeSatiCurrent) {
-          return _buildSadeSatiCurrentContent((data as SadeSatiCurrent).raw);
-        } else if (data is List<RawSadeSati>) {
-          return _buildSadeSatiLifeContent(data as List<RawSadeSati>);
-        } else if (data is Map<String, dynamic>) {
-          // Handle if we passed a map with both current and life,
-          // but for now let's assume we pass the relevant object
-          return const Text("Complex Sade Sati Data");
-        }
-        return const Text("No Details Available");
+        return _buildSadeSatiCurrentContent(data as RawSadeSatiCurrent?);
+      case 'sadesati_life':
+        return _buildSadeSatiLifeContent(data as List<RawSadeSati>? ?? []);
       case 'pitra':
         return _buildPitraContent(data as RawPitra?);
       default:
-        return const Center(child: Text("Details not available"));
+        return Center(
+          child: Text(
+            "Details for $title not available",
+            style: GoogleFonts.lora(),
+          ),
+        );
     }
   }
 

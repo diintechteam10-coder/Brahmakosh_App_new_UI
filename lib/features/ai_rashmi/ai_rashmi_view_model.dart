@@ -59,7 +59,7 @@ class AiRashmiController extends GetxController {
     _voiceWebSocket.dispose();
     _audioRecorder.dispose();
     _audioPlayer.dispose();
-    
+
     // Clean up temp audio files
     for (var file in _tempAudioFiles) {
       try {
@@ -71,7 +71,7 @@ class AiRashmiController extends GetxController {
       }
     }
     _tempAudioFiles.clear();
-    
+
     super.onClose();
   }
 
@@ -84,7 +84,9 @@ class AiRashmiController extends GetxController {
         this.chatId = chatId;
         currentTitle = 'Voice Chat';
         print('📱 [ViewModel] ChatId set to: ${this.chatId}');
-        print('📱 [ViewModel] Loading history (this will call REST API /api/mobile/chat)...');
+        print(
+          '📱 [ViewModel] Loading history (this will call REST API /api/mobile/chat)...',
+        );
         loadHistory();
       } else {
         print('⚠️ [ViewModel] Empty chatId received');
@@ -135,7 +137,9 @@ class AiRashmiController extends GetxController {
       if (text.isNotEmpty) {
         print('📱 [ViewModel] Adding AI response to messages list');
         messages.add(Message(role: 'assistant', content: text));
-        print('📱 [ViewModel] Reloading history (this will call REST API /api/mobile/chat)...');
+        print(
+          '📱 [ViewModel] Reloading history (this will call REST API /api/mobile/chat)...',
+        );
         loadHistory();
         update();
         print('✅ [ViewModel] AI response added');
@@ -150,7 +154,9 @@ class AiRashmiController extends GetxController {
       print('📱 [ViewModel] Audio chunk callback');
       print('📱 [ViewModel] Chunk index: $chunkIndex');
       print('📱 [ViewModel] Audio data size: ${audioData.length} bytes');
-      print('📱 [ViewModel] Adding to received chunks (total: ${_receivedAudioChunks.length + 1})');
+      print(
+        '📱 [ViewModel] Adding to received chunks (total: ${_receivedAudioChunks.length + 1})',
+      );
       _receivedAudioChunks.add(audioData);
       print('📱 [ViewModel] Starting audio playback...');
       _playAudioChunksSequentially();
@@ -186,40 +192,45 @@ class AiRashmiController extends GetxController {
       print('📱 [ViewModel] WebSocket onError callback triggered');
       print('📱 [ViewModel] Error message: $message');
       print('📱 [ViewModel] Error code: $errorCode');
-      
+
       // Handle specific error cases with user-friendly messages
       String userFriendlyError = message;
-      
-      if (message.contains('ElevenLabs API error') || 
+
+      if (message.contains('ElevenLabs API error') ||
           message.contains('detected_unusual_activity') ||
           message.contains('Free Tier usage disabled')) {
-        userFriendlyError = 'Voice service temporarily unavailable. Please try again later or use text chat.';
+        userFriendlyError =
+            'Voice service temporarily unavailable. Please try again later or use text chat.';
         print('📱 [ViewModel] Detected ElevenLabs API error');
       } else if (message.contains('401') || message.contains('Unauthorized')) {
-        userFriendlyError = 'Authentication failed. Please try logging in again.';
+        userFriendlyError =
+            'Authentication failed. Please try logging in again.';
         print('📱 [ViewModel] Detected authentication error');
-      } else if (message.contains('Failed to connect') || message.contains('Connection')) {
-        userFriendlyError = 'Connection error. Please check your internet connection and try again.';
+      } else if (message.contains('Failed to connect') ||
+          message.contains('Connection')) {
+        userFriendlyError =
+            'Connection error. Please check your internet connection and try again.';
         print('📱 [ViewModel] Detected connection error');
       } else if (message.contains('speech') || message.contains('audio')) {
-        userFriendlyError = 'Unable to generate voice response. Please try using text chat instead.';
+        userFriendlyError =
+            'Unable to generate voice response. Please try using text chat instead.';
         print('📱 [ViewModel] Detected speech/audio error');
       }
-      
+
       print('📱 [ViewModel] User-friendly error: $userFriendlyError');
       error = userFriendlyError;
       isProcessingVoice = false;
       isRecording = false;
-      
+
       // Stop the timer if recording was in progress
       print('📱 [ViewModel] Cancelling audio chunk timer...');
       _audioChunkTimer?.cancel();
       _audioChunkTimer = null;
-      
+
       // Stop WebSocket session on error
       print('📱 [ViewModel] Stopping WebSocket session due to error...');
       _voiceWebSocket.stopSession();
-      
+
       update();
       print('📱 [ViewModel] ============================================');
     };
@@ -327,8 +338,10 @@ class AiRashmiController extends GetxController {
   Future<void> startVoiceRecording() async {
     print('📱 [ViewModel] ============================================');
     print('📱 [ViewModel] startVoiceRecording() called');
-    print('📱 [ViewModel] Current state - isRecording: $isRecording, isProcessingVoice: $isProcessingVoice');
-    
+    print(
+      '📱 [ViewModel] Current state - isRecording: $isRecording, isProcessingVoice: $isProcessingVoice',
+    );
+
     if (isRecording || isProcessingVoice) {
       print('⚠️ [ViewModel] Already recording or processing, returning');
       print('📱 [ViewModel] ============================================');
@@ -355,11 +368,11 @@ class AiRashmiController extends GetxController {
         print('📱 [ViewModel] Starting WebSocket session with chatId: $chatId');
         // Start WebSocket session first and wait for confirmation
         await _voiceWebSocket.startSession(chatId: chatId);
-        
+
         print('📱 [ViewModel] WebSocket startSession completed');
         print('📱 [ViewModel] Checking WebSocket connection status...');
         print('📱 [ViewModel] isConnected: ${_voiceWebSocket.isConnected}');
-        
+
         if (!_voiceWebSocket.isConnected) {
           print('🔴 [ViewModel] WebSocket connection failed');
           error = 'Failed to connect to voice service';
@@ -367,11 +380,13 @@ class AiRashmiController extends GetxController {
           print('📱 [ViewModel] ============================================');
           return;
         }
-        
+
         print('✅ [ViewModel] WebSocket connected successfully!');
 
         // Wait a bit for server to send "started" confirmation
-        print('📱 [ViewModel] Waiting 500ms for server "started" confirmation...');
+        print(
+          '📱 [ViewModel] Waiting 500ms for server "started" confirmation...',
+        );
         await Future.delayed(const Duration(milliseconds: 500));
         print('📱 [ViewModel] Wait completed');
 
@@ -384,7 +399,9 @@ class AiRashmiController extends GetxController {
         print('📱 [ViewModel] Recording path: $currentRecordingPath');
 
         try {
-          print('📱 [ViewModel] Attempting to start recording with PCM16 format...');
+          print(
+            '📱 [ViewModel] Attempting to start recording with PCM16 format...',
+          );
           // Try PCM16 first (direct raw PCM, no header to parse)
           await _audioRecorder.start(
             const RecordConfig(
@@ -409,7 +426,8 @@ class AiRashmiController extends GetxController {
             ),
             path: currentRecordingPath!,
           );
-          _wavHeaderSize = 44; // Standard WAV header size (will be updated when parsed)
+          _wavHeaderSize =
+              44; // Standard WAV header size (will be updated when parsed)
           print('✅ [ViewModel] Recording started with WAV format');
         }
 
@@ -417,7 +435,9 @@ class AiRashmiController extends GetxController {
         isProcessingVoice = true;
         error = null;
         _receivedAudioChunks.clear(); // Clear previous chunks
-        print('📱 [ViewModel] Recording state set: isRecording=$isRecording, isProcessingVoice=$isProcessingVoice');
+        print(
+          '📱 [ViewModel] Recording state set: isRecording=$isRecording, isProcessingVoice=$isProcessingVoice',
+        );
         update();
 
         // Start sending audio chunks every 150ms (100-200ms range)
@@ -425,9 +445,13 @@ class AiRashmiController extends GetxController {
         // you'd need to use the record package's stream API or flutter_sound
         _lastSentPosition = 0;
         print('📱 [ViewModel] Starting audio chunk timer (every 150ms)...');
-        _audioChunkTimer = Timer.periodic(const Duration(milliseconds: 150), (timer) async {
+        _audioChunkTimer = Timer.periodic(const Duration(milliseconds: 150), (
+          timer,
+        ) async {
           if (!isRecording || !_voiceWebSocket.isConnected) {
-            print('⚠️ [ViewModel] Audio chunk timer: Stopping (isRecording: $isRecording, isConnected: ${_voiceWebSocket.isConnected})');
+            print(
+              '⚠️ [ViewModel] Audio chunk timer: Stopping (isRecording: $isRecording, isConnected: ${_voiceWebSocket.isConnected})',
+            );
             timer.cancel();
             return;
           }
@@ -462,12 +486,12 @@ class AiRashmiController extends GetxController {
   // Parse WAV header to find where PCM data starts
   int _parseWavHeader(Uint8List data) {
     if (data.length < 44) return 0;
-    
+
     // Check for RIFF header
     if (String.fromCharCodes(data.sublist(0, 4)) != 'RIFF') {
       return 0; // Not a WAV file
     }
-    
+
     // Find 'data' chunk (this is where PCM data starts)
     for (int i = 12; i < data.length - 8; i++) {
       if (String.fromCharCodes(data.sublist(i, i + 4)) == 'data') {
@@ -475,13 +499,13 @@ class AiRashmiController extends GetxController {
         return i + 8;
       }
     }
-    
+
     // Fallback: assume standard 44-byte header
     return 44;
   }
 
   Future<void> _sendAudioChunkIncremental() async {
-    if (currentRecordingPath == null || 
+    if (currentRecordingPath == null ||
         !File(currentRecordingPath!).existsSync()) {
       return;
     }
@@ -489,19 +513,23 @@ class AiRashmiController extends GetxController {
     try {
       final audioFile = File(currentRecordingPath!);
       final fileSize = await audioFile.length();
-      
+
       // If header not parsed yet and it's a WAV file, parse it first
-      if (!_headerParsed && currentRecordingPath!.endsWith('.wav') && fileSize >= 44) {
+      if (!_headerParsed &&
+          currentRecordingPath!.endsWith('.wav') &&
+          fileSize >= 44) {
         print('📱 [ViewModel] Parsing WAV header...');
         final headerFile = await audioFile.open();
         final headerData = await headerFile.read(min(200, fileSize));
         await headerFile.close();
-        
+
         _wavHeaderSize = _parseWavHeader(Uint8List.fromList(headerData));
         _headerParsed = true;
         _lastSentPosition = _wavHeaderSize; // Set position after header
-        print('📱 [ViewModel] WAV header parsed: headerSize=$_wavHeaderSize, position=$_lastSentPosition');
-        
+        print(
+          '📱 [ViewModel] WAV header parsed: headerSize=$_wavHeaderSize, position=$_lastSentPosition',
+        );
+
         if (fileSize <= _wavHeaderSize) {
           // Only header, no PCM data yet
           print('📱 [ViewModel] Only header present, no PCM data yet');
@@ -512,27 +540,28 @@ class AiRashmiController extends GetxController {
         _headerParsed = true;
         print('📱 [ViewModel] Raw PCM format, no header to parse');
       }
-      
+
       if (fileSize <= _lastSentPosition) {
         return; // No new data
       }
-      
+
       // Read PCM data from current position
       final randomAccessFile = await audioFile.open();
       await randomAccessFile.setPosition(_lastSentPosition);
       final newData = await randomAccessFile.read(fileSize - _lastSentPosition);
       await randomAccessFile.close();
-      
+
       if (newData.isEmpty) {
         return;
       }
-      
+
       // Convert to base64 and send (data is already PCM at this point)
       final base64Audio = base64Encode(newData);
-      print('📱 [ViewModel] Sending audio chunk: ${newData.length} bytes -> ${base64Audio.length} base64 chars (position: $_lastSentPosition -> $fileSize)');
+      print(
+        '📱 [ViewModel] Sending audio chunk: ${newData.length} bytes -> ${base64Audio.length} base64 chars (position: $_lastSentPosition -> $fileSize)',
+      );
       _voiceWebSocket.sendAudioChunk(base64Audio);
       _lastSentPosition = fileSize;
-      
     } catch (e, stackTrace) {
       // Log error but don't stop recording
       print('🔴 [ViewModel] Error sending audio chunk: $e');
@@ -547,7 +576,7 @@ class AiRashmiController extends GetxController {
     print('📱 [ViewModel] ============================================');
     print('📱 [ViewModel] stopVoiceRecording() called');
     print('📱 [ViewModel] isRecording: $isRecording');
-    
+
     if (!isRecording) {
       print('⚠️ [ViewModel] Not recording, returning');
       print('📱 [ViewModel] ============================================');
@@ -577,7 +606,7 @@ class AiRashmiController extends GetxController {
       print('📱 [ViewModel] Stopping WebSocket session...');
       await _voiceWebSocket.stopSession();
       print('✅ [ViewModel] WebSocket session stopped');
-      
+
       // Reset for next recording
       print('📱 [ViewModel] Resetting recording state...');
       _lastSentPosition = 0;
@@ -588,7 +617,9 @@ class AiRashmiController extends GetxController {
       try {
         if (currentRecordingPath != null &&
             File(currentRecordingPath!).existsSync()) {
-          print('📱 [ViewModel] Cleaning up recording file: $currentRecordingPath');
+          print(
+            '📱 [ViewModel] Cleaning up recording file: $currentRecordingPath',
+          );
           await File(currentRecordingPath!).delete();
           print('✅ [ViewModel] Recording file deleted');
         }
@@ -617,12 +648,12 @@ class AiRashmiController extends GetxController {
   // Play audio chunks sequentially
   Future<void> _playAudioChunksSequentially() async {
     if (_isPlayingChunk || _receivedAudioChunks.isEmpty) return;
-    
+
     if (!isPlayingAudio) {
       isPlayingAudio = true;
       update();
     }
-    
+
     await _playNextAudioChunk();
   }
 
@@ -648,18 +679,19 @@ class AiRashmiController extends GetxController {
     try {
       _isPlayingChunk = true;
       final audioData = _receivedAudioChunks.removeAt(0);
-      
+
       // Save chunk to temp file as MP3
       final directory = await getTemporaryDirectory();
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final chunkPath = '${directory.path}/audio_chunk_${timestamp}_${_receivedAudioChunks.length}.mp3';
+      final chunkPath =
+          '${directory.path}/audio_chunk_${timestamp}_${_receivedAudioChunks.length}.mp3';
       final chunkFile = File(chunkPath);
       await chunkFile.writeAsBytes(audioData);
       _tempAudioFiles.add(chunkFile);
 
       // Cancel previous subscription if any
       await _audioCompletionSubscription?.cancel();
-      
+
       // Setup completion listener
       final completer = Completer<void>();
       _audioCompletionSubscription = _audioPlayer.onPlayerComplete.listen((_) {
@@ -668,10 +700,10 @@ class AiRashmiController extends GetxController {
 
       // Play chunk
       await _audioPlayer.play(UrlSource('file://$chunkPath'));
-      
+
       // Wait for completion
       await completer.future;
-      
+
       // Clean up temp file
       try {
         if (chunkFile.existsSync()) {
@@ -681,9 +713,9 @@ class AiRashmiController extends GetxController {
       } catch (e) {
         // Ignore cleanup errors
       }
-      
+
       _isPlayingChunk = false;
-      
+
       // Play next chunk if available
       if (_receivedAudioChunks.isNotEmpty) {
         await _playNextAudioChunk();

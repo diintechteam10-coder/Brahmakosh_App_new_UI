@@ -9,6 +9,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/services/storage_service.dart';
 import '../views/astrology_chat_view.dart';
 import '../views/astrologist_profile_view.dart';
+import '../views/conversation_history_view.dart';
 
 class AstrologyController extends GetxController {
   final _experts = <AstrologistItem>[].obs;
@@ -349,10 +350,7 @@ class AstrologyController extends GetxController {
   }
 
   void openHistory() {
-    // Get.snackbar("History", "Opening Chat & Call logs...",
-    //     snackPosition: SnackPosition.BOTTOM,
-    //     backgroundColor: const Color(0xFF6366F1),
-    //     colorText: Colors.white);
+    Get.to(() => const ConversationHistoryView());
   }
 
   void openUserProfile() {

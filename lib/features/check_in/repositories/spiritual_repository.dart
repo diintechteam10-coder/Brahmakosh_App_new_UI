@@ -90,6 +90,15 @@ class SpiritualRepository {
     }
 
     if (responseBody != null) {
+      // print('************************************************');
+      // print('🚀 PROGRESS DATA RESPONSE (Spiritual Check-In):');
+      // // Print in chunks to avoid console truncation
+      // final pattern = RegExp('.{1,1000}');
+      // pattern
+      //     .allMatches(responseBody!)
+      //     .forEach((match) => print(match.group(0)));
+      // print('************************************************');
+
       return await compute(_parseCheckInResponse, responseBody!);
     }
     return null;
@@ -129,6 +138,7 @@ class SpiritualRepository {
           print(
             '✅ DEBUG_REPO: Response size: ${responseBody?.length ?? 0} bytes',
           );
+          print('✅ DEBUG_REPO: Response size: ${responseBody} bytes');
         },
       );
     } catch (e) {
@@ -185,6 +195,7 @@ class SpiritualRepository {
         hideLoader: false,
         onResponse: (httpResponse) {
           responseBody = httpResponse.body;
+          print('✅ DEBUG_REPO: Response my data: ${responseBody} bytes');
         },
       );
     } catch (e) {
