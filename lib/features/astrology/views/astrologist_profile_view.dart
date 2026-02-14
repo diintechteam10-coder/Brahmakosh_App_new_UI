@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:brahmakosh/common/models/astrologist_model.dart';
 import 'package:brahmakosh/core/theme/app_theme.dart';
+import 'package:brahmakosh/features/profile/viewmodels/profile_viewmodel.dart';
+import 'package:provider/provider.dart';
 
 class AstrologistProfileView extends StatelessWidget {
   final AstrologistItem expert;
@@ -385,7 +387,7 @@ class AstrologistProfileView extends StatelessWidget {
               icon: Icons.call,
               label: "Call",
               price: "₹${expert.voiceCharge ?? 20}/min",
-              onTap: () {},
+              onTap: () => _showComingSoonSheet(context),
             ),
           ),
           const SizedBox(width: 12),
@@ -394,7 +396,7 @@ class AstrologistProfileView extends StatelessWidget {
               icon: Icons.videocam,
               label: "Video",
               price: "₹${expert.videoCharge ?? 50}/min",
-              onTap: () {},
+              onTap: () => _showComingSoonSheet(context),
             ),
           ),
         ],
@@ -447,7 +449,7 @@ class AstrologistProfileView extends StatelessWidget {
             const SizedBox(height: 8),
 
             Text(
-              "You're about to start a live chat session with your chosen Expert.",
+              "You're about to start a live chat session with ${expert.name ?? 'your chosen Expert'}.",
               style: GoogleFonts.inter(
                 fontSize: 14,
                 color: Colors.black87,
@@ -514,33 +516,126 @@ class AstrologistProfileView extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context); // Close sheet
-                      controller.startChat(expert); // Start chat
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      backgroundColor: const Color(
-                        0xFFA67C00,
-                      ), // Dark Gold/Brown
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
+                Consumer<ProfileViewModel>(
+                  builder: (context, profileVM, child) {
+                    if (profileVM.isLoading) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Color(0xFFA67C00),
+                          ),
+                        ),
+                      );
+                    }
+
+                    return ElevatedButton(
+                      onPressed: () {
+                        // Read credits BEFORE dismissing the sheet
+                        final credits = profileVM.profile?.credits ?? 0;
+                        Navigator.pop(context);
+
+                        if (credits >= 100) {
+                          controller.startChat(expert);
+                        } else {
+                          controller.showRechargeBottomSheet(context);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        backgroundColor: const Color(
+                          0xFFA67C00,
+                        ), // Dark Gold/Brown
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        elevation: 0,
                       ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      "CONTINUE",
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                      child: Text(
+                        "CONTINUE",
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
               ],
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showComingSoonSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: Color(0xFFFFE0B2),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.rocket_launch_rounded,
+                color: Color(0xFFA67C00),
+                size: 28,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "Coming Soon!",
+              style: GoogleFonts.inter(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "This feature will be available soon. Stay tuned!",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: Colors.black87,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  backgroundColor: const Color(0xFFA67C00),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  "OK",
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
             ),
             const SizedBox(height: 16),
           ],

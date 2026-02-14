@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:brahmakosh/common/models/user_complete_details_model.dart';
 import 'package:brahmakosh/features/home/views/dosha_detail_screen.dart';
+import 'package:brahmakosh/features/home/widgets/north_indian_chart.dart';
 
 class PlanetsTab extends StatelessWidget {
   final List<Planets> planets;
@@ -148,87 +149,154 @@ class PlanetsTab extends StatelessWidget {
   }
 }
 
-class BirthChartTab extends StatelessWidget {
+class BirthChartTab extends StatefulWidget {
   final BirthChart birthChart;
   final BirthExtendedChart? birthExtendedChart;
+  final AstroDetails? astroDetails;
 
   const BirthChartTab({
     super.key,
     required this.birthChart,
     this.birthExtendedChart,
+    this.astroDetails,
   });
 
   @override
+  State<BirthChartTab> createState() => _BirthChartTabState();
+}
+
+class _BirthChartTabState extends State<BirthChartTab> {
+  // 0 = Lagna Chart (D1), 1 = Navamsa Chart (D9)
+  int _selectedChartindex = 0;
+
+  @override
   Widget build(BuildContext context) {
-    // This is a placeholder for the chart. A real chart drawing would be complex.
-    // For now, we will list the houses as a grid or list.
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      itemCount: 12,
-      itemBuilder: (context, index) {
-        int houseNum = index + 1;
-        List<String> planets = [];
+    // 1. Prepare Data based on selection
+    Map<int, List<String>> currentHouses = {};
+    if (_selectedChartindex == 0) {
+      currentHouses = _getHousesFromBirthChart(widget.birthChart);
+    } else {
+      currentHouses = _getHousesFromExtendedChart(widget.birthExtendedChart);
+    }
 
-        switch (houseNum) {
-          case 1:
-            planets = birthChart.houses?.house1 ?? [];
-            break;
-          case 2:
-            planets = birthChart.houses?.house2 ?? [];
-            break;
-          case 3:
-            planets = birthChart.houses?.house3 ?? [];
-            break;
-          case 4:
-            planets = birthChart.houses?.house4 ?? [];
-            break;
-          case 5:
-            planets = birthChart.houses?.house5 ?? [];
-            break;
-          case 6:
-            planets = birthChart.houses?.house6 ?? [];
-            break;
-          case 7:
-            planets = birthChart.houses?.house7 ?? [];
-            break;
-          case 8:
-            planets = birthChart.houses?.house8 ?? [];
-            break;
-          case 9:
-            planets = birthChart.houses?.house9 ?? [];
-            break;
-          case 10:
-            planets = birthChart.houses?.house10 ?? [];
-            break;
-          case 11:
-            planets = birthChart.houses?.house11 ?? [];
-            break;
-          case 12:
-            planets = birthChart.houses?.house12 ?? [];
-            break;
-        }
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+      child: Column(
+        children: [
+          // Toggle Buttons
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(25),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildToggleBtn("Birth Chart", 0),
+                _buildToggleBtn("Birth Extended Chart", 1),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
 
-        return Card(
-          margin: const EdgeInsets.only(bottom: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+          NorthIndianChart(
+            housesPlanets: currentHouses,
+            ascendantSign: widget.astroDetails?.ascendant,
           ),
-          child: ListTile(
-            title: Text(
-              "House $houseNum",
-              style: GoogleFonts.lora(fontWeight: FontWeight.bold),
+
+          const SizedBox(height: 24),
+          Text(
+            "Planet Notations",
+            style: GoogleFonts.lora(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF5D4037),
             ),
-            subtitle: Text(
-              planets.isEmpty ? "Empty" : planets.join(", "),
-              style: GoogleFonts.lora(),
-            ),
-            trailing: Text(
-              "Sign: -",
-            ), // Sign info not directly available in simple structure, need logic
           ),
-        );
-      },
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 16,
+            runSpacing: 8,
+            alignment: WrapAlignment.center,
+            children: const [
+              _LegendItem(code: "Su", name: "Sun"),
+              _LegendItem(code: "Mo", name: "Moon"),
+              _LegendItem(code: "Ma", name: "Mars"),
+              _LegendItem(code: "Me", name: "Mercury"),
+              _LegendItem(code: "Ju", name: "Jupiter"),
+              _LegendItem(code: "Ve", name: "Venus"),
+              _LegendItem(code: "Sa", name: "Saturn"),
+              _LegendItem(code: "Ra", name: "Rahu"),
+              _LegendItem(code: "Ke", name: "Ketu"),
+            ],
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
     );
+  }
+
+  Widget _buildToggleBtn(String label, int index) {
+    bool isSelected = _selectedChartindex == index;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedChartindex = index;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.orange : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.lora(
+            fontWeight: FontWeight.bold,
+            color: isSelected ? Colors.white : Colors.black87,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Map<int, List<String>> _getHousesFromBirthChart(BirthChart chart) {
+    return {
+      1: chart.houses?.house1 ?? [],
+      2: chart.houses?.house2 ?? [],
+      3: chart.houses?.house3 ?? [],
+      4: chart.houses?.house4 ?? [],
+      5: chart.houses?.house5 ?? [],
+      6: chart.houses?.house6 ?? [],
+      7: chart.houses?.house7 ?? [],
+      8: chart.houses?.house8 ?? [],
+      9: chart.houses?.house9 ?? [],
+      10: chart.houses?.house10 ?? [],
+      11: chart.houses?.house11 ?? [],
+      12: chart.houses?.house12 ?? [],
+    };
+  }
+
+  Map<int, List<String>> _getHousesFromExtendedChart(
+    BirthExtendedChart? chart,
+  ) {
+    if (chart == null) return {};
+    return {
+      1: chart.houses?.house1 ?? [],
+      2: chart.houses?.house2 ?? [],
+      3: chart.houses?.house3 ?? [],
+      4: chart.houses?.house4 ?? [],
+      5: chart.houses?.house5 ?? [],
+      6: chart.houses?.house6 ?? [],
+      7: chart.houses?.house7 ?? [],
+      8: chart.houses?.house8 ?? [],
+      9: chart.houses?.house9 ?? [],
+      10: chart.houses?.house10 ?? [],
+      11: chart.houses?.house11 ?? [],
+      12: chart.houses?.house12 ?? [],
+    };
   }
 }
 
@@ -239,6 +307,14 @@ class DoshasTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("DOSHAS_TAB_DEBUG: manglik != null: ${doshas.manglik != null}");
+    debugPrint(
+      "DOSHAS_TAB_DEBUG: kalsarpa != null: ${doshas.kalsarpa != null}",
+    );
+    debugPrint(
+      "DOSHAS_TAB_DEBUG: sadeSatiCurrent != null: ${doshas.sadeSatiCurrent != null}",
+    );
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Column(
@@ -247,7 +323,7 @@ class DoshasTab extends StatelessWidget {
             context,
             "Manglik Dosha",
             doshas.manglik?.present ?? false,
-            doshas.manglik?.description,
+            doshas.manglik?.raw?.manglikReport ?? doshas.manglik?.description,
             "manglik",
             doshas.manglik?.raw,
           ),
@@ -255,7 +331,7 @@ class DoshasTab extends StatelessWidget {
             context,
             "Kalsarpa Dosha",
             doshas.kalsarpa?.present ?? false,
-            doshas.kalsarpa?.description,
+            doshas.kalsarpa?.raw?.oneLine ?? doshas.kalsarpa?.description,
             "kalsarpa",
             doshas.kalsarpa?.raw,
           ),
@@ -263,11 +339,11 @@ class DoshasTab extends StatelessWidget {
             context,
             "Sade Sati",
             doshas.sadeSatiCurrent?.present ?? false,
-            doshas.sadeSatiCurrent?.status,
+            doshas.sadeSatiCurrent?.raw?.isUndergoingSadhesati ??
+                doshas.sadeSatiCurrent?.status,
             "sadesati",
-            doshas.sadeSatiCurrent,
+            doshas.sadeSatiCurrent?.raw,
           ),
-          // Optionally add Sade Sati Life if needed separately, or expect user to navigate via Sade Sati
           if (doshas.sadeSatiLife?.raw != null &&
               doshas.sadeSatiLife!.raw!.isNotEmpty)
             _buildDoshaCard(
@@ -275,15 +351,14 @@ class DoshasTab extends StatelessWidget {
               "Sade Sati Life Cycles",
               doshas.sadeSatiLife?.present ?? false,
               "View Life Cycles",
-              "sadesati",
+              "sadesati_life",
               doshas.sadeSatiLife?.raw,
             ),
-
           _buildDoshaCard(
             context,
             "Pitra Dosha",
             doshas.pitra?.present ?? false,
-            doshas.pitra?.description,
+            doshas.pitra?.raw?.conclusion ?? doshas.pitra?.description,
             "pitra",
             doshas.pitra?.raw,
           ),
@@ -378,6 +453,16 @@ class DashasTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint(
+      "DASHAS_TAB_DEBUG: currentYogini != null: ${dashas.currentYogini != null}",
+    );
+    debugPrint(
+      "DASHAS_TAB_DEBUG: currentChardasha != null: ${dashas.currentChardasha != null}",
+    );
+    debugPrint(
+      "DASHAS_TAB_DEBUG: majorChardasha != null: ${dashas.majorChardasha != null}",
+    );
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Column(
@@ -463,6 +548,30 @@ class DashasTab extends StatelessWidget {
                 return _buildDashaCard(
                   dasha.signName ?? "",
                   "${dasha.startDate} - ${dasha.endDate}",
+                );
+              },
+            ),
+            const SizedBox(height: 24),
+          ],
+
+          if (dashas.vimshottariDasha != null) ...[
+            Text(
+              "Vimshottari Dasha",
+              style: GoogleFonts.lora(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: dashas.vimshottariDasha!.length,
+              itemBuilder: (context, index) {
+                final dasha = dashas.vimshottariDasha![index];
+                return _buildDashaCard(
+                  dasha.planet ?? "",
+                  "${dasha.start} - ${dasha.end}",
                 );
               },
             ),
@@ -576,6 +685,35 @@ class BasicInfoTab extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _LegendItem extends StatelessWidget {
+  final String code;
+  final String name;
+
+  const _LegendItem({super.key, required this.code, required this.name});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          "$code: ",
+          style: GoogleFonts.lora(
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFFFF5722), // Orange for code
+          ),
+        ),
+        Text(
+          name,
+          style: GoogleFonts.lora(
+            color: const Color(0xFF5D4037), // Brown for name
+          ),
+        ),
+      ],
     );
   }
 }

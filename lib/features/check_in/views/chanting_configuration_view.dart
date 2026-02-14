@@ -9,17 +9,18 @@ import 'package:brahmakosh/core/constants/app_constants.dart';
 import 'package:brahmakosh/common/utils.dart';
 
 class ChantingConfigurationView extends StatelessWidget {
-  const ChantingConfigurationView({super.key});
+  const ChantingConfigurationView({super.key, required this.chantingCategoryId});
+  final String chantingCategoryId;
 
   // Hardcoded Category ID for "Chanting" from requirements
-  static const String chantingCategoryId = "69787dcbbeaf7e42675a2212";
+//  static const String chantingCategoryId = "69787dcbbeaf7e42675a2212";
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
           ChantingBloc(repository: SpiritualRepository())
-            ..add(const LoadChantingConfigs(categoryId: chantingCategoryId)),
+            ..add( LoadChantingConfigs(categoryId: chantingCategoryId)),
       child: Scaffold(
         backgroundColor: const Color(0xffFFF8E7),
         body: SafeArea(

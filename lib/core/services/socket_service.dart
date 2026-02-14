@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 
 import 'package:brahmakosh/common/utils.dart';
 import 'package:brahmakosh/core/services/storage_service.dart';
@@ -17,7 +16,7 @@ class SocketService {
   bool _isConnected = false;
   bool _disposed = false;
 
-  /// 🔵 Connection stream (like your example)
+  /// 🔵 Connection stream
   final _connectedCtrl = StreamController<bool>.broadcast();
   Stream<bool> get connected$ => _connectedCtrl.stream;
 
@@ -29,6 +28,12 @@ class SocketService {
   Future<void> initSocket() async {
     if (_disposed) return;
 
+    // Already connected — skip
+    if (_socket != null && _socket!.connected) {
+      Utils.print('ℹ️ Socket already connected, skipping re-init');
+      return;
+    }
+
     final token = StorageService.getString(AppConstants.keyAuthToken);
 
     if (token == null || token.isEmpty) {
@@ -36,7 +41,7 @@ class SocketService {
       return;
     }
 
-    /// 🔎 TOKEN VERIFICATION (kept as it is)
+    /// 🔎 TOKEN VERIFICATION
     try {
       Utils.print("🔍 Verifying token via REST API...");
       final response = await http.get(
@@ -59,18 +64,21 @@ class SocketService {
 
     disconnect(); // clear old connection
 
-    _socket = IO.io(
-      "https://stage.brahmakosh.com",
-      IO.OptionBuilder()
-          .setPath('/socket.io/')
-          .setTransports(['polling'])
-          .disableAutoConnect()
-          .enableReconnection()
-          .setReconnectionAttempts(5)
-          .setReconnectionDelay(2000)
-          .setExtraHeaders({"Authorization": "Bearer $token"})
-          .build(),
-    );
+    final options = IO.OptionBuilder()
+        .setPath('/socket.io/')
+        .setTransports(['polling', 'websocket'])
+        .disableAutoConnect()
+        .enableReconnection()
+        .setReconnectionAttempts(5)
+        .setReconnectionDelay(2000)
+        .setExtraHeaders({"Authorization": "Bearer $token"})
+        .build();
+
+    // Manually inject 'auth' object as per socktetdoc.md (Socket.IO v3+ feature)
+    // The library builder might not support setAuth, so we use the map directly.
+    options['auth'] = {'token': token};
+
+    _socket = IO.io("https://stage.brahmakosh.com", options);
 
     _socket!.connect();
 
@@ -79,6 +87,19 @@ class SocketService {
 
   /// 🔥 Core socket listeners
   void _attachCoreListeners() {
+    // 🔍 DEBUG: Log ALL events to find the missing ones
+    _socket!.onAny((event, data) {
+      if (event != 'ping' && event != 'pong') {
+        Utils.print("🔍 SOCKET EVENT: $event");
+        Utils.print("📦 DATA: $data");
+      }
+
+      // Specifically flag anything that looks like a read receipt
+      if (event.toString().toLowerCase().contains('read')) {
+        Utils.print("🎯 [WATCH] Read-related event detected: $event");
+      }
+    });
+
     _socket!.onConnect((_) {
       _isConnected = true;
       _connectedCtrl.add(true);
@@ -86,12 +107,8 @@ class SocketService {
       Utils.print("✅ SOCKET CONNECTED");
       Utils.print("Socket ID: ${_socket!.id}");
 
-      /// 🔁 Re-attach all stored listeners after reconnect
-      _listeners.forEach((event, handlers) {
-        for (final handler in handlers) {
-          _socket!.on(event, handler);
-        }
-      });
+      // NOTE: socket_io_client automatically persists listeners across reconnects.
+      // Do NOT manually re-attach them here, or they will duplicate.
     });
 
     _socket!.onDisconnect((_) {
@@ -113,10 +130,20 @@ class SocketService {
       Utils.print("🔁 SOCKET RECONNECTED");
     });
 
-    /// 🔥 Debug monitor (kept)
-    _socket!.onAny((event, data) {
-      Utils.print("📡 EVENT: $event");
-      Utils.print("📦 DATA: $data");
+    // Listen for server's connection:success event (per doc)
+    _socket!.on('connection:success', (data) {
+      Utils.print("✅ CONNECTION SUCCESS: $data");
+    });
+
+    /// 🔥 Re-attach registered listeners to the new socket instance
+    /// This is required for global listeners (like notifications) registered at app start
+    _listeners.forEach((event, handlers) {
+      for (var handler in handlers) {
+        _socket!.on(event, handler);
+      }
+      Utils.print(
+        "🔗 Re-attached ${handlers.length} handlers for event: $event",
+      );
     });
   }
 
@@ -133,14 +160,23 @@ class SocketService {
   }
 
   // ==============================
-  // 🔥 LISTENER MANAGEMENT (NEW)
+  // 🔥 LISTENER MANAGEMENT
   // ==============================
 
   void _addListener(String event, Function(dynamic) handler) {
     _listeners.putIfAbsent(event, () => []);
+
+    // Safety: Don't add same handler instance twice
+    if (_listeners[event]!.contains(handler)) {
+      Utils.print(
+        "ℹ️ Listener for '$event' already registered. Skipping map add.",
+      );
+      return;
+    }
+
     _listeners[event]!.add(handler);
     Utils.print(
-      "➕ Added listener for '$event'. Total: ${_listeners[event]!.length}",
+      "➕ Added listener for '$event'. Total active: ${_listeners[event]!.length}",
     );
   }
 
@@ -168,9 +204,10 @@ class SocketService {
   }
 
   // ==============================
-  // 🔥 YOUR EXISTING METHODS (KEPT)
+  // 🔥 CONVERSATION ROOM MANAGEMENT
   // ==============================
 
+  /// Join a conversation room (per doc: conversation:join with ack)
   void joinConversation(String conversationId) {
     Utils.print("Joining room: $conversationId");
 
@@ -181,20 +218,47 @@ class SocketService {
         Utils.print("✅ JOIN RESPONSE: $data");
       },
     );
-
-    on("conversation:joined", (data) {
-      Utils.print("✅ ROOM JOINED: $data");
-    });
+    // NOTE: No duplicate listener for conversation:joined here.
+    // The controller/notification service register their own listeners.
   }
 
-  void sendMessage(String conversationId, String message) {
+  /// Leave a conversation room (per doc: conversation:leave with ack)
+  void leaveConversation(String conversationId) {
+    Utils.print("Leaving room: $conversationId");
+
+    _socket?.emitWithAck(
+      "conversation:leave",
+      {"conversationId": conversationId},
+      ack: (data) {
+        Utils.print("✅ LEAVE RESPONSE: $data");
+      },
+    );
+  }
+
+  // ==============================
+  // 🔥 MESSAGING
+  // ==============================
+
+  /// Send a message with ack callback to receive the real message _id
+  void sendMessage(
+    String conversationId,
+    String message, {
+    Function(dynamic)? onAck,
+  }) {
     Utils.print("📤 Sending message: $message");
 
-    emit("message:send", {
-      "conversationId": conversationId,
-      "messageType": "text",
-      "content": message,
-    });
+    _socket?.emitWithAck(
+      "message:send",
+      {
+        "conversationId": conversationId,
+        "messageType": "text",
+        "content": message,
+      },
+      ack: (response) {
+        Utils.print("📤 SEND ACK: $response");
+        onAck?.call(response);
+      },
+    );
   }
 
   void startTyping(String conversationId) {
@@ -205,14 +269,20 @@ class SocketService {
     emit('typing:stop', {'conversationId': conversationId});
   }
 
-  void markMessageRead(String conversationId, String messageId) {
-    emit('message:read', {
-      'conversationId': conversationId,
-      'messageIds': [messageId],
-    });
+  /// Mark messages as read via socket (per doc: message:read)
+  void markMessageRead(String conversationId, [List<String>? messageIds]) {
+    final payload = <String, dynamic>{'conversationId': conversationId};
+    if (messageIds != null && messageIds.isNotEmpty) {
+      payload['messageIds'] = messageIds;
+    }
+    emit('message:read', payload);
   }
 
-  // Listeners
+  // ==============================
+  // 🔥 EVENT LISTENERS
+  // ==============================
+
+  // --- message:new ---
   void onNewMessage(Function(dynamic) callback) {
     on('message:new', callback);
   }
@@ -221,6 +291,7 @@ class SocketService {
     off('message:new', callback);
   }
 
+  // --- message:delivered ---
   void onMessageDelivered(Function(dynamic) callback) {
     on('message:delivered', callback);
   }
@@ -229,14 +300,18 @@ class SocketService {
     off('message:delivered', callback);
   }
 
+  // --- message:read:receipt (listening for both receipt and raw read event) ---
   void onMessageRead(Function(dynamic) callback) {
-    on('message:read', callback);
+    on('message:read:receipt', callback);
+    on('message:read', callback); // Catch-all for inconsistent naming
   }
 
   void offMessageRead(Function(dynamic) callback) {
+    off('message:read:receipt', callback);
     off('message:read', callback);
   }
 
+  // --- typing:status ---
   void onTypingStatus(Function(dynamic) callback) {
     on('typing:status', callback);
   }
@@ -245,11 +320,21 @@ class SocketService {
     off('typing:status', callback);
   }
 
+  // --- partner:status:changed ---
   void onPartnerStatusChanged(Function(dynamic) callback) {
     on('partner:status:changed', callback);
   }
 
   void offPartnerStatusChanged(Function(dynamic) callback) {
     off('partner:status:changed', callback);
+  }
+
+  // --- notification:new:message (for out-of-room notifications) ---
+  void onNotificationNewMessage(Function(dynamic) callback) {
+    on('notification:new:message', callback);
+  }
+
+  void offNotificationNewMessage(Function(dynamic) callback) {
+    off('notification:new:message', callback);
   }
 }

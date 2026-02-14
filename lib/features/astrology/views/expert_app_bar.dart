@@ -21,13 +21,18 @@ class AstrologyAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimary, size: 24), // Use textPrimary color
+        icon: const Icon(
+          Icons.arrow_back,
+          color: AppTheme.textPrimary,
+          size: 24,
+        ), // Use textPrimary color
         onPressed: () => Get.back(),
       ),
       titleSpacing: 0,
       title: Text(
         displayTitle,
-        style: GoogleFonts.cinzel( // Use Cinzel font for titles
+        style: GoogleFonts.cinzel(
+          // Use Cinzel font for titles
           fontSize: 16,
           fontWeight: FontWeight.w500,
           color: AppTheme.textPrimary, // Use textPrimary color
@@ -48,19 +53,34 @@ class AstrologyAppBar extends StatelessWidget implements PreferredSizeWidget {
               Container(
                 width: 16,
                 height: 16,
-                decoration: BoxDecoration(color: AppTheme.primaryGold, shape: BoxShape.circle),
-                child: const Icon(Icons.currency_rupee_sharp, color: Colors.white, size: 14),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryGold,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.currency_rupee_sharp,
+                  color: Colors.white,
+                  size: 14,
+                ),
               ),
               const SizedBox(width: 6),
               Text(
                 "2,500",
-                style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w500, color: AppTheme.textPrimary), // Use Cinzel and textPrimary
+                style: GoogleFonts.cinzel(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.textPrimary,
+                ), // Use Cinzel and textPrimary
               ),
             ],
           ),
         ),
         IconButton(
-          icon: const Icon(Icons.history, color: AppTheme.textPrimary, size: 24), // Use textPrimary color
+          icon: const Icon(
+            Icons.history,
+            color: AppTheme.textPrimary,
+            size: 24,
+          ), // Use textPrimary color
           onPressed: () => controller.openHistory(),
         ),
         const SizedBox(width: 4),

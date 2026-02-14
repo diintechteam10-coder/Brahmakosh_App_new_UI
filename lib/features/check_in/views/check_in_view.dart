@@ -1,4 +1,5 @@
 import 'package:brahmakosh/core/constants/app_constants.dart';
+import 'package:brahmakosh/features/check_in/views/prayer_configuration_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,8 +14,12 @@ import 'package:brahmakosh/common/utils.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
 
+import 'chanting_configuration_view.dart';
+
 class CheckInView extends StatefulWidget {
-  const CheckInView({super.key});
+  final ScrollController? scrollController;
+
+  const CheckInView({super.key, this.scrollController});
 
   @override
   State<CheckInView> createState() => _CheckInViewState();
@@ -166,6 +171,7 @@ class _CheckInViewState extends State<CheckInView>
                   return completer.future;
                 },
                 child: CustomScrollView(
+                  controller: widget.scrollController,
                   physics: const BouncingScrollPhysics(
                     parent: AlwaysScrollableScrollPhysics(),
                   ),
@@ -272,8 +278,17 @@ class _CheckInViewState extends State<CheckInView>
                                 onTap: () {
                                   if (activity.route != null) {
                                     if (activity.title == 'Chanting') {
-                                      Get.toNamed(
-                                        AppConstants.routeChantingConfiguration,
+                                      Get.to(
+                                        () => ChantingConfigurationView(
+                                          chantingCategoryId: activity.id!,
+                                        ),
+                                      );
+                                    } else if (activity.title == 'Prayer' &&
+                                        activity.id != null) {
+                                      Get.to(
+                                        () => PrayerConfigurationView(
+                                          prayerCategoryId: activity.id!,
+                                        ),
                                       );
                                     } else if (activity.id != null) {
                                       // BLoC Navigation Trigger
@@ -552,8 +567,41 @@ class _CheckInViewState extends State<CheckInView>
                 if (stats.prayer != null) _categoryRow('Prayer', stats.prayer!),
                 if (stats.silence != null)
                   _categoryRow('Silence', stats.silence!),
+                if (stats.bonus != null)
+                  _bonusRedemptionRow(
+                    'Bonus',
+                    '${stats.bonus!.count} bonuses • ${stats.bonus!.totalBonusPoints} points',
+                  ),
+                if (stats.redemption != null)
+                  _bonusRedemptionRow(
+                    'Redemption',
+                    '${stats.redemption!.count} redemptions • ${stats.redemption!.totalRedeemPoints} points',
+                  ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _bonusRedemptionRow(String title, String subtitle) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: GoogleFonts.lora(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+          ),
+          Text(
+            subtitle,
+            style: GoogleFonts.lora(fontSize: 13, color: Colors.black54),
           ),
         ],
       ),

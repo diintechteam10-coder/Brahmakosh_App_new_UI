@@ -122,8 +122,17 @@ class CategoryStats {
   CategoryDetail? chanting;
   CategoryDetail? prayer;
   CategoryDetail? silence;
+  Bonus? bonus;
+  Redemption? redemption;
 
-  CategoryStats({this.meditation, this.chanting, this.prayer, this.silence});
+  CategoryStats({
+    this.meditation,
+    this.chanting,
+    this.prayer,
+    this.silence,
+    this.bonus,
+    this.redemption,
+  });
 
   CategoryStats.fromJson(Map<String, dynamic> json) {
     meditation = json['meditation'] != null
@@ -138,6 +147,48 @@ class CategoryStats {
     silence = json['silence'] != null
         ? CategoryDetail.fromJson(json['silence'])
         : null;
+    bonus = json['bonus'] != null ? Bonus.fromJson(json['bonus']) : null;
+    redemption = json['redemption'] != null
+        ? Redemption.fromJson(json['redemption'])
+        : null;
+  }
+}
+
+class Bonus {
+  int? count;
+  int? totalBonusPoints;
+
+  Bonus({this.count, this.totalBonusPoints});
+
+  Bonus.fromJson(Map<String, dynamic> json) {
+    count = json['count'];
+    totalBonusPoints = json['totalBonusPoints'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['count'] = count;
+    data['totalBonusPoints'] = totalBonusPoints;
+    return data;
+  }
+}
+
+class Redemption {
+  int? count;
+  int? totalRedeemPoints;
+
+  Redemption({this.count, this.totalRedeemPoints});
+
+  Redemption.fromJson(Map<String, dynamic> json) {
+    count = json['count'];
+    totalRedeemPoints = json['totalRedeemPoints'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['count'] = count;
+    data['totalRedeemPoints'] = totalRedeemPoints;
+    return data;
   }
 }
 

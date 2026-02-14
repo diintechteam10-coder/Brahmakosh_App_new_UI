@@ -39,6 +39,7 @@ class SpiritualConfiguration {
   String? customChantingType;
   bool? isActive;
   bool? isDeleted;
+  String? prayerType;
   String? clientId;
   String? categoryId;
   int? iV;
@@ -57,6 +58,7 @@ class SpiritualConfiguration {
     this.customChantingType,
     this.isActive,
     this.isDeleted,
+    this.prayerType,
     this.clientId,
     this.categoryId,
     this.iV,
@@ -76,6 +78,7 @@ class SpiritualConfiguration {
     customChantingType = json['customChantingType'];
     isActive = json['isActive'];
     isDeleted = json['isDeleted'];
+    prayerType = json['prayerType'];
     clientId = json['clientId'];
     categoryId = json['categoryId'];
     iV = json['__v'];
@@ -96,6 +99,7 @@ class SpiritualConfiguration {
     data['customChantingType'] = customChantingType;
     data['isActive'] = isActive;
     data['isDeleted'] = isDeleted;
+    data['prayerType'] = prayerType;
     data['clientId'] = clientId;
     data['categoryId'] = categoryId;
     data['__v'] = iV;

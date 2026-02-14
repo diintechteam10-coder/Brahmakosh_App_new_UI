@@ -18,7 +18,9 @@ import 'pahar_section.dart';
 import 'luck_in_favour_section.dart';
 
 class HomeView extends StatefulWidget {
-  const HomeView({super.key});
+  final ScrollController? scrollController;
+
+  const HomeView({super.key, this.scrollController});
 
   @override
   State<HomeView> createState() => _HomeViewState();
@@ -84,16 +86,15 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         onRefresh: _handleRefresh,
         color: AppTheme.primaryGold,
         child: CustomScrollView(
+          controller: widget.scrollController,
           physics: const BouncingScrollPhysics(
             parent: AlwaysScrollableScrollPhysics(),
           ),
           slivers: [
-            const SliverToBoxAdapter(child: HomeTopBar()),
-
             SliverToBoxAdapter(
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height * 0.24,
-                child: PageView(
+              child: HomeTopBar(
+                bottomCardHeight: MediaQuery.of(context).size.height * 0.24,
+                bottomCard: PageView(
                   controller: _cardsPageController,
                   onPageChanged: (index) {
                     _currentCardPage = index;

@@ -69,6 +69,9 @@ class _KrishnaCategorySelectionViewState
       if (name.toLowerCase().contains('rashmi')) {
         deityName = 'Rashmi';
         imageAsset = 'assets/images/Small_rashmi.png';
+      } else if (name.toLowerCase().contains('krishna')) {
+        deityName = 'Krishna';
+        imageAsset = 'assets/images/Small_krishna.png';
       }
     }
 

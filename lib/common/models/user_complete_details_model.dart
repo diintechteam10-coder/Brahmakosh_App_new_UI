@@ -22,14 +22,18 @@ class UserCompleteDetailsModel {
 class Data {
   User? user;
   Astrology? astrology;
+  Doshas? doshas;
+  Dashas? dashas;
 
-  Data({this.user, this.astrology});
+  Data({this.user, this.astrology, this.doshas, this.dashas});
 
   Data.fromJson(Map<String, dynamic> json) {
     user = json['user'] != null ? User.fromJson(json['user']) : null;
     astrology = json['astrology'] != null
         ? Astrology.fromJson(json['astrology'])
         : null;
+    doshas = json['doshas'] != null ? Doshas.fromJson(json['doshas']) : null;
+    dashas = json['dashas'] != null ? Dashas.fromJson(json['dashas']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -39,6 +43,12 @@ class Data {
     }
     if (astrology != null) {
       data['astrology'] = astrology!.toJson();
+    }
+    if (doshas != null) {
+      data['doshas'] = doshas!.toJson();
+    }
+    if (dashas != null) {
+      data['dashas'] = dashas!.toJson();
     }
     return data;
   }
@@ -242,8 +252,6 @@ class Astrology {
   List<Planets>? planetsExtended;
   BirthChart? birthChart;
   BirthExtendedChart? birthExtendedChart;
-  Doshas? doshas;
-  Dashas? dashas;
   String? lastCalculated;
   String? calculationSource;
 
@@ -254,8 +262,6 @@ class Astrology {
     this.planetsExtended,
     this.birthChart,
     this.birthExtendedChart,
-    this.doshas,
-    this.dashas,
     this.lastCalculated,
     this.calculationSource,
   });
@@ -285,8 +291,6 @@ class Astrology {
     birthExtendedChart = json['birthExtendedChart'] != null
         ? BirthExtendedChart.fromJson(json['birthExtendedChart'])
         : null;
-    doshas = json['doshas'] != null ? Doshas.fromJson(json['doshas']) : null;
-    dashas = json['dashas'] != null ? Dashas.fromJson(json['dashas']) : null;
     lastCalculated = json['lastCalculated'];
     calculationSource = json['calculationSource'];
   }
@@ -312,12 +316,6 @@ class Astrology {
     }
     if (birthExtendedChart != null) {
       data['birthExtendedChart'] = birthExtendedChart!.toJson();
-    }
-    if (doshas != null) {
-      data['doshas'] = doshas!.toJson();
-    }
-    if (dashas != null) {
-      data['dashas'] = dashas!.toJson();
     }
     data['lastCalculated'] = lastCalculated;
     data['calculationSource'] = calculationSource;
@@ -767,10 +765,8 @@ class Doshas {
 class Manglik {
   bool? present;
   String? status;
-  // ignore: prefer_void_to_null
-  Null percentage;
-  // ignore: prefer_void_to_null
-  Null description;
+  double? percentage;
+  String? description;
   RawManglik? raw;
 
   Manglik({
@@ -878,12 +874,9 @@ class ManglikPresentRule {
 
 class Kalsarpa {
   bool? present;
-  // ignore: prefer_void_to_null
-  Null status;
-  // ignore: prefer_void_to_null
-  Null type;
-  // ignore: prefer_void_to_null
-  Null description;
+  String? status;
+  String? type;
+  String? description;
   RawKalsarpa? raw;
 
   Kalsarpa({this.present, this.status, this.type, this.description, this.raw});
@@ -1009,8 +1002,7 @@ class RawSadeSatiCurrent {
 class SadeSatiLife {
   bool? present;
   String? status;
-  // ignore: prefer_void_to_null
-  Null considerationDate;
+  String? considerationDate;
   bool? isUndergoing;
   List<RawSadeSati>? raw;
 
@@ -1092,10 +1084,8 @@ class RawSadeSati {
 
 class Pitra {
   bool? present;
-  // ignore: prefer_void_to_null
-  Null oneLine;
-  // ignore: prefer_void_to_null
-  Null description;
+  String? oneLine;
+  String? description;
   RawPitra? raw;
 
   Pitra({this.present, this.oneLine, this.description, this.raw});
@@ -1161,8 +1151,14 @@ class Dashas {
   CurrentYogini? currentYogini;
   CurrentChardasha? currentChardasha;
   List<MajorChardasha>? majorChardasha;
+  List<VimshottariDasha>? vimshottariDasha;
 
-  Dashas({this.currentYogini, this.currentChardasha, this.majorChardasha});
+  Dashas({
+    this.currentYogini,
+    this.currentChardasha,
+    this.majorChardasha,
+    this.vimshottariDasha,
+  });
 
   Dashas.fromJson(Map<String, dynamic> json) {
     currentYogini = json['currentYogini'] != null
@@ -1186,6 +1182,17 @@ class Dashas {
         majorChardasha!.add(MajorChardasha.fromJson(v));
       });
     }
+    if (json['vimshottariDasha'] != null) {
+      vimshottariDasha = <VimshottariDasha>[];
+      json['vimshottariDasha'].forEach((v) {
+        vimshottariDasha!.add(VimshottariDasha.fromJson(v));
+      });
+    } else if (json['vimshottari_dasha'] != null) {
+      vimshottariDasha = <VimshottariDasha>[];
+      json['vimshottari_dasha'].forEach((v) {
+        vimshottariDasha!.add(VimshottariDasha.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -1199,6 +1206,45 @@ class Dashas {
     if (majorChardasha != null) {
       data['major_chardasha'] = majorChardasha!.map((v) => v.toJson()).toList();
     }
+    if (vimshottariDasha != null) {
+      data['vimshottari_dasha'] = vimshottariDasha!
+          .map((v) => v.toJson())
+          .toList();
+    }
+    return data;
+  }
+}
+
+class VimshottariDasha {
+  String? planet;
+  int? planetId;
+  String? start;
+  String? end;
+  int? duration;
+
+  VimshottariDasha({
+    this.planet,
+    this.planetId,
+    this.start,
+    this.end,
+    this.duration,
+  });
+
+  VimshottariDasha.fromJson(Map<String, dynamic> json) {
+    planet = json['planet'];
+    planetId = json['planet_id'];
+    start = json['start'];
+    end = json['end'];
+    duration = json['duration'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['planet'] = planet;
+    data['planet_id'] = planetId;
+    data['start'] = start;
+    data['end'] = end;
+    data['duration'] = duration;
     return data;
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 import 'ai_rashmi_service.dart';
 import 'ai_rashmi_view_model.dart';
@@ -15,7 +16,12 @@ import '../gita/views/gita_chapter_screen.dart';
 
 class RashmiChat extends StatelessWidget {
   final String? backgroundImage;
-  const RashmiChat({super.key, this.backgroundImage});
+  final bool hideLearnGita;
+  const RashmiChat({
+    super.key,
+    this.backgroundImage,
+    this.hideLearnGita = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,13 +29,17 @@ class RashmiChat extends StatelessWidget {
     if (!Get.isRegistered<AiRashmiController>()) {
       Get.put(AiRashmiController(service: AiRashmiService()));
     }
-    return _RashmiChatView(backgroundImage: backgroundImage);
+    return _RashmiChatView(
+      backgroundImage: backgroundImage,
+      hideLearnGita: hideLearnGita,
+    );
   }
 }
 
 class _RashmiChatView extends StatefulWidget {
   final String? backgroundImage;
-  const _RashmiChatView({this.backgroundImage});
+  final bool hideLearnGita;
+  const _RashmiChatView({this.backgroundImage, this.hideLearnGita = false});
 
   @override
   State<_RashmiChatView> createState() => _RashmiChatViewState();
@@ -38,6 +48,7 @@ class _RashmiChatView extends StatefulWidget {
 class _RashmiChatViewState extends State<_RashmiChatView> {
   // late VideoPlayerController _vicontroller;
   final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final DeitySelectionService _deityService = DeitySelectionService();
   bool _isDeitySelectionOpen = false; // Toggle state
@@ -45,12 +56,35 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
   @override
   void initState() {
     super.initState();
-    // ... (video init code commented out)
+    // Always start with a fresh chat when this page is opened
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.isRegistered<AiRashmiController>()) {
+        final vm = Get.find<AiRashmiController>();
+        vm.newChat();
+        vm.addListener(_scrollToBottom);
+      }
+    });
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      });
+    }
   }
 
   @override
   void dispose() {
+    if (Get.isRegistered<AiRashmiController>()) {
+      Get.find<AiRashmiController>().removeListener(_scrollToBottom);
+    }
     _controller.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -147,6 +181,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                               ? _buildKrishnaEmptyState(context, vm, theme)
                               : _buildRashmiEmptyState(context, vm, theme))
                         : ListView.builder(
+                            controller: _scrollController,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
                               vertical: 16,
@@ -236,16 +271,113 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
     // Check if chat has started (messages exist) to hide FAQs
     final bool hasMessages = vm.messages.isNotEmpty;
 
+    // Professional, responsive input area
+    if (hasMessages) {
+      // Compact inline input during active chat
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 12,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            // const SizedBox(width: 12),
+            Expanded(
+              child: TextField(
+                controller: _controller,
+                minLines: 1,
+                maxLines: 10,
+                keyboardType: TextInputType.multiline,
+                textInputAction: TextInputAction.newline,
+                textCapitalization: TextCapitalization.sentences,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.black87,
+                  height: 1.4,
+                ),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  focusColor: Colors.white,
+
+                  hintText: 'Send message...',
+                  hintStyle: TextStyle(
+                    color: Colors.grey.shade400,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  focusedErrorBorder: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 12,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: GestureDetector(
+                onTap: vm.isSending
+                    ? null
+                    : () async {
+                        final text = _controller.text;
+                        if (text.trim().isNotEmpty) {
+                          _controller.clear();
+                          await vm.sendMessage(text);
+                        }
+                      },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: vm.isSending
+                        ? Colors.grey.shade300
+                        : const Color(0xFFFF8C00),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    vm.isSending
+                        ? Icons.hourglass_top_rounded
+                        : Icons.arrow_upward_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Expanded input for empty state (first message)
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16), // Reduced from 20
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 12,
             offset: const Offset(0, -2),
           ),
         ],
@@ -258,21 +390,29 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
             controller: _controller,
             minLines: 1,
             maxLines: 4,
+            textCapitalization: TextCapitalization.sentences,
             style: const TextStyle(
-              fontSize: 12, // Reduced from 16
-              fontWeight: FontWeight.w600,
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
               color: Colors.black87,
-              height: 1.0,
+              height: 1.4,
             ),
             decoration: InputDecoration(
-              hintText: hasMessages ? 'Send message...' : 'Ask $deityName',
-              hintStyle: const TextStyle(color: Colors.black54),
+              filled: true,
+              fillColor: Colors.white,
+              hintText: 'Ask $deityName anything...',
+              hintStyle: TextStyle(
+                color: Colors.grey.shade400,
+                fontSize: 15,
+                fontWeight: FontWeight.w400,
+              ),
               border: InputBorder.none,
-              focusedBorder: InputBorder.none,
               enabledBorder: InputBorder.none,
-              errorBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
               disabledBorder: InputBorder.none,
-              isDense: true,
+              errorBorder: InputBorder.none,
+              focusedErrorBorder: InputBorder.none,
+              contentPadding: EdgeInsets.zero,
             ),
             onSubmitted: (value) async {
               if (value.trim().isNotEmpty) {
@@ -281,54 +421,45 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
               }
             },
           ),
-
-          if (!hasMessages) const SizedBox(height: 24),
-
+          const SizedBox(height: 16),
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              if (!hasMessages)
-                Expanded(
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10, // Reduced from 16
-                          vertical: 4, // Reduced from 8
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.description_outlined,
-                              size: 14, // Reduced from 16
-                              color: Colors.grey.shade600,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              "FAQ's",
-                              style: TextStyle(
-                                fontSize: 12, // Reduced from 13
-                                color: Colors.grey.shade700,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Icon(
-                              Icons.keyboard_arrow_down,
-                              size: 16, // Reduced from 18
-                              color: Colors.grey.shade600,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Spacer(),
-                    ],
-                  ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
                 ),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade300),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.description_outlined,
+                      size: 14,
+                      color: Colors.grey.shade500,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      "FAQ's",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade600,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(width: 2),
+                    Icon(
+                      Icons.keyboard_arrow_down,
+                      size: 16,
+                      color: Colors.grey.shade500,
+                    ),
+                  ],
+                ),
+              ),
+              const Spacer(),
               GestureDetector(
                 onTap: vm.isSending
                     ? null
@@ -340,15 +471,15 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                         }
                       },
                 child: Container(
-                  padding: const EdgeInsets.all(8), // Reduced from 10
+                  padding: const EdgeInsets.all(10),
                   decoration: const BoxDecoration(
-                    color: Colors.orange,
+                    color: Color(0xFFFF8C00),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
-                    Icons.arrow_upward,
+                    Icons.arrow_upward_rounded,
                     color: Colors.white,
-                    size: 20, // Reduced from 24
+                    size: 20,
                   ),
                 ),
               ),
@@ -376,6 +507,9 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
       if (name.toLowerCase().contains('rashmi')) {
         deityName = 'Rashmi';
         imageAsset = 'assets/images/Small_rashmi.png';
+      } else if (name.toLowerCase().contains('krishna')) {
+        deityName = 'Krishna';
+        imageAsset = 'assets/images/Small_krishna.png';
       }
     }
 
@@ -490,17 +624,18 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
               height: MediaQuery.of(context).size.height * 0.40,
             ), // Push cards down
 
-            _buildKrishnaOptionCard(
-              context,
-              "Learn Gita Shloaks",
-              "Get the meaning from Gita Shloak",
-              Icons.auto_awesome,
-              Colors.orange,
-              () {
-                Get.to(() => const GitaChapterScreen());
-              },
-            ),
-            const SizedBox(height: 12),
+            if (!widget.hideLearnGita)
+              _buildKrishnaOptionCard(
+                context,
+                "Learn Gita Shloaks",
+                "Get the meaning from Gita Shloak",
+                Icons.auto_awesome,
+                Colors.orange,
+                () {
+                  Get.to(() => const GitaChapterScreen());
+                },
+              ),
+            if (!widget.hideLearnGita) const SizedBox(height: 12),
             _buildKrishnaOptionCard(
               context,
               "Ask Doubt",
@@ -710,10 +845,45 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
             ),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              child: Text(
-                msg.content,
-                style: TextStyle(color: textColor, height: 1.4),
-              ),
+              child: isUser
+                  ? Text(
+                      msg.content,
+                      style: TextStyle(color: textColor, height: 1.4),
+                    )
+                  : MarkdownBody(
+                      data: msg.content,
+                      selectable: true,
+                      shrinkWrap: true,
+                      styleSheet: MarkdownStyleSheet(
+                        p: TextStyle(
+                          color: textColor,
+                          height: 1.4,
+                          fontSize: 14,
+                        ),
+                        strong: TextStyle(
+                          color: textColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                        h1: TextStyle(
+                          color: textColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                        h2: TextStyle(
+                          color: textColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                        h3: TextStyle(
+                          color: textColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                        listBullet: TextStyle(color: textColor, fontSize: 14),
+                        blockSpacing: 8,
+                      ),
+                    ),
             ),
           ),
         ),

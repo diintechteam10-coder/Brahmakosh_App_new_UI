@@ -1,6 +1,9 @@
 import '../../../../core/common_imports.dart';
 import '../../profile/viewmodels/profile_viewmodel.dart';
 import '../../profile/views/profile_details_view.dart';
+import '../../profile/views/update_profile_view.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import '../viewmodels/dashboard_viewmodel.dart';
 import '../../agent/lemon_agent_page.dart';
 
@@ -55,7 +58,7 @@ class AppDrawer extends StatelessWidget {
                                 InkWell(
                                   onTap: () {
                                     Navigator.pop(context);
-                                    Get.to(() => const ProfileDetailsView());
+                                    Get.to(() => const UpdateProfileView());
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.all(6),
@@ -123,16 +126,61 @@ class AppDrawer extends StatelessWidget {
                                     Positioned(
                                       bottom: 0,
                                       right: 0,
-                                      child: Container(
-                                        padding: const EdgeInsets.all(4),
-                                        decoration: const BoxDecoration(
-                                          color: Colors.white,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(
-                                          Icons.camera_alt_outlined,
-                                          size: 14,
-                                          color: Color(0xff5D4037),
+                                      child: GestureDetector(
+                                        onTap: () async {
+                                          showModalBottomSheet(
+                                            context: context,
+                                            builder: (context) => Container(
+                                              height: 150,
+                                              color: Colors.white,
+                                              child: Column(
+                                                children: [
+                                                  ListTile(
+                                                    leading: const Icon(Icons.camera_alt),
+                                                    title: const Text("Camera"),
+                                                    onTap: () async {
+                                                      Navigator.pop(context);
+                                                      final ImagePicker picker = ImagePicker();
+                                                      final XFile? image = await picker.pickImage(
+                                                        source: ImageSource.camera,
+                                                        imageQuality: 50,
+                                                      );
+                                                      if (image != null) {
+                                                        viewModel.uploadProfileImage(File(image.path));
+                                                      }
+                                                    },
+                                                  ),
+                                                  ListTile(
+                                                    leading: const Icon(Icons.photo),
+                                                    title: const Text("Gallery"),
+                                                    onTap: () async {
+                                                      Navigator.pop(context);
+                                                      final ImagePicker picker = ImagePicker();
+                                                      final XFile? image = await picker.pickImage(
+                                                        source: ImageSource.gallery,
+                                                        imageQuality: 50,
+                                                      );
+                                                      if (image != null) {
+                                                        viewModel.uploadProfileImage(File(image.path));
+                                                      }
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: const BoxDecoration(
+                                            color: Colors.white,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(
+                                            Icons.camera_alt_outlined,
+                                            size: 14,
+                                            color: Color(0xff5D4037),
+                                          ),
                                         ),
                                       ),
                                     ),

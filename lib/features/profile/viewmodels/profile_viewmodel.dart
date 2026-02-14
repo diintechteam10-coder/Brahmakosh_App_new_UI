@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import '../../../../common/api_services.dart';
 import '../../../../common/api_urls.dart';
 import '../../../../core/constants/app_constants.dart';
@@ -106,8 +109,141 @@ class ProfileViewModel extends ChangeNotifier {
     }
   }
 
+  /// Update user profile
+  Future<void> updateProfile(Map<String, dynamic> body) async {
+    _isLoading = true;
+    _errorMessage = null;
+    _safeNotifyListeners();
+
+    try {
+      final token = StorageService.getString(AppConstants.keyAuthToken);
+
+      if (token == null || token.isEmpty) {
+        _errorMessage = 'No authentication token found';
+        _isLoading = false;
+        _safeNotifyListeners();
+        return;
+      }
+
+      await callWebApiPut(
+        null,
+        ApiUrls.getProfile, // Reuse URL /user/profile
+        body,
+        token: token,
+        showLoader: true,
+        // Assuming callWebApi defaults to POST when data is present
+        // If not, we might need callWebApiPost or similar if defined
+        
+        onResponse: (response) async {
+           try {
+             final responseBody = json.decode(response.body);
+             print("📦 Update Profile Response: ${response.body}");
+
+             if (responseBody['success'] == true) {
+                // Refresh profile to get updated data
+                await fetchProfile();
+                Get.snackbar("Success", "Profile updated successfully");
+             } else {
+                _errorMessage = responseBody['message'] ?? 'Failed to update profile';
+                Get.snackbar("Error", _errorMessage!);
+             }
+           } catch (e) {
+              print("❌ Error parsing update response: $e");
+              _errorMessage = "Error parsing server response";
+           }
+           
+           _isLoading = false;
+           _safeNotifyListeners();
+        },
+        onError: (error) {
+           print("❌ Update Profile API Error: $error");
+           _errorMessage = "Failed to update profile";
+           _isLoading = false;
+           _safeNotifyListeners();
+        }
+      );
+    } catch (e) {
+       print("🔥 Exception in updateProfile: $e");
+       _errorMessage = "Something went wrong";
+       _isLoading = false;
+       _safeNotifyListeners();
+    }
+  }
+
   /// Refresh profile data
   Future<void> refreshProfile() async {
     await fetchProfile();
+  }
+
+  /// Upload Profile Image
+  Future<void> uploadProfileImage(File imageFile) async {
+    _isLoading = true;
+    _errorMessage = null;
+    _safeNotifyListeners();
+
+    try {
+      final token = StorageService.getString(AppConstants.keyAuthToken);
+
+      if (token == null || token.isEmpty) {
+        _errorMessage = 'No authentication token found';
+        _isLoading = false;
+        _safeNotifyListeners();
+        return;
+      }
+
+      // Prepare file
+      List<http.MultipartFile> files = [];
+      
+      String fileName = imageFile.path.split('/').last;
+      String extension = fileName.split('.').last.toLowerCase();
+      String mimeType = 'jpeg';
+      if (extension == 'png') mimeType = 'png';
+      if (extension == 'jpg' || extension == 'jpeg') mimeType = 'jpeg';
+      // Add more if needed
+
+      var multipartFile = await http.MultipartFile.fromPath(
+        'image', 
+        imageFile.path,
+        contentType: MediaType('image', mimeType),
+      );
+      
+      files.add(multipartFile);
+
+      await callMultipartWebApi(
+        null,
+        ApiUrls.uploadProfileImage,
+        {}, 
+        files,
+        token: token,
+        showLoader: true,
+        onResponse: (response) async {
+           // callMultipartWebApi returns decoded JSON map directly in onResponse
+           print("📦 Upload Image Response: $response");
+           // Check success
+           var success = response['success'];
+           if (success == true) {
+              await fetchProfile(); // Refresh to get new image URL
+              Get.snackbar("Success", "Profile image updated successfully");
+           } else {
+              _errorMessage = response['message'] ?? 'Failed to upload image';
+              Get.snackbar("Error", _errorMessage!);
+           }
+           _isLoading = false;
+           _safeNotifyListeners();
+        },
+        onError: (error) {
+           print("❌ Upload Image Error: $error");
+           _errorMessage = "Failed to upload image";
+           _isLoading = false;
+           _safeNotifyListeners();
+        }
+      );
+
+    } catch (e) {
+       print("🔥 Exception in uploadProfileImage: $e");
+       _errorMessage = "Something went wrong";
+       _isLoading = false;
+       _safeNotifyListeners();
+    }
   }
 }

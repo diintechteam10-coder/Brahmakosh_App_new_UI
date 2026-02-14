@@ -98,6 +98,8 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
       }
     }
 
+    _parseMediaUrls(); // Parse URLs early
+
     /// 1️⃣ ENTRY
     _entryController = AnimationController(
       vsync: this,
@@ -174,6 +176,70 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
     _initVideo();
   }
 
+  void _parseMediaUrls() {
+    final args = Get.arguments;
+    List? clips = args != null ? args['clips'] : null;
+
+    String sourceUrl = "";
+    String? videoSourceUrl;
+
+    if (clips != null && clips.isNotEmpty) {
+      final clip = clips[0];
+      // Handle SpiritualClip Object
+      if (clip is SpiritualClip) {
+        if (clip.audioUrl != null && clip.audioUrl!.isNotEmpty) {
+          sourceUrl = clip.audioUrl!;
+        } else if (clip.fileUrl != null && clip.fileUrl!.isNotEmpty) {
+          sourceUrl = clip.fileUrl!;
+        }
+        // capture video url
+        if (clip.videoUrl != null && clip.videoUrl!.isNotEmpty) {
+          videoSourceUrl = clip.videoUrl;
+        }
+      }
+      // Handle Map (JSON)
+      else if (clip is Map) {
+        final audio = clip['audioUrl'];
+        final file = clip['url'] ?? clip['fileUrl'];
+        final video = clip['videoUrl'];
+
+        if (audio != null && audio.toString().isNotEmpty) {
+          sourceUrl = audio.toString();
+        } else if (file != null && file.toString().isNotEmpty) {
+          sourceUrl = file.toString();
+        }
+
+        if (video != null && video.toString().isNotEmpty) {
+          videoSourceUrl = video.toString();
+        }
+      }
+      // Final fallback (Dynamic access)
+      else {
+        try {
+          dynamic c = clip;
+          if (c.audioUrl != null && c.audioUrl.isNotEmpty) {
+            sourceUrl = c.audioUrl;
+          } else if (c.fileUrl != null && c.fileUrl.isNotEmpty) {
+            sourceUrl = c.fileUrl;
+          }
+
+          if (c.videoUrl != null && c.videoUrl.isNotEmpty) {
+            videoSourceUrl = c.videoUrl;
+          }
+        } catch (e) {
+          print("Error accessing clip properties: $e");
+        }
+      }
+    }
+
+    _currentVideoUrl = videoSourceUrl;
+
+    if (sourceUrl.isEmpty) {
+      sourceUrl = 'images/Default_music.mpeg';
+    }
+    _currentAudioUrl = sourceUrl;
+  }
+
   bool _isTransitionPlayed = false;
 
   void _initVideo() {
@@ -208,6 +274,7 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
       _isVideoInitialized = false;
     });
 
+    // ALWAYS use default video as per user request
     _videoController =
         VideoPlayerController.asset(
             'assets/images/Meditation_video.mp4',
@@ -224,6 +291,87 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
             // Start the actual meditation flow (animations, audio) only after transition
             _startFlow();
           });
+  }
+
+  // ... _triggerSaveSession ...
+
+  // ... _showCompletionDialog ...
+
+  void _startFlow() async {
+    final isPrayer = _config?.prayerType != null;
+
+    if (isPrayer) {
+      // Direct play for Prayer
+      setState(() {
+        showPlayImage = true;
+        _isStarted = true;
+        _isPlaying = true;
+      });
+      _entryController.forward();
+
+      // Auto-start controllers
+      _timerController.forward();
+      _breathingController.repeat(reverse: true);
+      _rippleController.repeat();
+
+      await _initAudio();
+      try {
+        await _audioPlayer.resume();
+      } catch (e) {
+        print("Error resuming audio on auto-start: $e");
+      }
+    } else {
+      Future.delayed(const Duration(milliseconds: 800), () {
+        _entryController.forward();
+      });
+
+      Future.delayed(const Duration(milliseconds: 3500), () {
+        setState(() => showPlayImage = true);
+      });
+
+      _initAudio();
+    }
+  }
+
+  Future<void> _initAudio() async {
+    try {
+      // Logic moved to _parseMediaUrls, just set player source here
+
+      String sourceUrl = _currentAudioUrl ?? 'images/Default_music.mpeg';
+      bool isNetwork = sourceUrl.toLowerCase().startsWith('http');
+      bool isAsset =
+          sourceUrl.toLowerCase().startsWith('assets/') ||
+          sourceUrl.toLowerCase().startsWith('images/');
+
+      await _audioPlayer.setReleaseMode(ReleaseMode.loop);
+
+      print(
+        "🎵 Audio Init: URL=$sourceUrl, Network=$isNetwork, Asset=$isAsset",
+      );
+
+      if (isNetwork) {
+        await _audioPlayer.setSourceUrl(sourceUrl);
+      } else if (isAsset) {
+        // If it starts with assets/, remove it because AssetSource assumes it
+        if (sourceUrl.startsWith('assets/')) {
+          sourceUrl = sourceUrl.replaceFirst('assets/', '');
+        }
+        await _audioPlayer.setSource(AssetSource(sourceUrl));
+      } else {
+        // Local file
+        await _audioPlayer.setSource(DeviceFileSource(sourceUrl));
+      }
+
+      _isAudioInitialized = true;
+      print("✅ Audio Initialized Successfully: $sourceUrl");
+
+      // Fix: Ensure video continues playing if it was impacted by audio init
+      if (_isVideoInitialized && !_videoController.value.isPlaying) {
+        _videoController.play();
+      }
+    } catch (e) {
+      print("❌ Error initializing audio: $e");
+    }
   }
 
   void _triggerSaveSession({
@@ -400,119 +548,6 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
     );
   }
 
-  void _startFlow() {
-    Future.delayed(const Duration(milliseconds: 800), () {
-      _entryController.forward();
-    });
-
-    Future.delayed(const Duration(milliseconds: 3500), () {
-      setState(() => showPlayImage = true);
-    });
-
-    _initAudio();
-  }
-
-  Future<void> _initAudio() async {
-    try {
-      final args = Get.arguments;
-      List? clips = args != null ? args['clips'] : null;
-
-      String sourceUrl = "";
-      String? videoSourceUrl; // Temp var for video
-      bool isNetwork = false;
-
-      if (clips != null && clips.isNotEmpty) {
-        final clip = clips[0];
-        print("🔍 DEBUG_PLAYER: Clip type: ${clip.runtimeType}");
-
-        // Handle SpiritualClip Object
-        if (clip is SpiritualClip) {
-          if (clip.audioUrl != null && clip.audioUrl!.isNotEmpty) {
-            sourceUrl = clip.audioUrl!;
-            isNetwork = true;
-          } else if (clip.fileUrl != null && clip.fileUrl!.isNotEmpty) {
-            sourceUrl = clip.fileUrl!;
-            isNetwork = true;
-          }
-          // capture video url
-          if (clip.videoUrl != null && clip.videoUrl!.isNotEmpty) {
-            videoSourceUrl = clip.videoUrl;
-          }
-        }
-        // Handle Map (JSON)
-        else if (clip is Map) {
-          final audio = clip['audioUrl'];
-          final file = clip['url'] ?? clip['fileUrl'];
-          final video = clip['videoUrl'];
-
-          if (audio != null && audio.toString().isNotEmpty) {
-            sourceUrl = audio.toString();
-            isNetwork = true;
-          } else if (file != null && file.toString().isNotEmpty) {
-            sourceUrl = file.toString();
-            isNetwork = true;
-          }
-
-          if (video != null && video.toString().isNotEmpty) {
-            videoSourceUrl = video.toString();
-          }
-        }
-        // Final fallback (Dynamic access)
-        else {
-          try {
-            // Optimistic dynamic access (avoid if possible)
-            dynamic c = clip;
-            if (c.audioUrl != null && c.audioUrl.isNotEmpty) {
-              sourceUrl = c.audioUrl;
-              isNetwork = true;
-            } else if (c.fileUrl != null && c.fileUrl.isNotEmpty) {
-              sourceUrl = c.fileUrl;
-              isNetwork = true;
-            }
-
-            if (c.videoUrl != null && c.videoUrl.isNotEmpty) {
-              videoSourceUrl = c.videoUrl;
-            }
-          } catch (e) {
-            print("Error accessing clip properties: $e");
-          }
-        }
-      }
-
-      // Assign video url to state
-      _currentVideoUrl = videoSourceUrl;
-
-      if (sourceUrl.isEmpty) {
-        // Default music fallback
-        sourceUrl = 'images/Default_music.mpeg';
-        isNetwork = false;
-        print("🎵 Audio Init: Using Default Music (Fallback)");
-      } else {
-        print("🎵 Audio Init: URL=$sourceUrl, Network=$isNetwork");
-      }
-
-      _currentAudioUrl = sourceUrl;
-
-      await _audioPlayer.setReleaseMode(ReleaseMode.loop);
-
-      if (isNetwork) {
-        await _audioPlayer.setSourceUrl(sourceUrl);
-      } else {
-        await _audioPlayer.setSource(AssetSource(sourceUrl));
-      }
-
-      _isAudioInitialized = true;
-      print("✅ Audio Initialized Successfully");
-
-      // Fix: Ensure video continues playing if it was impacted by audio init
-      if (_isVideoInitialized && !_videoController.value.isPlaying) {
-        _videoController.play();
-      }
-    } catch (e) {
-      print("❌ Error initializing audio: $e");
-    }
-  }
-
   @override
   void dispose() {
     _entryController.dispose();
@@ -615,7 +650,7 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context); // Close dialog
+              Navigator.pop(context); // Close confirmation dialog
 
               // Calculate partial stats
               double elapsedSeconds =
@@ -626,6 +661,8 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
                   .toInt()
                   .clamp(0, 100);
 
+              _isManualExit = true;
+
               // Save as incomplete with 0 karma
               _triggerSaveSession(
                 status: "incomplete",
@@ -634,8 +671,8 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
                 completionPercentage: percent,
               );
 
-              // Navigate to CheckIn screen (Dashboard Index 1)
-              Get.offAllNamed(AppConstants.routeDashboard, arguments: 1);
+              // Show Incomplete Dialog instead of direct exit
+              _showIncompleteDialog(context, percent);
             },
             child: const Text(
               "Exit",
@@ -647,6 +684,118 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
     );
   }
 
+  void _showIncompleteDialog(BuildContext context, int percentage) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: const Color(0xffFFF8E7), // Creamy background like screenshot
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Info Icon
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.grey, width: 3),
+                ),
+                child: const Icon(
+                  Icons.info_outline,
+                  color: Colors.grey,
+                  size: 40,
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              const Text(
+                "Incomplete",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xff4A3B32), // Dark brown
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Warning + Percent
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(
+                    Icons.warning_amber_rounded,
+                    color: Colors.amber,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      "Session partially completed\n($percentage%)",
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Color(0xff6D5D53),
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              const Text(
+                "+0 Karma Points",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xffFF9B44), // Orange
+                ),
+              ),
+              const SizedBox(height: 30),
+
+              // Done Button
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xff5D4037), // Dark Brown
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30), // Pill shape
+                    ),
+                    elevation: 0,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context); // Close dialog
+                    Get.offAllNamed(AppConstants.routeDashboard, arguments: 1);
+                  },
+                  child: const Text(
+                    "DONE",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  bool _isManualExit = false;
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -654,7 +803,10 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
     return BlocListener<MeditationSessionBloc, MeditationSessionState>(
       listener: (context, state) {
         if (state is SessionSaved) {
-          _showCompletionDialog(context, state.response);
+          // Only show completion dialog if NOT manually exited (i.e. timer finished)
+          if (!_isManualExit) {
+            _showCompletionDialog(context, state.response);
+          }
         }
         if (state is SessionError) {
           Utils.showToast(state.message);
@@ -844,6 +996,7 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
               onToggle: _toggleMeditation,
               timerController: _timerController,
               totalDuration: _totalDuration,
+              isPrayer: _config?.prayerType != null,
             ),
 
             /// 🎵 SONG SELECTION GRID
@@ -1188,6 +1341,7 @@ class _BottomControls extends StatelessWidget {
   final VoidCallback onToggle;
   final AnimationController timerController;
   final int totalDuration;
+  final bool isPrayer;
 
   const _BottomControls({
     required this.isVisible,
@@ -1196,6 +1350,7 @@ class _BottomControls extends StatelessWidget {
     required this.onToggle,
     required this.timerController,
     required this.totalDuration,
+    this.isPrayer = false,
   });
 
   @override
@@ -1215,7 +1370,7 @@ class _BottomControls extends StatelessWidget {
               !isStarted
                   ? "READY TO MEDITATE"
                   : isPlaying
-                  ? "INHALE ... EXHALE"
+                  ? (isPrayer ? "PRAYER IN PROGRESS" : "INHALE ... EXHALE")
                   : "PAUSED",
               style: const TextStyle(
                 color: Colors.white,

@@ -2,6 +2,7 @@ import '../../../../core/common_imports.dart';
 import '../../../../common/colors.dart';
 import '../models/profile_model.dart';
 import '../viewmodels/profile_viewmodel.dart';
+import 'update_profile_view.dart'; // Added Import
 
 class ProfileDetailsView extends StatelessWidget {
   const ProfileDetailsView({super.key});
@@ -38,7 +39,9 @@ class ProfileDetailsView extends StatelessWidget {
               ),
               actions: [
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                     Get.to(() => const UpdateProfileView());
+                  },
                   icon: Icon(
                     Icons.edit_outlined,
                     size: 20,

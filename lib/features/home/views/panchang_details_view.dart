@@ -56,7 +56,9 @@ class PanchangDetailsView extends StatelessWidget {
                 unselectedLabelColor: const Color(0xFF6D3A0C).withOpacity(0.6),
                 indicatorColor: const Color(0xFFE65100),
                 labelStyle: GoogleFonts.lora(fontWeight: FontWeight.bold),
-                isScrollable: true,
+                isScrollable: false,
+                padding: EdgeInsets.zero,
+                labelPadding: const EdgeInsets.symmetric(horizontal: 4),
                 tabs: const [
                   Tab(text: "Over View"),
                   Tab(text: "Panchang"),
@@ -333,40 +335,42 @@ class PanchangDetailsView extends StatelessWidget {
               children: [
                 const Icon(Icons.verified, color: Colors.white, size: 30),
                 const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "BEST TIME TODAY",
-                      style: GoogleFonts.lora(
-                        color: Colors.white70,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "BEST TIME TODAY",
+                        style: GoogleFonts.lora(
+                          color: Colors.white70,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    Text(
-                      "Abhijit Muhurta",
-                      style: GoogleFonts.lora(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                      Text(
+                        "Abhijit Muhurta",
+                        style: GoogleFonts.lora(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    Text(
-                      "Highly auspicious for all activities",
-                      style: GoogleFonts.lora(
-                        color: Colors.white70,
-                        fontSize: 12,
+                      Text(
+                        "Highly auspicious for all activities",
+                        style: GoogleFonts.lora(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                const Spacer(),
+                const SizedBox(width: 8),
                 Text(
                   "${advanced?.abhijitMuhurta?.start} - ${advanced?.abhijitMuhurta?.end}",
                   style: GoogleFonts.lora(
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -644,6 +648,10 @@ class PanchangDetailsView extends StatelessWidget {
               ),
               labelColor: const Color(0xFFE65100),
               unselectedLabelColor: Colors.grey,
+              isScrollable: false,
+              padding: EdgeInsets.zero,
+              labelPadding: EdgeInsets.zero,
+              dividerColor: Colors.transparent,
               tabs: [
                 Tab(
                   child: Row(

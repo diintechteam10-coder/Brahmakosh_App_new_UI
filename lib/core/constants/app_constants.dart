@@ -35,7 +35,7 @@ class AppConstants {
   static const String routeMantraChanting = '/mantraChanting';
   static const String routeMeditationStart = '/meditationStart';
   static const String routeSpiritualConfiguration = '/spiritualConfiguration';
-  static const String routeChantingConfiguration = '/chantingConfiguration';
+  // static const String routeChantingConfiguration = '/chantingConfiguration';
   static const int splashDuration = 1;
   static const String routeWalkthrough = '/walkthrough';
   static const String routeRedeem = '/redeem';

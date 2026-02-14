@@ -32,8 +32,8 @@ class DestinyGuidanceSection extends StatelessWidget {
                 context,
                 title: "Astrology",
                 subtitle: "Planetary movements\ninfluencing your day.",
-                icon: Icons.auto_awesome,
-                color: const Color(0xFFFDECB6),
+                icon: "assets/images/Astrology_image.png",
+                color: const Color(0xFFFFDFB6),
                 buttonText: "View Astrology",
                 onTap: () {
                   Navigator.push(
@@ -49,8 +49,8 @@ class DestinyGuidanceSection extends StatelessWidget {
                 context,
                 title: "Numerology",
                 subtitle: "Numbers reveal\nlife patterns & more.",
-                icon: Icons.star,
-                color: const Color(0xFFF2E3BC),
+                icon: "assets/images/Numerology_Image.png",
+                color: const Color(0xFFFFDFB6),
                 buttonText: "View Numerology",
                 onTap: () {
                   Navigator.push(
@@ -72,7 +72,7 @@ class DestinyGuidanceSection extends StatelessWidget {
     BuildContext context, {
     required String title,
     required String subtitle,
-    required IconData icon,
+    required String icon,
     required Color color,
     required String buttonText,
     required VoidCallback onTap,
@@ -95,16 +95,17 @@ class DestinyGuidanceSection extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.5),
-                border: Border.all(color: Colors.white, width: 2),
-              ),
-              child: Icon(icon, size: 28, color: const Color(0xFF874101)),
-            ),
+            // Container(
+            //   width: 50,
+            //   height: 50,
+            //   decoration: BoxDecoration(
+            //     shape: BoxShape.circle,
+            //     color: Colors.white.withOpacity(0.5),
+            //     border: Border.all(color: Colors.white, width: 2),
+            //   ),
+            //   child: Icon(icon, size: 28, color: const Color(0xFF874101)),
+            // ),
+            Image.asset(icon,fit: BoxFit.cover,),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -112,7 +113,7 @@ class DestinyGuidanceSection extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: GoogleFonts.playfairDisplay(
+                    style: GoogleFonts.inter(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFF6D3A0C),
@@ -121,10 +122,10 @@ class DestinyGuidanceSection extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: GoogleFonts.lora(
-                      fontSize: 12,
-                      color: const Color(0xFF596072),
-                      height: 1.2,
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: const Color(0xFF874101),
+                      height: 1.3,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -134,14 +135,14 @@ class DestinyGuidanceSection extends StatelessWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.6),
+                        color: const Color(0xFFFFC67A),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       buttonText,
                       style: GoogleFonts.lora(
                         fontSize: 10,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color: const Color(0xFF6D3A0C),
                       ),
                     ),
