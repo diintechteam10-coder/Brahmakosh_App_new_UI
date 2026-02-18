@@ -152,12 +152,20 @@ class PanchangView extends StatelessWidget {
       children: [
         Expanded(
           child: _buildTimeCard(
-              'Sunrise', '06:21 AM', Icons.wb_sunny_outlined, Colors.orange),
+            'Sunrise',
+            '06:21 AM',
+            Icons.wb_sunny_outlined,
+            Colors.orange,
+          ),
         ),
         const SizedBox(width: 16),
         Expanded(
           child: _buildTimeCard(
-              'Sunset', '05:58 PM', Icons.nights_stay_outlined, Colors.indigo),
+            'Sunset',
+            '05:58 PM',
+            Icons.nights_stay_outlined,
+            Colors.indigo,
+          ),
         ),
       ],
     );
@@ -194,10 +202,7 @@ class PanchangView extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
-                    color: AppTheme.textSecondary,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: AppTheme.textSecondary, fontSize: 12),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -339,7 +344,9 @@ class PanchangView extends StatelessWidget {
           Row(
             children: [
               Icon(
-                isGood ? Icons.check_circle_outline : Icons.warning_amber_rounded,
+                isGood
+                    ? Icons.check_circle_outline
+                    : Icons.warning_amber_rounded,
                 size: 20,
                 color: isGood ? AppTheme.successGreen : AppTheme.errorRed,
               ),

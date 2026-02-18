@@ -48,7 +48,6 @@ class AstrologistReview {
   });
 }
 
-
 // API Models
 class AstrologistModel {
   bool? success;
@@ -153,13 +152,16 @@ class AstrologistItem {
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
     version = json['__v'];
-    
+
     // Handle languages - can be a list or comma-separated string
     if (json['languages'] != null) {
       if (json['languages'] is List) {
         languages = List<String>.from(json['languages']);
       } else if (json['languages'] is String) {
-        languages = (json['languages'] as String).split(',').map((e) => e.trim()).toList();
+        languages = (json['languages'] as String)
+            .split(',')
+            .map((e) => e.trim())
+            .toList();
       }
     } else {
       languages = ['Hindi', 'English']; // Default languages
@@ -217,14 +219,16 @@ class AstrologistItem {
     return Astrologist(
       id: id ?? '',
       name: name ?? 'Astrologer',
-      image: profilePhoto ?? 'https://randomuser.me/api/portraits/men/1.jpg',
+      image: profilePhoto ?? '',
       skills: skillsList,
       languages: languages ?? ['Hindi', 'English'],
       experience: expYears,
       rating: rating ?? 4.5,
       totalConsultations: reviews ?? 0,
       pricePerMinute: (chatCharge ?? 0).toDouble(),
-      isOnline: status?.toLowerCase() == 'online' || status?.toLowerCase() == 'available',
+      isOnline:
+          status?.toLowerCase() == 'online' ||
+          status?.toLowerCase() == 'available',
       bio: profileSummary ?? 'Experienced astrologer',
       isFirstFree: false,
       reviews: [],

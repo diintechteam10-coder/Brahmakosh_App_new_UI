@@ -95,7 +95,7 @@ class _GitaChapterViewState extends State<_GitaChapterView> {
                     return Center(child: Text('Error: ${state.message}'));
                   } else if (state is GitaChapterLoaded) {
                     return ListView.builder(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.only(left: 16,right: 16,top: 16, bottom: 50),
                       itemCount: state.chapters.length,
                       itemBuilder: (context, index) {
                         final chapter = state.chapters[index];
@@ -144,7 +144,7 @@ class _GitaChapterViewState extends State<_GitaChapterView> {
               ),
             ),
             Positioned(
-              top: 25,
+              top: 30,
               left: 12,
               child: _roundIcon(
                 Icons.arrow_back_ios_new_outlined,
@@ -152,7 +152,7 @@ class _GitaChapterViewState extends State<_GitaChapterView> {
               ),
             ),
             Positioned(
-              top: 25,
+              top: 30,
               right: 12,
               child: _roundIcon(Icons.menu, () {}),
             ),

@@ -41,7 +41,7 @@ class _SplashViewState extends State<SplashView> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SizedBox.expand(
-        child: Image.asset('assets/images/splashScreen.png', fit: BoxFit.cover),
+        child: Image.asset('assets/images/splash2.jpg', fit: BoxFit.cover),
       ),
       // body: SafeArea(
       //   child: Center(

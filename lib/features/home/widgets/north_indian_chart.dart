@@ -146,7 +146,7 @@ class NorthIndianChart extends StatelessWidget {
         int maxPerLine = 3;
         if (i == 2 || i == 4 || i == 8 || i == 10)
           maxPerLine =
-              2; // Narrower triangles (H3, H5, H9, H11) -> wait, indexes are correct?
+          2; // Narrower triangles (H3, H5, H9, H11) -> wait, indexes are correct?
         // H3 is index 2. H5 index 4. H9 index 8. H11 index 10.
         // These are the side triangles, very narrow horizontally.
 

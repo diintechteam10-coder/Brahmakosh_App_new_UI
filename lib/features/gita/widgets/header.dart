@@ -63,7 +63,7 @@ class GitaHeader extends StatelessWidget {
 
             /// Back
             Positioned(
-              top: 25,
+              top: 30,
               left: 12,
               child: _roundIcon(
                 Icons.arrow_back_ios_new_outlined,
@@ -73,7 +73,7 @@ class GitaHeader extends StatelessWidget {
 
             /// Menu
             Positioned(
-              top: 25,
+              top: 30,
               right: 12,
               child: _roundIcon(Icons.menu, onMenu),
             ),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:async'; // Added for TimeoutException
+import 'dart:developer';
 import 'package:brahmakosh/common/exception.dart';
 import 'package:brahmakosh/common/models/avtar_list.dart';
 import 'package:brahmakosh/common/utils.dart';
@@ -25,6 +26,8 @@ import 'package:brahmakosh/features/check_in/models/spiritual_clip_model.dart';
 import 'package:brahmakosh/common/models/user_complete_details_model.dart';
 import 'package:brahmakosh/features/numerology/models/numerology_history_model.dart';
 import 'package:brahmakosh/features/numerology/models/numerology_detail_model.dart';
+import 'package:brahmakosh/features/home/models/dosha_dasha_model.dart';
+import 'package:brahmakosh/features/home/models/remedies_model.dart';
 
 const bool allowInsecureDevFallback = false;
 
@@ -799,6 +802,31 @@ Future<AvtarList?> getLiveAvatars(TickerProvider? tickerProvider) async {
   return avtarList;
 }
 
+Future<DoshaDashaModel?> getDoshaDasha(
+  TickerProvider? tickerProvider,
+  String userId,
+) async {
+  DoshaDashaModel? doshaDashaData;
+  final token = StorageService.getString(AppConstants.keyAuthToken) ?? "";
+  // Construct URL: {{base_url}}/api/client/users/{{user_id}}/doshas
+  final url = "${ApiUrls.doshaDasha}/$userId/doshas";
+
+  await callWebApiGet(
+    tickerProvider,
+    url,
+    token: token,
+    onResponse: (response) {
+      doshaDashaData = DoshaDashaModel.fromJson(jsonDecode(response.body));
+    },
+    onError: (error) {
+      Utils.print('Error fetching dosha dasha data: $error');
+    },
+    showLoader: false, // Background fetch usually
+    shouldLogoutOn401: false,
+  );
+  return doshaDashaData;
+}
+
 Future<BrahmReel?> getBrahmReels(TickerProvider? tickerProvider) async {
   BrahmReel? brahmReel;
   final token = StorageService.getString(AppConstants.keyAuthToken) ?? "";
@@ -1067,10 +1095,8 @@ Future<UserCompleteDetailsModel?> getUserCompleteDetails(
       debugPrint('************************************************');
       debugPrint('🚀 ASTROLOGY DATA RESPONSE (Complete Details):');
       // Print in chunks to avoid console truncation
-      final pattern = RegExp('.{1,1000}');
-      pattern
-          .allMatches(response.body)
-          .forEach((match) => debugPrint(match.group(0)));
+      // Print the full response using developer log to avoid truncation
+      log(response.body, name: 'ASTROLOGY_DATA');
       debugPrint('************************************************');
 
       try {
@@ -1153,4 +1179,28 @@ Future<NumerologyDetailResponse?> getNumerologyDetail(
     shouldLogoutOn401: false,
   );
   return responseModel;
+}
+
+Future<RemediesModel?> getRemedies(
+  TickerProvider? tickerProvider,
+  String userId,
+) async {
+  RemediesModel? remediesModel;
+  final token = StorageService.getString(AppConstants.keyAuthToken) ?? "";
+  final url =
+      "${ApiUrls.baseUrl}/api/client/users/$userId/remedies"; // Construct URL dynamically
+  await callWebApiGet(
+    tickerProvider,
+    url,
+    token: token,
+    onResponse: (response) {
+      remediesModel = RemediesModel.fromJson(jsonDecode(response.body));
+    },
+    onError: (error) {
+      Utils.print('Error fetching remedies: $error');
+    },
+    showLoader: false,
+    shouldLogoutOn401: false,
+  );
+  return remediesModel;
 }

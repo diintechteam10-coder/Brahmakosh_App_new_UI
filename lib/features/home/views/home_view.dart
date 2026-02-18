@@ -16,6 +16,7 @@ import 'todays_muhrat_section.dart';
 import 'personality_discovery_section.dart';
 import 'pahar_section.dart';
 import 'luck_in_favour_section.dart';
+import 'dosha_dasha_remedies_section.dart';
 
 class HomeView extends StatefulWidget {
   final ScrollController? scrollController;
@@ -123,8 +124,14 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
+            SliverToBoxAdapter(
+              child: RepaintBoundary(child: DoshaDashaRemediesSection()),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 20)),
+
             // SliverToBoxAdapter(child: RepaintBoundary(child: PaharSection())),
             // const SliverToBoxAdapter(child: SizedBox(height: 20)),
+
             SliverToBoxAdapter(
               child: RepaintBoundary(child: LuckInFavourSection()),
             ),

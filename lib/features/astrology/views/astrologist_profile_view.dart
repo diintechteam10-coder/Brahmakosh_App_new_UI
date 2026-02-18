@@ -129,8 +129,8 @@ class AstrologistProfileView extends StatelessWidget {
   }
 
   Widget _buildHeader() {
-    final imageUrl =
-        expert.profilePhoto ?? 'https://randomuser.me/api/portraits/men/1.jpg';
+    final hasProfilePhoto =
+        expert.profilePhoto != null && expert.profilePhoto!.isNotEmpty;
     final status = expert.status?.toLowerCase() ?? 'offline';
     final isOnline = status == 'online';
 
@@ -142,25 +142,54 @@ class AstrologistProfileView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Big Avatar
-        Container(
-          width: 100,
-          height: 100,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            image: DecorationImage(
-              image: NetworkImage(imageUrl),
-              fit: BoxFit.cover,
-            ),
-            border: Border.all(color: Colors.white, width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
+        hasProfilePhoto
+            ? Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: NetworkImage(expert.profilePhoto!),
+                    fit: BoxFit.cover,
+                  ),
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+              )
+            : Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFD4AF37),
+                      Color(0xFFA67C00),
+                    ], // Gold Gradient
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFA67C00).withOpacity(0.3),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.person_rounded,
+                  size: 52,
+                  color: Colors.white,
+                ),
               ),
-            ],
-          ),
-        ),
         const SizedBox(width: 16),
 
         // Info Side
@@ -308,10 +337,24 @@ class AstrologistProfileView extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const CircleAvatar(
-              radius: 20,
-              backgroundImage: NetworkImage(
-                'https://randomuser.me/api/portraits/men/32.jpg',
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFFD4AF37),
+                    Color(0xFFA67C00),
+                  ], // Gold Gradient
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: const Icon(
+                Icons.person_rounded,
+                size: 20,
+                color: Colors.white,
               ),
             ),
             const SizedBox(width: 12),
@@ -516,50 +559,52 @@ class AstrologistProfileView extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 16),
-                Consumer<ProfileViewModel>(
-                  builder: (context, profileVM, child) {
-                    if (profileVM.isLoading) {
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Color(0xFFA67C00),
+                Expanded(
+                  child: Consumer<ProfileViewModel>(
+                    builder: (context, profileVM, child) {
+                      if (profileVM.isLoading) {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Color(0xFFA67C00),
+                            ),
+                          ),
+                        );
+                      }
+
+                      return ElevatedButton(
+                        onPressed: () {
+                          // Read credits BEFORE dismissing the sheet
+                          final credits = profileVM.profile?.credits ?? 0;
+                          Navigator.pop(context);
+
+                          if (credits >= 100) {
+                            controller.startChat(expert);
+                          } else {
+                            controller.showRechargeBottomSheet(context);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          backgroundColor: const Color(
+                            0xFFA67C00,
+                          ), // Dark Gold/Brown
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          "CONTINUE",
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
                         ),
                       );
-                    }
-
-                    return ElevatedButton(
-                      onPressed: () {
-                        // Read credits BEFORE dismissing the sheet
-                        final credits = profileVM.profile?.credits ?? 0;
-                        Navigator.pop(context);
-
-                        if (credits >= 100) {
-                          controller.startChat(expert);
-                        } else {
-                          controller.showRechargeBottomSheet(context);
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        backgroundColor: const Color(
-                          0xFFA67C00,
-                        ), // Dark Gold/Brown
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        "CONTINUE",
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    );
-                  },
+                    },
+                  ),
                 ),
               ],
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:brahmakosh/common/models/user_complete_details_model.dart';
 import 'package:brahmakosh/features/home/views/dosha_detail_screen.dart';
 import 'package:brahmakosh/features/home/widgets/north_indian_chart.dart';
@@ -149,6 +150,317 @@ class PlanetsTab extends StatelessWidget {
   }
 }
 
+class BasicInfoTab extends StatelessWidget {
+  final AstroDetails astroDetails;
+  final GhatChakra? ghatChakra;
+  final List<AyanamshaEntry>? ayanamsha;
+
+  const BasicInfoTab({
+    super.key,
+    required this.astroDetails,
+    this.ghatChakra,
+    this.ayanamsha,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildInfoSection("Basic Details", [
+            _buildInfoRow("Ascendant", astroDetails.ascendant ?? "-"),
+            _buildInfoRow("Sign", astroDetails.sign ?? "-"),
+            _buildInfoRow("Sign Lord", astroDetails.signLord ?? "-"),
+            _buildInfoRow("Nakshatra", astroDetails.nakshatra ?? "-"),
+            _buildInfoRow("Nakshatra Lord", astroDetails.nakshatraLord ?? "-"),
+            _buildInfoRow("Charan", astroDetails.charan.toString()),
+            _buildInfoRow("Yog", astroDetails.yog ?? "-"),
+            _buildInfoRow("Karan", astroDetails.karan ?? "-"),
+            _buildInfoRow("Tithi", astroDetails.tithi ?? "-"),
+            _buildInfoRow("Yunja", astroDetails.yunja ?? "-"),
+            _buildInfoRow("Tatva", astroDetails.tatva ?? "-"),
+            _buildInfoRow("Name Alphabet", astroDetails.nameAlphabet ?? "-"),
+            _buildInfoRow("Paya", astroDetails.paya ?? "-"),
+          ]),
+
+          if (ghatChakra != null) ...[
+            const SizedBox(height: 24),
+            _buildInfoSection("Panchang / Ghat Chakra", [
+              if (ghatChakra!.month != null)
+                _buildInfoRow("Month", ghatChakra!.month!),
+              if (ghatChakra!.tithi != null)
+                _buildInfoRow("Tithi", ghatChakra!.tithi!),
+              if (ghatChakra!.day != null)
+                _buildInfoRow("Day", ghatChakra!.day!),
+              if (ghatChakra!.nakshatra != null)
+                _buildInfoRow("Nakshatra", ghatChakra!.nakshatra!),
+              if (ghatChakra!.yog != null)
+                _buildInfoRow("Yog", ghatChakra!.yog!),
+              if (ghatChakra!.karan != null)
+                _buildInfoRow("Karan", ghatChakra!.karan!),
+              if (ghatChakra!.pahar != null)
+                _buildInfoRow("Pahar", ghatChakra!.pahar!),
+              if (ghatChakra!.moon != null)
+                _buildInfoRow("Moon", ghatChakra!.moon!),
+            ]),
+          ],
+
+          if (ayanamsha != null && ayanamsha!.isNotEmpty) ...[
+            const SizedBox(height: 24),
+            _buildInfoSection("Ayanamsha", [
+              ...ayanamsha!.map(
+                (e) => _buildInfoRow(
+                  e.type?.replaceAll('_', ' ') ?? "Type",
+                  e.formatted ?? "${e.degree?.toStringAsFixed(2)}°",
+                ),
+              ),
+            ]),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoSection(String title, List<Widget> children) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: GoogleFonts.lora(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF5D4037),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.02),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(children: children),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.lora(fontSize: 14, color: Colors.grey[600]),
+          ),
+          Text(
+            value,
+            style: GoogleFonts.lora(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF4A4A4A),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class BhavChalitTab extends StatelessWidget {
+  final BhavMadhya bhavMadhya;
+
+  const BhavChalitTab({super.key, required this.bhavMadhya});
+
+  @override
+  Widget build(BuildContext context) {
+    // We assume both lists are 1-12 and sorted or indexable by house-1
+    // But better to be safe and index by house number.
+    final Map<int, BhavMadhyaHouse> madhyaMap = {};
+    if (bhavMadhya.bhavMadhya != null) {
+      for (var item in bhavMadhya.bhavMadhya!) {
+        if (item.house != null) madhyaMap[item.house!] = item;
+      }
+    }
+
+    final Map<int, BhavSandhiHouse> sandhiMap = {};
+    if (bhavMadhya.bhavSandhi != null) {
+      for (var item in bhavMadhya.bhavSandhi!) {
+        if (item.house != null) sandhiMap[item.house!] = item;
+      }
+    }
+
+    // Houses 1 to 12
+    final List<int> houses = List.generate(12, (index) => index + 1);
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.02),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: DataTable(
+                headingRowColor: WidgetStateProperty.all(
+                  const Color(0xFFD4A373),
+                ), // App Theme Color
+                columnSpacing: 10,
+                dataRowMinHeight: 60,
+                dataRowMaxHeight: 80,
+                border: TableBorder.all(
+                  color: const Color(0xFFD4A373).withOpacity(0.3),
+                  width: 1,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                columns: [
+                  DataColumn(
+                    label: Center(
+                      child: Text(
+                        "House",
+                        style: GoogleFonts.lora(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Center(
+                      child: Text(
+                        "Bhav Madhya",
+                        style: GoogleFonts.lora(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Center(
+                      child: Text(
+                        "Bhav Sandhi",
+                        style: GoogleFonts.lora(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+                rows: houses.map((houseId) {
+                  final madhya = madhyaMap[houseId];
+                  final sandhi = sandhiMap[houseId];
+
+                  return DataRow(
+                    color: WidgetStateProperty.resolveWith<Color?>((
+                      Set<WidgetState> states,
+                    ) {
+                      return Colors.white;
+                    }),
+                    cells: [
+                      DataCell(
+                        Text(
+                          "Bhav $houseId",
+                          style: GoogleFonts.lora(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: const Color(0xFF5D4037),
+                          ),
+                        ),
+                      ),
+                      DataCell(
+                        Center(
+                          child: _buildCellContent(
+                            sign: madhya?.sign,
+                            degree: madhya?.normDegree ?? madhya?.degree,
+                          ),
+                        ),
+                      ),
+                      DataCell(
+                        Center(
+                          child: _buildCellContent(
+                            sign: sandhi?.sign,
+                            degree: sandhi?.normDegree ?? sandhi?.degree,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCellContent({String? sign, double? degree}) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          sign ?? "-",
+          style: GoogleFonts.lora(
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+            color: const Color(0xFF5D4037),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          _toDMS(degree),
+          textAlign: TextAlign.center, // Format Degree to DMS
+          style: GoogleFonts.lora(fontSize: 13, color: const Color(0xFF8D6E63)),
+        ),
+      ],
+    );
+  }
+
+  String _toDMS(double? decimalDegree) {
+    if (decimalDegree == null) return "-";
+    int d = decimalDegree.toInt();
+    double mPart = (decimalDegree - d) * 60;
+    int m = mPart.toInt();
+    double sPart = (mPart - m) * 60;
+    int s = sPart.round(); // Round seconds usually
+
+    // Sometimes normDegree can be very large or negative, usually 0-360.
+    // Assuming normal range.
+
+    return "$d°$m'${s}\"";
+  }
+}
+
 class BirthChartTab extends StatefulWidget {
   final BirthChart birthChart;
   final BirthExtendedChart? birthExtendedChart;
@@ -280,8 +592,8 @@ class _BirthChartTabState extends State<BirthChartTab> {
   }
 
   Map<int, List<String>> _getHousesFromExtendedChart(
-    BirthExtendedChart? chart,
-  ) {
+      BirthExtendedChart? chart,
+      ) {
     if (chart == null) return {};
     return {
       1: chart.houses?.house1 ?? [],
@@ -302,23 +614,29 @@ class _BirthChartTabState extends State<BirthChartTab> {
 
 class DoshasTab extends StatelessWidget {
   final Doshas doshas;
+  final List<SadhesatiLifeDetail>? sadhesatiLifeDetails;
+  final PitraDoshaReport? pitraDoshaReport;
 
-  const DoshasTab({super.key, required this.doshas});
+  const DoshasTab({
+    super.key,
+    required this.doshas,
+    this.sadhesatiLifeDetails,
+    this.pitraDoshaReport,
+  });
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("DOSHAS_TAB_DEBUG: manglik != null: ${doshas.manglik != null}");
-    debugPrint(
-      "DOSHAS_TAB_DEBUG: kalsarpa != null: ${doshas.kalsarpa != null}",
-    );
-    debugPrint(
-      "DOSHAS_TAB_DEBUG: sadeSatiCurrent != null: ${doshas.sadeSatiCurrent != null}",
-    );
+    // Determine data availability
+    final hasSadeSatiLife =
+        (doshas.sadeSatiLife?.raw != null &&
+            doshas.sadeSatiLife!.raw!.isNotEmpty) ||
+        (sadhesatiLifeDetails != null && sadhesatiLifeDetails!.isNotEmpty);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Column(
         children: [
+          // Manglik
           _buildDoshaCard(
             context,
             "Manglik Dosha",
@@ -327,6 +645,8 @@ class DoshasTab extends StatelessWidget {
             "manglik",
             doshas.manglik?.raw,
           ),
+
+          // Kalsarpa
           _buildDoshaCard(
             context,
             "Kalsarpa Dosha",
@@ -335,6 +655,8 @@ class DoshasTab extends StatelessWidget {
             "kalsarpa",
             doshas.kalsarpa?.raw,
           ),
+
+          // Sade Sati Current
           _buildDoshaCard(
             context,
             "Sade Sati",
@@ -344,23 +666,28 @@ class DoshasTab extends StatelessWidget {
             "sadesati",
             doshas.sadeSatiCurrent?.raw,
           ),
-          if (doshas.sadeSatiLife?.raw != null &&
-              doshas.sadeSatiLife!.raw!.isNotEmpty)
+
+          // Sade Sati Life
+          if (hasSadeSatiLife)
             _buildDoshaCard(
               context,
               "Sade Sati Life Cycles",
               doshas.sadeSatiLife?.present ?? false,
               "View Life Cycles",
               "sadesati_life",
-              doshas.sadeSatiLife?.raw,
+              sadhesatiLifeDetails ?? doshas.sadeSatiLife?.raw,
             ),
+
+          // Pitra Dosha
           _buildDoshaCard(
             context,
             "Pitra Dosha",
-            doshas.pitra?.present ?? false,
-            doshas.pitra?.raw?.conclusion ?? doshas.pitra?.description,
+            pitraDoshaReport?.isPitriDoshaPresent ??
+                (doshas.pitra?.present ?? false),
+            pitraDoshaReport?.conclusion ??
+                (doshas.pitra?.raw?.conclusion ?? doshas.pitra?.description),
             "pitra",
-            doshas.pitra?.raw,
+            pitraDoshaReport ?? doshas.pitra?.raw,
           ),
         ],
       ),
@@ -453,127 +780,82 @@ class DashasTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint(
-      "DASHAS_TAB_DEBUG: currentYogini != null: ${dashas.currentYogini != null}",
-    );
-    debugPrint(
-      "DASHAS_TAB_DEBUG: currentChardasha != null: ${dashas.currentChardasha != null}",
-    );
-    debugPrint(
-      "DASHAS_TAB_DEBUG: majorChardasha != null: ${dashas.majorChardasha != null}",
-    );
-
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (dashas.currentYogini != null) ...[
-            Text(
-              "Current Yogini Dasha",
-              style: GoogleFonts.lora(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            _buildDashaCard(
-              "Major: ${dashas.currentYogini!.majorDasha?.dashaName}",
-              "${dashas.currentYogini!.majorDasha?.startDate} - ${dashas.currentYogini!.majorDasha?.endDate}",
-            ),
-            _buildDashaCard(
-              "Sub: ${dashas.currentYogini!.subDasha?.dashaName}",
-              "${dashas.currentYogini!.subDasha?.startDate} - ${dashas.currentYogini!.subDasha?.endDate}",
-            ),
-            _buildDashaCard(
-              "Sub-Sub: ${dashas.currentYogini!.subSubDasha?.dashaName}",
-              "${dashas.currentYogini!.subSubDasha?.startDate} - ${dashas.currentYogini!.subSubDasha?.endDate}",
+            _buildSectionHeader("Current Yogini Dasha"),
+            const SizedBox(height: 12),
+            _buildCurrentHierarchyCard(
+              majorTitle: "Major",
+              majorName: dashas.currentYogini!.majorDasha?.dashaName,
+              majorDate:
+                  "${dashas.currentYogini!.majorDasha?.startDate} - ${dashas.currentYogini!.majorDasha?.endDate}",
+              subTitle: "Sub",
+              subName: dashas.currentYogini!.subDasha?.dashaName,
+              subDate:
+                  "${dashas.currentYogini!.subDasha?.startDate} - ${dashas.currentYogini!.subDasha?.endDate}",
+              subSubTitle: "Sub-Sub",
+              subSubName: dashas.currentYogini!.subSubDasha?.dashaName,
+              subSubDate:
+                  "${dashas.currentYogini!.subSubDasha?.startDate} - ${dashas.currentYogini!.subSubDasha?.endDate}",
             ),
             const SizedBox(height: 24),
           ],
-
           if (dashas.currentChardasha != null) ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Current Chardasha",
-                  style: GoogleFonts.lora(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+            _buildSectionHeader("Current Chardasha"),
+            if (dashas.currentChardasha!.dashaDate != null)
+              Padding(
+                padding: const EdgeInsets.only(left: 4, bottom: 8),
+                child: Text(
+                  "${dashas.currentChardasha!.dashaDate}",
+                  style: GoogleFonts.lora(fontSize: 12, color: Colors.grey),
                 ),
-                if (dashas.currentChardasha!.dashaDate != null)
-                  Text(
-                    "${dashas.currentChardasha!.dashaDate}",
-                    style: GoogleFonts.lora(fontSize: 12, color: Colors.grey),
-                  ),
-              ],
-            ),
-
+              ),
             const SizedBox(height: 8),
-            if (dashas.currentChardasha!.majorDasha != null)
-              _buildDashaCard(
-                "Major: ${dashas.currentChardasha!.majorDasha?.signName}",
-                "${dashas.currentChardasha!.majorDasha?.startDate} - ${dashas.currentChardasha!.majorDasha?.endDate}",
-              ),
-            if (dashas.currentChardasha!.subDasha != null)
-              _buildDashaCard(
-                "Sub: ${dashas.currentChardasha!.subDasha?.signName}",
-                "${dashas.currentChardasha!.subDasha?.startDate} - ${dashas.currentChardasha!.subDasha?.endDate}",
-              ),
-            if (dashas.currentChardasha!.subSubDasha != null)
-              _buildDashaCard(
-                "Sub-Sub: ${dashas.currentChardasha!.subSubDasha?.signName}",
-                "${dashas.currentChardasha!.subSubDasha?.startDate} - ${dashas.currentChardasha!.subSubDasha?.endDate}",
-              ),
-            const SizedBox(height: 24),
-          ],
-
-          if (dashas.majorChardasha != null) ...[
-            Text(
-              "Major Chardasha",
-              style: GoogleFonts.lora(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: dashas.majorChardasha!.length,
-              itemBuilder: (context, index) {
-                final dasha = dashas.majorChardasha![index];
-                return _buildDashaCard(
-                  dasha.signName ?? "",
-                  "${dasha.startDate} - ${dasha.endDate}",
-                );
-              },
+            _buildCurrentHierarchyCard(
+              majorTitle: "Major",
+              majorName: dashas.currentChardasha!.majorDasha?.signName,
+              majorDate:
+                  "${dashas.currentChardasha!.majorDasha?.startDate} - ${dashas.currentChardasha!.majorDasha?.endDate}",
+              subTitle: "Sub",
+              subName: dashas.currentChardasha!.subDasha?.signName,
+              subDate:
+                  "${dashas.currentChardasha!.subDasha?.startDate} - ${dashas.currentChardasha!.subDasha?.endDate}",
+              subSubTitle: "Sub-Sub",
+              subSubName: dashas.currentChardasha!.subSubDasha?.signName,
+              subSubDate:
+                  "${dashas.currentChardasha!.subSubDasha?.startDate} - ${dashas.currentChardasha!.subSubDasha?.endDate}",
             ),
             const SizedBox(height: 24),
           ],
-
-          if (dashas.vimshottariDasha != null) ...[
-            Text(
-              "Vimshottari Dasha",
-              style: GoogleFonts.lora(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: dashas.vimshottariDasha!.length,
-              itemBuilder: (context, index) {
-                final dasha = dashas.vimshottariDasha![index];
-                return _buildDashaCard(
-                  dasha.planet ?? "",
-                  "${dasha.start} - ${dasha.end}",
+          if (dashas.majorChardasha != null &&
+              dashas.majorChardasha!.isNotEmpty) ...[
+            _buildSectionHeader("Major Chardasha"),
+            const SizedBox(height: 12),
+            _buildDashaTimelineList(
+              items: dashas.majorChardasha!.map((e) {
+                return _TimelineItemData(
+                  title: e.signName ?? "",
+                  dateRange: "${e.startDate} - ${e.endDate}",
                 );
-              },
+              }).toList(),
+            ),
+            const SizedBox(height: 24),
+          ],
+          if (dashas.vimshottariDasha != null &&
+              dashas.vimshottariDasha!.isNotEmpty) ...[
+            _buildSectionHeader("Vimshottari Dasha"),
+            const SizedBox(height: 12),
+            _buildDashaTimelineList(
+              items: dashas.vimshottariDasha!.map((e) {
+                return _TimelineItemData(
+                  title: e.planet ?? "",
+                  dateRange: "${e.start} - ${e.end}",
+                );
+              }).toList(),
             ),
           ],
         ],
@@ -581,31 +863,374 @@ class DashasTab extends StatelessWidget {
     );
   }
 
-  Widget _buildDashaCard(String title, String subtitle) {
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0),
+      child: Text(
+        title,
+        style: GoogleFonts.lora(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: const Color(0xFF5D4037),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCurrentHierarchyCard({
+    String? majorTitle,
+    String? majorName,
+    String? majorDate,
+    String? subTitle,
+    String? subName,
+    String? subDate,
+    String? subSubTitle,
+    String? subSubName,
+    String? subSubDate,
+  }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(color: const Color(0xFFEFEBE9)),
+      ),
+      child: Column(
+        children: [
+          if (majorName != null)
+            _buildHierarchyRow(
+              level: 0,
+              label: majorTitle ?? "Major",
+              value: majorName,
+              date: majorDate,
+              isLast: subName == null,
+            ),
+          if (subName != null)
+            _buildHierarchyRow(
+              level: 1,
+              label: subTitle ?? "Sub",
+              value: subName,
+              date: subDate,
+              isLast: subSubName == null,
+            ),
+          if (subSubName != null)
+            _buildHierarchyRow(
+              level: 2,
+              label: subSubTitle ?? "Sub-Sub",
+              value: subSubName,
+              date: subSubDate,
+              isLast: true,
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHierarchyRow({
+    required int level,
+    required String label,
+    required String value,
+    String? date,
+    required bool isLast,
+  }) {
+    // Indentation based on level
+    final double indent = level * 24.0;
+    final Color dotColor = level == 0
+        ? const Color(0xFF6D3A0C)
+        : (level == 1 ? const Color(0xFF8D6E63) : const Color(0xFFA1887F));
+
+    final formattedDate = _formatDateRange(date);
+
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Timeline logic for hierarchy
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: Column(
+              children: [
+                Container(
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: dotColor,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: dotColor.withOpacity(0.3),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                ),
+                if (!isLast)
+                  Expanded(
+                    child: Container(
+                      width: 2,
+                      color: const Color(0xFFD7CCC8).withOpacity(0.5),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(left: indent, bottom: isLast ? 0 : 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            label.toUpperCase(),
+                            style: GoogleFonts.lora(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[600],
+                              letterSpacing: 1.0,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            value,
+                            style: GoogleFonts.lora(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF4E342E),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  if (formattedDate != null) ...[
+                    const SizedBox(height: 6),
+                    formattedDate,
+                  ],
+                ],
+              ),
+            ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildDashaTimelineList({required List<_TimelineItemData> items}) {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final item = items[index];
+        final isFirst = index == 0;
+        final isLast = index == items.length - 1;
+        final formattedDate = _formatDateRange(item.dateRange, compact: true);
+
+        return IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(
+                width: 48,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        width: 2,
+                        color: isFirst
+                            ? Colors.transparent
+                            : const Color(0xFFD7CCC8),
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF8D6E63),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 2,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        width: 2,
+                        color: isLast
+                            ? Colors.transparent
+                            : const Color(0xFFD7CCC8),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFEFEBE9)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.02),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        item.title,
+                        style: GoogleFonts.lora(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF4E342E),
+                        ),
+                      ),
+                      if (formattedDate != null)
+                        formattedDate
+                      else
+                        Text(
+                          item.dateRange,
+                          style: GoogleFonts.lora(
+                            fontSize: 12,
+                            color: const Color(0xFF8D6E63),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget? _formatDateRange(String? dateStr, {bool compact = false}) {
+    if (dateStr == null || dateStr.isEmpty) return null;
+
+    try {
+      final parts = dateStr.split(" - ");
+      if (parts.length != 2) {
+        return Text(
+          dateStr,
+          style: GoogleFonts.lora(fontSize: 12, color: const Color(0xFF8D6E63)),
+        );
+      }
+
+      final startStr = parts[0].trim();
+      final endStr = parts[1].trim();
+
+      DateTime start;
+      DateTime end;
+      DateFormat outFormat;
+
+      // Try parsing with time first
+      try {
+        final formatWithTime = DateFormat("d-M-yyyy H:m");
+        start = formatWithTime.parse(startStr);
+        end = formatWithTime.parse(endStr);
+        outFormat = DateFormat("d MMM yyyy, h:mm a");
+      } catch (_) {
+        // Fallback to date only (e.g. for Chardasha)
+        final formatDateOnly = DateFormat("d-M-yyyy");
+        start = formatDateOnly.parse(startStr);
+        end = formatDateOnly.parse(endStr);
+        outFormat = DateFormat("d MMM yyyy");
+      }
+
+      if (compact) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              "${outFormat.format(start)} -",
+              style: GoogleFonts.lora(
+                fontSize: 10,
+                color: const Color(0xFFA1887F),
+              ),
+            ),
+            Text(
+              outFormat.format(end),
+              style: GoogleFonts.lora(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF6D3A0C),
+              ),
+            ),
+          ],
+        );
+      }
+
+      // Use Column to prevent overflow in narrow spaces (like hierarchy view)
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildDateChip("Start", outFormat.format(start)),
+          const SizedBox(height: 4),
+          _buildDateChip("End", outFormat.format(end)),
+        ],
+      );
+    } catch (e) {
+      // Fallback
+      return Text(
+        dateStr,
+        style: GoogleFonts.lora(fontSize: 12, color: const Color(0xFF8D6E63)),
+      );
+    }
+  }
+
+  Widget _buildDateChip(String label, String date) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFBF5),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: const Color(0xFFD7CCC8)),
+      ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            title,
-            style: GoogleFonts.lora(fontWeight: FontWeight.w600, fontSize: 16),
+            "$label: ",
+            style: GoogleFonts.lora(
+              fontSize: 10,
+              color: const Color(0xFFA1887F),
+            ),
           ),
           Text(
-            subtitle,
-            style: GoogleFonts.lora(fontSize: 12, color: Colors.grey),
+            date,
+            style: GoogleFonts.lora(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF6D3A0C),
+            ),
           ),
         ],
       ),
@@ -613,80 +1238,11 @@ class DashasTab extends StatelessWidget {
   }
 }
 
-class BasicInfoTab extends StatelessWidget {
-  final AstroDetails astroDetails;
+class _TimelineItemData {
+  final String title;
+  final String dateRange;
 
-  const BasicInfoTab({super.key, required this.astroDetails});
-
-  @override
-  Widget build(BuildContext context) {
-    // Map of display name to property value
-    final Map<String, String?> details = {
-      "Ascendant": astroDetails.ascendant,
-      "Ascendant Lord": astroDetails.ascendantLord,
-      "Sign": astroDetails.sign,
-      "Sign Lord": astroDetails.signLord,
-      "Nakshatra": astroDetails.nakshatra,
-      "Nakshatra Lord": astroDetails.nakshatraLord,
-      "Charan": astroDetails.charan,
-      "Varna": astroDetails.varna,
-      "Vashya": astroDetails.vashya,
-      "Yoni": astroDetails.yoni,
-      "Gan": astroDetails.gan,
-      "Nadi": astroDetails.nadi,
-      "Tithi": astroDetails.tithi,
-      "Yog": astroDetails.yog,
-      "Karan": astroDetails.karan,
-      "Yunja": astroDetails.yunja,
-      "Tatva": astroDetails.tatva,
-      "Name Alphabet": astroDetails.nameAlphabet,
-      "Paya": astroDetails.paya,
-    };
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      child: Column(
-        children: details.entries.map((entry) {
-          return _buildDetailRow(entry.key, entry.value ?? "-");
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: GoogleFonts.lora(fontSize: 14, color: Colors.grey[700]),
-          ),
-          Text(
-            value,
-            style: GoogleFonts.lora(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF333333),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  _TimelineItemData({required this.title, required this.dateRange});
 }
 
 class _LegendItem extends StatelessWidget {

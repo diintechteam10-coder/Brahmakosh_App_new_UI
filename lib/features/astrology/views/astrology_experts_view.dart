@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:brahmakosh/features/astrology/controllers/astrology_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -245,8 +246,29 @@ class AstrologyExpertsView extends StatelessWidget {
     AstrologistItem expert,
     AstrologyController controller,
   ) {
-    final imageUrl =
-        expert.profilePhoto ?? 'https://randomuser.me/api/portraits/men/1.jpg';
+    // ── Partner detail logs ──
+    developer.log(
+      '🔍 [Partner Details] '
+      'id: ${expert.id}, '
+      'name: ${expert.name}, '
+      'status: ${expert.status}, '
+      'experience: ${expert.experience}, '
+      'expertise: ${expert.expertise}, '
+      'profilePhoto: ${expert.profilePhoto}, '
+      'profileSummary: ${expert.profileSummary}, '
+      'chatCharge: ${expert.chatCharge}, '
+      'voiceCharge: ${expert.voiceCharge}, '
+      'videoCharge: ${expert.videoCharge}, '
+      'rating: ${expert.rating}, '
+      'reviews: ${expert.reviews}, '
+      'languages: ${expert.languages}, '
+      'categoryId: ${expert.categoryId}, '
+      'isActive: ${expert.isActive}',
+      name: 'AstrologyExpertsView',
+    );
+
+    final hasProfilePhoto =
+        expert.profilePhoto != null && expert.profilePhoto!.isNotEmpty;
     // Use lowercase for comparison to be safe
     final status = expert.status?.toLowerCase() ?? 'offline';
     final isOnline = status == 'online';
@@ -303,18 +325,55 @@ class AstrologyExpertsView extends StatelessWidget {
                   children: [
                     Stack(
                       children: [
-                        Container(
-                          width: 64,
-                          height: 64,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              image: NetworkImage(imageUrl),
-                              fit: BoxFit.cover,
-                            ),
-                            border: Border.all(color: Colors.white, width: 2),
-                          ),
-                        ),
+                        hasProfilePhoto
+                            ? Container(
+                                width: 64,
+                                height: 64,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                    image: NetworkImage(expert.profilePhoto!),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 2,
+                                  ),
+                                ),
+                              )
+                            : Container(
+                                width: 64,
+                                height: 64,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFFD4AF37),
+                                      Color(0xFFA67C00),
+                                    ], // Gold Gradient
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 2,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(
+                                        0xFFA67C00,
+                                      ).withOpacity(0.3),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: const Icon(
+                                  Icons.person_rounded,
+                                  size: 36,
+                                  color: Colors.white,
+                                ),
+                              ),
                         Positioned(
                           right: 0,
                           top: 0,
@@ -565,58 +624,60 @@ class AstrologyExpertsView extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 16),
-                Consumer<ProfileViewModel>(
-                  builder: (context, profileVM, child) {
-                    if (profileVM.isLoading) {
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Color(0xFFA67C00),
+                Expanded(
+                  child: Consumer<ProfileViewModel>(
+                    builder: (context, profileVM, child) {
+                      if (profileVM.isLoading) {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Color(0xFFA67C00),
+                            ),
+                          ),
+                        );
+                      }
+                      return ElevatedButton(
+                        onPressed: () {
+                          // Read credits BEFORE dismissing the sheet
+                          final credits = profileVM.profile?.credits ?? 0;
+                          final minRequired =
+                              (expert.chatCharge ?? 15) *
+                              5; // Enforce 5 mins minimum
+
+                          Navigator.pop(context);
+
+                          if (credits >= minRequired) {
+                            controller.startChat(expert);
+                          } else {
+                            // Optional: Show snackbar explaining why
+                            Get.snackbar(
+                              "Insufficient Credits",
+                              "You need at least ₹$minRequired for a 5-minute session with this expert.",
+                              backgroundColor: Colors.redAccent,
+                              colorText: Colors.white,
+                            );
+                            controller.showRechargeBottomSheet(context);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          backgroundColor: const Color(0xFFA67C00),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          "CONTINUE",
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
                         ),
                       );
-                    }
-                    return ElevatedButton(
-                      onPressed: () {
-                        // Read credits BEFORE dismissing the sheet
-                        final credits = profileVM.profile?.credits ?? 0;
-                        final minRequired =
-                            (expert.chatCharge ?? 15) *
-                            5; // Enforce 5 mins minimum
-
-                        Navigator.pop(context);
-
-                        if (credits >= minRequired) {
-                          controller.startChat(expert);
-                        } else {
-                          // Optional: Show snackbar explaining why
-                          Get.snackbar(
-                            "Insufficient Credits",
-                            "You need at least ₹$minRequired for a 5-minute session with this expert.",
-                            backgroundColor: Colors.redAccent,
-                            colorText: Colors.white,
-                          );
-                          controller.showRechargeBottomSheet(context);
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        backgroundColor: const Color(0xFFA67C00),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        "CONTINUE",
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    );
-                  },
+                    },
+                  ),
                 ),
               ],
             ),

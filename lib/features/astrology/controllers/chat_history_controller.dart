@@ -8,6 +8,8 @@ import '../../../core/services/storage_service.dart';
 import '../../../core/services/socket_service.dart';
 import '../models/chat_models.dart';
 
+import '../../../common/models/astrologist_model.dart';
+
 class ChatHistoryController extends GetxController {
   final conversations = <Map<String, dynamic>>[].obs;
   final messages = <ChatMessage>[].obs;
@@ -16,11 +18,19 @@ class ChatHistoryController extends GetxController {
   final unreadCounts = <String, int>{}.obs;
   final sessionDetails =
       <String, dynamic>{}.obs; // Stores summary, duration etc.
+  final selectedStatus =
+      'all'.obs; // Filter: all, pending, accepted, active, ended
 
   // Store partner info for the currently viewed conversation
   String currentPartnerName = '';
   String currentPartnerPhoto = '';
   String currentPartnerId = '';
+  String currentPartnerExpertise = '';
+  String currentPartnerExperience = '';
+  double currentPartnerRating = 0.0;
+  String currentSessionStatus = '';
+  String currentSessionDate = '';
+  String _currentConversationId = ''; // Track which conversation is loaded
 
   @override
   void onInit() {
@@ -119,6 +129,12 @@ class ChatHistoryController extends GetxController {
     }
   }
 
+  Future<void> changeStatus(String status) async {
+    if (selectedStatus.value == status) return;
+    selectedStatus.value = status;
+    await fetchConversations();
+  }
+
   Future<void> fetchConversations() async {
     isLoading.value = true;
     try {
@@ -128,18 +144,34 @@ class ChatHistoryController extends GetxController {
         return;
       }
 
+      String url = ApiUrls.getConversations;
+      if (selectedStatus.value != 'all') {
+        url += '?status=${selectedStatus.value}';
+      }
+
       await callWebApiGet(
         null,
-        ApiUrls.getConversations,
+        url,
         token: token,
         showLoader: false,
         onResponse: (response) {
           final data = jsonDecode(response.body);
           if (data['success'] == true) {
             final List<dynamic> requestList = data['data'] ?? [];
-            conversations.assignAll(
-              requestList.map((e) => Map<String, dynamic>.from(e)).toList(),
-            );
+            var list = requestList
+                .map((e) => Map<String, dynamic>.from(e))
+                .toList();
+
+            // Client-side filtering fallback in case backend ignores query param
+            if (selectedStatus.value != 'all') {
+              final filterStatus = selectedStatus.value.toLowerCase();
+              list = list.where((c) {
+                final s = (c['status'] ?? '').toString().toLowerCase();
+                return s == filterStatus;
+              }).toList();
+            }
+
+            conversations.assignAll(list);
 
             // Populate unread counts from initial fetch
             for (var conv in conversations) {
@@ -247,7 +279,7 @@ class ChatHistoryController extends GetxController {
       Utils.print(
         '📤 markConversationAsRead: Requesting read for $conversationId',
       );
-      await callWebApi(
+      await callWebApiPatch(
         null,
         '${ApiUrls.chatApiUrl}/conversations/$conversationId/read',
         {},
@@ -278,6 +310,16 @@ class ChatHistoryController extends GetxController {
   }
 
   Future<void> fetchMessages(String conversationId) async {
+    // Skip if already showing the requested conversation (avoids flicker on rebuild)
+    if (_currentConversationId == conversationId &&
+        messages.isNotEmpty &&
+        !isLoadingMessages.value) {
+      Utils.print(
+        '⏭️ fetchMessages: Already showing $conversationId, skipping',
+      );
+      return;
+    }
+    _currentConversationId = conversationId;
     isLoadingMessages.value = true;
     messages.clear();
     sessionDetails.clear(); // Clear previous session details
@@ -386,6 +428,56 @@ class ChatHistoryController extends GetxController {
     return '';
   }
 
+  /// Extract partner expertise from a conversation object.
+  String getPartnerExpertise(Map<String, dynamic> conv) {
+    final otherUser = conv['otherUser'];
+    if (otherUser is Map) {
+      return _parseExpertise(otherUser['expertise']);
+    }
+    final partner = conv['partnerId'];
+    if (partner is Map) {
+      return _parseExpertise(partner['expertise']);
+    }
+    return '';
+  }
+
+  /// Handle expertise being either a List or a String from the API.
+  String _parseExpertise(dynamic value) {
+    if (value is List) {
+      return value.join(', ');
+    }
+    if (value is String) {
+      return value;
+    }
+    return '';
+  }
+
+  /// Extract partner experience from a conversation object.
+  String getPartnerExperience(Map<String, dynamic> conv) {
+    final otherUser = conv['otherUser'];
+    if (otherUser is Map) {
+      return otherUser['experience']?.toString() ?? '';
+    }
+    final partner = conv['partnerId'];
+    if (partner is Map) {
+      return partner['experience']?.toString() ?? '';
+    }
+    return '';
+  }
+
+  /// Extract partner rating from a conversation object.
+  double getPartnerRating(Map<String, dynamic> conv) {
+    final otherUser = conv['otherUser'];
+    if (otherUser is Map) {
+      return (otherUser['rating'] ?? 0).toDouble();
+    }
+    final partner = conv['partnerId'];
+    if (partner is Map) {
+      return (partner['rating'] ?? 0).toDouble();
+    }
+    return 0.0;
+  }
+
   /// Extract partner ID string.
   String getPartnerId(Map<String, dynamic> conv) {
     // Primary: 'otherUser' from /api/chat/conversations
@@ -436,5 +528,50 @@ class ChatHistoryController extends GetxController {
     if (diff.inDays < 1) return '${diff.inHours}h ago';
     if (diff.inDays < 7) return '${diff.inDays}d ago';
     return '${dt.day}/${dt.month}/${dt.year}';
+  }
+
+  AstrologistItem getAstrologistItemForConversation(String conversationId) {
+    // Find the conversation object
+    final conv = conversations.firstWhere(
+      (c) => getConversationId(c) == conversationId,
+      orElse: () => {},
+    );
+
+    if (conv.isEmpty) {
+      // Fallback if not found in list, use stored current partner details
+      return AstrologistItem(
+        id: currentPartnerId.isNotEmpty ? currentPartnerId : conversationId,
+        name: currentPartnerName,
+        profilePhoto: currentPartnerPhoto,
+        experience: currentPartnerExperience,
+        expertise: currentPartnerExpertise,
+        rating: currentPartnerRating > 0 ? currentPartnerRating : 4.5,
+        chatCharge: 15, // Default or fetch if available
+      );
+    }
+
+    // Try to parse rating safely
+    double rating = 4.5;
+    try {
+      rating = getPartnerRating(conv);
+    } catch (e) {
+      rating = 4.5;
+    }
+
+    // Ensure strings are not null
+    final photo = getPartnerPhoto(conv);
+    final exp = getPartnerExperience(conv);
+    final expertise = getPartnerExpertise(conv);
+
+    return AstrologistItem(
+      id: getPartnerId(conv),
+      name: getPartnerName(conv),
+      profilePhoto: photo,
+      experience: exp,
+      expertise: expertise,
+      rating: rating,
+      chatCharge: 15, // Default as history doesn't store current price
+      languages: ['Hindi', 'English'], // Default
+    );
   }
 }
