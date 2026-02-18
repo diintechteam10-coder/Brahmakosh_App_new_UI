@@ -7,6 +7,8 @@ import 'package:brahmakosh/core/constants/app_constants.dart';
 import 'package:brahmakosh/core/services/storage_service.dart';
 import 'package:brahmakosh/features/home/views/planet_positions_screen.dart';
 import 'package:brahmakosh/features/home/widgets/astrology_tabs.dart';
+import 'package:brahmakosh/features/home/widgets/ashtakvarga_tab.dart';
+import 'package:brahmakosh/features/home/widgets/remedies_tab.dart';
 
 class AstrologyDetailsScreen extends StatefulWidget {
   const AstrologyDetailsScreen({super.key});
@@ -24,7 +26,7 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 8, vsync: this);
     _fetchData();
   }
 
@@ -146,6 +148,7 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
                     ),
                   ),
                   child: TabBar(
+                    tabAlignment: TabAlignment.start,
                     controller: _tabController,
                     labelColor: Colors.white,
                     unselectedLabelColor: const Color(0xFF6D3A0C),
@@ -154,8 +157,8 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
                       color: const Color(0xFFD4A373),
                     ),
                     indicatorSize: TabBarIndicatorSize.tab,
-                    isScrollable: false,
-                    labelPadding: const EdgeInsets.symmetric(horizontal: 2),
+                    isScrollable: true,
+                    labelPadding: const EdgeInsets.symmetric(horizontal: 12),
                     padding: EdgeInsets.zero,
                     labelStyle: GoogleFonts.lora(
                       fontWeight: FontWeight.bold,
@@ -166,8 +169,11 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
                       Tab(text: "Basic Info"),
                       Tab(text: "Planets"),
                       Tab(text: "Birth Chart"),
+                      Tab(text: "Bhav Chalit"), // New Tab
                       Tab(text: "Doshas"),
                       Tab(text: "Dashas"),
+                      Tab(text: "Ashtakvarga"),
+                      Tab(text: "Remedies"),
                     ],
                   ),
                 ),
@@ -178,6 +184,8 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
                     children: [
                       BasicInfoTab(
                         astroDetails: astro.astroDetails ?? AstroDetails(),
+                        ghatChakra: astro.ghatChakra,
+                        ayanamsha: astro.ayanamsha,
                       ),
                       PlanetsTab(
                         planets: astro.planets ?? [],
@@ -198,8 +206,20 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
                         birthExtendedChart: astro.birthExtendedChart,
                         astroDetails: astro.astroDetails,
                       ),
-                      DoshasTab(doshas: _data?.data?.doshas ?? Doshas()),
-                      DashasTab(dashas: _data?.data?.dashas ?? Dashas()),
+                      BhavChalitTab(
+                        bhavMadhya: astro.bhavMadhya ?? BhavMadhya(),
+                      ),
+                      DoshasTab(
+                        doshas: _data?.data?.doshas ?? Doshas(),
+                        sadhesatiLifeDetails: astro.sadhesatiLifeDetails,
+                        pitraDoshaReport: astro.pitraDoshaReport,
+                      ),
+                      DashasTab(dashas: _getEffectiveDashas()),
+                      AshtakvargaTab(
+                        planetAshtak: astro.planetAshtak,
+                        sarvashtak: astro.sarvashtak,
+                      ),
+                      RemediesTab(gemstoneSuggestion: astro.gemstoneSuggestion),
                     ],
                   ),
                 ),
@@ -409,5 +429,49 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
       return months[month - 1];
     }
     return "";
+  }
+
+  /// Constructs an effective Dashas object by merging data from
+  /// data.dashas (top-level) and data.astrology (embedded dasha fields).
+  /// This handles the case where the API returns dasha data under the
+  /// astrology object instead of a separate dashas object.
+  Dashas _getEffectiveDashas() {
+    final topLevelDashas = _data?.data?.dashas;
+    final astro = _data?.data?.astrology;
+
+    // If we have top-level dashas with actual data, use them
+    if (topLevelDashas != null &&
+        (topLevelDashas.currentYogini != null ||
+            topLevelDashas.currentChardasha != null ||
+            topLevelDashas.majorChardasha != null ||
+            topLevelDashas.vimshottariDasha != null)) {
+      return topLevelDashas;
+    }
+
+    // Otherwise, construct from astrology data
+    if (astro != null) {
+      return Dashas(
+        currentYogini:
+            topLevelDashas?.currentYogini ?? astro.astrologyCurrentYoginiDasha,
+        currentChardasha:
+            topLevelDashas?.currentChardasha ?? astro.astrologyCurrentChardasha,
+        majorChardasha:
+            topLevelDashas?.majorChardasha ?? astro.astrologyMajorChardasha,
+        // Map majorVdasha (VDashaPeriod) to VimshottariDasha for the tab
+        vimshottariDasha:
+            topLevelDashas?.vimshottariDasha ??
+            astro.majorVdasha
+                ?.map(
+                  (v) => VimshottariDasha(
+                    planet: v.planet,
+                    start: v.start,
+                    end: v.end,
+                  ),
+                )
+                .toList(),
+      );
+    }
+
+    return topLevelDashas ?? Dashas();
   }
 }

@@ -2,7 +2,9 @@ import '../../../../core/common_imports.dart';
 import '../../../../common/colors.dart';
 import '../models/profile_model.dart';
 import '../viewmodels/profile_viewmodel.dart';
-import 'update_profile_view.dart'; // Added Import
+import 'update_profile_view.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class ProfileDetailsView extends StatelessWidget {
   const ProfileDetailsView({super.key});
@@ -40,7 +42,7 @@ class ProfileDetailsView extends StatelessWidget {
               actions: [
                 IconButton(
                   onPressed: () {
-                     Get.to(() => const UpdateProfileView());
+                    Get.to(() => const UpdateProfileView());
                   },
                   icon: Icon(
                     Icons.edit_outlined,
@@ -160,18 +162,72 @@ class ProfileDetailsView extends StatelessWidget {
               Positioned(
                 bottom: 0,
                 right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
-                  ),
-                  child: const Icon(
-                    Icons.camera_alt_outlined,
-                    size: 16,
-                    color: Colors.black87,
-                  ),
+                // Make camera icon functional
+                child: Consumer<ProfileViewModel>(
+                  builder: (context, viewModel, child) {
+                    return GestureDetector(
+                      onTap: () async {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) => Container(
+                            height: 150,
+                            color: Colors.white,
+                            child: Column(
+                              children: [
+                                ListTile(
+                                  leading: const Icon(Icons.camera_alt),
+                                  title: const Text("Camera"),
+                                  onTap: () async {
+                                    Navigator.pop(context);
+                                    final ImagePicker picker = ImagePicker();
+                                    final XFile? image = await picker.pickImage(
+                                      source: ImageSource.camera,
+                                      imageQuality: 50,
+                                    );
+                                    if (image != null) {
+                                      viewModel.uploadProfileImage(
+                                        File(image.path),
+                                      );
+                                    }
+                                  },
+                                ),
+                                ListTile(
+                                  leading: const Icon(Icons.photo),
+                                  title: const Text("Gallery"),
+                                  onTap: () async {
+                                    Navigator.pop(context);
+                                    final ImagePicker picker = ImagePicker();
+                                    final XFile? image = await picker.pickImage(
+                                      source: ImageSource.gallery,
+                                      imageQuality: 50,
+                                    );
+                                    if (image != null) {
+                                      viewModel.uploadProfileImage(
+                                        File(image.path),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2),
+                        ),
+                        child: const Icon(
+                          Icons.camera_alt_outlined,
+                          size: 16,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],

@@ -6,6 +6,9 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../viewmodels/dashboard_viewmodel.dart';
 import '../../agent/lemon_agent_page.dart';
+import '../../astrology/views/credit_history_view.dart';
+import '../../../common/widgets/profile_image_view.dart';
+import '../../wallet/views/recharge_plans_view.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -87,89 +90,71 @@ class AppDrawer extends StatelessWidget {
                                 // Profile Image
                                 Stack(
                                   children: [
-                                    Container(
-                                      width: 70,
-                                      height: 70,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: Colors.white,
-                                          width: 2,
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withOpacity(
-                                              0.1,
+                                    GestureDetector(
+                                      onTap: () {
+                                        if (profile?.profileImageUrl != null) {
+                                          _showProfileOptions(
+                                            context,
+                                            profile!.profileImageUrl!,
+                                            viewModel,
+                                          );
+                                        } else {
+                                          // Directly open edit sheet if no image
+                                          _showImageSourceSheet(
+                                            context,
+                                            viewModel,
+                                          );
+                                        }
+                                      },
+                                      child: Hero(
+                                        tag: 'profile_pic_drawer',
+                                        child: Container(
+                                          width: 70,
+                                          height: 70,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: Colors.white,
+                                              width: 2,
                                             ),
-                                            blurRadius: 10,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(
+                                                  0.1,
+                                                ),
+                                                blurRadius: 10,
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                      child: CircleAvatar(
-                                        radius: 35,
-                                        backgroundColor: Colors.grey[200],
-                                        backgroundImage:
-                                            profile?.profileImageUrl != null
-                                            ? NetworkImage(
-                                                profile!.profileImageUrl!,
-                                              )
-                                            : null,
-                                        child: profile?.profileImageUrl == null
-                                            ? const Icon(
-                                                Icons.person,
-                                                size: 35,
-                                                color: AppTheme.primaryGold,
-                                              )
-                                            : null,
+                                          child: CircleAvatar(
+                                            radius: 35,
+                                            backgroundColor: Colors.grey[200],
+                                            backgroundImage:
+                                                profile?.profileImageUrl != null
+                                                ? NetworkImage(
+                                                    profile!.profileImageUrl!,
+                                                  )
+                                                : null,
+                                            child:
+                                                profile?.profileImageUrl == null
+                                                ? const Icon(
+                                                    Icons.person,
+                                                    size: 35,
+                                                    color: AppTheme.primaryGold,
+                                                  )
+                                                : null,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                     Positioned(
                                       bottom: 0,
                                       right: 0,
                                       child: GestureDetector(
-                                        onTap: () async {
-                                          showModalBottomSheet(
-                                            context: context,
-                                            builder: (context) => Container(
-                                              height: 150,
-                                              color: Colors.white,
-                                              child: Column(
-                                                children: [
-                                                  ListTile(
-                                                    leading: const Icon(Icons.camera_alt),
-                                                    title: const Text("Camera"),
-                                                    onTap: () async {
-                                                      Navigator.pop(context);
-                                                      final ImagePicker picker = ImagePicker();
-                                                      final XFile? image = await picker.pickImage(
-                                                        source: ImageSource.camera,
-                                                        imageQuality: 50,
-                                                      );
-                                                      if (image != null) {
-                                                        viewModel.uploadProfileImage(File(image.path));
-                                                      }
-                                                    },
-                                                  ),
-                                                  ListTile(
-                                                    leading: const Icon(Icons.photo),
-                                                    title: const Text("Gallery"),
-                                                    onTap: () async {
-                                                      Navigator.pop(context);
-                                                      final ImagePicker picker = ImagePicker();
-                                                      final XFile? image = await picker.pickImage(
-                                                        source: ImageSource.gallery,
-                                                        imageQuality: 50,
-                                                      );
-                                                      if (image != null) {
-                                                        viewModel.uploadProfileImage(File(image.path));
-                                                      }
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        },
+                                        onTap: () => _showImageSourceSheet(
+                                          context,
+                                          viewModel,
+                                        ),
                                         child: Container(
                                           padding: const EdgeInsets.all(4),
                                           decoration: const BoxDecoration(
@@ -292,6 +277,16 @@ class AppDrawer extends StatelessWidget {
                                         icon: Icons.shopping_cart_outlined,
                                         label: "Orders",
                                         onTap: () {},
+                                      ),
+                                      _menuItem(
+                                        icon: Icons.receipt_long_outlined,
+                                        label: "Credit History",
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                          Get.to(
+                                            () => const CreditHistoryView(),
+                                          );
+                                        },
                                       ),
                                       // _menuItem(
                                       //   icon: Icons.bookmark_outline,
@@ -657,7 +652,8 @@ class AppDrawer extends StatelessWidget {
             // Redeem Button
             GestureDetector(
               onTap: () {
-                // Navigate to credit related screen
+                Navigator.pop(context);
+                Get.to(() => const RechargePlansView());
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(
@@ -677,6 +673,126 @@ class AppDrawer extends StatelessWidget {
                   ),
                 ),
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showProfileOptions(
+    BuildContext context,
+    String imageUrl,
+    ProfileViewModel viewModel,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 10),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: const CircleAvatar(
+                backgroundColor: Color(0xff5D4037),
+                radius: 20,
+                child: Icon(Icons.person, color: Colors.white, size: 20),
+              ),
+              title: Text(
+                'View Profile Picture',
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                Get.to(
+                  () => ProfileImageView(
+                    imageUrl: imageUrl,
+                    heroTag: 'profile_pic_drawer',
+                  ),
+                  transition: Transition.fadeIn,
+                );
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const CircleAvatar(
+                backgroundColor: Color(0xff5D4037),
+                radius: 20,
+                child: Icon(Icons.edit, color: Colors.white, size: 20),
+              ),
+              title: Text(
+                'Edit Profile Picture',
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _showImageSourceSheet(context, viewModel);
+              },
+            ),
+            const SizedBox(height: 30),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showImageSourceSheet(BuildContext context, ProfileViewModel viewModel) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        height: 150,
+        color: Colors.white,
+        child: Column(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text("Camera"),
+              onTap: () async {
+                Navigator.pop(context);
+                final ImagePicker picker = ImagePicker();
+                final XFile? image = await picker.pickImage(
+                  source: ImageSource.camera,
+                  imageQuality: 50,
+                );
+                if (image != null) {
+                  viewModel.uploadProfileImage(File(image.path));
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo),
+              title: const Text("Gallery"),
+              onTap: () async {
+                Navigator.pop(context);
+                final ImagePicker picker = ImagePicker();
+                final XFile? image = await picker.pickImage(
+                  source: ImageSource.gallery,
+                  imageQuality: 50,
+                );
+                if (image != null) {
+                  viewModel.uploadProfileImage(File(image.path));
+                }
+              },
             ),
           ],
         ),

@@ -5,8 +5,8 @@ import 'package:brahmakosh/features/home/views/astrology_details_screen.dart';
 
 class DoshaDetailScreen extends StatelessWidget {
   final String title;
-  final String doshaType; // "manglik", "kalsarpa", "sadesati", "pitra"
-  final dynamic data; // The raw object for that dosha
+  final String doshaType;
+  final dynamic data;
 
   const DoshaDetailScreen({
     super.key,
@@ -144,59 +144,162 @@ class DoshaDetailScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle("Sade Sati Life Cycles"),
         const SizedBox(height: 10),
-        ListView.separated(
+        ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: life.length,
-          separatorBuilder: (c, i) => const SizedBox(height: 12),
           itemBuilder: (context, index) {
             final item = life[index];
-            return Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "${item.type?.replaceAll('_', ' ')}",
-                    style: GoogleFonts.lora(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: const Color(0xFF6D3A0C),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    "Date: ${item.date}",
-                    style: GoogleFonts.lora(
-                      fontSize: 12,
-                      color: Colors.grey[700],
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    "${item.summary}",
-                    style: GoogleFonts.lora(fontSize: 13),
-                  ),
-                ],
-              ),
+            return _buildTimelineItem(
+              context,
+              item,
+              index == 0,
+              index == life.length - 1,
             );
           },
         ),
       ],
     );
+  }
+
+  Widget _buildTimelineItem(
+    BuildContext context,
+    RawSadeSati item,
+    bool isFirst,
+    bool isLast,
+  ) {
+    final phaseColor = _getPhaseColor(item.type);
+
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Timeline Line and Dot
+          SizedBox(
+            width: 40,
+            child: Column(
+              children: [
+                // Upper Line
+                Expanded(
+                  child: Container(
+                    width: 2,
+                    color: isFirst
+                        ? Colors.transparent
+                        : const Color(0xFFD7CCC8),
+                  ),
+                ),
+                // Dot
+                Container(
+                  width: 14,
+                  height: 14,
+                  decoration: BoxDecoration(
+                    color: phaseColor,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(
+                        0xFFFFFBF5,
+                      ), // Background color for gap
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: phaseColor.withOpacity(0.4),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                ),
+                // Lower Line
+                Expanded(
+                  child: Container(
+                    width: 2,
+                    color: isLast
+                        ? Colors.transparent
+                        : const Color(0xFFD7CCC8),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Content
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 24.0, right: 8.0),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: phaseColor.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  border: Border.all(color: phaseColor.withOpacity(0.2)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            (item.type?.replaceAll('_', ' ') ?? "Cycle")
+                                .toUpperCase(),
+                            style: GoogleFonts.lora(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: phaseColor,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      "Date: ${item.date}",
+                      style: GoogleFonts.lora(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF8D6E63),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      "${item.summary}",
+                      style: GoogleFonts.lora(
+                        fontSize: 14,
+                        color: const Color(0xFF4E342E),
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getPhaseColor(String? type) {
+    if (type == null) return const Color(0xFF6D3A0C);
+    final lowerType = type.toLowerCase();
+    if (lowerType.contains('rising')) {
+      return const Color(0xFFE65100); // Warm Orange for Rising
+    } else if (lowerType.contains('peak')) {
+      return const Color(0xFFB71C1C); // Deep Red for Peak
+    } else if (lowerType.contains('setting')) {
+      return const Color(0xFF2E7D32); // Green for Setting/Cooling
+    }
+    return const Color(0xFF6D3A0C); // Default Brown
   }
 
   Widget _buildPitraContent(RawPitra? pitra) {

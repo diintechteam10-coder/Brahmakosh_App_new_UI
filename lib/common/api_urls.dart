@@ -51,6 +51,7 @@ class ApiUrls {
   static const String completeUserDetails = '$baseUrl/api/client/users';
   static const String numerologyHistory = '$baseUrl/api/client/users';
   static const String numerologyDetail = '$baseUrl/api/client/users';
+  static const String doshaDasha = '$baseUrl/api/client/users';
 
   /// 🔹 Gita APIs
   static const String gitaChapters = '$baseUrl/api/chapters';
@@ -76,5 +77,8 @@ class ApiUrls {
   static const String userCreditBalance = '$chatApiUrl/credits/balance/user';
   static const String markConversationRead =
       '$chatApiUrl/conversations'; // /{conversationId}/read
+  static const String submitFeedback =
+      '$chatApiUrl/conversations'; // /{id}/feedback
   static const String unreadCount = '$chatApiUrl/unread-count';
+  static const String creditHistory = '$chatApiUrl/credits/history/user';
 }

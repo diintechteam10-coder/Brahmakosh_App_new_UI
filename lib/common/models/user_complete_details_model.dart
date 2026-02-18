@@ -252,6 +252,20 @@ class Astrology {
   List<Planets>? planetsExtended;
   BirthChart? birthChart;
   BirthExtendedChart? birthExtendedChart;
+  GhatChakra? ghatChakra;
+  List<AyanamshaEntry>? ayanamsha;
+  BhavMadhya? bhavMadhya;
+  Map<String, PlanetAshtak>? planetAshtak;
+  SarvAshtak? sarvashtak;
+  CurrentVdasha? currentVdasha;
+  CurrentVdashaAll? currentVdashaAll;
+  List<VDashaPeriod>? majorVdasha;
+  CurrentChardasha? astrologyCurrentChardasha;
+  List<MajorChardasha>? astrologyMajorChardasha;
+  CurrentYogini? astrologyCurrentYoginiDasha;
+  List<SadhesatiLifeDetail>? sadhesatiLifeDetails;
+  PitraDoshaReport? pitraDoshaReport;
+  GemstoneSuggestion? gemstoneSuggestion;
   String? lastCalculated;
   String? calculationSource;
 
@@ -262,6 +276,20 @@ class Astrology {
     this.planetsExtended,
     this.birthChart,
     this.birthExtendedChart,
+    this.ghatChakra,
+    this.ayanamsha,
+    this.bhavMadhya,
+    this.planetAshtak,
+    this.sarvashtak,
+    this.currentVdasha,
+    this.currentVdashaAll,
+    this.majorVdasha,
+    this.astrologyCurrentChardasha,
+    this.astrologyMajorChardasha,
+    this.astrologyCurrentYoginiDasha,
+    this.sadhesatiLifeDetails,
+    this.pitraDoshaReport,
+    this.gemstoneSuggestion,
     this.lastCalculated,
     this.calculationSource,
   });
@@ -291,6 +319,65 @@ class Astrology {
     birthExtendedChart = json['birthExtendedChart'] != null
         ? BirthExtendedChart.fromJson(json['birthExtendedChart'])
         : null;
+    ghatChakra = json['ghatChakra'] != null
+        ? GhatChakra.fromJson(json['ghatChakra'])
+        : null;
+    if (json['ayanamsha'] != null) {
+      ayanamsha = <AyanamshaEntry>[];
+      json['ayanamsha'].forEach((v) {
+        ayanamsha!.add(AyanamshaEntry.fromJson(v));
+      });
+    }
+    bhavMadhya = json['bhavMadhya'] != null
+        ? BhavMadhya.fromJson(json['bhavMadhya'])
+        : null;
+    if (json['planetAshtak'] != null) {
+      planetAshtak = <String, PlanetAshtak>{};
+      (json['planetAshtak'] as Map<String, dynamic>).forEach((key, value) {
+        if (value != null) {
+          planetAshtak![key] = PlanetAshtak.fromJson(value);
+        }
+      });
+    }
+    sarvashtak = json['sarvashtak'] != null
+        ? SarvAshtak.fromJson(json['sarvashtak'])
+        : null;
+    currentVdasha = json['currentVdasha'] != null
+        ? CurrentVdasha.fromJson(json['currentVdasha'])
+        : null;
+    currentVdashaAll = json['currentVdashaAll'] != null
+        ? CurrentVdashaAll.fromJson(json['currentVdashaAll'])
+        : null;
+    if (json['majorVdasha'] != null) {
+      majorVdasha = <VDashaPeriod>[];
+      json['majorVdasha'].forEach((v) {
+        majorVdasha!.add(VDashaPeriod.fromJson(v));
+      });
+    }
+    astrologyCurrentChardasha = json['currentChardasha'] != null
+        ? CurrentChardasha.fromJson(json['currentChardasha'])
+        : null;
+    if (json['majorChardasha'] != null) {
+      astrologyMajorChardasha = <MajorChardasha>[];
+      json['majorChardasha'].forEach((v) {
+        astrologyMajorChardasha!.add(MajorChardasha.fromJson(v));
+      });
+    }
+    astrologyCurrentYoginiDasha = json['currentYoginiDasha'] != null
+        ? CurrentYogini.fromJson(json['currentYoginiDasha'])
+        : null;
+    if (json['sadhesatiLifeDetails'] != null) {
+      sadhesatiLifeDetails = <SadhesatiLifeDetail>[];
+      json['sadhesatiLifeDetails'].forEach((v) {
+        sadhesatiLifeDetails!.add(SadhesatiLifeDetail.fromJson(v));
+      });
+    }
+    pitraDoshaReport = json['pitraDoshaReport'] != null
+        ? PitraDoshaReport.fromJson(json['pitraDoshaReport'])
+        : null;
+    gemstoneSuggestion = json['gemstoneSuggestion'] != null
+        ? GemstoneSuggestion.fromJson(json['gemstoneSuggestion'])
+        : null;
     lastCalculated = json['lastCalculated'];
     calculationSource = json['calculationSource'];
   }
@@ -316,6 +403,54 @@ class Astrology {
     }
     if (birthExtendedChart != null) {
       data['birthExtendedChart'] = birthExtendedChart!.toJson();
+    }
+    if (ghatChakra != null) {
+      data['ghatChakra'] = ghatChakra!.toJson();
+    }
+    if (ayanamsha != null) {
+      data['ayanamsha'] = ayanamsha!.map((v) => v.toJson()).toList();
+    }
+    if (bhavMadhya != null) {
+      data['bhavMadhya'] = bhavMadhya!.toJson();
+    }
+    if (planetAshtak != null) {
+      data['planetAshtak'] = planetAshtak!.map(
+        (k, v) => MapEntry(k, v.toJson()),
+      );
+    }
+    if (sarvashtak != null) {
+      data['sarvashtak'] = sarvashtak!.toJson();
+    }
+    if (currentVdasha != null) {
+      data['currentVdasha'] = currentVdasha!.toJson();
+    }
+    if (currentVdashaAll != null) {
+      data['currentVdashaAll'] = currentVdashaAll!.toJson();
+    }
+    if (majorVdasha != null) {
+      data['majorVdasha'] = majorVdasha!.map((v) => v.toJson()).toList();
+    }
+    if (astrologyCurrentChardasha != null) {
+      data['currentChardasha'] = astrologyCurrentChardasha!.toJson();
+    }
+    if (astrologyMajorChardasha != null) {
+      data['majorChardasha'] = astrologyMajorChardasha!
+          .map((v) => v.toJson())
+          .toList();
+    }
+    if (astrologyCurrentYoginiDasha != null) {
+      data['currentYoginiDasha'] = astrologyCurrentYoginiDasha!.toJson();
+    }
+    if (sadhesatiLifeDetails != null) {
+      data['sadhesatiLifeDetails'] = sadhesatiLifeDetails!
+          .map((v) => v.toJson())
+          .toList();
+    }
+    if (pitraDoshaReport != null) {
+      data['pitraDoshaReport'] = pitraDoshaReport!.toJson();
+    }
+    if (gemstoneSuggestion != null) {
+      data['gemstoneSuggestion'] = gemstoneSuggestion!.toJson();
     }
     data['lastCalculated'] = lastCalculated;
     data['calculationSource'] = calculationSource;
@@ -715,6 +850,7 @@ class Doshas {
   SadeSatiCurrent? sadeSatiCurrent;
   SadeSatiLife? sadeSatiLife;
   Pitra? pitra;
+  DoshaSummary? doshaSummary;
 
   Doshas({
     this.manglik,
@@ -722,11 +858,15 @@ class Doshas {
     this.sadeSatiCurrent,
     this.sadeSatiLife,
     this.pitra,
+    this.doshaSummary,
   });
 
   Doshas.fromJson(Map<String, dynamic> json) {
     manglik = json['manglik'] != null
         ? Manglik.fromJson(json['manglik'])
+        : null;
+    kalsarpa = json['kalsarpa'] != null
+        ? Kalsarpa.fromJson(json['kalsarpa'])
         : null;
     sadeSatiCurrent = json['sadeSatiCurrent'] != null
         ? SadeSatiCurrent.fromJson(json['sadeSatiCurrent'])
@@ -739,6 +879,9 @@ class Doshas {
               ? SadeSatiLife.fromJson(json['sade_sati_life'])
               : null);
     pitra = json['pitra'] != null ? Pitra.fromJson(json['pitra']) : null;
+    doshaSummary = json['doshaSummary'] != null
+        ? DoshaSummary.fromJson(json['doshaSummary'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -757,6 +900,9 @@ class Doshas {
     }
     if (pitra != null) {
       data['pitra'] = pitra!.toJson();
+    }
+    if (doshaSummary != null) {
+      data['doshaSummary'] = doshaSummary!.toJson();
     }
     return data;
   }
@@ -1537,6 +1683,667 @@ class MajorChardasha {
     data['duration'] = duration;
     data['start_date'] = startDate;
     data['end_date'] = endDate;
+    return data;
+  }
+}
+
+// ============================================================
+// NEW MODEL CLASSES FOR EXTENDED ASTROLOGY API DATA
+// ============================================================
+
+class GhatChakra {
+  String? month;
+  String? tithi;
+  String? day;
+  String? nakshatra;
+  String? yog;
+  String? karan;
+  String? pahar;
+  String? moon;
+
+  GhatChakra({
+    this.month,
+    this.tithi,
+    this.day,
+    this.nakshatra,
+    this.yog,
+    this.karan,
+    this.pahar,
+    this.moon,
+  });
+
+  GhatChakra.fromJson(Map<String, dynamic> json) {
+    month = json['month'];
+    tithi = json['tithi'];
+    day = json['day'];
+    nakshatra = json['nakshatra'];
+    yog = json['yog'];
+    karan = json['karan'];
+    pahar = json['pahar']?.toString();
+    moon = json['moon']?.toString();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['month'] = month;
+    data['tithi'] = tithi;
+    data['day'] = day;
+    data['nakshatra'] = nakshatra;
+    data['yog'] = yog;
+    data['karan'] = karan;
+    data['pahar'] = pahar;
+    data['moon'] = moon;
+    return data;
+  }
+}
+
+class AyanamshaEntry {
+  String? type;
+  double? degree;
+  String? formatted;
+
+  AyanamshaEntry({this.type, this.degree, this.formatted});
+
+  AyanamshaEntry.fromJson(Map<String, dynamic> json) {
+    type = json['type'];
+    degree = (json['degree'] as num?)?.toDouble();
+    formatted = json['formatted'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['type'] = type;
+    data['degree'] = degree;
+    data['formatted'] = formatted;
+    return data;
+  }
+}
+
+class BhavMadhya {
+  double? ascendant;
+  double? midheaven;
+  double? ayanamsha;
+  List<BhavMadhyaHouse>? bhavMadhya;
+  List<BhavSandhiHouse>? bhavSandhi;
+
+  BhavMadhya({
+    this.ascendant,
+    this.midheaven,
+    this.ayanamsha,
+    this.bhavMadhya,
+    this.bhavSandhi,
+  });
+
+  BhavMadhya.fromJson(Map<String, dynamic> json) {
+    ascendant = (json['ascendant'] as num?)?.toDouble();
+    midheaven = (json['midheaven'] as num?)?.toDouble();
+    ayanamsha = (json['ayanamsha'] as num?)?.toDouble();
+    if (json['bhav_madhya'] != null) {
+      bhavMadhya = <BhavMadhyaHouse>[];
+      json['bhav_madhya'].forEach((v) {
+        bhavMadhya!.add(BhavMadhyaHouse.fromJson(v));
+      });
+    }
+    if (json['bhav_sandhi'] != null) {
+      bhavSandhi = <BhavSandhiHouse>[];
+      json['bhav_sandhi'].forEach((v) {
+        bhavSandhi!.add(BhavSandhiHouse.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['ascendant'] = ascendant;
+    data['midheaven'] = midheaven;
+    data['ayanamsha'] = ayanamsha;
+    if (bhavMadhya != null) {
+      data['bhav_madhya'] = bhavMadhya!.map((v) => v.toJson()).toList();
+    }
+    if (bhavSandhi != null) {
+      data['bhav_sandhi'] = bhavSandhi!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class BhavMadhyaHouse {
+  int? house;
+  double? degree;
+  String? sign;
+  double? normDegree;
+  int? signId;
+
+  BhavMadhyaHouse({
+    this.house,
+    this.degree,
+    this.sign,
+    this.normDegree,
+    this.signId,
+  });
+
+  BhavMadhyaHouse.fromJson(Map<String, dynamic> json) {
+    house = json['house'];
+    degree = (json['degree'] as num?)?.toDouble();
+    sign = json['sign'];
+    normDegree = (json['norm_degree'] as num?)?.toDouble();
+    signId = json['sign_id'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['house'] = house;
+    data['degree'] = degree;
+    data['sign'] = sign;
+    data['norm_degree'] = normDegree;
+    data['sign_id'] = signId;
+    return data;
+  }
+}
+
+class BhavSandhiHouse {
+  int? house;
+  double? degree;
+  String? sign;
+  double? normDegree;
+  int? signId;
+
+  BhavSandhiHouse({
+    this.house,
+    this.degree,
+    this.sign,
+    this.normDegree,
+    this.signId,
+  });
+
+  BhavSandhiHouse.fromJson(Map<String, dynamic> json) {
+    house = json['house'];
+    degree = (json['degree'] as num?)?.toDouble();
+    sign = json['sign'];
+    normDegree = (json['norm_degree'] as num?)?.toDouble();
+    signId = json['sign_id'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['house'] = house;
+    data['degree'] = degree;
+    data['sign'] = sign;
+    data['norm_degree'] = normDegree;
+    data['sign_id'] = signId;
+    return data;
+  }
+}
+
+class AshtakVarga {
+  String? type;
+  String? planet;
+  String? sign;
+  int? signId;
+
+  AshtakVarga({this.type, this.planet, this.sign, this.signId});
+
+  AshtakVarga.fromJson(Map<String, dynamic> json) {
+    type = json['type'];
+    planet = json['planet'];
+    sign = json['sign'];
+    signId = json['sign_id'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['type'] = type;
+    data['planet'] = planet;
+    data['sign'] = sign;
+    data['sign_id'] = signId;
+    return data;
+  }
+}
+
+class SignPoints {
+  int? sun;
+  int? moon;
+  int? mars;
+  int? mercury;
+  int? jupiter;
+  int? venus;
+  int? saturn;
+  int? ascendant;
+  int? total;
+
+  SignPoints({
+    this.sun,
+    this.moon,
+    this.mars,
+    this.mercury,
+    this.jupiter,
+    this.venus,
+    this.saturn,
+    this.ascendant,
+    this.total,
+  });
+
+  SignPoints.fromJson(Map<String, dynamic> json) {
+    sun = json['sun'];
+    moon = json['moon'];
+    mars = json['mars'];
+    mercury = json['mercury'];
+    jupiter = json['jupiter'];
+    venus = json['venus'];
+    saturn = json['saturn'];
+    ascendant = json['ascendant'];
+    total = json['total'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['sun'] = sun;
+    data['moon'] = moon;
+    data['mars'] = mars;
+    data['mercury'] = mercury;
+    data['jupiter'] = jupiter;
+    data['venus'] = venus;
+    data['saturn'] = saturn;
+    data['ascendant'] = ascendant;
+    data['total'] = total;
+    return data;
+  }
+}
+
+class PlanetAshtak {
+  AshtakVarga? ashtakVarga;
+  Map<String, SignPoints>? ashtakPoints;
+
+  PlanetAshtak({this.ashtakVarga, this.ashtakPoints});
+
+  PlanetAshtak.fromJson(Map<String, dynamic> json) {
+    ashtakVarga = json['ashtak_varga'] != null
+        ? AshtakVarga.fromJson(json['ashtak_varga'])
+        : null;
+    if (json['ashtak_points'] != null) {
+      ashtakPoints = <String, SignPoints>{};
+      (json['ashtak_points'] as Map<String, dynamic>).forEach((key, value) {
+        ashtakPoints![key] = SignPoints.fromJson(value);
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (ashtakVarga != null) {
+      data['ashtak_varga'] = ashtakVarga!.toJson();
+    }
+    if (ashtakPoints != null) {
+      data['ashtak_points'] = ashtakPoints!.map(
+        (k, v) => MapEntry(k, v.toJson()),
+      );
+    }
+    return data;
+  }
+}
+
+class SarvAshtak {
+  AshtakVarga? ashtakVarga;
+  Map<String, SignPoints>? ashtakPoints;
+
+  SarvAshtak({this.ashtakVarga, this.ashtakPoints});
+
+  SarvAshtak.fromJson(Map<String, dynamic> json) {
+    ashtakVarga = json['ashtak_varga'] != null
+        ? AshtakVarga.fromJson(json['ashtak_varga'])
+        : null;
+    if (json['ashtak_points'] != null) {
+      ashtakPoints = <String, SignPoints>{};
+      (json['ashtak_points'] as Map<String, dynamic>).forEach((key, value) {
+        ashtakPoints![key] = SignPoints.fromJson(value);
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (ashtakVarga != null) {
+      data['ashtak_varga'] = ashtakVarga!.toJson();
+    }
+    if (ashtakPoints != null) {
+      data['ashtak_points'] = ashtakPoints!.map(
+        (k, v) => MapEntry(k, v.toJson()),
+      );
+    }
+    return data;
+  }
+}
+
+class VDashaPeriod {
+  String? planet;
+  int? planetId;
+  String? start;
+  String? end;
+  String? duration;
+
+  VDashaPeriod({
+    this.planet,
+    this.planetId,
+    this.start,
+    this.end,
+    this.duration,
+  });
+
+  VDashaPeriod.fromJson(Map<String, dynamic> json) {
+    planet = json['planet'];
+    planetId = json['planet_id'];
+    start = json['start'];
+    end = json['end'];
+    duration = json['duration']?.toString();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['planet'] = planet;
+    data['planet_id'] = planetId;
+    data['start'] = start;
+    data['end'] = end;
+    data['duration'] = duration;
+    return data;
+  }
+}
+
+class CurrentVdasha {
+  VDashaPeriod? major;
+  VDashaPeriod? minor;
+  VDashaPeriod? subMinor;
+  VDashaPeriod? subSubMinor;
+  VDashaPeriod? subSubSubMinor;
+
+  CurrentVdasha({
+    this.major,
+    this.minor,
+    this.subMinor,
+    this.subSubMinor,
+    this.subSubSubMinor,
+  });
+
+  CurrentVdasha.fromJson(Map<String, dynamic> json) {
+    major = json['major'] != null ? VDashaPeriod.fromJson(json['major']) : null;
+    minor = json['minor'] != null ? VDashaPeriod.fromJson(json['minor']) : null;
+    subMinor = json['sub_minor'] != null
+        ? VDashaPeriod.fromJson(json['sub_minor'])
+        : null;
+    subSubMinor = json['sub_sub_minor'] != null
+        ? VDashaPeriod.fromJson(json['sub_sub_minor'])
+        : null;
+    subSubSubMinor = json['sub_sub_sub_minor'] != null
+        ? VDashaPeriod.fromJson(json['sub_sub_sub_minor'])
+        : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (major != null) data['major'] = major!.toJson();
+    if (minor != null) data['minor'] = minor!.toJson();
+    if (subMinor != null) data['sub_minor'] = subMinor!.toJson();
+    if (subSubMinor != null) data['sub_sub_minor'] = subSubMinor!.toJson();
+    if (subSubSubMinor != null) {
+      data['sub_sub_sub_minor'] = subSubSubMinor!.toJson();
+    }
+    return data;
+  }
+}
+
+class VdashaLevel {
+  Map<String, dynamic>? planet;
+  List<VDashaPeriod>? dashaPeriod;
+
+  VdashaLevel({this.planet, this.dashaPeriod});
+
+  VdashaLevel.fromJson(Map<String, dynamic> json) {
+    planet = json['planet'] is Map<String, dynamic> ? json['planet'] : null;
+    if (json['dasha_period'] != null) {
+      dashaPeriod = <VDashaPeriod>[];
+      json['dasha_period'].forEach((v) {
+        dashaPeriod!.add(VDashaPeriod.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (planet != null) data['planet'] = planet;
+    if (dashaPeriod != null) {
+      data['dasha_period'] = dashaPeriod!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class CurrentVdashaAll {
+  VdashaLevel? major;
+  VdashaLevel? minor;
+  VdashaLevel? subMinor;
+  VdashaLevel? subSubMinor;
+  VdashaLevel? subSubSubMinor;
+
+  CurrentVdashaAll({
+    this.major,
+    this.minor,
+    this.subMinor,
+    this.subSubMinor,
+    this.subSubSubMinor,
+  });
+
+  CurrentVdashaAll.fromJson(Map<String, dynamic> json) {
+    major = json['major'] != null ? VdashaLevel.fromJson(json['major']) : null;
+    minor = json['minor'] != null ? VdashaLevel.fromJson(json['minor']) : null;
+    subMinor = json['sub_minor'] != null
+        ? VdashaLevel.fromJson(json['sub_minor'])
+        : null;
+    subSubMinor = json['sub_sub_minor'] != null
+        ? VdashaLevel.fromJson(json['sub_sub_minor'])
+        : null;
+    subSubSubMinor = json['sub_sub_sub_minor'] != null
+        ? VdashaLevel.fromJson(json['sub_sub_sub_minor'])
+        : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (major != null) data['major'] = major!.toJson();
+    if (minor != null) data['minor'] = minor!.toJson();
+    if (subMinor != null) data['sub_minor'] = subMinor!.toJson();
+    if (subSubMinor != null) data['sub_sub_minor'] = subSubMinor!.toJson();
+    if (subSubSubMinor != null) {
+      data['sub_sub_sub_minor'] = subSubSubMinor!.toJson();
+    }
+    return data;
+  }
+}
+
+class SadhesatiLifeDetail {
+  String? moonSign;
+  String? saturnSign;
+  bool? isSaturnRetrograde;
+  String? type;
+  String? millisecond;
+  String? date;
+  String? summary;
+
+  SadhesatiLifeDetail({
+    this.moonSign,
+    this.saturnSign,
+    this.isSaturnRetrograde,
+    this.type,
+    this.millisecond,
+    this.date,
+    this.summary,
+  });
+
+  SadhesatiLifeDetail.fromJson(Map<String, dynamic> json) {
+    moonSign = json['moon_sign'];
+    saturnSign = json['saturn_sign'];
+    isSaturnRetrograde = json['is_saturn_retrograde'];
+    type = json['type'];
+    millisecond = json['millisecond']?.toString();
+    date = json['date'];
+    summary = json['summary'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['moon_sign'] = moonSign;
+    data['saturn_sign'] = saturnSign;
+    data['is_saturn_retrograde'] = isSaturnRetrograde;
+    data['type'] = type;
+    data['millisecond'] = millisecond;
+    data['date'] = date;
+    data['summary'] = summary;
+    return data;
+  }
+}
+
+class PitraDoshaReport {
+  String? whatIsPitriDosha;
+  bool? isPitriDoshaPresent;
+  List<String>? rulesMatched;
+  String? conclusion;
+  List<String>? remedies;
+  List<String>? effects;
+
+  PitraDoshaReport({
+    this.whatIsPitriDosha,
+    this.isPitriDoshaPresent,
+    this.rulesMatched,
+    this.conclusion,
+    this.remedies,
+    this.effects,
+  });
+
+  PitraDoshaReport.fromJson(Map<String, dynamic> json) {
+    whatIsPitriDosha = json['what_is_pitri_dosha'];
+    isPitriDoshaPresent = json['is_pitri_dosha_present'];
+    rulesMatched = json['rules_matched']?.cast<String>();
+    conclusion = json['conclusion'];
+    remedies = json['remedies']?.cast<String>();
+    effects = json['effects']?.cast<String>();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['what_is_pitri_dosha'] = whatIsPitriDosha;
+    data['is_pitri_dosha_present'] = isPitriDoshaPresent;
+    data['rules_matched'] = rulesMatched;
+    data['conclusion'] = conclusion;
+    data['remedies'] = remedies;
+    data['effects'] = effects;
+    return data;
+  }
+}
+
+class GemstoneDetail {
+  String? name;
+  String? gemKey;
+  String? semiGem;
+  String? wearFinger;
+  String? weightCaret;
+  String? wearMetal;
+  String? wearDay;
+  String? gemDeity;
+
+  GemstoneDetail({
+    this.name,
+    this.gemKey,
+    this.semiGem,
+    this.wearFinger,
+    this.weightCaret,
+    this.wearMetal,
+    this.wearDay,
+    this.gemDeity,
+  });
+
+  GemstoneDetail.fromJson(Map<String, dynamic> json) {
+    name = json['name'];
+    gemKey = json['gem_key'];
+    semiGem = json['semi_gem'];
+    wearFinger = json['wear_finger'];
+    weightCaret = json['weight_caret'];
+    wearMetal = json['wear_metal'];
+    wearDay = json['wear_day'];
+    gemDeity = json['gem_deity'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['gem_key'] = gemKey;
+    data['semi_gem'] = semiGem;
+    data['wear_finger'] = wearFinger;
+    data['weight_caret'] = weightCaret;
+    data['wear_metal'] = wearMetal;
+    data['wear_day'] = wearDay;
+    data['gem_deity'] = gemDeity;
+    return data;
+  }
+}
+
+class GemstoneSuggestion {
+  GemstoneDetail? life;
+  GemstoneDetail? benefic;
+  GemstoneDetail? lucky;
+
+  GemstoneSuggestion({this.life, this.benefic, this.lucky});
+
+  GemstoneSuggestion.fromJson(Map<String, dynamic> json) {
+    life = json['LIFE'] != null ? GemstoneDetail.fromJson(json['LIFE']) : null;
+    benefic = json['BENEFIC'] != null
+        ? GemstoneDetail.fromJson(json['BENEFIC'])
+        : null;
+    lucky = json['LUCKY'] != null
+        ? GemstoneDetail.fromJson(json['LUCKY'])
+        : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (life != null) data['LIFE'] = life!.toJson();
+    if (benefic != null) data['BENEFIC'] = benefic!.toJson();
+    if (lucky != null) data['LUCKY'] = lucky!.toJson();
+    return data;
+  }
+}
+
+class DoshaSummary {
+  bool? manglik;
+  bool? kalsarpa;
+  bool? sadeSatiCurrent;
+  bool? sadeSatiLife;
+  bool? pitra;
+  bool? anyPresent;
+
+  DoshaSummary({
+    this.manglik,
+    this.kalsarpa,
+    this.sadeSatiCurrent,
+    this.sadeSatiLife,
+    this.pitra,
+    this.anyPresent,
+  });
+
+  DoshaSummary.fromJson(Map<String, dynamic> json) {
+    manglik = json['manglik'];
+    kalsarpa = json['kalsarpa'];
+    sadeSatiCurrent = json['sadeSatiCurrent'];
+    sadeSatiLife = json['sadeSatiLife'];
+    pitra = json['pitra'];
+    anyPresent = json['anyPresent'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['manglik'] = manglik;
+    data['kalsarpa'] = kalsarpa;
+    data['sadeSatiCurrent'] = sadeSatiCurrent;
+    data['sadeSatiLife'] = sadeSatiLife;
+    data['pitra'] = pitra;
+    data['anyPresent'] = anyPresent;
     return data;
   }
 }

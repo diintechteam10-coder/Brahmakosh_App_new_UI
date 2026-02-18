@@ -156,6 +156,8 @@ class AstrologyChatController extends GetxController {
   }
 
   // ...
+  final sessionDetails = <String, dynamic>{}.obs;
+
   Future<void> _fetchMessages({bool isPolling = false}) async {
     Utils.print("📌 ENTER _fetchMessages (isPolling: $isPolling)");
     if (_conversationId == null) {
@@ -173,156 +175,200 @@ class AstrologyChatController extends GetxController {
       final token = StorageService.getString(AppConstants.keyAuthToken);
       if (token == null) return;
 
-      await callWebApiGet(
-        null,
-        "${ApiUrls.chatApiUrl}/conversations/$_conversationId/messages",
-        token: token,
-        showLoader: !isPolling,
-        onResponse: (response) {
-          if (response.statusCode == 200) {
-            final data = jsonDecode(response.body);
-            if (data['success'] == true) {
-              // ✅ SUCCESS! Conversation is active (or ended, but access granted)
-              if (!isRequestAccepted.value) {
-                isRequestAccepted.value = true;
-                Utils.print("✅ Polling detected acceptance! 403 -> 200");
-                // Switch from acceptance polling to active status polling
-                _startActiveStatusPolling();
-                _startMessageSyncPolling(); // Fail-safe for blue ticks
-                _startTimer();
-              }
+      final url =
+          "${ApiUrls.chatApiUrl}/conversations/$_conversationId/messages";
+      final headers = <String, String>{
+        'Content-Type': 'application/json',
+        'clientId': AppConstants.clientId,
+        'Authorization': 'Bearer $token',
+      };
 
-              final List<dynamic> msgList = data['data']['messages'];
-              final loadedMessages = msgList
-                  .map((m) => ChatMessage.fromJson(m))
-                  .toList();
-
-              // SMART MERGE: Union of (Fetched) and (Existing Socket Messages)
-              final Map<String, ChatMessage> mergedMap = {};
-
-              // Debug: Log fetched IDs
-              Utils.print(
-                "📥 Fetched ${loadedMessages.length} messages from API",
+      // During polling, use raw HTTP to avoid _returnResponse showing toasts for 403
+      if (isPolling) {
+        final response = await http
+            .get(Uri.parse(url), headers: headers)
+            .timeout(const Duration(seconds: 15));
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          if (data['success'] == true) {
+            // Parse Session Details if available
+            if (data['data'] != null && data['data']['sessionDetails'] is Map) {
+              sessionDetails.value = Map<String, dynamic>.from(
+                data['data']['sessionDetails'],
               );
-              if (loadedMessages.isNotEmpty) {
-                Utils.print(
-                  "🔍 Sample API ID: ${loadedMessages.first.messageId} | Content: ${loadedMessages.first.content}",
-                );
-              }
-
-              // 1. Add all fetched messages (Source of Truth)
-              for (var m in loadedMessages) {
-                mergedMap[m.messageId] = m;
-              }
-
-              // 2. Add local/socket messages only if NOT duplicate by ID
-              //    AND NOT duplicate by (Content + Approx Time)
-              int ignoredCount = 0;
-              for (var m in messages) {
-                if (m.messageId.isEmpty) continue;
-
-                // Direct ID check
-                if (mergedMap.containsKey(m.messageId)) {
-                  ignoredCount++;
-                  continue;
-                }
-
-                // Fuzzy check: Content + Same Sender + Time within 5s (increased window)
-                final isContentDuplicate = mergedMap.values.any((existing) {
-                  final sameSender = existing.senderId == m.senderId;
-                  final sameContent =
-                      existing.content.trim() == m.content.trim();
-
-                  final timeDiff = existing.createdAt
-                      .difference(m.createdAt)
-                      .inSeconds
-                      .abs();
-
-                  // Detailed Log for debugging collisions
-                  if (sameContent && sameSender && timeDiff > 5) {
-                    Utils.print(
-                      "🤔 Fuzzy Mismatch (Time): ${m.messageId} (${m.createdAt}) vs ${existing.messageId} (${existing.createdAt}) = Diff: ${timeDiff}s",
-                    );
-                  } else if (sameSender && timeDiff <= 5 && !sameContent) {
-                    Utils.print(
-                      "🤔 Fuzzy Mismatch (Content): '${m.content}' vs '${existing.content}'",
-                    );
-                  }
-
-                  return sameSender && sameContent && timeDiff <= 5;
-                });
-
-                if (isContentDuplicate) {
-                  Utils.print(
-                    "⚠️ [SmartMerge] Ignored duplicate: ${m.messageId} (Content match)",
-                  );
-                  ignoredCount++;
-                  continue;
-                }
-
-                // If unique, add it
-                mergedMap[m.messageId] = m;
-              }
-
-              Utils.print(
-                "📊 Merge Result [${hashCode}]: ${mergedMap.length} total messages (Ignored $ignoredCount duplicates)",
-              );
-
-              final uniqueList = mergedMap.values.toList();
-              uniqueList.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-
-              // FINAL AGGRESSIVE SCRUB
-              final List<ChatMessage> finalScrubbed = [];
-              final Set<String> seenIds = {};
-              for (var msg in uniqueList) {
-                if (seenIds.contains(msg.messageId)) continue;
-
-                // Final fuzzy check against already added scrubbed messages
-                bool isFuzzyDup = finalScrubbed.any((existing) {
-                  if (existing.senderId != msg.senderId) return false;
-                  if (existing.content.trim() != msg.content.trim())
-                    return false;
-                  return existing.createdAt
-                          .difference(msg.createdAt)
-                          .inSeconds
-                          .abs() <=
-                      5;
-                });
-
-                if (isFuzzyDup) {
-                  Utils.print(
-                    "🛑 [HyperScrub] Blocked duplicate: ${msg.messageId}",
-                  );
-                  continue;
-                }
-
-                seenIds.add(msg.messageId);
-                finalScrubbed.add(msg);
-              }
-
-              Utils.print(
-                "🧹 [HyperScrub] Final Count [${hashCode}]: ${finalScrubbed.length} (from ${uniqueList.length})",
-              );
-              messages.assignAll(finalScrubbed);
-
-              _processedMessageIds.clear();
-              _processedMessageIds.addAll(
-                finalScrubbed.map((m) => m.messageId),
-              );
-
-              if (!isPolling) _scrollToBottom();
-
-              markMessagesAsRead();
             }
-          } else if (response.statusCode == 403) {
-            // Still pending or blocked
-            Utils.print("⏳ Polling: 403 - Waiting for acceptance...");
+
+            if (!isRequestAccepted.value && !isChatEnded.value) {
+              isRequestAccepted.value = true;
+              Utils.print("✅ Polling detected acceptance! 403 -> 200");
+              _startActiveStatusPolling();
+              _startMessageSyncPolling();
+              _startTimer();
+            }
+
+            final List<dynamic> msgList = data['data']['messages'];
+            final loadedMessages = msgList
+                .map((m) => ChatMessage.fromJson(m))
+                .toList();
+
+            // SMART MERGE
+            final Map<String, ChatMessage> mergedMap = {};
+            for (var m in loadedMessages) {
+              mergedMap[m.messageId] = m;
+            }
+            for (var m in messages) {
+              if (m.messageId.isEmpty) continue;
+              if (mergedMap.containsKey(m.messageId)) continue;
+              final isContentDuplicate = mergedMap.values.any((existing) {
+                return existing.senderId == m.senderId &&
+                    existing.content.trim() == m.content.trim() &&
+                    existing.createdAt
+                            .difference(m.createdAt)
+                            .inSeconds
+                            .abs() <=
+                        5;
+              });
+              if (!isContentDuplicate) mergedMap[m.messageId] = m;
+            }
+
+            final uniqueList = mergedMap.values.toList();
+            uniqueList.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
+            // Final scrub
+            final List<ChatMessage> finalScrubbed = [];
+            final Set<String> seenIds = {};
+            for (var msg in uniqueList) {
+              if (seenIds.contains(msg.messageId)) continue;
+              bool isFuzzyDup = finalScrubbed.any((existing) {
+                if (existing.senderId != msg.senderId) return false;
+                if (existing.content.trim() != msg.content.trim()) return false;
+                return existing.createdAt
+                        .difference(msg.createdAt)
+                        .inSeconds
+                        .abs() <=
+                    5;
+              });
+              if (isFuzzyDup) continue;
+              seenIds.add(msg.messageId);
+              finalScrubbed.add(msg);
+            }
+
+            messages.assignAll(finalScrubbed);
+            _processedMessageIds.clear();
+            _processedMessageIds.addAll(finalScrubbed.map((m) => m.messageId));
+            markMessagesAsRead();
           }
-        },
-        onError: (error) {
-          if (!isPolling) Utils.print("❌ Error fetching messages: $error");
-        },
-      );
+        } else if (response.statusCode == 403) {
+          // Silently ignore - still pending acceptance (NO toast)
+          Utils.print("⏳ Polling: 403 - Waiting for acceptance...");
+        }
+      } else {
+        // Non-polling: use standard callWebApiGet
+        await callWebApiGet(
+          null,
+          url,
+          token: token,
+          showLoader: true,
+          onResponse: (response) {
+            if (response.statusCode == 200) {
+              final data = jsonDecode(response.body);
+              if (data['success'] == true) {
+                if (data['data'] != null &&
+                    data['data']['sessionDetails'] is Map) {
+                  sessionDetails.value = Map<String, dynamic>.from(
+                    data['data']['sessionDetails'],
+                  );
+                  Utils.print(
+                    '✅ fetchMessages: Session details found: $sessionDetails',
+                  );
+                }
+
+                if (!isRequestAccepted.value && !isChatEnded.value) {
+                  isRequestAccepted.value = true;
+                  Utils.print("✅ Polling detected acceptance! 403 -> 200");
+                  _startActiveStatusPolling();
+                  _startMessageSyncPolling();
+                  _startTimer();
+                }
+
+                final List<dynamic> msgList = data['data']['messages'];
+                final loadedMessages = msgList
+                    .map((m) => ChatMessage.fromJson(m))
+                    .toList();
+
+                final Map<String, ChatMessage> mergedMap = {};
+                Utils.print(
+                  "📥 Fetched ${loadedMessages.length} messages from API",
+                );
+
+                for (var m in loadedMessages) {
+                  mergedMap[m.messageId] = m;
+                }
+
+                int ignoredCount = 0;
+                for (var m in messages) {
+                  if (m.messageId.isEmpty) continue;
+                  if (mergedMap.containsKey(m.messageId)) {
+                    ignoredCount++;
+                    continue;
+                  }
+                  final isContentDuplicate = mergedMap.values.any((existing) {
+                    return existing.senderId == m.senderId &&
+                        existing.content.trim() == m.content.trim() &&
+                        existing.createdAt
+                                .difference(m.createdAt)
+                                .inSeconds
+                                .abs() <=
+                            5;
+                  });
+                  if (isContentDuplicate) {
+                    ignoredCount++;
+                    continue;
+                  }
+                  mergedMap[m.messageId] = m;
+                }
+
+                Utils.print(
+                  "📊 Merge Result: ${mergedMap.length} total (Ignored $ignoredCount duplicates)",
+                );
+
+                final uniqueList = mergedMap.values.toList();
+                uniqueList.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
+                final List<ChatMessage> finalScrubbed = [];
+                final Set<String> seenIds = {};
+                for (var msg in uniqueList) {
+                  if (seenIds.contains(msg.messageId)) continue;
+                  bool isFuzzyDup = finalScrubbed.any((existing) {
+                    if (existing.senderId != msg.senderId) return false;
+                    if (existing.content.trim() != msg.content.trim())
+                      return false;
+                    return existing.createdAt
+                            .difference(msg.createdAt)
+                            .inSeconds
+                            .abs() <=
+                        5;
+                  });
+                  if (isFuzzyDup) continue;
+                  seenIds.add(msg.messageId);
+                  finalScrubbed.add(msg);
+                }
+
+                messages.assignAll(finalScrubbed);
+                _processedMessageIds.clear();
+                _processedMessageIds.addAll(
+                  finalScrubbed.map((m) => m.messageId),
+                );
+                _scrollToBottom();
+                markMessagesAsRead();
+              }
+            }
+          },
+          onError: (error) {
+            Utils.print("❌ Error fetching messages: $error");
+          },
+        );
+      }
     } catch (e) {
       Utils.print("❌ Error fetching messages: $e");
     } finally {
@@ -504,6 +550,8 @@ class AstrologyChatController extends GetxController {
     Utils.print("📌 EXIT _onPartnerJoined");
   }
 
+  final isChatEnded = false.obs;
+
   void _onConversationEnded(dynamic data) {
     Utils.print("📌 ENTER _onConversationEnded");
     try {
@@ -525,95 +573,31 @@ class AstrologyChatController extends GetxController {
       } else {
         // Normal end logic
         isRequestAccepted.value = false; // BLOCK sending
-        _timer?.cancel();
 
-        // Show non-dismissible dialog
-        Get.generalDialog(
-          barrierDismissible: false,
-          barrierLabel: "Chat Ended",
-          pageBuilder: (context, _, __) {
-            return WillPopScope(
-              onWillPop: () async => false, // Block back button dismissal
-              child: Dialog(
-                backgroundColor: Colors.white,
-                surfaceTintColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFAF3E0),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.front_hand, // Stop icon concept
-                          color: Color(0xFF8D6E63),
-                          size: 28,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        "Consultation Ended",
-                        style: GoogleFonts.cinzel(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        "The expert has ended the session. Thank you for consulting with ${expert.name}.",
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          color: const Color(0xFF8D6E63),
-                          height: 1.4,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 24),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // Correct cleanup
-                            _socketService.leaveConversation(
-                              _conversationId ?? '',
-                            );
-                            Get.back(); // Close dialog
-                            Get.back(); // Leave screen
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFA1887F),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: Text(
-                            "Go Back",
-                            style: GoogleFonts.inter(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
+        // Stop all timers
+        _timer?.cancel();
+        _activeStatusTimer?.cancel();
+        _msgSyncTimer?.cancel();
+        _statusPollingTimer?.cancel();
+
+        isChatEnded.value = true; // Show summary report
+        _fetchMessages(); // Fetch final summary
+
+        // Retry fetching to pick up AI-generated summary (server generates it async)
+        Future.delayed(const Duration(seconds: 3), () {
+          if (sessionDetails['summary'] == null ||
+              sessionDetails['summary'].toString().isEmpty) {
+            Utils.print('🔄 Retry 1: Fetching summary after 3s delay...');
+            _fetchMessages();
+          }
+        });
+        Future.delayed(const Duration(seconds: 8), () {
+          if (sessionDetails['summary'] == null ||
+              sessionDetails['summary'].toString().isEmpty) {
+            Utils.print('🔄 Retry 2: Fetching summary after 8s delay...');
+            _fetchMessages();
+          }
+        });
       }
     } catch (e) {
       Utils.print("❌ Error parsing end event: $e");
@@ -1008,13 +992,23 @@ class AstrologyChatController extends GetxController {
     Utils.print("📌 EXIT showEndChatDialog");
   }
 
+  // ... (keeping other methods)
+
   void _endChat() {
     Utils.print("📌 ENTER _endChat");
     if (_conversationId == null) {
       Utils.print("📌 EXIT _endChat - no conversationId");
-      Get.back();
       return;
     }
+
+    // Stop all timers immediately
+    _timer?.cancel();
+    _activeStatusTimer?.cancel();
+    _msgSyncTimer?.cancel();
+    _statusPollingTimer?.cancel();
+
+    // Show summary screen immediately (fallback duration until details load)
+    isChatEnded.value = true;
 
     final token = StorageService.getString(AppConstants.keyAuthToken) ?? "";
     // Use patch for end chat
@@ -1025,13 +1019,94 @@ class AstrologyChatController extends GetxController {
       token: token,
       onResponse: (_) {
         Utils.print("Chat ended successfully");
+        // Fetch final summary AFTER server has processed the end
+        // so sessionDetails (duration, credits, messages, highlights) are available
+        _fetchMessages();
+
+        // Retry fetching to pick up AI-generated summary (server generates it async)
+        Future.delayed(const Duration(seconds: 3), () {
+          if (sessionDetails['summary'] == null ||
+              sessionDetails['summary'].toString().isEmpty) {
+            Utils.print('🔄 _endChat Retry 1: Fetching summary after 3s...');
+            _fetchMessages();
+          }
+        });
+        Future.delayed(const Duration(seconds: 8), () {
+          if (sessionDetails['summary'] == null ||
+              sessionDetails['summary'].toString().isEmpty) {
+            Utils.print('🔄 _endChat Retry 2: Fetching summary after 8s...');
+            _fetchMessages();
+          }
+        });
       },
     );
 
     // Leave the room but keep socket alive for global notifications
     _socketService.leaveConversation(_conversationId!);
-    Get.back();
+
     Utils.print("📌 EXIT _endChat");
+  }
+
+  Future<void> submitFeedback({
+    required double rating,
+    String comment = "",
+    String satisfaction = "",
+  }) async {
+    if (_conversationId == null) return;
+
+    final token = StorageService.getString(AppConstants.keyAuthToken) ?? "";
+    final url = "${ApiUrls.submitFeedback}/$_conversationId/feedback";
+
+    final body = {
+      "stars": rating,
+      "feedback": comment,
+      "satisfaction": satisfaction,
+    };
+
+    Utils.print("📤 Submitting feedback: $body to $url");
+
+    await callWebApiPatch(
+      null,
+      url,
+      body,
+      token: token,
+      onResponse: (response) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          Utils.print("✅ Feedback submitted successfully");
+          // Close bottom sheet
+          Get.back();
+          // Navigate back to Experts View
+          Get.back();
+
+          Get.snackbar(
+            "Thank You",
+            "Your feedback has been submitted.",
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+            snackPosition: SnackPosition.BOTTOM,
+            margin: const EdgeInsets.all(16),
+          );
+        } else {
+          Utils.print("❌ Feedback failed: ${response.body}");
+          Get.snackbar(
+            "Error",
+            data['message'] ?? "Failed to submit feedback",
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+        }
+      },
+      onError: (error) {
+        Utils.print("❌ Feedback error: $error");
+        Get.snackbar(
+          "Error",
+          "Something went wrong. Please try again.",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      },
+    );
   }
 
   void _requestChat() {

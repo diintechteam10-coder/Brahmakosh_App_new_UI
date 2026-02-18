@@ -4,6 +4,8 @@ import 'package:brahmakosh/common_imports.dart';
 import 'package:brahmakosh/features/home/models/founder_message_model.dart';
 import 'package:brahmakosh/common/models/sponsor_model.dart';
 import 'package:brahmakosh/features/home/models/panchang_model.dart';
+import 'package:brahmakosh/features/home/models/dosha_dasha_model.dart';
+import 'package:brahmakosh/features/home/models/remedies_model.dart';
 import 'package:brahmakosh/core/services/storage_service.dart';
 import 'package:brahmakosh/core/constants/app_constants.dart';
 import 'package:get/get.dart';
@@ -33,6 +35,14 @@ class HomeController extends GetxController {
 
   PanchangData? get panchangData => _panchangData.value;
   bool get isPanchangLoading => _isPanchangLoading.value;
+
+  // Dosha Dasha Data
+  final _doshaDashaData = Rxn<DoshaDashaModel>();
+  final _isDoshaDashaLoading = false.obs;
+
+  DoshaDashaModel? get doshaDashaData => _doshaDashaData.value;
+  Rxn<DoshaDashaModel> get doshaDashaDataRx => _doshaDashaData;
+  bool get isDoshaDashaLoading => _isDoshaDashaLoading.value;
 
   @override
   void onInit() {
@@ -108,6 +118,10 @@ class HomeController extends GetxController {
       fetchFounderMessages(null),
       fetchSponsors(null),
       fetchUserCompleteDetails(null),
+      fetchSponsors(null),
+      fetchUserCompleteDetails(null),
+      fetchDoshaDasha(null),
+      fetchRemedies(null),
     ]);
   }
 
@@ -213,5 +227,50 @@ class HomeController extends GetxController {
       (m) => m.isActive & !m.isDeleted,
       orElse: () => _founderMessageModel.value!.data.first,
     );
+  }
+
+  Future<void> fetchDoshaDasha(TickerProvider? tickerProvider) async {
+    if (_doshaDashaData.value == null) _isDoshaDashaLoading.value = true;
+    try {
+      final userId = StorageService.getString(AppConstants.keyUserId) ?? "";
+      if (userId.isEmpty) return;
+
+      final response = await getDoshaDasha(tickerProvider, userId);
+
+      if (response != null && response.success == true) {
+        _doshaDashaData.value = response;
+        // Optionally cache validation
+      }
+    } catch (e) {
+      debugPrint('Error fetching dosha dasha: $e');
+    } finally {
+      _isDoshaDashaLoading.value = false;
+    }
+  }
+
+  // Remedies Data
+  final _remediesData = Rxn<RemediesModel>();
+  final _isRemediesLoading = false.obs;
+
+  RemediesModel? get remediesData => _remediesData.value;
+  Rxn<RemediesModel> get remediesDataRx => _remediesData;
+  bool get isRemediesLoading => _isRemediesLoading.value;
+
+  Future<void> fetchRemedies(TickerProvider? tickerProvider) async {
+    if (_remediesData.value == null) _isRemediesLoading.value = true;
+    try {
+      final userId = StorageService.getString(AppConstants.keyUserId) ?? "";
+      if (userId.isEmpty) return;
+
+      final response = await getRemedies(tickerProvider, userId);
+
+      if (response != null && response.success == true) {
+        _remediesData.value = response;
+      }
+    } catch (e) {
+      debugPrint('Error fetching remedies: $e');
+    } finally {
+      _isRemediesLoading.value = false;
+    }
   }
 }

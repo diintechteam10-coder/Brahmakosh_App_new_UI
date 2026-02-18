@@ -109,6 +109,12 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
 
   Widget _buildProfileHeader(NumerologyDetailData data) {
     final profileVM = context.watch<ProfileViewModel>();
+    final profileImageUrl =
+        profileVM.profile?.profileImageUrl;
+    final hasImage =
+        profileImageUrl != null &&
+            profileImageUrl.isNotEmpty;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
@@ -128,13 +134,47 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
         children: [
           Row(
             children: [
-               CircleAvatar(
+              hasImage
+                  ?CircleAvatar(
                 radius: 24, // Reduced radius
                 backgroundColor: Colors.grey,
                 backgroundImage: NetworkImage(
                   profileVM.profile?.profileImageUrl ?? 'https://i.pravatar.cc/150?img=11',
                 ), // Placeholder
-              ),
+              ):
+              Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: const LinearGradient(
+          colors: [
+            Color(0xFFD4AF37),
+            Color(0xFFA67C00),
+          ], // Gold Gradient
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        border: Border.all(
+          color: Colors.white,
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(
+              0xFFA67C00,
+            ).withOpacity(0.3),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: const Icon(
+        Icons.person_rounded,
+        size: 24,
+        color: Colors.white,
+      ),
+    ),
               const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -420,7 +460,7 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Lucky Color",
+                    " Daily Lucky Color",
                     style: GoogleFonts.merriweather(
                       fontSize: 14, // Reduced
                       fontWeight: FontWeight.bold,
@@ -438,14 +478,14 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
               ),
             ],
           ),
-          Container(
-            width: 40,
-            height: 40,
-            decoration: const BoxDecoration(
-              color: Colors.amber,
-              shape: BoxShape.circle,
-            ),
-          ),
+          // Container(
+          //   width: 40,
+          //   height: 40,
+          //   decoration: const BoxDecoration(
+          //     color: Colors.amber,
+          //     shape: BoxShape.circle,
+          //   ),
+          // ),
         ],
       ),
     );
@@ -787,14 +827,14 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
           // Lucky Items
           _buildLuckyItemCard(
             Icons.palette,
-            "Lucky Color",
+            "Daily Lucky Color",
             daily.luckyColor ?? "-",
             const Color(0xFFE8F5E9),
           ),
           const SizedBox(height: 16),
           _buildLuckyItemCard(
             Icons.tag,
-            "Lucky Number",
+            "Daily Lucky Number",
             daily.luckyNumber ?? "-",
             Colors.white,
           ),

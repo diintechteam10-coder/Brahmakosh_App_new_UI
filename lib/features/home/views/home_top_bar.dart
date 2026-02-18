@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/common_imports.dart';
 import 'package:brahmakosh/features/home/controllers/home_controller.dart';
 import 'package:brahmakosh/common/models/user_complete_details_model.dart';
+import 'package:brahmakosh/features/profile/viewmodels/profile_viewmodel.dart';
 
 class HomeTopBar extends StatefulWidget {
   final Widget? bottomCard;
@@ -34,8 +35,8 @@ class _HomeTopBarState extends State<HomeTopBar> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _startAutoSlide();
-    // _startDayPhaseWatcher();
-    _startDayPhaseRotation();
+    _startDayPhaseWatcher();
+    // _startDayPhaseRotation();
 
     // Initial update if data exists
     final controller = Get.find<HomeController>();
@@ -71,20 +72,49 @@ class _HomeTopBarState extends State<HomeTopBar> with TickerProviderStateMixin {
     }
   }
 
-  void _startDayPhaseRotation() {
-    _dayPhaseTimer = Timer.periodic(const Duration(seconds: 5), (_) {
-      if (!mounted) return;
+  // void _startDayPhaseRotation() {
+  //   _dayPhaseTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+  //     if (!mounted) return;
+  //
+  //     setState(() {
+  //       if (_currentPhase == DayPhase.morning) {
+  //         _currentPhase = DayPhase.afternoon;
+  //       } else if (_currentPhase == DayPhase.afternoon) {
+  //         _currentPhase = DayPhase.night;
+  //       } else {
+  //         _currentPhase = DayPhase.morning;
+  //       }
+  //     });
+  //   });
+  // }
+  void _startDayPhaseWatcher() {
+    _updateDayPhase(); // initial check
 
-      setState(() {
-        if (_currentPhase == DayPhase.morning) {
-          _currentPhase = DayPhase.afternoon;
-        } else if (_currentPhase == DayPhase.afternoon) {
-          _currentPhase = DayPhase.night;
-        } else {
-          _currentPhase = DayPhase.morning;
-        }
-      });
+    // Check every minute to update phase if needed
+    _dayPhaseTimer = Timer.periodic(const Duration(minutes: 1), (_) {
+      _updateDayPhase();
     });
+  }
+
+  void _updateDayPhase() {
+    final now = DateTime.now();
+    final hour = now.hour;
+
+    DayPhase newPhase;
+
+    if (hour >= 5 && hour < 12) {
+      newPhase = DayPhase.morning;
+    } else if (hour >= 12 && hour < 17) {
+      newPhase = DayPhase.afternoon;
+    } else {
+      newPhase = DayPhase.night;
+    }
+
+    if (mounted && newPhase != _currentPhase) {
+      setState(() {
+        _currentPhase = newPhase;
+      });
+    }
   }
 
   void _updateSigns(UserCompleteDetailsModel? data) {
@@ -187,25 +217,75 @@ class _HomeTopBarState extends State<HomeTopBar> with TickerProviderStateMixin {
                             children: [
                               GestureDetector(
                                 onTap: () => Scaffold.of(context).openDrawer(),
-                                child: Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        blurRadius: 4,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                    image: const DecorationImage(
-                                      image: AssetImage(
-                                        'assets/images/brahmkosh_logo.jpeg',
-                                      ),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
+                                child: Consumer<ProfileViewModel>(
+                                  builder: (context, profileVM, child) {
+                                    // Use profileImageUrl as it likely contains the full URL
+                                    final profileImageUrl =
+                                        profileVM.profile?.profileImageUrl;
+                                    final hasImage =
+                                        profileImageUrl != null &&
+                                        profileImageUrl.isNotEmpty;
+
+                                    return hasImage
+                                        ? Container(
+                                            width: 40,
+                                            height: 40,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                color: Colors.white,
+                                                width: 1.5,
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withOpacity(0.1),
+                                                  blurRadius: 4,
+                                                  offset: const Offset(0, 2),
+                                                ),
+                                              ],
+                                              image: DecorationImage(
+                                                image: NetworkImage(
+                                                  profileImageUrl,
+                                                ),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          )
+                                        : Container(
+                                            width: 40,
+                                            height: 40,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              gradient: const LinearGradient(
+                                                colors: [
+                                                  Color(0xFFD4AF37),
+                                                  Color(0xFFA67C00),
+                                                ], // Gold Gradient
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomRight,
+                                              ),
+                                              border: Border.all(
+                                                color: Colors.white,
+                                                width: 1.5,
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: const Color(
+                                                    0xFFA67C00,
+                                                  ).withOpacity(0.3),
+                                                  blurRadius: 4,
+                                                  offset: const Offset(0, 2),
+                                                ),
+                                              ],
+                                            ),
+                                            child: const Icon(
+                                              Icons.person_rounded,
+                                              size: 24,
+                                              color: Colors.white,
+                                            ),
+                                          );
+                                  },
                                 ),
                               ),
                               Expanded(
