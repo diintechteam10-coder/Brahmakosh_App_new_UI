@@ -9,6 +9,9 @@ import '../../agent/lemon_agent_page.dart';
 import '../../astrology/views/credit_history_view.dart';
 import '../../../common/widgets/profile_image_view.dart';
 import '../../wallet/views/recharge_plans_view.dart';
+import '../../sankalp/views/sankalp_screen.dart';
+import '../../pooja/views/pooja_list_screen.dart';
+import '../../swapna_decoder/views/swapna_decoder_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -253,6 +256,42 @@ class AppDrawer extends StatelessWidget {
                                     profile?.credits ?? 0,
                                   ),
 
+                                  const SizedBox(height: 16),
+
+                                  // SANKALP SECTION
+                                  _sectionHeader("Sankalp"),
+                                  _menuItem(
+                                    icon: Icons.spa_outlined,
+                                    label: "My Sankalp",
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      Get.to(() => const SankalpScreen());
+                                    },
+                                  ),
+                                  const SizedBox(height: 16),
+
+                                  // POOJA PADHATTI SECTION
+                                  _sectionHeader("Pooja Padhatti"),
+                                  _menuItem(
+                                    icon: Icons.temple_hindu_outlined,
+                                    label: "Pooja Vidhi",
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      Get.to(() => const PoojaListScreen());
+                                    },
+                                  ),
+                                  const SizedBox(height: 16),
+
+                                  // SWAPNA DECODER SECTION
+                                  _sectionHeader("Swapna Decoder"),
+                                  _menuItem(
+                                    icon: Icons.nightlight_round_outlined,
+                                    label: "Swapna Decoder",
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      Get.to(() => const SwapnaDecoderScreen());
+                                    },
+                                  ),
                                   const SizedBox(height: 16),
 
                                   // OTHERS
