@@ -47,25 +47,26 @@ class Data {
   String? updatedAt;
   int? iV;
 
-  Data(
-      {this.sId,
-      this.name,
-      this.description,
-      this.agentId,
-      this.gender,
-      this.link,
-      this.imageUrl,
-      this.imageKey,
-      this.videoUrl,
-      this.videoKey,
-      this.status,
-      this.viewers,
-      this.duration,
-      this.clientId,
-      this.isActive,
-      this.createdAt,
-      this.updatedAt,
-      this.iV});
+  Data({
+    this.sId,
+    this.name,
+    this.description,
+    this.agentId,
+    this.gender,
+    this.link,
+    this.imageUrl,
+    this.imageKey,
+    this.videoUrl,
+    this.videoKey,
+    this.status,
+    this.viewers,
+    this.duration,
+    this.clientId,
+    this.isActive,
+    this.createdAt,
+    this.updatedAt,
+    this.iV,
+  });
 
   Data.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];

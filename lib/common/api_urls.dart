@@ -47,6 +47,7 @@ class ApiUrls {
       '$baseUrl/api/spiritual-clips/configuration';
   static const String saveSpiritualSession =
       '$baseUrl/api/spiritual-stats/save-session';
+  static const String spiritualStatsUser = '$baseUrl/api/spiritual-stats/user';
   static const String panchang = '$baseUrl/api/client/users';
   static const String completeUserDetails = '$baseUrl/api/client/users';
   static const String numerologyHistory = '$baseUrl/api/client/users';

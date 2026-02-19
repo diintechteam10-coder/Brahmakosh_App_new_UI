@@ -31,26 +31,26 @@ class _GemstoneDetailViewState extends State<GemstoneDetailView>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE3F2FD), // Light Blue bg
+      backgroundColor: const Color(0xFFFDF5E6), // Old Lace / Beige bg
       appBar: AppBar(
         title: Text(
           "Gemstone Details",
           style: GoogleFonts.playfairDisplay(
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF0D47A1),
+            color: const Color(0xFF6D3A0C),
           ),
         ),
-        backgroundColor: const Color(0xFFE3F2FD),
+        backgroundColor: const Color(0xFFFDF5E6),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF0D47A1)),
+          icon: const Icon(Icons.arrow_back, color: Color(0xFF6D3A0C)),
           onPressed: () => Get.back(),
         ),
         bottom: TabBar(
           controller: _tabController,
-          labelColor: const Color(0xFF0D47A1),
+          labelColor: const Color(0xFF6D3A0C),
           unselectedLabelColor: Colors.grey,
-          indicatorColor: const Color(0xFF0D47A1),
+          indicatorColor: const Color(0xFFD4A373),
           labelStyle: GoogleFonts.lora(fontWeight: FontWeight.bold),
           tabs: const [
             Tab(text: "Life"),
@@ -77,17 +77,18 @@ class _GemstoneDetailViewState extends State<GemstoneDetailView>
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.blue.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
+              color: const Color(0xFFD4A373).withOpacity(0.15),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
             ),
           ],
+          border: Border.all(color: const Color(0xFFFDECB6).withOpacity(0.5)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,9 +96,9 @@ class _GemstoneDetailViewState extends State<GemstoneDetailView>
             Text(
               detail.name ?? "Gemstone",
               style: GoogleFonts.playfairDisplay(
-                fontSize: 28,
+                fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF0D47A1),
+                color: const Color(0xFF6D3A0C),
               ),
             ),
             const SizedBox(height: 8),
@@ -136,7 +137,7 @@ class _GemstoneDetailViewState extends State<GemstoneDetailView>
               style: GoogleFonts.lora(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey[600],
+                color: const Color(0xFF8D6E63),
               ),
             ),
           ),
@@ -146,7 +147,7 @@ class _GemstoneDetailViewState extends State<GemstoneDetailView>
               style: GoogleFonts.lora(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF1565C0),
+                color: const Color(0xFF6D3A0C),
               ),
             ),
           ),
@@ -163,19 +164,19 @@ class RudrakshaDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFEFEBE9), // Light Brown bg
+      backgroundColor: const Color(0xFFFDF5E6),
       appBar: AppBar(
         title: Text(
           "Rudraksha Details",
           style: GoogleFonts.playfairDisplay(
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF4E342E),
+            color: const Color(0xFF6D3A0C),
           ),
         ),
-        backgroundColor: const Color(0xFFEFEBE9),
+        backgroundColor: const Color(0xFFFDF5E6),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF4E342E)),
+          icon: const Icon(Icons.arrow_back, color: Color(0xFF6D3A0C)),
           onPressed: () => Get.back(),
         ),
       ),
@@ -207,17 +208,20 @@ class RudrakshaDetailView extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.brown.withOpacity(0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
+                    color: const Color(0xFFD4A373).withOpacity(0.15),
+                    blurRadius: 15,
+                    offset: const Offset(0, 8),
                   ),
                 ],
+                border: Border.all(
+                  color: const Color(0xFFFDECB6).withOpacity(0.5),
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -225,9 +229,9 @@ class RudrakshaDetailView extends StatelessWidget {
                   Text(
                     rudraksha.name ?? "Rudraksha",
                     style: GoogleFonts.playfairDisplay(
-                      fontSize: 24,
+                      fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF4E342E),
+                      color: const Color(0xFF6D3A0C),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -286,36 +290,37 @@ class PujaDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8E1), // Light Amber bg
+      backgroundColor: const Color(0xFFFDF5E6),
       appBar: AppBar(
         title: Text(
           "Puja Suggestions",
           style: GoogleFonts.playfairDisplay(
             fontWeight: FontWeight.bold,
-            color: const Color(0xFFE65100),
+            color: const Color(0xFF6D3A0C),
           ),
         ),
-        backgroundColor: const Color(0xFFFFF8E1),
+        backgroundColor: const Color(0xFFFDF5E6),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFFE65100)),
+          icon: const Icon(Icons.arrow_back, color: Color(0xFF6D3A0C)),
           onPressed: () => Get.back(),
         ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: Colors.orange.withOpacity(0.1),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
+                color: const Color(0xFFD4A373).withOpacity(0.15),
+                blurRadius: 15,
+                offset: const Offset(0, 8),
               ),
             ],
+            border: Border.all(color: const Color(0xFFFDECB6).withOpacity(0.5)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -323,9 +328,9 @@ class PujaDetailView extends StatelessWidget {
               Text(
                 "Summary",
                 style: GoogleFonts.playfairDisplay(
-                  fontSize: 22,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFFBF360C),
+                  color: const Color(0xFFD4A373),
                 ),
               ),
               const SizedBox(height: 12),
@@ -342,9 +347,9 @@ class PujaDetailView extends StatelessWidget {
                 Text(
                   "Suggested Pujas",
                   style: GoogleFonts.playfairDisplay(
-                    fontSize: 20,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFFBF360C),
+                    color: const Color(0xFFD4A373),
                   ),
                 ),
                 const SizedBox(height: 16),

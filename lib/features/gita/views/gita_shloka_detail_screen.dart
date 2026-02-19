@@ -237,7 +237,7 @@ class _GitaDetailView extends StatelessWidget {
                     // 'EXPLANATION',
                     displayVerse.explanation,
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 60),
                 ],
               ),
             );

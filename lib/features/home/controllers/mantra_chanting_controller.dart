@@ -22,11 +22,9 @@ class MantraChantingController extends GetxController
   final AudioPlayer _backgroundAudioPlayer =
       AudioPlayer(); // For background chant
 
-  // Projectile Animation Controllers
-  late AnimationController moveController;
-  late Animation<Alignment> moveAnimation;
-  late Animation<double> moveScaleAnimation;
-  late Animation<double> moveOpacityAnimation;
+  // Animation State for Mantra Text Emergence
+  final isMantraVisible = false.obs;
+  final animationTriggers = <int>[].obs;
 
   List<Data> get chantingMantras => _chantingMantras.value;
   Data? get chantingMantra => _chantingMantras.isNotEmpty
@@ -42,9 +40,6 @@ class MantraChantingController extends GetxController
   late Animation<double> scaleAnimation;
   late Animation<double> rippleAnimation;
   late Animation<double> glowAnimation;
-
-  // Animation State for Mantra Text Emergence
-  final isMantraVisible = false.obs;
 
   final AudioPlayer _effectAudioPlayer = AudioPlayer(); // For bell sound
 
@@ -75,29 +70,6 @@ class MantraChantingController extends GetxController
 
     // Initial state: visible at top
     isMantraVisible.value = true;
-
-    // Mantra Projectile Animation
-    moveController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-
-    moveAnimation = Tween<Alignment>(
-      begin: Alignment.center,
-      end: const Alignment(0, -0.9),
-    ).animate(CurvedAnimation(parent: moveController, curve: Curves.easeInOut));
-
-    moveScaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.5,
-    ).animate(CurvedAnimation(parent: moveController, curve: Curves.easeInOut));
-
-    moveOpacityAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(
-        parent: moveController,
-        curve: const Interval(0.5, 1.0, curve: Curves.easeOut),
-      ),
-    );
 
     scaleController = AnimationController(
       duration: const Duration(milliseconds: 200),
@@ -261,7 +233,7 @@ class MantraChantingController extends GetxController
     rippleController.forward(from: 0.0);
 
     // Trigger Projectile Animation
-    moveController.forward(from: 0.0);
+    animationTriggers.add(DateTime.now().millisecondsSinceEpoch);
 
     // Check if completed 108
     if (chantCount.value == (chantingMantra!.malaCount ?? 108)) {
@@ -312,7 +284,6 @@ class MantraChantingController extends GetxController
     rippleController.dispose();
     glowController.dispose();
     celebrationController.dispose();
-    moveController.dispose();
     stopTimer();
     super.onClose();
   }

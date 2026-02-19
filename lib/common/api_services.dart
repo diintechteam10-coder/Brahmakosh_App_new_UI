@@ -791,6 +791,7 @@ Future<AvtarList?> getLiveAvatars(TickerProvider? tickerProvider) async {
     ApiUrls.liveAvatars,
     token: token,
     onResponse: (response) {
+      Utils.print('Live Avatars Response: ' + response.body);
       avtarList = AvtarList.fromJson(jsonDecode(response.body));
     },
     onError: (error) {

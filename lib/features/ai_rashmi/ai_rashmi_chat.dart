@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
+import '../agent/lemon_agent_page.dart';
 import 'ai_rashmi_service.dart';
 import 'ai_rashmi_view_model.dart';
 
@@ -13,6 +14,7 @@ import 'krishna_category_selection_view.dart';
 import 'rashmi_category_selection_view.dart'; // New Import
 import 'widgets/deity_selection_widget.dart'; // New Import
 import '../gita/views/gita_chapter_screen.dart';
+import 'avatar_introduction_screen.dart';
 
 class RashmiChat extends StatelessWidget {
   final String? backgroundImage;
@@ -948,32 +950,10 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                   right: 0,
                   top: 0,
                   child: GestureDetector(
-                    onTap: () async {
-                      if (!Get.isRegistered<AgentController>()) {
-                        Get.put(AgentController());
-                      }
-                      final agentController = Get.find<AgentController>();
-                      if (agentController.avatars.isEmpty) {
-                        await agentController.fetchAvatars(null);
-                      }
-
-                      final currentId = _deityService.selectedDeity?.sId;
-                      final otherDeity = agentController.avatars
-                          .firstWhereOrNull(
-                            (a) =>
-                                (a.name?.toLowerCase().contains('rashmi') ==
-                                        true ||
-                                    a.name?.toLowerCase().contains('krishna') ==
-                                        true) &&
-                                a.sId != currentId,
-                          );
-
-                      if (otherDeity != null) {
-                        _deityService.setSelectedDeity(otherDeity);
-                        setState(() {});
-                        Get.back(); // Close drawer
-                        await vm.newChat(); // Start new chat with new deity
-                      }
+                    onTap: () {
+                      Navigator.pop(context); // Close drawer
+                      Get.to(() => AvatarAgentPage(),
+                      );
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(
@@ -995,7 +975,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            deityName == 'Krishna' ? "Avatar" : "Chat",
+                            "Avatar",
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
