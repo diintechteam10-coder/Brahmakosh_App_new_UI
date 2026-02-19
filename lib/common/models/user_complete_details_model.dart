@@ -1298,12 +1298,16 @@ class Dashas {
   CurrentChardasha? currentChardasha;
   List<MajorChardasha>? majorChardasha;
   List<VimshottariDasha>? vimshottariDasha;
+  CurrentVdasha? currentVdasha;
+  CurrentVdashaAll? currentVdashaAll;
 
   Dashas({
     this.currentYogini,
     this.currentChardasha,
     this.majorChardasha,
     this.vimshottariDasha,
+    this.currentVdasha,
+    this.currentVdashaAll,
   });
 
   Dashas.fromJson(Map<String, dynamic> json) {
@@ -1339,6 +1343,12 @@ class Dashas {
         vimshottariDasha!.add(VimshottariDasha.fromJson(v));
       });
     }
+    currentVdasha = json['currentVdasha'] != null
+        ? CurrentVdasha.fromJson(json['currentVdasha'])
+        : null;
+    currentVdashaAll = json['currentVdashaAll'] != null
+        ? CurrentVdashaAll.fromJson(json['currentVdashaAll'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -1356,6 +1366,12 @@ class Dashas {
       data['vimshottari_dasha'] = vimshottariDasha!
           .map((v) => v.toJson())
           .toList();
+    }
+    if (currentVdasha != null) {
+      data['currentVdasha'] = currentVdasha!.toJson();
+    }
+    if (currentVdashaAll != null) {
+      data['currentVdashaAll'] = currentVdashaAll!.toJson();
     }
     return data;
   }

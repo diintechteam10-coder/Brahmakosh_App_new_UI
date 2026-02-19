@@ -15,6 +15,7 @@ import 'dart:async';
 import 'package:intl/intl.dart';
 
 import 'chanting_configuration_view.dart';
+import 'package:brahmakosh/features/check_in/views/spiritual_stats_screen.dart';
 
 class CheckInView extends StatefulWidget {
   final ScrollController? scrollController;
@@ -191,7 +192,9 @@ class _CheckInViewState extends State<CheckInView>
                                 Icons.history,
                                 color: Color(0xff7B4A12),
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                Get.to(() => const SpiritualStatsScreen());
+                              },
                             ),
                             Text(
                               'BRAHMAKOSH',

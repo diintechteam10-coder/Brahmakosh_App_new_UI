@@ -10,6 +10,8 @@ import 'package:brahmakosh/features/home/widgets/astrology_tabs.dart';
 import 'package:brahmakosh/features/home/widgets/ashtakvarga_tab.dart';
 import 'package:brahmakosh/features/home/widgets/remedies_tab.dart';
 
+import '../widgets/sarvashtak_tab.dart';
+
 class AstrologyDetailsScreen extends StatefulWidget {
   const AstrologyDetailsScreen({super.key});
 
@@ -26,7 +28,7 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 8, vsync: this);
+    _tabController = TabController(length: 9, vsync: this);
     _fetchData();
   }
 
@@ -93,18 +95,6 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("ASTROLOGY_DEBUG: _data != null: ${_data != null}");
-    debugPrint("ASTROLOGY_DEBUG: _data.data != null: ${_data?.data != null}");
-    debugPrint(
-      "ASTROLOGY_DEBUG: _data.data.astrology != null: ${_data?.data?.astrology != null}",
-    );
-    debugPrint(
-      "ASTROLOGY_DEBUG: _data.data.doshas != null: ${_data?.data?.doshas != null}",
-    );
-    debugPrint(
-      "ASTROLOGY_DEBUG: _data.data.dashas != null: ${_data?.data?.dashas != null}",
-    );
-
     final astro = _data?.data?.astrology;
 
     return Scaffold(
@@ -172,6 +162,7 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
                       Tab(text: "Bhav Chalit"), // New Tab
                       Tab(text: "Doshas"),
                       Tab(text: "Dashas"),
+                      Tab(text: "Sarvashtak"),
                       Tab(text: "Ashtakvarga"),
                       Tab(text: "Remedies"),
                     ],
@@ -215,10 +206,16 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
                         pitraDoshaReport: astro.pitraDoshaReport,
                       ),
                       DashasTab(dashas: _getEffectiveDashas()),
+                      SarvashtakTab(
+                        sarvashtak: astro.sarvashtak ?? SarvAshtak(),
+                        ascendantSign: astro.astroDetails?.ascendant,
+                      ),
                       AshtakvargaTab(
                         planetAshtak: astro.planetAshtak,
-                        sarvashtak: astro.sarvashtak,
+                        // sarvashtak removed from here
+                        ascendantSign: astro.astroDetails?.ascendant,
                       ),
+
                       RemediesTab(gemstoneSuggestion: astro.gemstoneSuggestion),
                     ],
                   ),
@@ -439,39 +436,28 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
     final topLevelDashas = _data?.data?.dashas;
     final astro = _data?.data?.astrology;
 
-    // If we have top-level dashas with actual data, use them
-    if (topLevelDashas != null &&
-        (topLevelDashas.currentYogini != null ||
-            topLevelDashas.currentChardasha != null ||
-            topLevelDashas.majorChardasha != null ||
-            topLevelDashas.vimshottariDasha != null)) {
-      return topLevelDashas;
-    }
-
-    // Otherwise, construct from astrology data
-    if (astro != null) {
-      return Dashas(
-        currentYogini:
-            topLevelDashas?.currentYogini ?? astro.astrologyCurrentYoginiDasha,
-        currentChardasha:
-            topLevelDashas?.currentChardasha ?? astro.astrologyCurrentChardasha,
-        majorChardasha:
-            topLevelDashas?.majorChardasha ?? astro.astrologyMajorChardasha,
-        // Map majorVdasha (VDashaPeriod) to VimshottariDasha for the tab
-        vimshottariDasha:
-            topLevelDashas?.vimshottariDasha ??
-            astro.majorVdasha
-                ?.map(
-                  (v) => VimshottariDasha(
-                    planet: v.planet,
-                    start: v.start,
-                    end: v.end,
-                  ),
-                )
-                .toList(),
-      );
-    }
-
-    return topLevelDashas ?? Dashas();
+    // Construct a merged Dasha object
+    return Dashas(
+      currentYogini:
+          topLevelDashas?.currentYogini ?? astro?.astrologyCurrentYoginiDasha,
+      currentChardasha:
+          topLevelDashas?.currentChardasha ?? astro?.astrologyCurrentChardasha,
+      majorChardasha:
+          topLevelDashas?.majorChardasha ?? astro?.astrologyMajorChardasha,
+      vimshottariDasha:
+          topLevelDashas?.vimshottariDasha ??
+          astro?.majorVdasha
+              ?.map(
+                (v) => VimshottariDasha(
+                  planet: v.planet,
+                  start: v.start,
+                  end: v.end,
+                ),
+              )
+              .toList(),
+      currentVdasha: topLevelDashas?.currentVdasha ?? astro?.currentVdasha,
+      currentVdashaAll:
+          topLevelDashas?.currentVdashaAll ?? astro?.currentVdashaAll,
+    );
   }
 }

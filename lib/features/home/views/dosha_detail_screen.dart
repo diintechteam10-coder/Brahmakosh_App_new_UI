@@ -52,7 +52,9 @@ class DoshaDetailScreen extends StatelessWidget {
       case 'sadesati':
         return _buildSadeSatiCurrentContent(data as RawSadeSatiCurrent?);
       case 'sadesati_life':
-        return _buildSadeSatiLifeContent(data as List<RawSadeSati>? ?? []);
+        return _buildSadeSatiLifeContent(
+          data as List<SadhesatiLifeDetail>? ?? [],
+        );
       case 'pitra':
         return _buildPitraContent(data as RawPitra?);
       default:
@@ -138,7 +140,7 @@ class DoshaDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSadeSatiLifeContent(List<RawSadeSati> life) {
+  Widget _buildSadeSatiLifeContent(List<SadhesatiLifeDetail> life) {
     if (life.isEmpty) return const Text("No Life Cycles Data");
 
     return Column(
@@ -165,7 +167,7 @@ class DoshaDetailScreen extends StatelessWidget {
 
   Widget _buildTimelineItem(
     BuildContext context,
-    RawSadeSati item,
+    SadhesatiLifeDetail item,
     bool isFirst,
     bool isLast,
   ) {

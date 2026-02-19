@@ -9,10 +9,16 @@ class AgentController extends GetxController {
   final _selectedAgent = Rxn<Data>();
 
   List<Data> get avatars => _avatars;
+  List<Data> get activeAvatars =>
+      _avatars.where((a) => a.isActive == true).toList();
+  bool get hasActiveAgents => activeAvatars.isNotEmpty;
   bool get isLoading => _isLoading.value;
   Data? get selectedAgent => _selectedAgent.value;
 
-  Future<void> fetchAvatars(TickerProvider? tickerProvider, {String? preferredAgentId}) async {
+  Future<void> fetchAvatars(
+    TickerProvider? tickerProvider, {
+    String? preferredAgentId,
+  }) async {
     _isLoading.value = true;
     try {
       // Only fetch if avatars are empty to avoid unnecessary API calls
@@ -26,36 +32,30 @@ class AgentController extends GetxController {
       // Handle selection logic - always do this even if avatars were already loaded
       if (_avatars.isNotEmpty) {
         if (preferredAgentId != null) {
-          debugPrint('AgentController: Looking for agentId: $preferredAgentId');
-          final found = _avatars.firstWhereOrNull((a) => a.agentId == preferredAgentId);
+          final found = _avatars.firstWhereOrNull(
+            (a) => a.agentId == preferredAgentId,
+          );
           if (found != null) {
-            debugPrint('AgentController: Found agent: ${found.name}, agentId: ${found.agentId}');
             _selectedAgent.value = found;
           } else {
-            debugPrint('AgentController: Agent not found, selecting first: ${_avatars.first.name}');
-            _selectedAgent.value = _avatars.first;
+            _selectedAgent.value = activeAvatars.isNotEmpty
+                ? activeAvatars.first
+                : _avatars.first;
           }
         } else {
-          debugPrint('AgentController: No preferredAgentId, selecting first: ${_avatars.first.name}');
-          _selectedAgent.value = _avatars.first;
+          _selectedAgent.value = activeAvatars.isNotEmpty
+              ? activeAvatars.first
+              : _avatars.first;
         }
 
-        // Auto-connect to selected agent immediately
-        _autoConnectToFirstAgent();
+        // Auto-connect removed from here, will be triggered by manual Talk button if needed
+        // but we keep the callback for compatibility if other pages use it
+        // _autoConnectToFirstAgent();
       }
     } catch (e) {
       debugPrint('Error in fetchAvatars: $e');
     } finally {
       _isLoading.value = false;
-    }
-  }
-
-  // Callback to auto-connect when first agent is loaded
-  VoidCallback? onFirstAgentLoaded;
-
-  void _autoConnectToFirstAgent() {
-    if (onFirstAgentLoaded != null) {
-      onFirstAgentLoaded!();
     }
   }
 

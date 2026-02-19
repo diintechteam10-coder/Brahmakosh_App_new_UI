@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:brahmakosh/common/models/user_complete_details_model.dart';
 import 'package:brahmakosh/features/home/views/dosha_detail_screen.dart';
 import 'package:brahmakosh/features/home/widgets/north_indian_chart.dart';
+import 'package:brahmakosh/features/home/views/all_dashas_screen.dart';
 
 class PlanetsTab extends StatelessWidget {
   final List<Planets> planets;
@@ -592,8 +593,8 @@ class _BirthChartTabState extends State<BirthChartTab> {
   }
 
   Map<int, List<String>> _getHousesFromExtendedChart(
-      BirthExtendedChart? chart,
-      ) {
+    BirthExtendedChart? chart,
+  ) {
     if (chart == null) return {};
     return {
       1: chart.houses?.house1 ?? [],
@@ -633,7 +634,7 @@ class DoshasTab extends StatelessWidget {
         (sadhesatiLifeDetails != null && sadhesatiLifeDetails!.isNotEmpty);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Column(
         children: [
           // Manglik
@@ -675,7 +676,20 @@ class DoshasTab extends StatelessWidget {
               doshas.sadeSatiLife?.present ?? false,
               "View Life Cycles",
               "sadesati_life",
-              sadhesatiLifeDetails ?? doshas.sadeSatiLife?.raw,
+              sadhesatiLifeDetails ??
+                  doshas.sadeSatiLife?.raw
+                      ?.map(
+                        (e) => SadhesatiLifeDetail(
+                          moonSign: e.moonSign,
+                          saturnSign: e.saturnSign,
+                          isSaturnRetrograde: e.isSaturnRetrograde,
+                          type: e.type,
+                          millisecond: e.millisecond,
+                          date: e.date,
+                          summary: e.summary,
+                        ),
+                      )
+                      .toList(),
             ),
 
           // Pitra Dosha
@@ -785,6 +799,25 @@ class DashasTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (dashas.currentVdasha != null) ...[
+            _buildSectionHeader("Current Vimshottari Dasha"),
+            const SizedBox(height: 12),
+            _buildCurrentHierarchyCard(
+              majorTitle: "Major",
+              majorName: dashas.currentVdasha!.major?.planet,
+              majorDate:
+                  "${dashas.currentVdasha!.major?.start} - ${dashas.currentVdasha!.major?.end}",
+              subTitle: "Minor",
+              subName: dashas.currentVdasha!.minor?.planet,
+              subDate:
+                  "${dashas.currentVdasha!.minor?.start} - ${dashas.currentVdasha!.minor?.end}",
+              subSubTitle: "Sub-Minor",
+              subSubName: dashas.currentVdasha!.subMinor?.planet,
+              subSubDate:
+                  "${dashas.currentVdasha!.subMinor?.start} - ${dashas.currentVdasha!.subMinor?.end}",
+            ),
+            const SizedBox(height: 24),
+          ],
           if (dashas.currentYogini != null) ...[
             _buildSectionHeader("Current Yogini Dasha"),
             const SizedBox(height: 12),
@@ -831,34 +864,51 @@ class DashasTab extends StatelessWidget {
             ),
             const SizedBox(height: 24),
           ],
-          if (dashas.majorChardasha != null &&
-              dashas.majorChardasha!.isNotEmpty) ...[
-            _buildSectionHeader("Major Chardasha"),
-            const SizedBox(height: 12),
-            _buildDashaTimelineList(
-              items: dashas.majorChardasha!.map((e) {
-                return _TimelineItemData(
-                  title: e.signName ?? "",
-                  dateRange: "${e.startDate} - ${e.endDate}",
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 24),
-          ],
-          if (dashas.vimshottariDasha != null &&
-              dashas.vimshottariDasha!.isNotEmpty) ...[
-            _buildSectionHeader("Vimshottari Dasha"),
-            const SizedBox(height: 12),
-            _buildDashaTimelineList(
-              items: dashas.vimshottariDasha!.map((e) {
-                return _TimelineItemData(
-                  title: e.planet ?? "",
-                  dateRange: "${e.start} - ${e.end}",
-                );
-              }).toList(),
-            ),
-          ],
+          // View All Button
+          _buildViewAllButton(context),
         ],
+      ),
+    );
+  }
+
+  Widget _buildViewAllButton(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AllDashasScreen(dashas: dashas),
+          ),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: const Color(0xFFFDECB6).withOpacity(0.3),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "View All Dashas",
+                style: GoogleFonts.lora(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF6D3A0C),
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(
+                Icons.arrow_forward,
+                size: 20,
+                color: Color(0xFF6D3A0C),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -1030,108 +1080,6 @@ class DashasTab extends StatelessWidget {
     );
   }
 
-  Widget _buildDashaTimelineList({required List<_TimelineItemData> items}) {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: items.length,
-      itemBuilder: (context, index) {
-        final item = items[index];
-        final isFirst = index == 0;
-        final isLast = index == items.length - 1;
-        final formattedDate = _formatDateRange(item.dateRange, compact: true);
-
-        return IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(
-                width: 48,
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        width: 2,
-                        color: isFirst
-                            ? Colors.transparent
-                            : const Color(0xFFD7CCC8),
-                      ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF8D6E63),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 2,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Container(
-                        width: 2,
-                        color: isLast
-                            ? Colors.transparent
-                            : const Color(0xFFD7CCC8),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFEFEBE9)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.02),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        item.title,
-                        style: GoogleFonts.lora(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF4E342E),
-                        ),
-                      ),
-                      if (formattedDate != null)
-                        formattedDate
-                      else
-                        Text(
-                          item.dateRange,
-                          style: GoogleFonts.lora(
-                            fontSize: 12,
-                            color: const Color(0xFF8D6E63),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   Widget? _formatDateRange(String? dateStr, {bool compact = false}) {
     if (dateStr == null || dateStr.isEmpty) return null;
 
@@ -1236,13 +1184,6 @@ class DashasTab extends StatelessWidget {
       ),
     );
   }
-}
-
-class _TimelineItemData {
-  final String title;
-  final String dateRange;
-
-  _TimelineItemData({required this.title, required this.dateRange});
 }
 
 class _LegendItem extends StatelessWidget {

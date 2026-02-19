@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:brahmakosh/features/home/controllers/mantra_chanting_controller.dart';
@@ -42,13 +43,6 @@ class MantraChantingView extends StatelessWidget {
           }
         },
         builder: (context, state) {
-          // Listen to controller completion manually or via Obx hook
-          // We can't use `ever` inside build easily without setup.
-          // Better to use Obx widget for the completion listener effect?
-          // No, usually we do it in controller. But we want view to handle it.
-          // Let's use `Obx` that calls a function only once?
-          // Or just standard Obx widget that checks value.
-
           return PopScope(
             canPop: false,
             onPopInvoked: (didPop) async {
@@ -57,14 +51,9 @@ class MantraChantingView extends StatelessWidget {
               // Handle exit logic in dialog
             },
             child: Scaffold(
-              body: Stack(
+              backgroundColor: Color(0xffFDF6E3),
+              body: Column(
                 children: [
-                  Positioned.fill(
-                    child: Image.asset(
-                      'assets/images/chanting_backgroud.png',
-                      fit: BoxFit.cover,
-                    ),
-                  ),
                   _CompletionListener(
                     controller: controller,
                     child: const SizedBox.shrink(),
@@ -74,12 +63,29 @@ class MantraChantingView extends StatelessWidget {
                       children: [
                         _buildHeader(context, controller),
                         const SizedBox(height: 60),
-                        _buildMantraDial(controller),
+                        Stack(
+                          children: [
+                            Center(
+                              child: Container(
+                                height: 250,
+                                width: 250,
+                                child: Image.asset(
+                                  "assets/images/chantingbg.png",
+                                ),
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.topCenter,
+                              child: Center(
+                                child: _buildMantraDial(controller),
+                              ),
+                            ),
+                          ],
+                        ),
                         const SizedBox(height: 20),
                         _buildStatusSection(controller),
                         const SizedBox(height: 8),
                         _buildChantButton(controller),
-                        const Spacer(),
                       ],
                     ),
                   ),
@@ -196,41 +202,18 @@ class MantraChantingView extends StatelessWidget {
               ],
             );
           }),
-          AnimatedBuilder(
-            animation: controller.moveController,
-            builder: (context, child) {
-              final mantraText =
-                  controller.chantingMantra?.name ?? "ॐ नमः शिवाय";
-              return Align(
-                alignment: controller.moveAnimation.value,
-                child: Opacity(
-                  opacity: controller.moveOpacityAnimation.value,
-                  child: Transform.scale(
-                    scale: controller.moveScaleAnimation.value,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Text(
-                        mantraText,
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.tiroDevanagariHindi(
-                          fontSize: 32,
-                          color: const Color(0xffFFD700),
-                          fontWeight: FontWeight.bold,
-                          shadows: [
-                            const Shadow(
-                              color: Colors.black45,
-                              offset: Offset(0, 2),
-                              blurRadius: 4,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
+          Obx(() {
+            final mantraText = controller.chantingMantra?.name ?? "ॐ नमः शिवाय";
+            return Stack(
+              children: controller.animationTriggers.map((id) {
+                return _FloatingMantra(
+                  key: ValueKey(id),
+                  mantraText: mantraText,
+                  onComplete: () => controller.animationTriggers.remove(id),
+                );
+              }).toList(),
+            );
+          }),
         ],
       ),
     );
@@ -675,4 +658,101 @@ class _CompletionListenerState extends State<_CompletionListener> {
 
   @override
   Widget build(BuildContext context) => widget.child;
+}
+
+class _FloatingMantra extends StatefulWidget {
+  final String mantraText;
+  final VoidCallback onComplete;
+
+  const _FloatingMantra({
+    super.key,
+    required this.mantraText,
+    required this.onComplete,
+  });
+
+  @override
+  State<_FloatingMantra> createState() => _FloatingMantraState();
+}
+
+class _FloatingMantraState extends State<_FloatingMantra>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Alignment> _moveAnimation;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _opacityAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 5),
+      vsync: this,
+    );
+
+    _moveAnimation = Tween<Alignment>(
+      begin: Alignment.center,
+      end: const Alignment(0, -50),
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.5,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+    _opacityAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.5, 1.0, curve: Curves.easeOut),
+      ),
+    );
+
+    _controller.forward().then((_) {
+      if (mounted) {
+        widget.onComplete();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Align(
+          alignment: _moveAnimation.value,
+          child: Opacity(
+            opacity: _opacityAnimation.value,
+            child: Transform.scale(
+              scale: _scaleAnimation.value,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  widget.mantraText,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.tiroDevanagariHindi(
+                    fontSize: 32,
+                    color: const Color(0xffFFD700),
+                    fontWeight: FontWeight.bold,
+                    shadows: [
+                      const Shadow(
+                        color: Colors.black45,
+                        offset: Offset(0, 2),
+                        blurRadius: 4,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 }

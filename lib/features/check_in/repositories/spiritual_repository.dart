@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:brahmakosh/core/common_imports.dart';
 import 'package:brahmakosh/common/api_services.dart';
 import 'package:brahmakosh/common/api_urls.dart';
 import 'package:brahmakosh/core/constants/app_constants.dart';
@@ -9,8 +11,9 @@ import 'package:brahmakosh/features/check_in/models/spiritual_checkin_model.dart
 import 'package:brahmakosh/features/check_in/models/spiritual_configuration_model.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_clip_model.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_session_model.dart';
-import 'package:get/get.dart'; // Still needed for TickerProviderStateMixin used in API calls?
+
 // Actually API calls need TickerProvider. We might need to pass one or refactor api_services to be cleaner.
+import 'package:brahmakosh/features/check_in/models/spiritual_stats_model.dart';
 // For now, let's pass null as TickerProvider to API services if we want to avoid UI dependency in Repository,
 // OR we might need to change how `callWebApi` works.
 // However, the existing `callWebApi` in `api_services.dart` takes `TickerProvider?` for showing loader.
@@ -239,6 +242,84 @@ class SpiritualRepository {
     return responseData ?? {};
   }
 
+  /// Fetches user profile image if missing from cache
+  Future<String?> fetchUserProfileImage() async {
+    try {
+      final token = StorageService.getString(AppConstants.keyAuthToken);
+      if (token == null || token.isEmpty) return null;
+
+      final Completer<String?> completer = Completer<String?>();
+
+      await callWebApiGet(
+        null,
+        ApiUrls.getProfile,
+        token: token,
+        showLoader: false,
+        hideLoader: false,
+        onResponse: (httpResponse) async {
+          try {
+            final responseBody = json.decode(httpResponse.body);
+            if (responseBody['success'] == true &&
+                responseBody['data'] != null) {
+              final userData = responseBody['data']['user'];
+              final String? imageUrl = userData['profile']?['profile_image'];
+              if (imageUrl != null && imageUrl.isNotEmpty) {
+                await StorageService.setString(
+                  AppConstants.keyUserImage,
+                  imageUrl,
+                );
+                completer.complete(imageUrl);
+              } else {
+                completer.complete(null);
+              }
+            } else {
+              completer.complete(null);
+            }
+          } catch (e) {
+            completer.complete(null);
+          }
+        },
+      );
+      return completer.future;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Fetches spiritual stats for a user.
+  Future<SpiritualStatsResponse?> getSpiritualStats() async {
+    String? responseBody;
+    final token = StorageService.getString(AppConstants.keyAuthToken) ?? "";
+    final userId = StorageService.getString(AppConstants.keyUserId) ?? "";
+
+    if (userId.isEmpty) {
+      print('❌ DEBUG_REPO: API Error: User ID not found in storage');
+      return null;
+    }
+
+    final url = "${ApiUrls.spiritualStatsUser}/$userId";
+
+    try {
+      await callWebApiGet(
+        null,
+        url,
+        token: token,
+        showLoader: false,
+        hideLoader: false,
+        onResponse: (httpResponse) {
+          responseBody = httpResponse.body;
+        },
+      );
+    } catch (e) {
+      rethrow;
+    }
+
+    if (responseBody != null) {
+      return await compute(_parseStatsResponse, responseBody!);
+    }
+    return null;
+  }
+
   // --- Private Helpers & Static Parsers for Compute ---
 
   Future<void> _cacheConfigToDisk(
@@ -295,5 +376,15 @@ class SpiritualRepository {
 
   static String _encodeConfigResponse(SpiritualConfigurationResponse response) {
     return jsonEncode(response.toJson());
+  }
+
+  static SpiritualStatsResponse? _parseStatsResponse(String responseBody) {
+    try {
+      final json = jsonDecode(responseBody);
+      return SpiritualStatsResponse.fromJson(json);
+    } catch (e) {
+      print('Error parsing stats response: $e');
+      return null;
+    }
   }
 }
