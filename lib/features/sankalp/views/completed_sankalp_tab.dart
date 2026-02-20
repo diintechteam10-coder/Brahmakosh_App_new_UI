@@ -35,123 +35,103 @@ class CompletedSankalpTab extends StatelessWidget {
               .toList();
         }
 
-        if (completedSankalps.isEmpty) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Decorative Illustration
+            Container(
+              height: 200,
+              width: 200,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.03),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Stack(
+                alignment: Alignment.center,
                 children: [
-                  // Circular Art
-                  SizedBox(
-                    height: 200,
-                    width: 200,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Container(
-                          height: 180,
-                          width: 180,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: const Color(0xffff7438),
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          height: 130,
-                          width: 130,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: const Color(0xffff7438).withOpacity(0.5),
-                              width: 1,
-                            ),
-                            color: const Color(0xffFEDA87).withOpacity(0.2),
-                          ),
-                        ),
-                        Positioned(
-                          top: 0,
-                          child: Container(
-                            width: 8,
-                            height: 8,
-                            decoration: const BoxDecoration(
-                              color: Color(0xffff7438),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                  const Icon(
+                    Icons.history_outlined,
+                    size: 80,
+                    color: Color(0xff8D6E63),
                   ),
-                  const SizedBox(height: 24),
-                  Text(
-                    "No Sankalp completed yet",
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xff2D2D2D),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    "Your journey is just beginning.Complete your first\nSankalp to see your spiritual record here.",
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      color: const Color(0xff4D4D4D),
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  GestureDetector(
-                    onTap: () {
-                      final bloc = context.read<SankalpBloc>();
-                      Get.to(
-                        () => BlocProvider.value(
-                          value: bloc,
-                          child: const ChooseSankalpScreen(),
-                        ),
-                        transition: Transition.upToDown,
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xffff7438),
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            "Choose Sankalp",
-                            style: GoogleFonts.inter(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Icon(
-                            Icons.arrow_forward,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ],
-                      ),
-                    ),
+                  Positioned(
+                    top: 40,
+                    right: 40,
+                    child: Icon(Icons.check_circle, color: Colors.green.withOpacity(0.5), size: 24),
                   ),
                 ],
               ),
             ),
-          );
-        }
+            const SizedBox(height: 32),
+            Text(
+              "Your Journey Awaits",
+              style: GoogleFonts.lora(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xff4E342E),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              "You haven't completed any sankalps yet.\nEvery journey begins with a single step.",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                fontSize: 15,
+                color: const Color(0xff7D6E63),
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 32),
+            GestureDetector(
+              onTap: () {
+                final bloc = context.read<SankalpBloc>();
+                Get.to(
+                  () => BlocProvider.value(
+                    value: bloc,
+                    child: const ChooseSankalpScreen(),
+                  ),
+                  transition: Transition.downToUp,
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                decoration: BoxDecoration(
+                  color: const Color(0xffff7438),
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xffff7438).withOpacity(0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  "Choose a Sankalp",
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
         return ListView.builder(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -182,67 +162,89 @@ class CompletedSankalpTab extends StatelessWidget {
         );
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 15,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
-        child: Row(
+        child: Column(
           children: [
-            // Image Placeholder
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                image: DecorationImage(
-                  image: NetworkImage(
-                    sankalp.bannerImage.isNotEmpty
-                        ? sankalp.bannerImage
-                        : "https://images.unsplash.com/photo-1604881991720-f91add269bed?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80",
-                  ),
-                  fit: BoxFit.cover,
-                ),
-                color: Colors.grey[300],
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Text(
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      image: DecorationImage(
+                        image: NetworkImage(
+                          sankalp.bannerImage.isNotEmpty
+                              ? sankalp.bannerImage
+                              : "https://images.unsplash.com/photo-1604881991720-f91add269bed?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80",
+                        ),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
                           sankalp.title,
-                          style: GoogleFonts.playfairDisplay(
+                          style: GoogleFonts.lora(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: const Color(0xff4E342E),
                           ),
                         ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.history_edu,
+                              size: 14,
+                              color: Color(0xff8D6E63),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              "${userSankalp.totalDays} Days Completed",
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xff8D6E63),
+                              ),
+                            ),
+                          ],
                         ),
-                        decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.green),
-                        ),
-                        child: Text(
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.check, size: 14, color: Colors.green),
+                        const SizedBox(width: 4),
+                        Text(
                           "SUCCESS",
                           style: GoogleFonts.inter(
                             fontSize: 10,
@@ -250,36 +252,38 @@ class CompletedSankalpTab extends StatelessWidget {
                             color: Colors.green,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    "${userSankalp.totalDays} Days Completed",
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xff4E342E),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.monetization_on,
-                        size: 14,
-                        color: Color(0xffD4AF37),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        "${userSankalp.totalDays * sankalp.karmaPointsPerDay} Karma Points Earned",
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xff8D6E63),
-                        ),
-                      ),
-                    ],
+                ],
+              ),
+            ),
+            const Divider(height: 1, indent: 16, endIndent: 16),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.monetization_on,
+                    size: 18,
+                    color: Color(0xffD4AF37),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    "Total Karma Earned",
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: const Color(0xff5D4037),
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    "+${userSankalp.totalDays * sankalp.karmaPointsPerDay}",
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xff4E342E),
+                    ),
                   ),
                 ],
               ),

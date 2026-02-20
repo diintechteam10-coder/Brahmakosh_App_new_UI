@@ -156,8 +156,8 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
                           // Duration Section
                           Text(
                             "Duration",
-                            style: GoogleFonts.playfairDisplay(
-                              fontSize: 20,
+                            style: GoogleFonts.lora(
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: const Color(0xff4E342E),
                             ),
@@ -184,49 +184,67 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
                           // Daily Reminder Section
                           _buildReminderCard(context),
 
-                          const SizedBox(height: 100), // Spacing for button
+                          const SizedBox(height: 24),
+
+                          // Start Sankalp Button
+                          Container(
+                            width: double.infinity,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xffff7438), Color(0xffE65100)],
+                              ),
+                              borderRadius: BorderRadius.circular(30),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xffff7438).withOpacity(0.3),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(30),
+                                onTap: () {
+                                  if (_selectedDurationIndex == 3 &&
+                                      _currentTotalDays <= 0) {
+                                    Get.snackbar(
+                                      "Invalid Duration",
+                                      "Please enter a valid number of days.",
+                                    );
+                                    return;
+                                  }
+                                  _showStartConfirmation(context);
+                                },
+                                child: Center(
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.bolt, color: Colors.white, size: 22),
+                                      const SizedBox(width: 12),
+                                      Text(
+                                        "Start Sankalp",
+                                        style: GoogleFonts.inter(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
                         ],
                       ),
                     ),
                   ),
                 ],
-              ),
-              Positioned(
-                bottom: 24,
-                left: 24,
-                right: 24,
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_selectedDurationIndex == 3 &&
-                          _currentTotalDays <= 0) {
-                        Get.snackbar(
-                          "Invalid Duration",
-                          "Please enter a valid number of days.",
-                        );
-                        return;
-                      }
-                      _showStartConfirmation(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xffff7438),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(28),
-                      ),
-                      elevation: 4,
-                    ),
-                    child: Text(
-                      "Start Sankalp",
-                      style: GoogleFonts.inter(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
               ),
             ],
           ),
@@ -254,15 +272,17 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
         children: [
           Row(
             children: [
-              Text(
-                "About",
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xff4E342E),
+              Expanded(
+                child: Text(
+                  "About this Sankalp",
+                  style: GoogleFonts.lora(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xff4E342E),
+                  ),
                 ),
               ),
-              const Spacer(),
+              const SizedBox(width: 8),
               const Icon(
                 Icons.monetization_on,
                 size: 16,
@@ -306,23 +326,33 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
         },
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 4),
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: const EdgeInsets.symmetric(vertical: 14),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xffff9800) : Colors.white,
-            borderRadius: BorderRadius.circular(12),
+            color: isSelected ? Colors.transparent : Colors.white,
+            gradient: isSelected
+                ? const LinearGradient(colors: [Color(0xffFEDA87), Color(0xffFFD54F)])
+                : null,
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isSelected
-                  ? const Color(0xffff9800)
-                  : const Color(0xff8D6E63).withOpacity(0.3),
+              color: isSelected ? Colors.transparent : const Color(0xff8D6E63).withOpacity(0.1),
+              width: 1.5,
             ),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: const Color(0xffFEDA87).withOpacity(0.3),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    )
+                  ]
+                : null,
           ),
-          alignment: Alignment.center,
           child: Text(
             label,
             style: GoogleFonts.inter(
-              fontSize: 13, // Slightly smaller to fit
+              fontSize: 12,
               fontWeight: FontWeight.bold,
-              color: isSelected ? Colors.white : const Color(0xff8D6E63),
+              color: isSelected ? const Color(0xff4E342E) : const Color(0xff8D6E63),
             ),
             textAlign: TextAlign.center,
           ),
@@ -395,8 +425,8 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
         children: [
           Text(
             "Daily Reminder",
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 20,
+            style: GoogleFonts.lora(
+              fontSize: 18,
               fontWeight: FontWeight.bold,
               color: const Color(0xff4E342E),
             ),
@@ -530,7 +560,7 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
               const SizedBox(height: 20),
               Text(
                 "Confirm Sankalp?",
-                style: GoogleFonts.playfairDisplay(
+                style: GoogleFonts.lora(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: const Color(0xff4E342E),

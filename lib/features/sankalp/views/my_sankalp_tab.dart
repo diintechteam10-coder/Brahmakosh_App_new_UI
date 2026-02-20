@@ -28,7 +28,7 @@ class MySankalpTab extends StatelessWidget {
         List<UserSankalpModel> activeSankalps = [];
         if (state is SankalpLoaded) {
           activeSankalps = state.userSankalps
-              .where((s) => s.status == 'active' && s.currentDay < s.totalDays)
+              .where((s) => s.status == 'active' && s.currentDay <= s.totalDays)
               .toList();
         }
 
@@ -80,19 +80,39 @@ class MySankalpTab extends StatelessWidget {
                 },
               ),
             ),
-            floatingActionButton: FloatingActionButton(
-              backgroundColor: const Color(0xffff7438),
-              onPressed: () {
-                final bloc = context.read<SankalpBloc>();
-                Get.to(
-                  () => BlocProvider.value(
-                    value: bloc,
-                    child: const ChooseSankalpScreen(),
+            floatingActionButton: Container(
+              height: 64,
+              width: 64,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: const LinearGradient(
+                  colors: [Color(0xffff7438), Color(0xffE65100)],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xffff7438).withOpacity(0.4),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
                   ),
-                  transition: Transition.downToUp,
-                );
-              },
-              child: const Icon(Icons.add, color: Colors.white),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(32),
+                  onTap: () {
+                    final bloc = context.read<SankalpBloc>();
+                    Get.to(
+                      () => BlocProvider.value(
+                        value: bloc,
+                        child: const ChooseSankalpScreen(),
+                      ),
+                      transition: Transition.downToUp,
+                    );
+                  },
+                  child: const Icon(Icons.add, color: Colors.white, size: 30),
+                ),
+              ),
             ),
           ),
         );
@@ -107,98 +127,68 @@ class MySankalpTab extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Circular Art
-            SizedBox(
-              height: 200,
-              width: 200,
+            // Decorative Illustration
+            Container(
+              height: 220,
+              width: 220,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    const Color(0xffFEDA87).withOpacity(0.2),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
               child: Stack(
                 alignment: Alignment.center,
                 children: [
                   Container(
-                    height: 180,
-                    width: 180,
+                    height: 160,
+                    width: 160,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: const Color(0xffff7438),
+                        color: const Color(0xffff7438).withOpacity(0.3),
                         width: 1,
                       ),
                     ),
                   ),
-                  Positioned(
-                    right: 15,
-                    top: 40,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: const Color(0xffFEDA87).withOpacity(0.5),
-                      ),
-                      child: const Icon(
-                        Icons.star,
-                        size: 16,
-                        color: Color(0xffff7438),
-                      ),
-                    ),
+                  const Icon(
+                    Icons.auto_awesome,
+                    size: 80,
+                    color: Color(0xffff7438),
                   ),
                   Positioned(
-                    left: 10,
-                    bottom: 60,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: const Color(0xffFEDA87).withOpacity(0.5),
-                      ),
-                      child: const Icon(
-                        Icons.local_florist,
-                        size: 16,
-                        color: Color(0xffff7438),
-                      ),
-                    ),
+                    top: 40,
+                    right: 30,
+                    child: Icon(Icons.star, color: const Color(0xffFEDA87), size: 24),
+                  ),
+                  Positioned(
+                    bottom: 40,
+                    left: 20,
+                    child: Icon(Icons.star_border, color: const Color(0xffFEDA87), size: 20),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 24),
-            RichText(
-              textAlign: TextAlign.center,
-              text: TextSpan(
-                children: [
-                  TextSpan(
-                    text: "You don't have any \n",
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xff2D2D2D), // Dark text
-                    ),
-                  ),
-                  TextSpan(
-                    text: "Sankalp",
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xffff7438), // Orange highlight
-                    ),
-                  ),
-                  TextSpan(
-                    text: " yet",
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xff2D2D2D),
-                    ),
-                  ),
-                ],
+            Text(
+              "No Active Sankalps",
+              style: GoogleFonts.lora(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xff4E342E),
               ),
             ),
             const SizedBox(height: 12),
             Text(
-              "Choose a sankalp to begin your journey\ntowards a more mindful life.",
+              "Start your journey towards mindfulness\nby choosing a sankalp that resonates with you.",
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
-                fontSize: 14,
-                color: const Color(0xff4D4D4D),
+                fontSize: 15,
+                color: const Color(0xff7D6E63),
+                height: 1.5,
               ),
             ),
             const SizedBox(height: 32),
@@ -210,23 +200,29 @@ class MySankalpTab extends StatelessWidget {
                     value: bloc,
                     child: const ChooseSankalpScreen(),
                   ),
-                  transition: Transition.upToDown,
+                  transition: Transition.downToUp,
                 );
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 decoration: BoxDecoration(
-                  color: const Color(0xffff7438),
-                  borderRadius: BorderRadius.circular(25),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xffff7438), Color(0xffE65100)],
+                  ),
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xffff7438).withOpacity(0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      "Choose Sankalp",
+                      "Discover Sankalps",
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -234,23 +230,9 @@ class MySankalpTab extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Icon(
-                      Icons.arrow_forward,
-                      color: Colors.white,
-                      size: 20,
-                    ),
+                    const Icon(Icons.explore_outlined, color: Colors.white, size: 20),
                   ],
                 ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              "YOUR SPIRITUAL PATH AWAITS",
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey,
-                letterSpacing: 1.0,
               ),
             ),
           ],
@@ -260,12 +242,13 @@ class MySankalpTab extends StatelessWidget {
   }
 
   Widget _buildSankalpCard(BuildContext context, UserSankalpModel userSankalp) {
-    // Calculate progress
-    double progress = userSankalp.totalDays > 0
-        ? userSankalp.currentDay / userSankalp.totalDays
-        : 0;
+    final completedDays =
+        userSankalp.dailyReports.where((r) => r.status == 'yes').length;
+    double progress =
+        userSankalp.totalDays > 0 ? completedDays / userSankalp.totalDays : 0;
 
     final sankalp = userSankalp.sankalp;
+    final bool isReportPending = _isReportPending(userSankalp);
 
     return GestureDetector(
       onTap: () {
@@ -276,175 +259,193 @@ class MySankalpTab extends StatelessWidget {
             child: SankalpProgressScreen(sankalpId: userSankalp.id),
           ),
           transition: Transition.rightToLeft,
-        );
+        )?.then((_) {
+          bloc.add(FetchUserSankalps());
+        });
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 15,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                // Image Placeholder
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    image: DecorationImage(
-                      image: NetworkImage(
-                        sankalp.bannerImage.isNotEmpty
-                            ? sankalp.bannerImage
-                            : "https://images.unsplash.com/photo-1604881991720-f91add269bed?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80",
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      image: DecorationImage(
+                        image: NetworkImage(
+                          sankalp.bannerImage.isNotEmpty
+                              ? sankalp.bannerImage
+                              : "https://images.unsplash.com/photo-1604881991720-f91add269bed?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80",
+                        ),
+                        fit: BoxFit.cover,
                       ),
-                      fit: BoxFit.cover,
                     ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              sankalp.title,
-                              style: GoogleFonts.playfairDisplay(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xff4E342E),
-                              ),
-                            ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          sankalp.title,
+                          style: GoogleFonts.lora(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xff4E342E),
                           ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.green.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.green),
-                            ),
-                            child: Text(
-                              "${userSankalp.currentDay}/${userSankalp.totalDays} Days",
-                              style: GoogleFonts.inter(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        sankalp.description,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: const Color(0xff8D6E63),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.monetization_on,
-                            size: 14,
-                            color: Color(0xffD4AF37),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            "+${sankalp.karmaPointsPerDay} Karma",
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xff4E342E),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.stars,
+                              size: 14,
+                              color: Color(0xffD4AF37),
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            Text(
+                              "+${sankalp.karmaPointsPerDay} Karma / Day",
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xff8D6E63),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.green.withOpacity(0.1)),
+                    ),
+                    child: Text(
+                      "$completedDays/${userSankalp.totalDays} Days",
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (isReportPending)
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                child: ElevatedButton(
+                  onPressed: () {
+                    final bloc = context.read<SankalpBloc>();
+                    Get.to(
+                      () => BlocProvider.value(
+                        value: bloc,
+                        child: SankalpProgressScreen(sankalpId: userSankalp.id),
+                      ),
+                      transition: Transition.rightToLeft,
+                    )?.then((_) {
+                      bloc.add(FetchUserSankalps());
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xffff7438),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.check_circle_outline, size: 18),
+                      const SizedBox(width: 8),
+                      Text(
+                        "Mark Daily Progress",
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            // Daily Check-in Button if pending
-            if (_isReportPending(userSankalp))
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => _showCheckInDialog(context, userSankalp),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xffff7438),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                    child: Text(
-                      "Mark Daily Progress",
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
               ),
-            // Progress Bar
-            Row(
-              children: [
-                Text(
-                  "Completion Progress",
-                  style: GoogleFonts.inter(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xff4E342E),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Completion",
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xff8D6E63),
+                        ),
+                      ),
+                      Text(
+                        "${(progress * 100).toInt()}%",
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xff4E342E),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                const Spacer(),
-                Text(
-                  "${(progress * 100).toInt()}%",
-                  style: GoogleFonts.inter(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xffff7438),
+                  const SizedBox(height: 8),
+                  Stack(
+                    children: [
+                      Container(
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      ),
+                      FractionallySizedBox(
+                        widthFactor: progress,
+                        child: Container(
+                          height: 6,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xffFEDA87), Color(0xffff7438)],
+                            ),
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: progress,
-                backgroundColor: Colors.grey[200],
-                valueColor: const AlwaysStoppedAnimation<Color>(
-                  Color(0xffff7438),
-                ),
-                minHeight: 6,
+                ],
               ),
             ),
           ],

@@ -33,29 +33,44 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
       appBar: AppBar(
         title: Text(
           "Progress",
-          style: GoogleFonts.playfairDisplay(
-            color: const Color(0xff5D4037),
+          style: GoogleFonts.lora(
+            fontSize: 20,
+            color: const Color(0xff4E342E),
             fontWeight: FontWeight.bold,
           ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Color(0xff5D4037)),
-          onPressed: () => Get.back(),
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Color(0xff5D4037), size: 20),
+            onPressed: () => Get.back(),
+          ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications, color: Color(0xff5D4037)),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const NotificationScreen(),
-                ),
-              );
-            },
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.notifications_none, color: Color(0xff5D4037), size: 20),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const NotificationScreen(),
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -154,8 +169,10 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
               : (completedDays / totalDays) * 100;
 
           final isSankalpCompleted = userSankalp.status == 'completed';
-          final currentDayDisplay =
+          final rawCurrentDay =
               progressStats?.currentDay ?? userSankalp.currentDay;
+          final currentDayDisplay =
+              rawCurrentDay > totalDays ? totalDays : rawCurrentDay;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -185,7 +202,7 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                           Flexible(
                             child: Text(
                               sankalp.title,
-                              style: GoogleFonts.playfairDisplay(
+                              style: GoogleFonts.lora(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
                                 color: const Color(0xff4E342E),
@@ -259,17 +276,36 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: LinearProgressIndicator(
-                          value: progressPercentage / 100,
-                          minHeight: 8,
-                          backgroundColor: Colors.grey[200],
-                          valueColor: const AlwaysStoppedAnimation(
-                            Color(0xffff7438),
+                      const SizedBox(height: 12),
+                      Stack(
+                        children: [
+                          Container(
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(4),
+                            ),
                           ),
-                        ),
+                          FractionallySizedBox(
+                            widthFactor: progressPercentage / 100,
+                            child: Container(
+                              height: 8,
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xffFEDA87), Color(0xffff7438)],
+                                ),
+                                borderRadius: BorderRadius.circular(4),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xffFEDA87).withOpacity(0.3),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 16),
                       Row(
@@ -321,7 +357,7 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                 const SizedBox(height: 24),
                 Text(
                   "Your Journey",
-                  style: GoogleFonts.playfairDisplay(
+                  style: GoogleFonts.lora(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: const Color(0xff4E342E),
@@ -355,220 +391,202 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                         dayNum == currentDayDisplay && !isSankalpCompleted;
 
                     return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
+                      margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
-                        color: isCompleted
-                            ? const Color(0xffF1F8E9)
-                            : const Color(
-                                0xffFFFDE7,
-                              ), // Light Green or Light Yellow
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(
-                          color: isCompleted
-                              ? Colors.green
-                              : const Color(0xffFFCC80),
-                          width: 1.5,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: isCompleted
-                                  ? Colors.white
-                                  : const Color(
-                                      0xffFFCC80,
-                                    ).withValues(alpha: 0.4),
-                              border: Border.all(
-                                color: isCompleted
-                                    ? Colors.green
-                                    : const Color(0xffFF9800),
-                              ),
-                            ),
-                            child: Text(
-                              dayNum.toString().padLeft(2, '0'),
-                              style: GoogleFonts.inter(
-                                fontWeight: FontWeight.bold,
-                                color: isCompleted
-                                    ? Colors.green
-                                    : const Color(0xffEF6C00),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      "Day $dayNum",
-                                      style: GoogleFonts.inter(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                        color: const Color(0xff4E342E),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    if (isToday)
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 6,
-                                          vertical: 2,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xffFFCC80),
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          "TODAY",
-                                          style: GoogleFonts.inter(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    if (isCompleted)
-                                      Container(
-                                        margin: const EdgeInsets.only(left: 8),
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 6,
-                                          vertical: 2,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.green.withValues(
-                                            alpha: 0.1,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            4,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          "COMPLETED",
-                                          style: GoogleFonts.inter(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.green,
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    Icon(
-                                      isCompleted
-                                          ? Icons.check_circle
-                                          : Icons.radio_button_unchecked,
-                                      size: 14,
-                                      color: isCompleted
-                                          ? Colors.green
-                                          : Colors.grey,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      isCompleted
-                                          ? "Completed"
-                                          : "Not Completed",
-                                      style: GoogleFonts.inter(
-                                        fontSize: 12,
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          Text(
-                            "+${sankalp.karmaPointsPerDay} KARMA",
-                            style: GoogleFonts.inter(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                              color: const Color(0xff8D6E63),
-                            ),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.03),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
                           ),
                         ],
+                      ),
+                      child: IntrinsicHeight(
+                        child: Row(
+                          children: [
+                            // Status Accent
+                            Container(
+                              width: 6,
+                              decoration: BoxDecoration(
+                                color: isCompleted ? Colors.green : (isToday ? const Color(0xffff7438) : Colors.grey[300]),
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(20),
+                                  bottomLeft: Radius.circular(20),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 44,
+                                      height: 44,
+                                      decoration: BoxDecoration(
+                                        color: isCompleted ? Colors.green.withOpacity(0.1) : Colors.grey[50],
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          dayNum.toString().padLeft(2, '0'),
+                                          style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                            color: isCompleted ? Colors.green : const Color(0xff4E342E),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Day $dayNum",
+                                            style: GoogleFonts.inter(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                              color: const Color(0xff4E342E),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                isCompleted ? Icons.check_circle : (isToday ? Icons.timer_outlined : Icons.radio_button_unchecked),
+                                                size: 14,
+                                                color: isCompleted ? Colors.green : (isToday ? const Color(0xffff7438) : Colors.grey[400]),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                isCompleted ? "Completed" : (isToday ? "Today" : "Coming Up"),
+                                                style: GoogleFonts.inter(
+                                                  fontSize: 12,
+                                                  fontWeight: isToday ? FontWeight.bold : FontWeight.w500,
+                                                  color: isCompleted ? Colors.green : (isToday ? const Color(0xffff7438) : Colors.grey[600]),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          "+${sankalp.karmaPointsPerDay}",
+                                          style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14,
+                                            color: const Color(0xff4E342E),
+                                          ),
+                                        ),
+                                        Text(
+                                          "KARMA",
+                                          style: GoogleFonts.inter(
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.bold,
+                                            color: const Color(0xff8D6E63),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },
                 ),
                 if (!isSankalpCompleted) ...[
                   const SizedBox(height: 20),
-                  SizedBox(
+                  Container(
                     width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        context.read<SankalpBloc>().add(
-                          ReportDailyStatus(
-                            userSankalpId: userSankalp!.id,
-                            status: 'yes',
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xffff7438),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(28),
-                        ),
-                        elevation: 4,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xffff7438), Color(0xffE65100)],
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.check_circle_outline,
-                            color: Colors.white,
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xffff7438).withOpacity(0.3),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(30),
+                        onTap: () {
+                          context.read<SankalpBloc>().add(
+                                ReportDailyStatus(
+                                  userSankalpId: userSankalp!.id,
+                                  status: 'yes',
+                                ),
+                              );
+                        },
+                        child: Center(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.check_circle_outline, color: Colors.white),
+                              const SizedBox(width: 8),
+                              Text(
+                                "Mark Day $currentDayDisplay Completed",
+                                style: GoogleFonts.inter(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            "Mark Day $currentDayDisplay Completed",
-                            style: GoogleFonts.inter(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
                 ] else ...[
                   const SizedBox(height: 20),
-                  SizedBox(
+                  Container(
                     width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Get.back();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xff8D6E63),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(28),
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: const Color(0xff8D6E63),
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xff8D6E63).withOpacity(0.2),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
                         ),
-                        elevation: 2,
-                      ),
-                      child: Text(
-                        "Back to My Sankalp",
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(30),
+                        onTap: () => Get.back(),
+                        child: Center(
+                          child: Text(
+                            "Back to My Sankalp",
+                            style: GoogleFonts.inter(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ),
                     ),

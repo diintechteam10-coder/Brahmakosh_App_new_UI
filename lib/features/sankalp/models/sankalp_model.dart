@@ -122,7 +122,7 @@ class UserSankalpModel {
           ? DateTime.tryParse(json['endDate'])
           : null,
       status: json['status'] ?? '',
-      currentDay: json['currentDay'] ?? 1,
+      currentDay: json['currentDay'] ?? 0,
       totalDays: json['totalDays'] ?? 0,
       dailyReports:
           (json['dailyReports'] as List<dynamic>?)

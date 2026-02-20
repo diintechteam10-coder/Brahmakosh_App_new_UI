@@ -119,9 +119,13 @@ class SwapnaRepository {
   // Fetch User Dream Requests
   Future<List<DreamRequestModel>> fetchDreamRequests() async {
     final token = await _getToken();
+    final userId = await StorageService.getString(AppConstants.keyUserId);
     try {
+      final url = userId != null && userId.isNotEmpty
+          ? '${ApiUrls.dreamRequests}?userId=$userId'
+          : ApiUrls.dreamRequests;
       final response = await http.get(
-        Uri.parse(ApiUrls.dreamRequests),
+        Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',

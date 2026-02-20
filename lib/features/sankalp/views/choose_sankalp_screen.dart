@@ -30,17 +30,25 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
       appBar: AppBar(
         title: Text(
           "Choose Sankalp",
-          style: GoogleFonts.playfairDisplay(
-            color: const Color(0xff5D4037),
+          style: GoogleFonts.lora(
+            fontSize: 20,
+            color: const Color(0xff4E342E),
             fontWeight: FontWeight.bold,
           ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xff5D4037)),
-          onPressed: () => Get.back(),
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Color(0xff5D4037), size: 20),
+            onPressed: () => Get.back(),
+          ),
         ),
       ),
       body: BlocBuilder<SankalpBloc, SankalpState>(
@@ -87,9 +95,7 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
         }
 
         try {
-          debugPrint("Navigating to detail for sankalp: ${sankalp.id}");
           final bloc = context.read<SankalpBloc>();
-
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -100,33 +106,32 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
             ),
           );
         } catch (e) {
-          debugPrint("Navigation error: $e");
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Full details not available")),
           );
         }
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
+        margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 15,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
         child: Column(
           children: [
-            // Image Area
+            // Image Area with Gradient Overlay
             Container(
-              height: 150,
+              height: 180,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(20),
+                  top: Radius.circular(24),
                 ),
                 image: DecorationImage(
                   image: NetworkImage(
@@ -139,13 +144,30 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
               ),
               child: Stack(
                 children: [
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(24),
+                        ),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            Colors.black.withOpacity(0.4),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                   Positioned(
-                    top: 10,
-                    right: 10,
+                    top: 12,
+                    right: 12,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
-                        vertical: 5,
+                        vertical: 6,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.9),
@@ -154,9 +176,9 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
                       child: Text(
                         "${sankalp.totalDays} Days",
                         style: GoogleFonts.inter(
-                          fontSize: 12,
+                          fontSize: 11,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xff5D4037),
+                          color: const Color(0xffE65100),
                         ),
                       ),
                     ),
@@ -171,18 +193,21 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
                 children: [
                   Text(
                     sankalp.title,
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 20,
+                    style: GoogleFonts.lora(
+                      fontSize: 19,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xff4E342E),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   Text(
                     sankalp.description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.inter(
-                      fontSize: 14,
+                      fontSize: 13,
                       color: const Color(0xff8D6E63),
+                      height: 1.4,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -192,11 +217,11 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
                       Row(
                         children: [
                           const Icon(
-                            Icons.monetization_on,
+                            Icons.stars,
                             size: 16,
                             color: Color(0xffD4AF37),
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 6),
                           Text(
                             "+${sankalp.karmaPointsPerDay} Karma / Day",
                             style: GoogleFonts.inter(
@@ -207,10 +232,17 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
                           ),
                         ],
                       ),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        size: 16,
-                        color: Colors.grey[400],
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xffFEDA87).withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.arrow_forward,
+                          size: 14,
+                          color: Color(0xffE65100),
+                        ),
                       ),
                     ],
                   ),

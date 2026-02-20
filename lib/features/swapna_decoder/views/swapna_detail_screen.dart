@@ -56,7 +56,9 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
     if (_isLoading) {
       return Scaffold(
         backgroundColor: CustomColors.lightPinkColor,
-        body: const Center(child: CircularProgressIndicator()),
+        body: const Center(
+          child: CircularProgressIndicator(color: Color(0xffFF7438)),
+        ),
       );
     }
 
@@ -64,7 +66,29 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
       return Scaffold(
         backgroundColor: CustomColors.lightPinkColor,
         appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
-        body: Center(child: Text("Error: $_error")),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline_rounded, size: 48, color: Colors.grey[400]),
+              const SizedBox(height: 12),
+              Text(
+                "Failed to load details",
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xff5D4037),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                _error!,
+                style: GoogleFonts.inter(fontSize: 13, color: Colors.grey[500]),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
       );
     }
 
@@ -83,63 +107,112 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
             elevation: 0,
             expandedHeight: 300,
             pinned: true,
-            leading: IconButton(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+            leading: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.9),
                   shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                    ),
+                  ],
                 ),
-                child: const Icon(
-                  Icons.arrow_back,
-                  color: Color(0xff5D4037),
-                  size: 20,
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back,
+                    color: Color(0xff5D4037),
+                    size: 20,
+                  ),
+                  onPressed: () => Get.back(),
                 ),
               ),
-              onPressed: () => Get.back(),
             ),
             flexibleSpace: FlexibleSpaceBar(
-              background: CachedNetworkImage(
-                imageUrl: swapna.thumbnailUrl ?? '',
-                fit: BoxFit.cover,
-                placeholder: (context, url) =>
-                    Container(color: Colors.grey[200]),
-                errorWidget: (context, url, error) => Container(
-                  color: Colors.grey[300],
-                  child: const Icon(Icons.broken_image, size: 50),
-                ),
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  CachedNetworkImage(
+                    imageUrl: swapna.thumbnailUrl ?? '',
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) =>
+                        Container(color: const Color(0xffF4E9E0)),
+                    errorWidget: (context, url, error) => Container(
+                      color: const Color(0xffF4E9E0),
+                      child: const Icon(
+                        Icons.nights_stay_outlined,
+                        size: 60,
+                        color: Color(0xffFEDA87),
+                      ),
+                    ),
+                  ),
+                  // Bottom gradient for smooth transition
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: 80,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            CustomColors.lightPinkColor.withOpacity(0.8),
+                            CustomColors.lightPinkColor,
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
           SliverToBoxAdapter(
             child: Container(
               decoration: const BoxDecoration(
-                color: Colors.white,
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xffFFFDF5),
+                    Colors.white,
+                  ],
+                ),
                 borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
               ),
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.fromLTRB(24, 20, 24, 40),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Drag handle
                   Center(
                     child: Container(
-                      width: 50,
-                      height: 5,
+                      width: 40,
+                      height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.grey[300],
+                        color: const Color(0xffFEDA87),
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                   ),
                   const SizedBox(height: 20),
+
+                  // Symbol name
                   Text(
                     swapna.symbolName,
-                    style: GoogleFonts.playfairDisplay(
+                    style: GoogleFonts.lora(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xff5D4037),
+                      color: const Color(0xff4E342E),
                     ),
                   ),
+
+                  // Hindi name
                   if (swapna.symbolNameHindi.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Text(
@@ -147,71 +220,123 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
                       style: GoogleFonts.notoSans(
                         fontSize: 18,
                         color: const Color(0xff8D6E63),
+                        fontWeight: FontWeight.w400,
                       ),
                     ),
                   ],
-                  const SizedBox(height: 16),
-                  _buildSectionTitle("Interpretation"),
-                  const SizedBox(height: 8),
+
+                  // Category badge
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          const Color(0xffFEDA87).withOpacity(0.4),
+                          const Color(0xffFEDA87).withOpacity(0.2),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: const Color(0xffFEDA87).withOpacity(0.6),
+                      ),
+                    ),
+                    child: Text(
+                      swapna.category,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xff5D4037),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Interpretation
+                  _buildSectionTitle("Interpretation", Icons.auto_stories_outlined),
+                  const SizedBox(height: 12),
                   Text(
                     swapna.detailedInterpretation ??
                         swapna.shortDescription ??
                         '',
                     style: GoogleFonts.inter(
-                      fontSize: 16,
-                      height: 1.5,
-                      color: Colors.black87,
+                      fontSize: 15,
+                      height: 1.7,
+                      color: const Color(0xff4E342E),
                     ),
                   ),
-                  const SizedBox(height: 24),
+
+                  const SizedBox(height: 28),
+
+                  // Positive Aspects
                   if (swapna.positiveAspects != null &&
                       swapna.positiveAspects!.isNotEmpty) ...[
-                    _buildSectionTitle("Positive Aspects"),
+                    _buildSectionTitle(
+                      "Positive Aspects",
+                      Icons.wb_sunny_outlined,
+                    ),
+                    const SizedBox(height: 12),
                     ...swapna.positiveAspects!.map(
-                      (e) => _buildBulletPoint(
+                      (e) => _buildAspectCard(
                         e.point,
                         e.description,
-                        Colors.green,
+                        const Color(0xff2E7D32),
+                        const Color(0xffE8F5E9),
                       ),
                     ),
                     const SizedBox(height: 24),
                   ],
+
+                  // Negative Aspects
                   if (swapna.negativeAspects != null &&
                       swapna.negativeAspects!.isNotEmpty) ...[
-                    _buildSectionTitle("Negative Aspects"),
+                    _buildSectionTitle(
+                      "Negative Aspects",
+                      Icons.warning_amber_outlined,
+                    ),
+                    const SizedBox(height: 12),
                     ...swapna.negativeAspects!.map(
-                      (e) => _buildBulletPoint(
+                      (e) => _buildAspectCard(
                         e.point,
                         e.description,
-                        Colors.redAccent,
+                        const Color(0xffC62828),
+                        const Color(0xffFFEBEE),
                       ),
                     ),
                     const SizedBox(height: 24),
                   ],
+
+                  // Remedies
                   if (swapna.remedies != null) ...[
-                    _buildSectionTitle("Remedies"),
-                    const SizedBox(height: 8),
+                    _buildSectionTitle("Remedies", Icons.self_improvement),
+                    const SizedBox(height: 12),
+
                     // Mantras
                     if (swapna.remedies!.mantras != null &&
                         swapna.remedies!.mantras!.isNotEmpty) ...[
-                      Text(
-                        "Mantras:",
-                        style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+                      _buildRemedyCard(
+                        "Mantras",
+                        "🕉",
+                        swapna.remedies!.mantras!,
+                        const Color(0xffFF7438),
+                        const Color(0xffFFF3E0),
                       ),
-                      ...swapna.remedies!.mantras!.map(
-                        (m) => Text("• $m", style: GoogleFonts.inter()),
-                      ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                     ],
+
                     // Precautions
                     if (swapna.remedies!.precautions != null &&
                         swapna.remedies!.precautions!.isNotEmpty) ...[
-                      Text(
-                        "Precautions:",
-                        style: GoogleFonts.inter(fontWeight: FontWeight.bold),
-                      ),
-                      ...swapna.remedies!.precautions!.map(
-                        (p) => Text("• $p", style: GoogleFonts.inter()),
+                      _buildRemedyCard(
+                        "Precautions",
+                        "⚠️",
+                        swapna.remedies!.precautions!,
+                        const Color(0xffF57F17),
+                        const Color(0xffFFFDE7),
                       ),
                     ],
                   ],
@@ -224,35 +349,132 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: GoogleFonts.playfairDisplay(
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-        color: const Color(0xff5D4037),
+  Widget _buildSectionTitle(String title, IconData icon) {
+    return Row(
+      children: [
+        Container(
+          width: 4,
+          height: 24,
+          decoration: BoxDecoration(
+            color: const Color(0xffFF7438),
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Icon(icon, size: 20, color: const Color(0xff8D6E63)),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: GoogleFonts.lora(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xff4E342E),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAspectCard(
+    String title,
+    String description,
+    Color accentColor,
+    Color bgColor,
+  ) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border(
+          left: BorderSide(color: accentColor, width: 4),
+        ),
+      ),
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: accentColor,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            description,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              height: 1.5,
+              color: const Color(0xff4E342E),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildBulletPoint(String title, String description, Color color) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: Row(
+  Widget _buildRemedyCard(
+    String title,
+    String emoji,
+    List<String> items,
+    Color accentColor,
+    Color bgColor,
+  ) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: accentColor.withOpacity(0.2)),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.circle, size: 8, color: color),
-          const SizedBox(width: 12),
-          Expanded(
-            child: RichText(
-              text: TextSpan(
-                style: GoogleFonts.inter(color: Colors.black87, height: 1.4),
+          Row(
+            children: [
+              Text(emoji, style: const TextStyle(fontSize: 20)),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: accentColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ...items.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextSpan(
-                    text: "$title: ",
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  Container(
+                    margin: const EdgeInsets.only(top: 7),
+                    width: 5,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: accentColor,
+                      shape: BoxShape.circle,
+                    ),
                   ),
-                  TextSpan(text: description),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      item,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        height: 1.5,
+                        color: const Color(0xff4E342E),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

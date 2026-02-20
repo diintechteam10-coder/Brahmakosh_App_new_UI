@@ -6,7 +6,11 @@ class DreamRequestModel {
   final bool? notificationSent;
   final DreamCompletedId? completedDreamId;
   final String? createdAt;
+  final String? updatedAt;
   final DreamUserModel? userId;
+  final String? userEmail;
+  final String? userName;
+  final String? clientId;
 
   DreamRequestModel({
     required this.id,
@@ -16,7 +20,11 @@ class DreamRequestModel {
     this.notificationSent,
     this.completedDreamId,
     this.createdAt,
+    this.updatedAt,
     this.userId,
+    this.userEmail,
+    this.userName,
+    this.clientId,
   });
 
   factory DreamRequestModel.fromJson(Map<String, dynamic> json) {
@@ -30,6 +38,7 @@ class DreamRequestModel {
           ? DreamCompletedId.fromJson(json['completedDreamId'])
           : null,
       createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
       userId: json['userId'] != null
           ? (json['userId'] is Map<String, dynamic>
                 ? DreamUserModel.fromJson(json['userId'])
@@ -37,6 +46,9 @@ class DreamRequestModel {
                       ? DreamUserModel(id: json['userId'], email: '')
                       : null))
           : null,
+      userEmail: json['userEmail'],
+      userName: json['userName'],
+      clientId: json['clientId'],
     );
   }
 }

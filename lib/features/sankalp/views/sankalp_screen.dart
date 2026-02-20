@@ -44,61 +44,91 @@ class _SankalpScreenState extends State<SankalpScreen>
         appBar: AppBar(
           title: Text(
             "My Sankalp",
-            style: GoogleFonts.playfairDisplay(
-              color: const Color(0xff5D4037),
+            style: GoogleFonts.lora(
+              fontSize: 22,
+              color: const Color(0xff4E342E),
               fontWeight: FontWeight.bold,
             ),
           ),
           backgroundColor: Colors.transparent,
           elevation: 0,
           centerTitle: false,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Color(0xff5D4037)),
-            onPressed: () => Get.back(),
+          leading: Container(
+            margin: const EdgeInsets.all(8),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Color(0xff5D4037), size: 20),
+              onPressed: () => Get.back(),
+            ),
           ),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.notifications, color: Color(0xff5D4037)),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const NotificationScreen(),
-                  ),
-                );
-              },
+            Container(
+              margin: const EdgeInsets.only(right: 8),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.notifications_none, color: Color(0xff5D4037), size: 20),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const NotificationScreen(),
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         ),
         body: Column(
           children: [
-            const SizedBox(height: 10),
+            const SizedBox(height: 15),
             // Custom Tab Bar Container
             Container(
-              height: 40, // Reduced height
+              height: 46,
               margin: const EdgeInsets.symmetric(horizontal: 24),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(
-                  alpha: 0.3,
-                ), // Lighter background for tab container
+                color: Colors.white.withOpacity(0.5),
                 borderRadius: BorderRadius.circular(25),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.03),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: TabBar(
                 controller: _tabController,
                 indicator: BoxDecoration(
                   borderRadius: BorderRadius.circular(25),
-                  color: const Color(0xffFEDA87),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xffFEDA87), Color(0xffFFD54F)],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xffFEDA87).withOpacity(0.4),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 indicatorSize: TabBarIndicatorSize.tab,
-                dividerColor: Colors.transparent, // Remove underline
+                dividerColor: Colors.transparent,
                 labelColor: const Color(0xff5D4037),
-                unselectedLabelColor: const Color(
-                  0xff8D6E63,
-                ), // Darker grey for visibility
+                unselectedLabelColor: const Color(0xff8D6E63),
                 labelStyle: GoogleFonts.inter(
                   fontWeight: FontWeight.bold,
-                  fontSize: 12, // Reduced font size
+                  fontSize: 13,
+                ),
+                unselectedLabelStyle: GoogleFonts.inter(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
                 ),
                 tabs: const [
                   Tab(text: "MY SANKALP"),
@@ -110,7 +140,10 @@ class _SankalpScreenState extends State<SankalpScreen>
             Expanded(
               child: TabBarView(
                 controller: _tabController,
-                children: [const MySankalpTab(), const CompletedSankalpTab()],
+                children: [
+                  const MySankalpTab(),
+                  const CompletedSankalpTab(),
+                ],
               ),
             ),
           ],
