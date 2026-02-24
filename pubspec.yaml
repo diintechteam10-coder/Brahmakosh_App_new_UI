@@ -4,7 +4,7 @@ description: "A new Flutter project."
 publish_to: 'none' 
 
 
-version: 1.0.0+17
+version: 1.0.0+20
 
 environment:
   sdk: ^3.10.0-290.1.beta
@@ -112,7 +112,10 @@ flutter:
     - assets/lotties/
 
 flutter_launcher_icons:
-  android: false
+  android: true
   ios: true
   image_path_ios: "assets/images/Icon.png"
+  image_path_android: "assets/images/Icon.png"
   remove_alpha_ios: true
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/Icon.png"
