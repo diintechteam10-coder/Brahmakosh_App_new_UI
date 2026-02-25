@@ -11,10 +11,16 @@ class RegisterController extends GetxController {
   final passwordController = TextEditingController();
 
   final isLoading = false.obs;
+  final isPrivacyPolicyAccepted = false.obs;
 
   /// 🔐 REGISTER STEP 1 (EMAIL + PASSWORD)
   Future<void> registerStep1() async {
     print("📩 Register Step 1 called");
+
+    if (!isPrivacyPolicyAccepted.value) {
+      Get.snackbar("Required", "Please accept the Privacy Policy");
+      return;
+    }
 
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       Get.snackbar("Error", "Email & Password required");

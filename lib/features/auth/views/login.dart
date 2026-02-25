@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter/gestures.dart';
 
 class LoginView extends StatelessWidget {
   LoginView({super.key});
@@ -117,46 +116,62 @@ class LoginView extends StatelessWidget {
 
               const SizedBox(height: 30),
 
-              // Login Button
+              // Login Button (Validated with Privacy Policy)
               Obx(() {
-                return GestureDetector(
-                  onTap: authController.isEmailLoading.value
-                      ? null
-                      : () {
-                          authController.loginWithEmail();
-                        },
-                  child: Container(
-                    height: 54,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: AppTheme.landingButton,
-                      borderRadius: BorderRadius.circular(30),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: authController.isEmailLoading.value
-                          ? const SizedBox(
-                              height: 24,
-                              width: 24,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
+                final bool isAccepted =
+                    authController.isPrivacyPolicyAccepted.value;
+                return Opacity(
+                  opacity: isAccepted ? 1.0 : 0.6,
+                  child: GestureDetector(
+                    onTap: authController.isEmailLoading.value
+                        ? null
+                        : () {
+                            if (!isAccepted) {
+                              Get.snackbar(
+                                "Required",
+                                "Please accept the Privacy Policy",
+                                snackPosition: SnackPosition.BOTTOM,
+                                backgroundColor: Colors.redAccent,
+                                colorText: Colors.white,
+                                margin: const EdgeInsets.all(16),
+                              );
+                            } else {
+                              authController.loginWithEmail();
+                            }
+                          },
+                    child: Container(
+                      height: 54,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: AppTheme.landingButton,
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: authController.isEmailLoading.value
+                            ? const SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Text(
+                                "Log In",
+                                style: GoogleFonts.inter(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
                               ),
-                            )
-                          : Text(
-                              "Log In",
-                              style: GoogleFonts.inter(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
+                      ),
                     ),
                   ),
                 );
@@ -194,53 +209,69 @@ class LoginView extends StatelessWidget {
 
               // Continue with Google
               Obx(() {
-                return GestureDetector(
-                  onTap: authController.isLoading.value
-                      ? null
-                      : () {
-                          authController.signInWithGoogle();
-                        },
-                  child: Container(
-                    height: 54,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: const Color(0xffFDFDFD),
-                      borderRadius: BorderRadius.circular(30),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          "assets/images/google.png",
-                          height: 24,
-                          width: 24,
-                        ),
-                        const SizedBox(width: 12),
-                        authController.isLoading.value
-                            ? const SizedBox(
-                                height: 24,
-                                width: 24,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Color(0xff755C3B),
+                final bool isAccepted =
+                    authController.isPrivacyPolicyAccepted.value;
+                return Opacity(
+                  opacity: isAccepted ? 1.0 : 0.6,
+                  child: GestureDetector(
+                    onTap: authController.isLoading.value
+                        ? null
+                        : () {
+                            if (!isAccepted) {
+                              Get.snackbar(
+                                "Required",
+                                "Please accept the Privacy Policy",
+                                snackPosition: SnackPosition.BOTTOM,
+                                backgroundColor: Colors.redAccent,
+                                colorText: Colors.white,
+                                margin: const EdgeInsets.all(16),
+                              );
+                            } else {
+                              authController.signInWithGoogle();
+                            }
+                          },
+                    child: Container(
+                      height: 54,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0xffFDFDFD),
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            "assets/images/google.png",
+                            height: 24,
+                            width: 24,
+                          ),
+                          const SizedBox(width: 12),
+                          authController.isLoading.value
+                              ? const SizedBox(
+                                  height: 24,
+                                  width: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Color(0xff755C3B),
+                                  ),
+                                )
+                              : Text(
+                                  "Continue with Google",
+                                  style: GoogleFonts.inter(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xff755C3B),
+                                  ),
                                 ),
-                              )
-                            : Text(
-                                "Continue with Google",
-                                style: GoogleFonts.inter(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xff755C3B),
-                                ),
-                              ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -248,39 +279,50 @@ class LoginView extends StatelessWidget {
 
               const SizedBox(height: 30),
 
-              // Terms and Conditions text (Replaced Checkbox)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: RichText(
-                  textAlign: TextAlign.center,
-                  text: TextSpan(
-                    text: "By continuing, you agree to our ",
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: Colors.black54,
-                    ),
-                    children: [
-                      TextSpan(
-                        text: "Terms and Conditions",
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xff5D4037),
-                          decoration: TextDecoration.underline,
+              // Privacy Policy Check (Checkbox + Text Link)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Obx(
+                    () => Transform.scale(
+                      scale: 1.1,
+                      child: Checkbox(
+                        value: authController.isPrivacyPolicyAccepted.value,
+                        onChanged: (value) {
+                          authController.isPrivacyPolicyAccepted.value =
+                              value ?? false;
+                        },
+                        activeColor: AppTheme.landingButton,
+                        side: const BorderSide(
+                          color: Color(0xff5D4037),
+                          width: 1.5,
                         ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () async {
-                            final url = Uri.parse(
-                              "https://www.brahmakosh.com/privacy-policy",
-                            );
-                            if (await canLaunchUrl(url)) {
-                              await launchUrl(url);
-                            }
-                          },
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                  GestureDetector(
+                    onTap: () async {
+                      final url = Uri.parse(
+                        "https://www.brahmakosh.com/privacy-policy",
+                      );
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url);
+                      }
+                    },
+                    child: Text(
+                      "Privacy and Policy",
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xff5D4037), // Matches other text
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
               ),
 
               const SizedBox(height: 20),

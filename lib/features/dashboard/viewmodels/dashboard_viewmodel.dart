@@ -5,6 +5,8 @@ import 'package:brahmakosh/core/services/location_service.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../../../core/common_imports.dart';
 import '../../../common/utils.dart';
+import '../../agent/controllers/agent_controller.dart';
+import '../../ai_rashmi/ai_rashmi_chat.dart';
 
 class DashboardViewModel extends ChangeNotifier {
   DashboardViewModel() {
@@ -17,6 +19,17 @@ class DashboardViewModel extends ChangeNotifier {
   int get currentIndex => _currentIndex;
 
   void changeTab(int index) {
+    if (index == 2) {
+      if (!Get.isRegistered<AgentController>()) {
+        Get.put(AgentController());
+      }
+      Get.to(
+        () =>
+            const RashmiChat(backgroundImage: 'assets/images/Krishna_chat.png'),
+      );
+      return;
+    }
+
     if (_currentIndex == index) return;
 
     _currentIndex = index;

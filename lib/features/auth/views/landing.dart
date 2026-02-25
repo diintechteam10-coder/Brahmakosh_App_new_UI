@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter/gestures.dart';
 
 class LandingView extends StatelessWidget {
   LandingView({super.key});
@@ -63,18 +62,36 @@ class LandingView extends StatelessWidget {
               const Spacer(),
 
               // Continue with Google
-              _buildButton(
-                text: "Continue with Google",
-                imagePath: "assets/images/google.png",
-                onTap: authController.isLoading.value
-                    ? null
-                    : () {
-                        authController.signInWithGoogle();
-                      },
-                isLoading: authController.isLoading.value,
-                backgroundColor: const Color(0xffFDFDFD),
-                textColor: const Color(0xff755C3B),
-              ),
+              Obx(() {
+                final bool isAccepted =
+                    authController.isPrivacyPolicyAccepted.value;
+                return Opacity(
+                  opacity: isAccepted ? 1.0 : 0.6,
+                  child: _buildButton(
+                    text: "Continue with Google",
+                    imagePath: "assets/images/google.png",
+                    onTap: authController.isLoading.value
+                        ? null
+                        : () {
+                            if (!isAccepted) {
+                              Get.snackbar(
+                                "Required",
+                                "Please accept the Privacy Policy",
+                                snackPosition: SnackPosition.BOTTOM,
+                                backgroundColor: Colors.redAccent,
+                                colorText: Colors.white,
+                                margin: const EdgeInsets.all(16),
+                              );
+                            } else {
+                              authController.signInWithGoogle();
+                            }
+                          },
+                    isLoading: authController.isLoading.value,
+                    backgroundColor: const Color(0xffFDFDFD),
+                    textColor: const Color(0xff755C3B),
+                  ),
+                );
+              }),
 
               const SizedBox(height: 16),
 
@@ -106,39 +123,50 @@ class LandingView extends StatelessWidget {
 
               const SizedBox(height: 48),
 
-              // Terms and Conditions text (Replaced Checkbox)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: RichText(
-                  textAlign: TextAlign.center,
-                  text: TextSpan(
-                    text: "By continuing, you agree to our ",
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: Colors.black54,
-                    ),
-                    children: [
-                      TextSpan(
-                        text: "Terms and Conditions",
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xff5D4037),
-                          decoration: TextDecoration.underline,
+              // Privacy Policy Check (Checkbox + Text Link)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Obx(
+                    () => Transform.scale(
+                      scale: 1.1,
+                      child: Checkbox(
+                        value: authController.isPrivacyPolicyAccepted.value,
+                        onChanged: (value) {
+                          authController.isPrivacyPolicyAccepted.value =
+                              value ?? false;
+                        },
+                        activeColor: AppTheme.landingButton,
+                        side: const BorderSide(
+                          color: Color(0xff5D4037),
+                          width: 1.5,
                         ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () async {
-                            final url = Uri.parse(
-                              "https://www.brahmakosh.com/privacy-policy",
-                            );
-                            if (await canLaunchUrl(url)) {
-                              await launchUrl(url);
-                            }
-                          },
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                  GestureDetector(
+                    onTap: () async {
+                      final url = Uri.parse(
+                        "https://www.brahmakosh.com/privacy-policy",
+                      );
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url);
+                      }
+                    },
+                    child: Text(
+                      "Privacy and Policy",
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xff5D4037), // Matches other text
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
               ),
 
               const SizedBox(height: 30),

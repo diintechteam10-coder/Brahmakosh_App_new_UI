@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/common_imports.dart';
 
@@ -17,13 +18,40 @@ class CustomBottomNavBar extends StatefulWidget {
 
 class _CustomBottomNavBarState extends State<CustomBottomNavBar>
     with TickerProviderStateMixin {
+  late AnimationController _rotationController;
+  late Animation<double> _rotationAnimation;
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
+
   @override
   void initState() {
     super.initState();
+
+    // Rotation animation for center button
+    _rotationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 4),
+    )..repeat();
+
+    _rotationAnimation = Tween<double>(begin: 0, end: 2 * math.pi).animate(
+      CurvedAnimation(parent: _rotationController, curve: Curves.linear),
+    );
+
+    // Pulse animation for center button when selected
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.15).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
   }
 
   @override
   void dispose() {
+    _rotationController.dispose();
+    _pulseController.dispose();
     super.dispose();
   }
 
@@ -100,77 +128,96 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Replaced AnimatedBuilder and Transforms with a static Container
-                  Container(
-                    width: 70,
-                    height: 70,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: isRashmiSelected
-                          ? const LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                AppTheme.primaryGold,
-                                AppTheme.darkGold,
-                                AppTheme.deepGold,
-                              ],
-                            )
-                          : const LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                AppTheme.lightGold,
-                                AppTheme.primaryGold,
-                              ],
-                            ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppTheme.primaryGold.withOpacity(
-                            isRashmiSelected ? 0.7 : 0.4,
-                          ),
-                          blurRadius: isRashmiSelected ? 20 : 15,
-                          offset: const Offset(0, 6),
-                          spreadRadius: isRashmiSelected ? 3 : 2,
-                        ),
-                        if (isRashmiSelected)
-                          BoxShadow(
-                            color: AppTheme.primaryGold.withOpacity(0.3),
-                            blurRadius: 30,
-                            offset: const Offset(0, 0),
-                            spreadRadius: 5,
-                          ),
-                      ],
-                    ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Outer ring
-                        if (isRashmiSelected)
-                          Container(
+                  AnimatedBuilder(
+                    animation: Listenable.merge([
+                      _rotationAnimation,
+                      _pulseAnimation,
+                    ]),
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: isRashmiSelected ? _pulseAnimation.value : 1.0,
+                        child: Transform.rotate(
+                          angle: isRashmiSelected
+                              ? _rotationAnimation.value
+                              : 0,
+                          child: Container(
                             width: 70,
                             height: 70,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              border: Border.all(
-                                color: AppTheme.primaryGold.withOpacity(0.3),
-                                width: 2,
-                              ),
+                              gradient: isRashmiSelected
+                                  ? const LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        AppTheme.primaryGold,
+                                        AppTheme.darkGold,
+                                        AppTheme.deepGold,
+                                      ],
+                                    )
+                                  : const LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        AppTheme.lightGold,
+                                        AppTheme.primaryGold,
+                                      ],
+                                    ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppTheme.primaryGold.withOpacity(
+                                    isRashmiSelected ? 0.7 : 0.4,
+                                  ),
+                                  blurRadius: isRashmiSelected ? 20 : 15,
+                                  offset: const Offset(0, 6),
+                                  spreadRadius: isRashmiSelected ? 3 : 2,
+                                ),
+                                if (isRashmiSelected)
+                                  BoxShadow(
+                                    color: AppTheme.primaryGold.withOpacity(
+                                      0.3,
+                                    ),
+                                    blurRadius: 30,
+                                    offset: const Offset(0, 0),
+                                    spreadRadius: 5,
+                                  ),
+                              ],
                             ),
-                          ),
-                        // Icon
-                        ClipOval(
-                          child: SizedBox(
-                            width: 70,
-                            height: 70,
-                            child: Image.asset(
-                              'assets/images/brahmkosh_logo.jpeg',
-                              fit: BoxFit.cover,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                // Outer ring
+                                if (isRashmiSelected)
+                                  Container(
+                                    width: 70,
+                                    height: 70,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: AppTheme.primaryGold.withOpacity(
+                                          0.3,
+                                        ),
+                                        width: 2,
+                                      ),
+                                    ),
+                                  ),
+                                // Icon
+                                ClipOval(
+                                  child: SizedBox(
+                                    width: 70,
+                                    height: 70,
+                                    child: Image.asset(
+                                      'assets/images/brahmkosh_logo.jpeg',
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 8),
                   Text(

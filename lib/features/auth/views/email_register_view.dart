@@ -142,38 +142,61 @@ class EmailRegisterView extends StatelessWidget {
               const SizedBox(height: 24),
 
               /// PRIVACY
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: RichText(
-                  textAlign: TextAlign.center,
-                  text: TextSpan(
-                    text: "By continuing, you agree to our ",
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: Colors.black54,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Obx(
+                    () => Transform.scale(
+                      scale: 1.1,
+                      child: Checkbox(
+                        value: controller.isPrivacyPolicyAccepted.value,
+                        onChanged: (value) {
+                          controller.isPrivacyPolicyAccepted.value =
+                              value ?? false;
+                        },
+                        activeColor: AppTheme.landingButton,
+                        side: const BorderSide(
+                          color: Color(0xff5D4037),
+                          width: 1.5,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
                     ),
-                    children: [
-                      TextSpan(
-                        text: "Terms and Conditions",
+                  ),
+                  Flexible(
+                    child: RichText(
+                      text: TextSpan(
+                        text: "I accept the ",
                         style: GoogleFonts.inter(
                           fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xff5D4037),
-                          decoration: TextDecoration.underline,
+                          color: Colors.black54,
                         ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () async {
-                            final url = Uri.parse(
-                              "https://www.brahmakosh.com/privacy-policy",
-                            );
-                            if (await canLaunchUrl(url)) {
-                              await launchUrl(url);
-                            }
-                          },
+                        children: [
+                          TextSpan(
+                            text: "Privacy Policy",
+                            style: GoogleFonts.inter(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xff5D4037),
+                              decoration: TextDecoration.underline,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () async {
+                                final url = Uri.parse(
+                                  "https://www.brahmakosh.com/privacy-policy",
+                                );
+                                if (await canLaunchUrl(url)) {
+                                  await launchUrl(url);
+                                }
+                              },
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
               const SizedBox(height: 20),
             ],
