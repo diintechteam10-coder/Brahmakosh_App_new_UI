@@ -141,8 +141,8 @@ class _DashboardLayoutState extends State<DashboardLayout>
       ),
       bottomNavigationBar: Consumer<DashboardViewModel>(
         builder: (context, viewModel, child) {
-          // Hide bottom navigation bar when on RashmiAi (index 2) or Remedies (index 4)
-          if (viewModel.currentIndex == 2 || viewModel.currentIndex == 4) {
+          // Hide bottom navigation bar when on Remedies (index 4)
+          if (viewModel.currentIndex == 4) {
             return const SizedBox.shrink();
           }
           return CustomBottomNavBar(

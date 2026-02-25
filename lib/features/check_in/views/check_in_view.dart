@@ -151,7 +151,7 @@ class _CheckInViewState extends State<CheckInView>
           }
 
           return SafeArea(
-            //bottom: false,
+            bottom: false,
             child: Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
@@ -171,15 +171,15 @@ class _CheckInViewState extends State<CheckInView>
                   context.read<CheckInBloc>().add(RefreshCheckIn(completer));
                   return completer.future;
                 },
-                child: CustomScrollView(
+                child: SingleChildScrollView(
                   controller: widget.scrollController,
                   physics: const BouncingScrollPhysics(
                     parent: AlwaysScrollableScrollPhysics(),
                   ),
-                  slivers: [
-                    // Header row
-                    SliverToBoxAdapter(
-                      child: Padding(
+                  child: Column(
+                    children: [
+                      // Header row
+                      Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
                           vertical: 0,
@@ -215,38 +215,30 @@ class _CheckInViewState extends State<CheckInView>
                           ],
                         ),
                       ),
-                    ),
 
-                    // Main title & Subtitle
-                    SliverToBoxAdapter(
-                      child: Column(
-                        children: [
-                          Text(
-                            '#AreYouSpiritual',
-                            style: GoogleFonts.playfairDisplay(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xff7B4A12),
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Take a moment for yourself',
-                            style: GoogleFonts.lora(
-                              fontSize: 16,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ],
+                      // Main title & Subtitle
+                      Text(
+                        '#AreYouSpiritual',
+                        style: GoogleFonts.playfairDisplay(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xff7B4A12),
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Take a moment for yourself',
+                        style: GoogleFonts.lora(
+                          fontSize: 16,
+                          color: Colors.black87,
+                        ),
+                      ),
 
-                    // Check-In Options
-                    if (data.activities != null &&
-                        data.activities!.isNotEmpty) ...[
-                      const SliverToBoxAdapter(child: SizedBox(height: 16)),
-                      SliverToBoxAdapter(
-                        child: Center(
+                      // Check-In Options
+                      if (data.activities != null &&
+                          data.activities!.isNotEmpty) ...[
+                        const SizedBox(height: 16),
+                        Center(
                           child: Text(
                             'CHECK-IN OPTIONS',
                             style: GoogleFonts.cinzel(
@@ -256,68 +248,61 @@ class _CheckInViewState extends State<CheckInView>
                             ),
                           ),
                         ),
-                      ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 16)),
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 56),
-                          child: GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: data.activities!.length,
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  crossAxisSpacing: 24,
-                                  mainAxisSpacing: 24,
-                                  childAspectRatio: 0.8,
-                                ),
-                            itemBuilder: (ctx, index) {
-                              // context shadowed? use ctx
-                              final activity = data!.activities![index];
-                              return _card(
-                                image: activity.image,
-                                title: activity.title?.toUpperCase() ?? '',
-                                onTap: () {
-                                  if (activity.route != null) {
-                                    if (activity.title == 'Chanting') {
-                                      Get.to(
-                                        () => ChantingConfigurationView(
-                                          chantingCategoryId: activity.id!,
-                                        ),
-                                      );
-                                    } else if (activity.title == 'Prayer' &&
-                                        activity.id != null) {
-                                      Get.to(
-                                        () => PrayerConfigurationView(
-                                          prayerCategoryId: activity.id!,
-                                        ),
-                                      );
-                                    } else if (activity.id != null) {
-                                      // BLoC Navigation Trigger
-                                      context.read<CheckInBloc>().add(
-                                        SelectActivity(
-                                          activityId: activity.id!,
-                                          route: AppConstants
-                                              .routeSpiritualConfiguration,
-                                          title: activity.title,
-                                        ),
-                                      );
+                        const SizedBox(height: 16),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 40),
+                          child: Wrap(
+                            spacing: 20,
+                            runSpacing: 12,
+                            alignment: WrapAlignment.center,
+                            children: data.activities!.map((activity) {
+                              return SizedBox(
+                                width:
+                                    (MediaQuery.of(context).size.width -
+                                        80 -
+                                        20) /
+                                    2,
+                                child: _card(
+                                  image: activity.image,
+                                  title: activity.title?.toUpperCase() ?? '',
+                                  onTap: () {
+                                    if (activity.route != null) {
+                                      if (activity.title == 'Chanting') {
+                                        Get.to(
+                                          () => ChantingConfigurationView(
+                                            chantingCategoryId: activity.id!,
+                                          ),
+                                        );
+                                      } else if (activity.title == 'Prayer' &&
+                                          activity.id != null) {
+                                        Get.to(
+                                          () => PrayerConfigurationView(
+                                            prayerCategoryId: activity.id!,
+                                          ),
+                                        );
+                                      } else if (activity.id != null) {
+                                        context.read<CheckInBloc>().add(
+                                          SelectActivity(
+                                            activityId: activity.id!,
+                                            route: AppConstants
+                                                .routeSpiritualConfiguration,
+                                            title: activity.title,
+                                          ),
+                                        );
+                                      }
                                     }
-                                  }
-                                },
+                                  },
+                                ),
                               );
-                            },
+                            }).toList(),
                           ),
                         ),
-                      ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 20)),
-                    ],
+                      ],
+                      SizedBox(height: 32),
 
-                    // Overview Stats
-                    if (data.stats != null) ...[
-                      SliverToBoxAdapter(
-                        child: Padding(
+                      // Overview Stats
+                      if (data.stats != null) ...[
+                        Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: Column(
                             children: [
@@ -346,40 +331,31 @@ class _CheckInViewState extends State<CheckInView>
                             ],
                           ),
                         ),
-                      ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 20)),
-                      SliverToBoxAdapter(
-                        child: RepaintBoundary(
+                        const SizedBox(height: 10),
+                        RepaintBoundary(
                           child: _buildOverviewStats(data.stats!),
                         ),
-                      ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 32)),
-                    ],
+                        const SizedBox(height: 16),
+                      ],
 
-                    // Category Progress
-                    if (data.categoryStats != null) ...[
-                      SliverToBoxAdapter(
-                        child: RepaintBoundary(
+                      // Category Progress
+                      if (data.categoryStats != null) ...[
+                        RepaintBoundary(
                           child: _buildCategoryStats(data.categoryStats!),
                         ),
-                      ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 32)),
-                    ],
+                        const SizedBox(height: 16),
+                      ],
 
-                    // Recent Activities
-                    if (data.recentActivities != null &&
-                        data.recentActivities!.isNotEmpty) ...[
-                      SliverToBoxAdapter(
-                        child: RepaintBoundary(
+                      // Recent Activities
+                      if (data.recentActivities != null &&
+                          data.recentActivities!.isNotEmpty)
+                        RepaintBoundary(
                           child: _buildRecentActivities(data.recentActivities!),
                         ),
-                      ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 36)),
-                    ],
+                      SizedBox(height: 24),
 
-                    // Karma & Motivation
-                    SliverToBoxAdapter(
-                      child: Column(
+                      // Karma & Motivation
+                      Column(
                         children: [
                           if (data.motivation?.emoji != null)
                             Text(
@@ -413,9 +389,10 @@ class _CheckInViewState extends State<CheckInView>
                             ),
                         ],
                       ),
-                    ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 48)),
-                  ],
+
+                      const SizedBox(height: 125),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -650,7 +627,10 @@ class _CheckInViewState extends State<CheckInView>
           ),
           const SizedBox(height: 12),
           ListView.separated(
+            // 1. Ensures the list only occupies the height of its children
             shrinkWrap: true,
+            // 2. Removes default internal padding (Crucial for fixing your image issue)
+            padding: EdgeInsets.zero,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: activities.length > 5 ? 5 : activities.length,
             separatorBuilder: (context, index) => const SizedBox(height: 10),
@@ -771,59 +751,59 @@ class _CheckInViewState extends State<CheckInView>
     return GestureDetector(
       onTap: onTap,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 10,
-                    color: Colors.black.withOpacity(0.1),
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  // Background Image
-                  image != null
-                      ? CachedNetworkImage(
-                          imageUrl: image,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => Container(
-                            color: Colors.transparent,
-                            child: const Center(
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                          ),
-                          errorWidget: (context, url, error) => Container(
-                            color: Colors.transparent,
-                            child: const Icon(Icons.error, color: Colors.red),
-                          ),
-                        )
-                      : Container(
-                          color: const Color(0xff7B4A12).withOpacity(0.1),
-                          child: const Icon(
-                            Icons.spa,
-                            color: Color(0xff7B4A12),
-                            size: 40,
+          Container(
+            height: 120,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 10,
+                  color: Colors.black.withOpacity(0.1),
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                // Background Image
+                image != null
+                    ? CachedNetworkImage(
+                        imageUrl: image,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(
+                          color: Colors.transparent,
+                          child: const Center(
+                            child: CircularProgressIndicator(strokeWidth: 2),
                           ),
                         ),
-                ],
-              ),
+                        errorWidget: (context, url, error) => Container(
+                          color: Colors.transparent,
+                          child: const Icon(Icons.error, color: Colors.red),
+                        ),
+                      )
+                    : Container(
+                        color: const Color(0xff7B4A12).withOpacity(0.1),
+                        child: const Icon(
+                          Icons.spa,
+                          color: Color(0xff7B4A12),
+                          size: 40,
+                        ),
+                      ),
+              ],
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 6),
           // Title Text
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: Text(
               title,
               style: GoogleFonts.cinzel(
-                fontSize: 14,
+                fontSize: 12,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 0.5,
                 color: const Color(0xff7B4A12),

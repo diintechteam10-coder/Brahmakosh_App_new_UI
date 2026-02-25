@@ -78,7 +78,7 @@ class SocketService {
     // The library builder might not support setAuth, so we use the map directly.
     options['auth'] = {'token': token};
 
-    _socket = IO.io("https://stage.brahmakosh.com", options);
+    _socket = IO.io("https://prod.brahmakosh.com", options);
 
     _socket!.connect();
 
