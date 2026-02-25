@@ -1,7 +1,7 @@
 class ApiUrls {
   /// 🔹 Base URL
   //static const String baseUrl = 'https://backend-jfg8.onrender.com';
-  static const String baseUrl = 'https://stage.brahmakosh.com';
+  static const String baseUrl = 'https://prod.brahmakosh.com';
 
   /// 🔹 Common API path
   static const String apiUrl = '$baseUrl/api/mobile';
