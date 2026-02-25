@@ -405,9 +405,11 @@ class VoiceAgentService extends ChangeNotifier {
         await _player.setAudioSource(AppAudioSource(audioBytes));
         _player.play(); // Start playing asynchronously
 
-        // Wait until playback completes
+        // Wait until playback completes or stops
         await _player.playerStateStream.firstWhere(
-          (state) => state.processingState == ProcessingState.completed,
+          (state) =>
+              state.processingState == ProcessingState.completed ||
+              state.processingState == ProcessingState.idle,
         );
 
         _audioBuffer.clear();
@@ -440,6 +442,7 @@ class VoiceAgentService extends ChangeNotifier {
         _channel = null;
       }
       _audioBuffer.clear();
+      await _player.stop(); // Stop audio playback immediately
     } catch (e) {
       debugPrint('[VoiceAgent] Cleanup error: $e');
     }

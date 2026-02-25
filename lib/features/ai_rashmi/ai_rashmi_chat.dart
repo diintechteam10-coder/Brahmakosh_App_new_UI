@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -1398,6 +1399,68 @@ class _FullScreenVoiceOverlay extends StatefulWidget {
 }
 
 class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
+  Timer? _timer;
+  int _seconds = 0;
+  VoiceAgentState? _previousState;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.voiceService.addListener(_onVoiceStateChanged);
+    _onVoiceStateChanged(); // Check initial state
+  }
+
+  @override
+  void dispose() {
+    widget.voiceService.removeListener(_onVoiceStateChanged);
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _onVoiceStateChanged() {
+    final currentState = widget.voiceService.state;
+    if (currentState != _previousState) {
+      if (currentState == VoiceAgentState.LISTENING ||
+          currentState == VoiceAgentState.PROCESSING ||
+          currentState == VoiceAgentState.SPEAKING) {
+        _startTimer();
+      } else {
+        _stopTimer();
+      }
+      _previousState = currentState;
+    }
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    setState(() {
+      _seconds = 0;
+    });
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          _seconds++;
+        });
+      }
+    });
+  }
+
+  void _stopTimer() {
+    _timer?.cancel();
+    _timer = null;
+    if (mounted) {
+      setState(() {
+        _seconds = 0;
+      });
+    }
+  }
+
+  String get _formattedTime {
+    final minutes = (_seconds ~/ 60).toString().padLeft(2, '0');
+    final secs = (_seconds % 60).toString().padLeft(2, '0');
+    return "$minutes:$secs";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1437,18 +1500,18 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
                     currentActionIcon = Icons.hourglass_empty;
                     break;
                   case VoiceAgentState.LISTENING:
-                    title = "Listening...";
+                    title = _formattedTime;
                     actionColor = Colors.redAccent;
                     currentActionIcon = Icons.fiber_manual_record;
                     break;
                   case VoiceAgentState.PROCESSING:
-                    title = "Processing...";
+                    title = _formattedTime;
                     isProcessingOrSpeaking = true;
                     actionColor = Colors.orangeAccent;
                     currentActionIcon = Icons.more_horiz;
                     break;
                   case VoiceAgentState.SPEAKING:
-                    title = "Agent is Speaking...";
+                    title = _formattedTime;
                     isProcessingOrSpeaking = true;
                     actionColor = Colors.greenAccent;
                     currentActionIcon = Icons.volume_up;
