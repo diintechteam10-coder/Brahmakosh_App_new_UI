@@ -16,7 +16,7 @@ class Utils {
       msg: text,
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.SNACKBAR,
-      timeInSecForIosWeb: 2,
+      timeInSecForIosWeb: 1,
       backgroundColor: Colors.grey.shade900,
       textColor: Colors.white,
       fontSize: 16.0,
