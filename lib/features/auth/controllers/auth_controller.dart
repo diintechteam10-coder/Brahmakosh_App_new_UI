@@ -19,17 +19,11 @@ class AuthController extends GetxController {
 
   var isLoading = false.obs;
   var isEmailLoading = false.obs;
-  var isPrivacyPolicyAccepted = false.obs;
 
   User? get currentUser => _auth.currentUser;
 
   Future<void> loginWithEmail() async {
     if (isEmailLoading.value) return;
-
-    if (!isPrivacyPolicyAccepted.value) {
-      Get.snackbar("Required", "Please accept the Privacy Policy");
-      return;
-    }
 
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
@@ -100,11 +94,6 @@ class AuthController extends GetxController {
   Future<void> signInWithGoogle() async {
     if (isLoading.value) {
       print('⏳ Already loading, returning...');
-      return;
-    }
-
-    if (!isPrivacyPolicyAccepted.value) {
-      Get.snackbar("Required", "Please accept the Privacy Policy");
       return;
     }
 
