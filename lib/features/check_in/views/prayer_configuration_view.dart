@@ -192,7 +192,7 @@ class PrayerConfigurationView extends StatelessWidget {
   Widget _buildPrayerSelector(BuildContext context, PrayerLoaded state) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
@@ -232,7 +232,7 @@ class PrayerConfigurationView extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(width: 20),
+          const SizedBox(height: 12),
           if (state.filteredConfigurations.isEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 20),
@@ -325,7 +325,7 @@ class PrayerConfigurationView extends StatelessWidget {
   Widget _buildSummary(BuildContext context, PrayerLoaded state) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),

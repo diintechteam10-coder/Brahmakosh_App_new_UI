@@ -91,7 +91,7 @@ class _AiGuideViewState extends State<AiGuideView> {
                     letterSpacing: 1.2,
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
 
                 // Subtitle
                 Text(
@@ -100,7 +100,7 @@ class _AiGuideViewState extends State<AiGuideView> {
                   style: GoogleFonts.lora(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: AppTheme.textSecondary.withOpacity(0.9),
+                    color: AppTheme.textPrimary,
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -112,10 +112,13 @@ class _AiGuideViewState extends State<AiGuideView> {
                     scale:
                         1.15, // Scale up the character by 15% to make it appear larger
                     alignment: Alignment.bottomCenter,
-                    child: Image.asset(
-                      widget.characterImagePath,
-                      fit: BoxFit.contain,
-                      alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Image.asset(
+                        widget.characterImagePath,
+                        fit: BoxFit.contain,
+                        alignment: Alignment.bottomCenter,
+                      ),
                     ),
                   ),
                 ),
@@ -213,80 +216,80 @@ class _AiGuideViewState extends State<AiGuideView> {
                 ),
 
                 // Bottom feature buttons
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 30.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      // Daily Guidance
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.3),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: AppTheme.primaryGold,
-                            width: 1,
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            const Icon(
-                              Icons.spa,
-                              color: Colors.white,
-                              size: 24,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              "Daily\nGuidance",
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.lora(
-                                fontSize: 12,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Today's Stars
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.3),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: AppTheme.primaryGold,
-                            width: 1,
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            const Icon(
-                              Icons.star,
-                              color: Colors.white,
-                              size: 24,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              "Today's\nStars",
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.lora(
-                                fontSize: 12,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.only(bottom: 30.0),
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //     children: [
+                //       // Daily Guidance
+                //       Container(
+                //         padding: const EdgeInsets.symmetric(
+                //           horizontal: 16,
+                //           vertical: 8,
+                //         ),
+                //         decoration: BoxDecoration(
+                //           color: Colors.black.withOpacity(0.3),
+                //           borderRadius: BorderRadius.circular(12),
+                //           border: Border.all(
+                //             color: AppTheme.primaryGold,
+                //             width: 1,
+                //           ),
+                //         ),
+                //         child: Column(
+                //           children: [
+                //             const Icon(
+                //               Icons.spa,
+                //               color: Colors.white,
+                //               size: 24,
+                //             ),
+                //             const SizedBox(height: 4),
+                //             Text(
+                //               "Daily\nGuidance",
+                //               textAlign: TextAlign.center,
+                //               style: GoogleFonts.lora(
+                //                 fontSize: 12,
+                //                 color: Colors.white,
+                //               ),
+                //             ),
+                //           ],
+                //         ),
+                //       ),
+                //       // Today's Stars
+                //       Container(
+                //         padding: const EdgeInsets.symmetric(
+                //           horizontal: 16,
+                //           vertical: 8,
+                //         ),
+                //         decoration: BoxDecoration(
+                //           color: Colors.black.withOpacity(0.3),
+                //           borderRadius: BorderRadius.circular(12),
+                //           border: Border.all(
+                //             color: AppTheme.primaryGold,
+                //             width: 1,
+                //           ),
+                //         ),
+                //         child: Column(
+                //           children: [
+                //             const Icon(
+                //               Icons.star,
+                //               color: Colors.white,
+                //               size: 24,
+                //             ),
+                //             const SizedBox(height: 4),
+                //             Text(
+                //               "Today's\nStars",
+                //               textAlign: TextAlign.center,
+                //               style: GoogleFonts.lora(
+                //                 fontSize: 12,
+                //                 color: Colors.white,
+                //               ),
+                //             ),
+                //           ],
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
               ],
             ),
           ),

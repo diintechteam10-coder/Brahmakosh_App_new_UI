@@ -67,7 +67,20 @@ class DoshaDetailScreen extends StatelessWidget {
           data as List<SadhesatiLifeDetail>? ?? [],
         );
       case 'pitra':
-        return _buildPitraContent(data as RawPitra?);
+        RawPitra? pitraData;
+        if (data is RawPitra) {
+          pitraData = data;
+        } else if (data is PitraDoshaReport) {
+          pitraData = RawPitra(
+            whatIsPitriDosha: data.whatIsPitriDosha,
+            isPitriDoshaPresent: data.isPitriDoshaPresent,
+            rulesMatched: data.rulesMatched,
+            conclusion: data.conclusion,
+            remedies: data.remedies,
+            effects: data.effects,
+          );
+        }
+        return _buildPitraContent(pitraData);
       default:
         return Center(
           child: Text(
