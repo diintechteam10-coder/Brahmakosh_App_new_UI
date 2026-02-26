@@ -25,14 +25,25 @@ class DoshaDetailScreen extends StatelessWidget {
           style: GoogleFonts.lora(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF6D3A0C),
+            color: const Color(0xff4E342E),
           ),
         ),
         backgroundColor: const Color(0xFFFFFBF5),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF6D3A0C)),
-          onPressed: () => Navigator.pop(context),
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Color(0xff5D4037),
+              size: 20,
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
         centerTitle: true,
       ),
@@ -61,7 +72,7 @@ class DoshaDetailScreen extends StatelessWidget {
         return Center(
           child: Text(
             "Details for $title not available",
-            style: GoogleFonts.lora(),
+            style: GoogleFonts.inter(),
           ),
         );
     }
@@ -344,7 +355,7 @@ class DoshaDetailScreen extends StatelessWidget {
         style: GoogleFonts.lora(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: const Color(0xFF5D4037),
+          color: const Color(0xff4E342E),
         ),
       ),
     );
@@ -365,19 +376,19 @@ class DoshaDetailScreen extends StatelessWidget {
         children: [
           Text(
             title,
-            style: GoogleFonts.lora(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF8D6E63),
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xff8D6E63),
             ),
           ),
           const SizedBox(height: 8),
           Text(
             content,
-            style: GoogleFonts.lora(
-              fontSize: 15,
-              color: const Color(0xFF3E2723),
-              height: 1.4,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: const Color(0xff4E342E),
+              height: 1.5,
             ),
           ),
         ],
@@ -399,9 +410,9 @@ class DoshaDetailScreen extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: GoogleFonts.lora(
+              style: GoogleFonts.inter(
                 fontSize: 14,
-                color: const Color(0xFF4E342E),
+                color: const Color(0xff4E342E),
                 height: 1.4,
               ),
             ),

@@ -75,9 +75,21 @@ class _SpiritualConfigurationViewState
               backgroundColor: const Color(0xffFFF8E7),
               appBar: AppBar(
                 backgroundColor: const Color(0xffFFF8E7),
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
-                  onPressed: () => Get.back(),
+                elevation: 0,
+                leading: Container(
+                  margin: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: Color(0xff5D4037),
+                      size: 20,
+                    ),
+                    onPressed: () => Get.back(),
+                  ),
                 ),
               ),
               body: Center(
@@ -90,7 +102,7 @@ class _SpiritualConfigurationViewState
                       color: Colors.red,
                     ),
                     const SizedBox(height: 16),
-                    Text(errorMessage, style: GoogleFonts.poppins()),
+                    Text(errorMessage, style: GoogleFonts.inter()),
                   ],
                 ),
               ),
@@ -114,21 +126,20 @@ class _SpiritualConfigurationViewState
                       ),
                       child: Column(
                         children: [
-                          const SizedBox(height: 5),
                           Text(
                             title ?? 'Spirituality',
-                            style: GoogleFonts.poppins(
-                              fontSize: 22,
+                            style: GoogleFonts.lora(
+                              fontSize: 24,
                               fontWeight: FontWeight.bold,
-                              color: const Color(0xff1E1E1E),
+                              color: const Color(0xff4E342E),
                             ),
                           ),
                           const SizedBox(height: 5),
                           Text(
                             'How are you feeling today?',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.inter(
                               fontSize: 14,
-                              color: const Color(0xff1E1E1E),
+                              color: const Color(0xff8D6E63),
                             ),
                           ),
                           const SizedBox(height: 15),
@@ -142,7 +153,7 @@ class _SpiritualConfigurationViewState
                           const SizedBox(height: 10),
                           Text(
                             'You can stop anytime',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.inter(
                               fontSize: 12,
                               color: Colors.grey[600],
                             ),
@@ -165,18 +176,21 @@ class _SpiritualConfigurationViewState
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
-            onPressed: () => Get.back(),
+          Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Color(0xff5D4037),
+                size: 20,
+              ),
+              onPressed: () => Get.back(),
+            ),
           ),
-          Text(
-            'Back',
-            style: GoogleFonts.poppins(fontSize: 16, color: Colors.black87),
-          ),
-          const Spacer(),
-          const Icon(Icons.more_vert, color: Colors.black87),
         ],
       ),
     );
@@ -214,18 +228,25 @@ class _SpiritualConfigurationViewState
         children: [
           Row(
             children: [
-              const Icon(
-                Icons.check_circle_outline,
-                size: 20,
-                color: Colors.black87,
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: const Color(0xffFF9B44).withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.timer_outlined,
+                  size: 18,
+                  color: Color(0xffFF9B44),
+                ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 10),
               Text(
                 'Select Duration',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.lora(
                   fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xff4E342E),
                 ),
               ),
             ],
@@ -249,7 +270,7 @@ class _SpiritualConfigurationViewState
                       thumbColor: Colors.white,
                       overlayColor: const Color(0xffFF9B44).withOpacity(0.1),
                       valueIndicatorColor: const Color(0xffFF9B44),
-                      valueIndicatorTextStyle: GoogleFonts.poppins(
+                      valueIndicatorTextStyle: GoogleFonts.inter(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
@@ -283,11 +304,11 @@ class _SpiritualConfigurationViewState
                       children: [
                         Text(
                           _formatDuration(durations.first),
-                          style: GoogleFonts.poppins(color: Colors.grey),
+                          style: GoogleFonts.inter(color: Colors.grey),
                         ),
                         Text(
                           _formatDuration(durations.last),
-                          style: GoogleFonts.poppins(color: Colors.grey),
+                          style: GoogleFonts.inter(color: Colors.grey),
                         ),
                       ],
                     ),
@@ -312,53 +333,74 @@ class _SpiritualConfigurationViewState
   }
 
   Widget _buildConfigurationSummary(ConfigLoaded state) {
-    // Get emoji
     final emoji =
         SpiritualConfigBloc.emotionEmojis[state.selectedEmotion] ?? '😐';
 
-    return Column(
-      children: [
-        Text(
-          'Summary',
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: const Color(0xff1E1E1E),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-        ),
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _summaryChip(emoji, 'Mood'),
-            const SizedBox(width: 24),
-            _summaryChip('🕒', _formatDuration(state.selectedDuration)),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.star, color: Color(0xffFF9B44), size: 20),
-            const SizedBox(width: 8),
-            Text(
-              'Finish to earn ',
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                color: const Color(0xff1E1E1E),
-              ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            'Summary',
+            style: GoogleFonts.lora(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xff4E342E),
             ),
-            Text(
-              '+${state.selectedConfig?.karmaPoints ?? 10} karma Points',
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xffFF9B44),
-              ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _summaryChip(emoji, 'Mood'),
+              const SizedBox(width: 24),
+              _summaryChip('🕒', _formatDuration(state.selectedDuration)),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xffFFF5E6),
+              borderRadius: BorderRadius.circular(12),
             ),
-          ],
-        ),
-      ],
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.star, color: Color(0xffFF9B44), size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  'Finish to earn ',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: const Color(0xff4E342E),
+                  ),
+                ),
+                Text(
+                  '+${state.selectedConfig?.karmaPoints ?? 10} karma Points',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xffFF9B44),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -369,7 +411,7 @@ class _SpiritualConfigurationViewState
         const SizedBox(width: 8),
         Text(
           label,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.inter(
             fontSize: 14,
             color: const Color(0xff1E1E1E),
           ),
@@ -379,24 +421,37 @@ class _SpiritualConfigurationViewState
   }
 
   Widget _buildStartButton(BuildContext context) {
-    return SizedBox(
+    return Container(
       width: double.infinity,
-      height: 48,
+      height: 52,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: const LinearGradient(
+          colors: [Color(0xffFF8C00), Color(0xffFFA040)],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xffFF8C00).withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: ElevatedButton(
         onPressed: () {
           context.read<SpiritualConfigBloc>().add(StartSession());
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xffFF8C00), // Orange
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
           foregroundColor: Colors.white,
-          elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
         ),
         child: Text(
           'Start',
-          style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
+          style: GoogleFonts.lora(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -543,7 +598,7 @@ class _EmotionListState extends State<_EmotionList> {
                     child: Text(
                       emotion,
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.inter(
                         fontSize: isSelected ? 16 : 12,
                         fontWeight: isSelected
                             ? FontWeight.bold

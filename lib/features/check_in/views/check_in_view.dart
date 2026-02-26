@@ -219,7 +219,7 @@ class _CheckInViewState extends State<CheckInView>
                       // Main title & Subtitle
                       Text(
                         '#AreYouSpiritual',
-                        style: GoogleFonts.playfairDisplay(
+                        style: GoogleFonts.lora(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: const Color(0xff7B4A12),
@@ -241,7 +241,7 @@ class _CheckInViewState extends State<CheckInView>
                         Center(
                           child: Text(
                             'CHECK-IN OPTIONS',
-                            style: GoogleFonts.cinzel(
+                            style: GoogleFonts.lora(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                               color: const Color(0xff7B4A12),
@@ -523,9 +523,10 @@ class _CheckInViewState extends State<CheckInView>
         children: [
           Text(
             'YOUR PROGRESS',
-            style: GoogleFonts.cinzel(
+            style: GoogleFonts.lora(
               fontSize: 14,
               fontWeight: FontWeight.bold,
+              letterSpacing: 1,
               color: const Color(0xff7B4A12),
             ),
           ),
@@ -619,9 +620,10 @@ class _CheckInViewState extends State<CheckInView>
         children: [
           Text(
             'RECENT ACTIVITIES',
-            style: GoogleFonts.cinzel(
+            style: GoogleFonts.lora(
               fontSize: 14,
               fontWeight: FontWeight.bold,
+              letterSpacing: 1,
               color: const Color(0xff7B4A12),
             ),
           ),
@@ -802,7 +804,7 @@ class _CheckInViewState extends State<CheckInView>
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: Text(
               title,
-              style: GoogleFonts.cinzel(
+              style: GoogleFonts.lora(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 0.5,

@@ -95,7 +95,12 @@ class _GitaChapterViewState extends State<_GitaChapterView> {
                     return Center(child: Text('Error: ${state.message}'));
                   } else if (state is GitaChapterLoaded) {
                     return ListView.builder(
-                      padding: const EdgeInsets.only(left: 16,right: 16,top: 16, bottom: 60),
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        top: 16,
+                        bottom: 60,
+                      ),
                       itemCount: state.chapters.length,
                       itemBuilder: (context, index) {
                         final chapter = state.chapters[index];
@@ -345,21 +350,31 @@ class _GitaChapterViewState extends State<_GitaChapterView> {
                   Row(
                     children: [
                       Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: LinearProgressIndicator(
-                            value: 3 / (chapter.shlokaCount ?? 1),
-                            minHeight: 4,
-                            backgroundColor: Colors.grey.shade200,
-                            valueColor: const AlwaysStoppedAnimation(
-                              Color(0xFFFF9F2D),
-                            ),
-                          ),
+                        child: Builder(
+                          builder: (context) {
+                            final completedVerses =
+                                StorageService.getInt(
+                                  'gita_chapter_${chapter.chapterNumber}_completed',
+                                ) ??
+                                0;
+                            final total = chapter.shlokaCount ?? 1;
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: completedVerses / total,
+                                minHeight: 4,
+                                backgroundColor: Colors.grey.shade200,
+                                valueColor: const AlwaysStoppedAnimation(
+                                  Color(0xFFFF9F2D),
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '3/${chapter.shlokaCount ?? 0}',
+                        '${StorageService.getInt('gita_chapter_${chapter.chapterNumber}_completed') ?? 0}/${chapter.shlokaCount ?? 0}',
                         style: const TextStyle(
                           fontSize: 10,
                           color: Colors.grey,

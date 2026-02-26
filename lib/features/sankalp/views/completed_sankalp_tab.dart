@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart' hide Transition;
 import 'package:google_fonts/google_fonts.dart';
 
 import '../blocs/sankalp_bloc.dart';
+import '../blocs/sankalp_event.dart';
 import '../blocs/sankalp_state.dart';
 import '../models/sankalp_model.dart';
 import 'sankalp_progress_screen.dart';
@@ -27,111 +28,114 @@ class CompletedSankalpTab extends StatelessWidget {
         List<UserSankalpModel> completedSankalps = [];
         if (state is SankalpLoaded) {
           completedSankalps = state.userSankalps
-              .where(
-                (s) =>
-                    s.status == 'completed' ||
-                    (s.status == 'active' && s.currentDay >= s.totalDays),
-              )
+              .where((s) => s.status == 'completed')
               .toList();
         }
 
-  Widget _buildEmptyState(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Decorative Illustration
-            Container(
-              height: 200,
-              width: 200,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: Stack(
-                alignment: Alignment.center,
+        Widget _buildEmptyState(BuildContext context) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
-                    Icons.history_outlined,
-                    size: 80,
-                    color: Color(0xff8D6E63),
+                  // Decorative Illustration
+                  Container(
+                    height: 200,
+                    width: 200,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.03),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        const Icon(
+                          Icons.history_outlined,
+                          size: 80,
+                          color: Color(0xff8D6E63),
+                        ),
+                        Positioned(
+                          top: 40,
+                          right: 40,
+                          child: Icon(
+                            Icons.check_circle,
+                            color: Colors.green.withOpacity(0.5),
+                            size: 24,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  Positioned(
-                    top: 40,
-                    right: 40,
-                    child: Icon(Icons.check_circle, color: Colors.green.withOpacity(0.5), size: 24),
+                  const SizedBox(height: 32),
+                  Text(
+                    "Your Journey Awaits",
+                    style: GoogleFonts.lora(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xff4E342E),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    "You haven't completed any sankalps yet.\nEvery journey begins with a single step.",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      color: const Color(0xff7D6E63),
+                      height: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  GestureDetector(
+                    onTap: () {
+                      final bloc = context.read<SankalpBloc>();
+                      Get.to(
+                        () => BlocProvider.value(
+                          value: bloc,
+                          child: const ChooseSankalpScreen(),
+                        ),
+                        transition: Transition.downToUp,
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 16,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xffff7438),
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xffff7438).withOpacity(0.3),
+                            blurRadius: 12,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        "Choose a Sankalp",
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 32),
-            Text(
-              "Your Journey Awaits",
-              style: GoogleFonts.lora(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xff4E342E),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              "You haven't completed any sankalps yet.\nEvery journey begins with a single step.",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                fontSize: 15,
-                color: const Color(0xff7D6E63),
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 32),
-            GestureDetector(
-              onTap: () {
-                final bloc = context.read<SankalpBloc>();
-                Get.to(
-                  () => BlocProvider.value(
-                    value: bloc,
-                    child: const ChooseSankalpScreen(),
-                  ),
-                  transition: Transition.downToUp,
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                decoration: BoxDecoration(
-                  color: const Color(0xffff7438),
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xffff7438).withOpacity(0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: Text(
-                  "Choose a Sankalp",
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+          );
+        }
 
         return ListView.builder(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -159,7 +163,9 @@ class CompletedSankalpTab extends StatelessWidget {
             child: SankalpProgressScreen(sankalpId: userSankalp.id),
           ),
           transition: Transition.rightToLeft,
-        );
+        )?.then((_) {
+          bloc.add(FetchUserSankalps());
+        });
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 20),

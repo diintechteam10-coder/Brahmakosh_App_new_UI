@@ -29,8 +29,8 @@ class _SplashViewState extends State<SplashView> {
     if (isFirstLaunch) {
       Get.offAllNamed(AppConstants.routeIntro);
     } else if (hasToken) {
-      // If token exists, go directly to walkthrough
-      Get.offAllNamed(AppConstants.routeWalkthrough);
+      // If token exists, go directly to dashboard (walkthrough disabled)
+      Get.offAllNamed(AppConstants.routeDashboard);
     } else {
       Get.offAllNamed(AppConstants.routeLogin);
     }
