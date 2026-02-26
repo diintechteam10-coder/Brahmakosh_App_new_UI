@@ -92,6 +92,10 @@ class ApiUrls {
       '$chatApiUrl/conversations'; // /{id}/feedback
   static const String unreadCount = '$chatApiUrl/unread-count';
   static const String creditHistory = '$chatApiUrl/credits/history/user';
+  static const String voiceRecordingUploadUrl =
+      '$chatApiUrl/voice/recording/upload-url';
+  static const String voiceRecordingAttach =
+      '$chatApiUrl/conversations'; // /:conversationId/voice-recording
   static const String notifications = '$baseUrl/api/notifications';
 
   /// 🔹 Swapna Decoder APIs
