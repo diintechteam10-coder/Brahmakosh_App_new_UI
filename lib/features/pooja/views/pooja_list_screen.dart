@@ -43,9 +43,20 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
         appBar: AppBar(
           backgroundColor: const Color(0xffFFF3E0),
           elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Color(0xff5D4037)),
-            onPressed: () => Navigator.pop(context),
+          leading: Container(
+            margin: const EdgeInsets.all(8),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Color(0xff5D4037),
+                size: 20,
+              ),
+              onPressed: () => Navigator.pop(context),
+            ),
           ),
           title: Row(
             children: [
@@ -76,7 +87,7 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                         ?.name;
                     return Text(
                       userName ?? "Guest",
-                      style: GoogleFonts.playfairDisplay(
+                      style: GoogleFonts.lora(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: const Color(0xff4E342E),
@@ -280,7 +291,7 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                   const Spacer(), // Push content to bottom
                   Text(
                     pooja.pujaName ?? "Unknown Puja",
-                    style: GoogleFonts.playfairDisplay(
+                    style: GoogleFonts.lora(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,

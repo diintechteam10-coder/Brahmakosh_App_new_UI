@@ -180,7 +180,10 @@ class SankalpBloc extends Bloc<SankalpEvent, SankalpState> {
     FetchSankalpProgress event,
     Emitter<SankalpState> emit,
   ) async {
-    emit(SankalpLoading());
+    // Preserve existing loaded state while loading progress
+    if (state is! SankalpLoaded) {
+      emit(SankalpLoading());
+    }
     try {
       final progress = await repository.fetchSankalpProgress(
         event.userSankalpId,

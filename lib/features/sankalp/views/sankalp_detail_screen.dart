@@ -197,7 +197,9 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
                               borderRadius: BorderRadius.circular(30),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xffff7438).withOpacity(0.3),
+                                  color: const Color(
+                                    0xffff7438,
+                                  ).withOpacity(0.3),
                                   blurRadius: 12,
                                   offset: const Offset(0, 6),
                                 ),
@@ -222,7 +224,11 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(Icons.bolt, color: Colors.white, size: 22),
+                                      const Icon(
+                                        Icons.bolt,
+                                        color: Colors.white,
+                                        size: 22,
+                                      ),
                                       const SizedBox(width: 12),
                                       Text(
                                         "Start Sankalp",
@@ -330,11 +336,15 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
           decoration: BoxDecoration(
             color: isSelected ? Colors.transparent : Colors.white,
             gradient: isSelected
-                ? const LinearGradient(colors: [Color(0xffFEDA87), Color(0xffFFD54F)])
+                ? const LinearGradient(
+                    colors: [Color(0xffFEDA87), Color(0xffFFD54F)],
+                  )
                 : null,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isSelected ? Colors.transparent : const Color(0xff8D6E63).withOpacity(0.1),
+              color: isSelected
+                  ? Colors.transparent
+                  : const Color(0xff8D6E63).withOpacity(0.1),
               width: 1.5,
             ),
             boxShadow: isSelected
@@ -343,7 +353,7 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
                       color: const Color(0xffFEDA87).withOpacity(0.3),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
-                    )
+                    ),
                   ]
                 : null,
           ),
@@ -352,7 +362,9 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
             style: GoogleFonts.inter(
               fontSize: 12,
               fontWeight: FontWeight.bold,
-              color: isSelected ? const Color(0xff4E342E) : const Color(0xff8D6E63),
+              color: isSelected
+                  ? const Color(0xff4E342E)
+                  : const Color(0xff8D6E63),
             ),
             textAlign: TextAlign.center,
           ),
@@ -596,17 +608,24 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(25),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 8,
+                        ),
                       ),
-                      child: Text(
-                        "Cancel",
-                        style: GoogleFonts.inter(
-                          color: const Color(0xff8D6E63),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          "Cancel",
+                          maxLines: 1,
+                          style: GoogleFonts.inter(
+                            color: const Color(0xff8D6E63),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
@@ -627,11 +646,18 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(25),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 8,
+                        ),
                       ),
-                      child: Text(
-                        "Yes, I'm Ready",
-                        style: GoogleFonts.inter(color: Colors.white),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          "Yes, I'm Ready",
+                          maxLines: 1,
+                          style: GoogleFonts.inter(color: Colors.white),
+                        ),
                       ),
                     ),
                   ),

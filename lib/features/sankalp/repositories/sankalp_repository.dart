@@ -66,6 +66,7 @@ class SankalpRepository {
       token: token,
       onResponse: (response) {
         final body = jsonDecode(response.body);
+        debugPrint("=== USER SANKALPS API RAW RESPONSE: ${response.body}");
         if (body['success'] == true && body['data'] != null) {
           userSankalps = (body['data'] as List)
               .map((e) => UserSankalpModel.fromJson(e))
@@ -220,6 +221,7 @@ class SankalpRepository {
       onResponse: (response) {
         try {
           final body = jsonDecode(response.body);
+          debugPrint("=== PROGRESS API RAW RESPONSE: ${response.body}");
           if (body['success'] == true && body['data'] != null) {
             progress = SankalpProgressModel.fromJson(body['data']);
           } else {

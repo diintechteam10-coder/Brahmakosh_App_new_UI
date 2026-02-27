@@ -128,7 +128,7 @@ class AskBiView extends StatelessWidget {
                     colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
                   ),
                   characterImagePath:
-                      'assets/images/Rashmi_Withoutbackground.png',
+                      'assets/images/Rashmi_new.png',
                   backgroundColor: const Color(
                     0xFFF0E5D8,
                   ), // Light taupe/cream color from image
@@ -156,7 +156,7 @@ class AskBiView extends StatelessWidget {
                         subtitle: "Your Spiritual Guide",
                         backgroundImage: 'assets/images/rashmi_background.jpeg',
                         characterImagePath:
-                            'assets/images/Rashmi_Withoutbackground.png',
+                            'assets/images/Rashmi_new.png',
                         chatBackgroundImage: 'assets/images/Rashmi_chat.png',
                       ),
                     );
@@ -179,7 +179,7 @@ class AskBiView extends StatelessWidget {
                     colors: [Color(0xFFE6C17A), Color(0xFFC79E59)],
                   ),
                   characterImagePath:
-                      'assets/images/Krishna_WithoutBackground.png',
+                      'assets/images/Krishana_new.png',
                   backgroundColor: const Color(
                     0xFF5F66B6,
                   ), // Purple-blue color from image
@@ -207,7 +207,7 @@ class AskBiView extends StatelessWidget {
                         subtitle: "Divine Cosmic Intelligence",
                         backgroundImage: 'assets/images/rashmi_background.jpeg',
                         characterImagePath:
-                            'assets/images/Krishna_WithoutBackground.png',
+                            'assets/images/Krishana_new.png',
                         chatBackgroundImage: 'assets/images/Krishna_chat.png',
                       ),
                     );
@@ -227,8 +227,8 @@ class AskBiView extends StatelessWidget {
                     "|| ॐ भूर्भुव: स्व: तत्सवितुर्वरेण्यं भर्गो देवस्य\nधीमहि धियो यो न: प्रचोदयात् ||",
                     textAlign: TextAlign.center,
                     style: GoogleFonts.rozhaOne(
-                      fontSize: 13, // Reduced from 15
-                      color: AppTheme.textSecondary.withOpacity(0.8),
+                      fontSize: 20, // Reduced from 15
+                      color: AppTheme.textPrimary,
                       height: 1.4, // Reduced line height slightly
                     ),
                   ),

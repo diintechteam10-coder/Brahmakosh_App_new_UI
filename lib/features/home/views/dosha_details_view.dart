@@ -22,16 +22,27 @@ class DoshaDetailView extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFFFFF8E1),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF6D3A0C)),
-          onPressed: () => Get.back(),
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Color(0xff5D4037),
+              size: 20,
+            ),
+            onPressed: () => Get.back(),
+          ),
         ),
         title: Text(
           title,
           style: GoogleFonts.lora(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF6D3A0C),
+            color: const Color(0xff4E342E),
           ),
         ),
       ),
@@ -73,9 +84,9 @@ class DoshaDetailView extends StatelessWidget {
                       children: [
                         Text(
                           "Status",
-                          style: GoogleFonts.lora(
-                            fontSize: 14,
-                            color: const Color(0xFF8D6E63),
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            color: const Color(0xff8D6E63),
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -83,10 +94,10 @@ class DoshaDetailView extends StatelessWidget {
                           doshaDetail.present == true
                               ? "Present"
                               : "Not Present",
-                          style: GoogleFonts.lora(
-                            fontSize: 18,
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF4E342E),
+                            color: const Color(0xff4E342E),
                           ),
                         ),
                       ],
@@ -107,7 +118,7 @@ class DoshaDetailView extends StatelessWidget {
                 style: GoogleFonts.lora(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF6D3A0C),
+                  color: const Color(0xff4E342E),
                 ),
               ),
               const SizedBox(height: 12),
@@ -121,9 +132,9 @@ class DoshaDetailView extends StatelessWidget {
                 child: Text(
                   // Prefer manglikReport, then description
                   doshaDetail.manglikReport ?? doshaDetail.description!,
-                  style: GoogleFonts.lora(
-                    fontSize: 16,
-                    color: const Color(0xFF5D4037),
+                  style: GoogleFonts.inter(
+                    fontSize: 15,
+                    color: const Color(0xff5D4037),
                     height: 1.5,
                   ),
                 ),
@@ -146,7 +157,7 @@ class DoshaDetailView extends StatelessWidget {
                 style: GoogleFonts.lora(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF6D3A0C),
+                  color: const Color(0xff4E342E),
                 ),
               ),
               const SizedBox(height: 12),
@@ -159,10 +170,10 @@ class DoshaDetailView extends StatelessWidget {
                 ),
                 child: Text(
                   doshaDetail.conclusion ?? doshaDetail.oneLine!,
-                  style: GoogleFonts.lora(
-                    fontSize: 16,
+                  style: GoogleFonts.inter(
+                    fontSize: 15,
                     fontStyle: FontStyle.italic,
-                    color: const Color(0xFFE65100),
+                    color: const Color(0xffff7438),
                     height: 1.5,
                   ),
                 ),
@@ -267,7 +278,7 @@ class DoshaDetailView extends StatelessWidget {
         style: GoogleFonts.lora(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: const Color(0xFF6D3A0C),
+          color: const Color(0xff4E342E),
         ),
       ),
     );
@@ -287,10 +298,10 @@ class DoshaDetailView extends StatelessWidget {
         children: [
           Text(
             title,
-            style: GoogleFonts.lora(
-              fontSize: 14,
+            style: GoogleFonts.inter(
+              fontSize: 13,
               fontWeight: FontWeight.bold,
-              color: Colors.brown,
+              color: const Color(0xff8D6E63),
             ),
           ),
           const SizedBox(height: 8),
@@ -308,9 +319,9 @@ class DoshaDetailView extends StatelessWidget {
                   Expanded(
                     child: Text(
                       item,
-                      style: GoogleFonts.lora(
+                      style: GoogleFonts.inter(
                         fontSize: 13,
-                        color: Colors.brown.shade700,
+                        color: const Color(0xff5D4037),
                         height: 1.4,
                       ),
                     ),
@@ -334,9 +345,9 @@ class DoshaDetailView extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: GoogleFonts.lora(
+        style: GoogleFonts.inter(
           fontSize: 14,
-          color: Colors.brown.shade800,
+          color: const Color(0xff5D4037),
           height: 1.5,
         ),
       ),
@@ -351,15 +362,18 @@ class DoshaDetailView extends StatelessWidget {
         children: [
           Text(
             label,
-            style: GoogleFonts.lora(
+            style: GoogleFonts.inter(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: Colors.brown,
+              color: const Color(0xff8D6E63),
             ),
           ),
           Text(
             value,
-            style: GoogleFonts.lora(fontSize: 14, color: Colors.brown.shade700),
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: const Color(0xff5D4037),
+            ),
           ),
         ],
       ),

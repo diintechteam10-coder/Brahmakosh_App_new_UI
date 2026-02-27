@@ -49,7 +49,11 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
             shape: BoxShape.circle,
           ),
           child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Color(0xff5D4037), size: 20),
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Color(0xff5D4037),
+              size: 20,
+            ),
             onPressed: () => Get.back(),
           ),
         ),
@@ -61,7 +65,11 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
               shape: BoxShape.circle,
             ),
             child: IconButton(
-              icon: const Icon(Icons.notifications_none, color: Color(0xff5D4037), size: 20),
+              icon: const Icon(
+                Icons.notifications_none,
+                color: Color(0xff5D4037),
+                size: 20,
+              ),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -151,7 +159,7 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
           }
 
           final sankalp = userSankalp.sankalp;
-          final totalDays = userSankalp.totalDays;
+          final totalDays = progressStats?.totalDays ?? userSankalp.totalDays;
 
           // Use progress stats if available, otherwise fallback to local calculation
           final completedDays =
@@ -171,8 +179,9 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
           final isSankalpCompleted = userSankalp.status == 'completed';
           final rawCurrentDay =
               progressStats?.currentDay ?? userSankalp.currentDay;
-          final currentDayDisplay =
-              rawCurrentDay > totalDays ? totalDays : rawCurrentDay;
+          final currentDayDisplay = rawCurrentDay > totalDays
+              ? totalDays
+              : rawCurrentDay;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -292,12 +301,17 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                               height: 8,
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Color(0xffFEDA87), Color(0xffff7438)],
+                                  colors: [
+                                    Color(0xffFEDA87),
+                                    Color(0xffff7438),
+                                  ],
                                 ),
                                 borderRadius: BorderRadius.circular(4),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xffFEDA87).withOpacity(0.3),
+                                    color: const Color(
+                                      0xffFEDA87,
+                                    ).withOpacity(0.3),
                                     blurRadius: 4,
                                     offset: const Offset(0, 2),
                                   ),
@@ -410,7 +424,11 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                             Container(
                               width: 6,
                               decoration: BoxDecoration(
-                                color: isCompleted ? Colors.green : (isToday ? const Color(0xffff7438) : Colors.grey[300]),
+                                color: isCompleted
+                                    ? Colors.green
+                                    : (isToday
+                                          ? const Color(0xffff7438)
+                                          : Colors.grey[300]),
                                 borderRadius: const BorderRadius.only(
                                   topLeft: Radius.circular(20),
                                   bottomLeft: Radius.circular(20),
@@ -426,7 +444,9 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                                       width: 44,
                                       height: 44,
                                       decoration: BoxDecoration(
-                                        color: isCompleted ? Colors.green.withOpacity(0.1) : Colors.grey[50],
+                                        color: isCompleted
+                                            ? Colors.green.withOpacity(0.1)
+                                            : Colors.grey[50],
                                         shape: BoxShape.circle,
                                       ),
                                       child: Center(
@@ -435,7 +455,9 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                                           style: GoogleFonts.inter(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,
-                                            color: isCompleted ? Colors.green : const Color(0xff4E342E),
+                                            color: isCompleted
+                                                ? Colors.green
+                                                : const Color(0xff4E342E),
                                           ),
                                         ),
                                       ),
@@ -443,7 +465,8 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                                     const SizedBox(width: 16),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             "Day $dayNum",
@@ -457,17 +480,40 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                                           Row(
                                             children: [
                                               Icon(
-                                                isCompleted ? Icons.check_circle : (isToday ? Icons.timer_outlined : Icons.radio_button_unchecked),
+                                                isCompleted
+                                                    ? Icons.check_circle
+                                                    : (isToday
+                                                          ? Icons.timer_outlined
+                                                          : Icons
+                                                                .radio_button_unchecked),
                                                 size: 14,
-                                                color: isCompleted ? Colors.green : (isToday ? const Color(0xffff7438) : Colors.grey[400]),
+                                                color: isCompleted
+                                                    ? Colors.green
+                                                    : (isToday
+                                                          ? const Color(
+                                                              0xffff7438,
+                                                            )
+                                                          : Colors.grey[400]),
                                               ),
                                               const SizedBox(width: 4),
                                               Text(
-                                                isCompleted ? "Completed" : (isToday ? "Today" : "Coming Up"),
+                                                isCompleted
+                                                    ? "Completed"
+                                                    : (isToday
+                                                          ? "Today"
+                                                          : "Coming Up"),
                                                 style: GoogleFonts.inter(
                                                   fontSize: 12,
-                                                  fontWeight: isToday ? FontWeight.bold : FontWeight.w500,
-                                                  color: isCompleted ? Colors.green : (isToday ? const Color(0xffff7438) : Colors.grey[600]),
+                                                  fontWeight: isToday
+                                                      ? FontWeight.bold
+                                                      : FontWeight.w500,
+                                                  color: isCompleted
+                                                      ? Colors.green
+                                                      : (isToday
+                                                            ? const Color(
+                                                                0xffff7438,
+                                                              )
+                                                            : Colors.grey[600]),
                                                 ),
                                               ),
                                             ],
@@ -476,8 +522,10 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                                       ),
                                     ),
                                     Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
                                       children: [
                                         Text(
                                           "+${sankalp.karmaPointsPerDay}",
@@ -531,17 +579,20 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                         borderRadius: BorderRadius.circular(30),
                         onTap: () {
                           context.read<SankalpBloc>().add(
-                                ReportDailyStatus(
-                                  userSankalpId: userSankalp!.id,
-                                  status: 'yes',
-                                ),
-                              );
+                            ReportDailyStatus(
+                              userSankalpId: userSankalp!.id,
+                              status: 'yes',
+                            ),
+                          );
                         },
                         child: Center(
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.check_circle_outline, color: Colors.white),
+                              const Icon(
+                                Icons.check_circle_outline,
+                                color: Colors.white,
+                              ),
                               const SizedBox(width: 8),
                               Text(
                                 "Mark Day $currentDayDisplay Completed",

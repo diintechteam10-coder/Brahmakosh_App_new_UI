@@ -61,7 +61,7 @@ class _SwapnaDecoderScreenState extends State<SwapnaDecoderScreen>
         leading: Container(
           margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white,
             shape: BoxShape.circle,
           ),
           child: IconButton(
@@ -73,7 +73,7 @@ class _SwapnaDecoderScreenState extends State<SwapnaDecoderScreen>
           Container(
             margin: const EdgeInsets.only(right: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white,
               shape: BoxShape.circle,
             ),
             child: IconButton(

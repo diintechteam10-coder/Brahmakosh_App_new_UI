@@ -20,17 +20,27 @@ class DashaTimelineView extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFFFFF3E0),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF5D4037)),
-          onPressed: () => Get.back(),
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Color(0xff5D4037),
+              size: 20,
+            ),
+            onPressed: () => Get.back(),
+          ),
         ),
         title: Text(
           "Dasha Timeline",
-          style: GoogleFonts.playfairDisplay(
-            // Premium Font
-            fontSize: 24,
+          style: GoogleFonts.lora(
+            fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF3E2723),
+            color: const Color(0xff4E342E),
           ),
         ),
         centerTitle: true,
@@ -115,10 +125,10 @@ class DashaTimelineView extends StatelessWidget {
         const SizedBox(width: 12),
         Text(
           title,
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 24,
+          style: GoogleFonts.lora(
+            fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF3E2723),
+            color: const Color(0xff4E342E),
           ),
         ),
       ],
@@ -202,10 +212,10 @@ class DashaTimelineView extends StatelessWidget {
             padding: const EdgeInsets.only(left: 4.0),
             child: Text(
               "Full Cycle Timeline",
-              style: GoogleFonts.playfairDisplay(
-                fontSize: 20,
+              style: GoogleFonts.lora(
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF5D4037),
+                color: const Color(0xff4E342E),
               ),
             ),
           ),
@@ -306,8 +316,7 @@ class DashaTimelineView extends StatelessWidget {
                       ),
                       child: Text(
                         level,
-                        style: GoogleFonts.lato(
-                          // Lora or Lato
+                        style: GoogleFonts.inter(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                           color: themeColor,
@@ -318,10 +327,10 @@ class DashaTimelineView extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     name,
-                    style: GoogleFonts.playfairDisplay(
+                    style: GoogleFonts.lora(
                       fontSize: compact ? 16 : 18,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF3E2723),
+                      color: const Color(0xff4E342E),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -371,7 +380,7 @@ class DashaTimelineView extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             "$label: ",
-            style: GoogleFonts.lato(
+            style: GoogleFonts.inter(
               fontSize: 12,
               color: Colors.grey[600],
               fontWeight: FontWeight.bold,
@@ -379,9 +388,9 @@ class DashaTimelineView extends StatelessWidget {
           ),
           Text(
             date,
-            style: GoogleFonts.lato(
+            style: GoogleFonts.inter(
               fontSize: 13,
-              color: const Color(0xFF424242),
+              color: const Color(0xff4E342E),
               fontWeight: FontWeight.w600,
             ),
           ),

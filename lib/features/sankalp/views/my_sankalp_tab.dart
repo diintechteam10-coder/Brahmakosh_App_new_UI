@@ -28,7 +28,7 @@ class MySankalpTab extends StatelessWidget {
         List<UserSankalpModel> activeSankalps = [];
         if (state is SankalpLoaded) {
           activeSankalps = state.userSankalps
-              .where((s) => s.status == 'active' && s.currentDay <= s.totalDays)
+              .where((s) => s.status == 'active')
               .toList();
         }
 
@@ -162,12 +162,20 @@ class MySankalpTab extends StatelessWidget {
                   Positioned(
                     top: 40,
                     right: 30,
-                    child: Icon(Icons.star, color: const Color(0xffFEDA87), size: 24),
+                    child: Icon(
+                      Icons.star,
+                      color: const Color(0xffFEDA87),
+                      size: 24,
+                    ),
                   ),
                   Positioned(
                     bottom: 40,
                     left: 20,
-                    child: Icon(Icons.star_border, color: const Color(0xffFEDA87), size: 20),
+                    child: Icon(
+                      Icons.star_border,
+                      color: const Color(0xffFEDA87),
+                      size: 20,
+                    ),
                   ),
                 ],
               ),
@@ -204,7 +212,10 @@ class MySankalpTab extends StatelessWidget {
                 );
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [Color(0xffff7438), Color(0xffE65100)],
@@ -230,7 +241,11 @@ class MySankalpTab extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Icon(Icons.explore_outlined, color: Colors.white, size: 20),
+                    const Icon(
+                      Icons.explore_outlined,
+                      color: Colors.white,
+                      size: 20,
+                    ),
                   ],
                 ),
               ),
@@ -242,10 +257,12 @@ class MySankalpTab extends StatelessWidget {
   }
 
   Widget _buildSankalpCard(BuildContext context, UserSankalpModel userSankalp) {
-    final completedDays =
-        userSankalp.dailyReports.where((r) => r.status == 'yes').length;
-    double progress =
-        userSankalp.totalDays > 0 ? completedDays / userSankalp.totalDays : 0;
+    final completedDays = userSankalp.dailyReports
+        .where((r) => r.status == 'yes')
+        .length;
+    double progress = userSankalp.totalDays > 0
+        ? completedDays / userSankalp.totalDays
+        : 0;
 
     final sankalp = userSankalp.sankalp;
     final bool isReportPending = _isReportPending(userSankalp);

@@ -37,7 +37,7 @@ class _DoshaDashaRemediesSectionState extends State<DoshaDashaRemediesSection> {
             style: GoogleFonts.lora(
               fontSize: 18 * scale,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF6D3A0C),
+              color: const Color(0xff4E342E),
             ),
           ),
           const SizedBox(height: 16),
@@ -78,10 +78,10 @@ class _DoshaDashaRemediesSectionState extends State<DoshaDashaRemediesSection> {
                             : null,
                         child: Text(
                           _tabs[index],
-                          style: GoogleFonts.lora(
+                          style: GoogleFonts.inter(
                             fontSize: 14 * scale,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF6D3A0C),
+                            color: const Color(0xff4E342E),
                             decoration: isSelected
                                 ? TextDecoration.underline
                                 : TextDecoration.none,
@@ -194,10 +194,10 @@ class _DoshaDashaRemediesSectionState extends State<DoshaDashaRemediesSection> {
                 SizedBox(width: 4 * scale),
                 Text(
                   "Yogini Dasha",
-                  style: GoogleFonts.lora(
+                  style: GoogleFonts.inter(
                     fontSize: 12 * scale,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF6D3A0C),
+                    color: const Color(0xff4E342E),
                   ),
                 ),
               ],
@@ -683,9 +683,9 @@ class _DoshaDashaRemediesSectionState extends State<DoshaDashaRemediesSection> {
           SizedBox(height: 8 * scale),
           Text(
             customDescription ?? detail.description ?? "",
-            style: GoogleFonts.lora(
+            style: GoogleFonts.inter(
               fontSize: 12 * scale,
-              color: const Color(0xFF6D4C41),
+              color: const Color(0xff5D4037),
               height: 1.4,
             ),
             maxLines: 2,
@@ -709,7 +709,7 @@ class _DoshaDashaRemediesSectionState extends State<DoshaDashaRemediesSection> {
                 children: [
                   Text(
                     "View Details",
-                    style: GoogleFonts.lora(
+                    style: GoogleFonts.inter(
                       fontSize: 11 * scale,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFFE65100),
@@ -842,9 +842,9 @@ class _DoshaDashaRemediesSectionState extends State<DoshaDashaRemediesSection> {
               icon: Icons.spa_outlined,
               content: Text(
                 remedies.rudraksha!.recommend ?? "Recommended for you.",
-                style: GoogleFonts.lora(
+                style: GoogleFonts.inter(
                   fontSize: 12 * scale,
-                  color: const Color(0xFF4E342E),
+                  color: const Color(0xff4E342E),
                   height: 1.4,
                 ),
                 maxLines: 2,
@@ -869,9 +869,9 @@ class _DoshaDashaRemediesSectionState extends State<DoshaDashaRemediesSection> {
               content: Text(
                 remedies.puja!.summary ??
                     "Puja recommendations based on your chart.",
-                style: GoogleFonts.lora(
+                style: GoogleFonts.inter(
                   fontSize: 12 * scale,
-                  color: const Color(0xFFE65100),
+                  color: const Color(0xffff7438),
                   height: 1.4,
                 ),
                 maxLines: 2,
@@ -896,7 +896,7 @@ class _DoshaDashaRemediesSectionState extends State<DoshaDashaRemediesSection> {
           children: [
             TextSpan(
               text: "$label: ",
-              style: GoogleFonts.lora(
+              style: GoogleFonts.inter(
                 fontSize: 12 * scale,
                 fontWeight: FontWeight.bold,
                 color: const Color(0xFF1565C0),
@@ -904,9 +904,9 @@ class _DoshaDashaRemediesSectionState extends State<DoshaDashaRemediesSection> {
             ),
             TextSpan(
               text: name ?? "N/A",
-              style: GoogleFonts.lora(
+              style: GoogleFonts.inter(
                 fontSize: 12 * scale,
-                color: const Color(0xFF424242),
+                color: const Color(0xff4E342E),
               ),
             ),
           ],
@@ -957,10 +957,10 @@ class _DoshaDashaRemediesSectionState extends State<DoshaDashaRemediesSection> {
                     SizedBox(width: 6 * scale),
                     Text(
                       title,
-                      style: GoogleFonts.lora(
+                      style: GoogleFonts.inter(
                         fontSize: 11 * scale,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF4E342E),
+                        color: const Color(0xff4E342E),
                       ),
                     ),
                   ],
@@ -981,7 +981,7 @@ class _DoshaDashaRemediesSectionState extends State<DoshaDashaRemediesSection> {
                 children: [
                   Text(
                     "View Details",
-                    style: GoogleFonts.lora(
+                    style: GoogleFonts.inter(
                       fontSize: 11 * scale,
                       fontWeight: FontWeight.bold,
                       color: themeColor,

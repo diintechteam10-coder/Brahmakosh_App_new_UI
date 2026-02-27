@@ -125,20 +125,28 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
       appBar: AppBar(
         title: Text(
           "Vidhi",
-          style: GoogleFonts.playfairDisplay(
-            color: const Color(0xff5D4037),
+          style: GoogleFonts.lora(
+            fontSize: 20,
+            color: const Color(0xff4E342E),
             fontWeight: FontWeight.bold,
           ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Color(0xff5D4037),
-            size: 20,
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
           ),
-          onPressed: () => Get.back(),
+          child: IconButton(
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Color(0xff5D4037),
+              size: 20,
+            ),
+            onPressed: () => Get.back(),
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -390,7 +398,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
         const SizedBox(width: 8),
         Text(
           title,
-          style: GoogleFonts.playfairDisplay(
+          style: GoogleFonts.lora(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: const Color(0xff4E342E),
