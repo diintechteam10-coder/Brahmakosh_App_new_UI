@@ -422,6 +422,11 @@ class AstrologistProfileView extends StatelessWidget {
               label: "Chat",
               price: "₹${expert.chatCharge ?? 15}/min",
               onTap: () {
+                final status = expert.status?.toLowerCase() ?? 'offline';
+                if (status != 'online') {
+                  _showExpertOfflineDialog(context);
+                  return;
+                }
                 _showChatConfirmationBottomSheet(context, controller);
               },
             ),
@@ -433,6 +438,12 @@ class AstrologistProfileView extends StatelessWidget {
               label: "Call",
               price: "₹${expert.voiceCharge ?? 20}/min",
               onTap: () {
+                final status = expert.status?.toLowerCase() ?? 'offline';
+                if (status != 'online') {
+                  _showExpertOfflineDialog(context);
+                  return;
+                }
+
                 final hasInit =
                     StorageService.getBool('chat_initiated_${expert.id}') ??
                     false;
@@ -802,10 +813,37 @@ class AstrologistProfileView extends StatelessWidget {
     );
   }
 
+  void _showExpertOfflineDialog(BuildContext context) {
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          "Expert Offline",
+          style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          "This expert is currently offline. Please try again later.",
+          style: GoogleFonts.inter(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              "OK",
+              style: GoogleFonts.inter(
+                color: const Color(0xFFA67C00),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showInitiateChatFirstDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
+    Get.dialog(
+      AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           "Chat Required",
@@ -817,7 +855,7 @@ class AstrologistProfileView extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Get.back(),
             child: Text(
               "OK",
               style: GoogleFonts.inter(

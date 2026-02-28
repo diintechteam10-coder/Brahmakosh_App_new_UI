@@ -130,7 +130,7 @@ class AstrologistItem {
   });
 
   AstrologistItem.fromJson(Map<String, dynamic> json) {
-    id = json['_id'];
+    id = json['_id'] ?? json['id']?.toString();
     name = json['name'];
     experience = json['experience'];
     expertise = json['expertise'];

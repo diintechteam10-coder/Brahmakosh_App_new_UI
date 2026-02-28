@@ -446,11 +446,19 @@ class AstrologyExpertsView extends StatelessWidget {
                             child: _buildActionButton(
                               icon: Icons.chat_bubble_outline,
                               price: expert.chatCharge?.toString() ?? "20",
-                              onTap: () => _showChatConfirmationBottomSheet(
-                                context,
-                                expert,
-                                controller,
-                              ),
+                              onTap: () {
+                                final status =
+                                    expert.status?.toLowerCase() ?? 'offline';
+                                if (status != 'online') {
+                                  _showExpertOfflineDialog(context);
+                                  return;
+                                }
+                                _showChatConfirmationBottomSheet(
+                                  context,
+                                  expert,
+                                  controller,
+                                );
+                              },
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -459,6 +467,13 @@ class AstrologyExpertsView extends StatelessWidget {
                               icon: Icons.phone_outlined,
                               price: expert.voiceCharge?.toString() ?? "20",
                               onTap: () {
+                                final status =
+                                    expert.status?.toLowerCase() ?? 'offline';
+                                if (status != 'online') {
+                                  _showExpertOfflineDialog(context);
+                                  return;
+                                }
+
                                 final hasInit =
                                     StorageService.getBool(
                                       'chat_initiated_${expert.id}',
@@ -877,10 +892,37 @@ class AstrologyExpertsView extends StatelessWidget {
     );
   }
 
+  void _showExpertOfflineDialog(BuildContext context) {
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          "Expert Offline",
+          style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          "This expert is currently offline. Please try again later.",
+          style: GoogleFonts.inter(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              "OK",
+              style: GoogleFonts.inter(
+                color: const Color(0xFFA67C00),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showInitiateChatFirstDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
+    Get.dialog(
+      AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           "Chat Required",
@@ -892,7 +934,7 @@ class AstrologyExpertsView extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Get.back(),
             child: Text(
               "OK",
               style: GoogleFonts.inter(

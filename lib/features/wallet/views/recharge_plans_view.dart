@@ -210,7 +210,38 @@ class _RechargePlansViewState extends State<RechargePlansView> {
       child: SafeArea(
         child: InkWell(
           onTap: () {
-            // Integrate payment gateway here
+            Get.dialog(
+              AlertDialog(
+                title: Text(
+                  "Request Sent",
+                  style: GoogleFonts.playfairDisplay(
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF6D3A0C),
+                  ),
+                ),
+                content: Text(
+                  "Your request has been sent for adding amount in wallet.",
+                  style: GoogleFonts.lora(fontSize: 16),
+                ),
+                backgroundColor: const Color(0xFFFDF5E6),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Get.back(),
+                    child: Text(
+                      "OK",
+                      style: GoogleFonts.lora(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: const Color(0xFFE65100),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
           },
           borderRadius: BorderRadius.circular(16),
           child: Container(

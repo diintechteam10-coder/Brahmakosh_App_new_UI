@@ -79,6 +79,8 @@ class ApiUrls {
   static const String chatPartners = '$chatApiUrl/partners';
   static const String chatHistory =
       '$chatApiUrl/partner/requests'; // Added for history
+  static const String callHistory =
+      '$chatApiUrl/voice/calls/history/user'; // Added for voice call history
   static const String createConversation = '$chatApiUrl/conversations';
   static const String getConversations = '$chatApiUrl/conversations';
   static const String getChatMessages =
