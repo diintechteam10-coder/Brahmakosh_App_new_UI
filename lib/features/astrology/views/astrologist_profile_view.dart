@@ -6,6 +6,8 @@ import 'package:brahmakosh/common/models/astrologist_model.dart';
 import 'package:brahmakosh/core/theme/app_theme.dart';
 import 'package:brahmakosh/features/profile/viewmodels/profile_viewmodel.dart';
 import 'package:provider/provider.dart';
+import 'package:brahmakosh/core/services/storage_service.dart';
+import 'voice_call_view.dart';
 
 class AstrologistProfileView extends StatelessWidget {
   final AstrologistItem expert;
@@ -430,7 +432,20 @@ class AstrologistProfileView extends StatelessWidget {
               icon: Icons.call,
               label: "Call",
               price: "₹${expert.voiceCharge ?? 20}/min",
-              onTap: () => _showComingSoonSheet(context),
+              onTap: () {
+                final hasInit =
+                    StorageService.getBool('chat_initiated_${expert.id}') ??
+                    false;
+                if (!hasInit) {
+                  _showInitiateChatFirstDialog(context);
+                } else {
+                  _showVoiceCallConfirmationBottomSheet(
+                    context,
+                    expert,
+                    controller,
+                  );
+                }
+              },
             ),
           ),
           const SizedBox(width: 12),
@@ -579,6 +594,10 @@ class AstrologistProfileView extends StatelessWidget {
                           Navigator.pop(context);
 
                           if (credits >= 100) {
+                            StorageService.setBool(
+                              'chat_initiated_${expert.id}',
+                              true,
+                            );
                             controller.startChat(expert);
                           } else {
                             controller.showRechargeBottomSheet(context);
@@ -611,6 +630,203 @@ class AstrologistProfileView extends StatelessWidget {
             const SizedBox(height: 16),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showVoiceCallConfirmationBottomSheet(
+    BuildContext context,
+    AstrologistItem expert,
+    AstrologyController controller,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: Color(0xFFFFE0B2),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.phone_in_talk,
+                color: Colors.black87,
+                size: 24,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "VOICE CONSULTATION",
+              style: GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "You're about to start a voice call session with ${expert.name ?? 'your chosen Expert'}.",
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: Colors.black87,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Divider(color: Colors.black12, thickness: 1),
+            const SizedBox(height: 16),
+            Text(
+              "Connect with an astrologer or guru through a live audio call and end the session at any time - credits are deducted only for the minutes used, so please ensure a stable internet connection for a smooth experience.",
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                color: Colors.black87,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "This session will deduct ₹${expert.voiceCharge ?? 20} per minute",
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF8B4513),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Would you like to continue?",
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      side: const BorderSide(color: Color(0xFF8B6914)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                    ),
+                    child: Text(
+                      "CANCEL",
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF8B6914),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Consumer<ProfileViewModel>(
+                    builder: (context, profileVM, child) {
+                      if (profileVM.isLoading) {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Color(0xFFA67C00),
+                            ),
+                          ),
+                        );
+                      }
+                      return ElevatedButton(
+                        onPressed: () {
+                          // Read credits BEFORE dismissing the sheet
+                          final credits = profileVM.profile?.credits ?? 0;
+                          final minRequired =
+                              (expert.voiceCharge ?? 20) *
+                              5; // Enforce 5 mins minimum
+
+                          Navigator.pop(context);
+
+                          if (credits >= minRequired) {
+                            Get.to(
+                              () =>
+                                  VoiceCallView(expert: expert.toAstrologist()),
+                            );
+                          } else {
+                            Get.snackbar(
+                              "Insufficient Credits",
+                              "You need at least ₹$minRequired for a 5-minute session with this expert.",
+                              backgroundColor: Colors.redAccent,
+                              colorText: Colors.white,
+                            );
+                            controller.showRechargeBottomSheet(context);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          backgroundColor: const Color(0xFFA67C00),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          "CONTINUE",
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showInitiateChatFirstDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          "Chat Required",
+          style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          "Please initiate a chat with the expert first before making a call.",
+          style: GoogleFonts.inter(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              "OK",
+              style: GoogleFonts.inter(
+                color: const Color(0xFFA67C00),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

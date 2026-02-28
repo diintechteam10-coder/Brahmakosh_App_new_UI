@@ -86,6 +86,7 @@ dependencies:
   socket_io_client_new: ^1.0.3
   fl_chart: ^1.1.1
   just_audio: ^0.10.5
+  noise_meter: ^5.1.0
 
 
 dev_dependencies:

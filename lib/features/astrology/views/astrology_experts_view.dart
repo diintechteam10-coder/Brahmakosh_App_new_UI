@@ -9,6 +9,7 @@ import 'package:brahmakosh/common/models/astrologist_model.dart';
 import 'package:brahmakosh/features/profile/viewmodels/profile_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'voice_call_view.dart'; // Added VoiceCallView import
+import 'package:brahmakosh/core/services/storage_service.dart';
 
 class AstrologyExpertsView extends StatelessWidget {
   final String? screenTitle;
@@ -457,12 +458,22 @@ class AstrologyExpertsView extends StatelessWidget {
                             child: _buildActionButton(
                               icon: Icons.phone_outlined,
                               price: expert.voiceCharge?.toString() ?? "20",
-                              onTap: () =>
+                              onTap: () {
+                                final hasInit =
+                                    StorageService.getBool(
+                                      'chat_initiated_${expert.id}',
+                                    ) ??
+                                    false;
+                                if (!hasInit) {
+                                  _showInitiateChatFirstDialog(context);
+                                } else {
                                   _showVoiceCallConfirmationBottomSheet(
                                     context,
                                     expert,
                                     controller,
-                                  ),
+                                  );
+                                }
+                              },
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -653,6 +664,10 @@ class AstrologyExpertsView extends StatelessWidget {
                           Navigator.pop(context);
 
                           if (credits >= minRequired) {
+                            StorageService.setBool(
+                              'chat_initiated_${expert.id}',
+                              true,
+                            );
                             controller.startChat(expert);
                           } else {
                             // Optional: Show snackbar explaining why
@@ -858,6 +873,35 @@ class AstrologyExpertsView extends StatelessWidget {
             const SizedBox(height: 16),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showInitiateChatFirstDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          "Chat Required",
+          style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          "Please initiate a chat with the expert first before making a call.",
+          style: GoogleFonts.inter(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              "OK",
+              style: GoogleFonts.inter(
+                color: const Color(0xFFA67C00),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -8,6 +8,11 @@ import 'package:record/record.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+
+import '../../core/constants/app_constants.dart';
+import '../../core/services/storage_service.dart';
 
 enum VoiceAgentState {
   IDLE,
@@ -35,7 +40,10 @@ class VoiceAgentService extends ChangeNotifier {
   String _aiText = "";
   String get aiText => _aiText;
 
-  final List<int> _audioBuffer = [];
+  // Audio Playback
+  final List<int> _audioBytesAccumulator = [];
+  final List<File> _tempAudioFiles = [];
+  StreamSubscription? _audioCompletionSubscription;
   StreamSubscription? _recordSub;
 
   // History Sync Callbacks
@@ -89,19 +97,20 @@ class VoiceAgentService extends ChangeNotifier {
     _errorMessage = "";
     _interimText = "";
     _aiText = "";
-    _audioBuffer.clear();
+    _audioBytesAccumulator.clear();
 
     await _connectWebSocket();
   }
 
   Future<void> _connectWebSocket({bool isReconnect = false}) async {
     try {
-      debugPrint(
-        '[VoiceAgent] Connecting to wss://prod.brahmakosh.com/api/voice/agent ...',
-      );
-      _channel = WebSocketChannel.connect(
-        Uri.parse('wss://prod.brahmakosh.com/api/voice/agent'),
-      );
+      final token = StorageService.getString(AppConstants.keyAuthToken);
+      final wsUrl = token != null && token.isNotEmpty
+          ? 'wss://prod.brahmakosh.com/api/voice/agent?token=$token'
+          : 'wss://prod.brahmakosh.com/api/voice/agent';
+
+      debugPrint('[VoiceAgent] Connecting to $wsUrl ...');
+      _channel = WebSocketChannel.connect(Uri.parse(wsUrl));
 
       _channel!.stream.listen(
         _handleMessage,
@@ -129,10 +138,13 @@ class VoiceAgentService extends ChangeNotifier {
 
       // Send start message ONLY once per session or on reconnect
       if (_currentUserId != null) {
+        final selectedVoice =
+            StorageService.getString('ai_selected_voice') ?? 'voice_1';
         final payload = {
           "type": "start",
           "userId": _currentUserId,
           "chatId": _currentChatId ?? "new",
+          "voice": selectedVoice,
         };
         _sendWSMessage(payload);
       }
@@ -344,6 +356,7 @@ class VoiceAgentService extends ChangeNotifier {
           break;
 
         case 'audio_chunk':
+          debugPrint('🔥 AUDIO CHUNK RECEIVED');
           _onAudioChunk(data);
           break;
 
@@ -391,39 +404,59 @@ class VoiceAgentService extends ChangeNotifier {
     final chunkBase64 = data['audio'];
     if (chunkBase64 != null) {
       final bytes = base64Decode(chunkBase64);
-      _audioBuffer.addAll(bytes);
+      _audioBytesAccumulator.addAll(bytes);
     }
   }
 
   Future<void> _onAudioComplete(Map data) async {
-    debugPrint('[VoiceAgent] Audio complete received. Playback starting.');
+    debugPrint(
+      '[VoiceAgent] Audio complete received. Playing accumulated response.',
+    );
 
-    if (_audioBuffer.isNotEmpty) {
+    if (_audioBytesAccumulator.isNotEmpty) {
       try {
-        final audioBytes = Uint8List.fromList(_audioBuffer);
+        final directory = await getTemporaryDirectory();
+        final timestamp = DateTime.now().millisecondsSinceEpoch;
+        final chunkPath = '${directory.path}/agent_full_audio_$timestamp.mp3';
+        final chunkFile = File(chunkPath);
 
-        await _player.setAudioSource(AppAudioSource(audioBytes));
-        _player.play(); // Start playing asynchronously
+        await chunkFile.writeAsBytes(_audioBytesAccumulator);
+        _tempAudioFiles.add(chunkFile);
 
-        // Wait until playback completes or stops
-        await _player.playerStateStream.firstWhere(
-          (state) =>
-              state.processingState == ProcessingState.completed ||
-              state.processingState == ProcessingState.idle,
-        );
+        await _audioCompletionSubscription?.cancel();
 
-        _audioBuffer.clear();
-        debugPrint('[VoiceAgent] Playback finished.');
+        final completer = Completer<void>();
+        _audioCompletionSubscription = _player.playerStateStream.listen((
+          state,
+        ) {
+          if (state.processingState == ProcessingState.completed) {
+            if (!completer.isCompleted) completer.complete();
+          }
+        });
+
+        await _player.setAudioSource(AudioSource.uri(Uri.file(chunkPath)));
+        await _player.play();
+        await completer.future;
+
+        try {
+          if (chunkFile.existsSync()) {
+            chunkFile.delete();
+            _tempAudioFiles.remove(chunkFile);
+          }
+        } catch (e) {
+          // ignore
+        }
       } catch (e) {
         debugPrint('[VoiceAgent] Audio playback error: $e');
       }
+
+      _audioBytesAccumulator.clear();
     }
 
     debugPrint('[VoiceAgent] Agent finished speaking. Resuming listening...');
     _interimText = "";
     _aiText = "";
 
-    // Automatically restart microphone listening without dropping websocket
     await _startMicrophone();
   }
 
@@ -432,6 +465,7 @@ class VoiceAgentService extends ChangeNotifier {
     try {
       _emptyTurnTimer?.cancel();
       _processingTimeoutTimer?.cancel();
+      _audioCompletionSubscription?.cancel();
       await _recordSub?.cancel();
       _recordSub = null;
       if (await _recorder.isRecording()) {
@@ -441,8 +475,15 @@ class VoiceAgentService extends ChangeNotifier {
         _channel!.sink.close();
         _channel = null;
       }
-      _audioBuffer.clear();
+      _audioBytesAccumulator.clear();
       await _player.stop(); // Stop audio playback immediately
+
+      for (var file in _tempAudioFiles) {
+        try {
+          if (file.existsSync()) file.delete();
+        } catch (_) {}
+      }
+      _tempAudioFiles.clear();
     } catch (e) {
       debugPrint('[VoiceAgent] Cleanup error: $e');
     }
@@ -456,23 +497,6 @@ class VoiceAgentService extends ChangeNotifier {
     _recorder.dispose();
     super.dispose();
   }
-}
 
-class AppAudioSource extends StreamAudioSource {
-  final Uint8List _bytes;
-
-  AppAudioSource(this._bytes);
-
-  @override
-  Future<StreamAudioResponse> request([int? start, int? end]) async {
-    start ??= 0;
-    end ??= _bytes.length;
-    return StreamAudioResponse(
-      sourceLength: _bytes.length,
-      contentLength: end - start,
-      offset: start,
-      stream: Stream.value(_bytes.sublist(start, end)),
-      contentType: 'audio/mpeg',
-    );
-  }
+  // No AppAudioSource needed
 }

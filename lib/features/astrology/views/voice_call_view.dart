@@ -82,6 +82,51 @@ class _VoiceCallViewState extends State<VoiceCallView> {
                   child: RTCVideoView(_remoteRenderer),
                 ),
 
+              // Recording Indicator (Top Right)
+              Obx(
+                () => controller.isRecording.value
+                    ? Positioned(
+                        top: 16,
+                        right: 16,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.redAccent.withOpacity(0.5),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 10,
+                                height: 10,
+                                decoration: const BoxDecoration(
+                                  color: Colors.redAccent,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                "Recording...",
+                                style: GoogleFonts.inter(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -223,16 +268,23 @@ class _VoiceCallViewState extends State<VoiceCallView> {
                           },
                         ),
 
-                        // Volume / Speaker (Optional, default to open for now)
-                        _buildControlButton(
-                          icon: Icons.volume_up,
-                          color: Colors.white24,
-                          iconColor: Colors.white,
-                          label: "Speaker",
-                          onTap: () {
-                            // Can add audio routing logic later using flutter_webrtc Helper
-                            // Helper.setSpeakerphoneOn(true);
-                          },
+                        // Volume / Speaker
+                        Obx(
+                          () => _buildControlButton(
+                            icon: controller.isSpeakerOn.value
+                                ? Icons.volume_up
+                                : Icons.volume_down,
+                            color: controller.isSpeakerOn.value
+                                ? Colors.white
+                                : Colors.white24,
+                            iconColor: controller.isSpeakerOn.value
+                                ? Colors.black87
+                                : Colors.white,
+                            label: controller.isSpeakerOn.value
+                                ? "Speaker On"
+                                : "Speaker",
+                            onTap: () => controller.toggleSpeaker(),
+                          ),
                         ),
                       ],
                     ),

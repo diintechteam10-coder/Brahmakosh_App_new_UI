@@ -26,6 +26,8 @@ class VoiceCallController extends GetxController {
   final isRinging = false.obs;
   final isConnected = false.obs;
   final isMuted = false.obs;
+  final isSpeakerOn = false.obs;
+  final isRecording = false.obs;
   final isEnded = false.obs;
   final duration = 0.obs;
 
@@ -237,6 +239,12 @@ class VoiceCallController extends GetxController {
     }
   }
 
+  void toggleSpeaker() {
+    isSpeakerOn.value = !isSpeakerOn.value;
+    Helper.setSpeakerphoneOn(isSpeakerOn.value);
+    Utils.print("[VOICE_CALL_LOG] 🔊 Speaker toggled: ${isSpeakerOn.value}");
+  }
+
   void endCall() {
     if (_conversationId != null) {
       _socketService.emit('voice:call:end', {
@@ -265,6 +273,7 @@ class VoiceCallController extends GetxController {
     _peerConnection?.close();
 
     // Stop Recorder
+    isRecording.value = false;
     await _stopRecordingAndUpload();
 
     // Clean up listeners
@@ -288,11 +297,13 @@ class VoiceCallController extends GetxController {
           const RecordConfig(encoder: AudioEncoder.aacLc),
           path: _recordingPath!,
         );
+        isRecording.value = true;
         Utils.print(
           "[VOICE_CALL_LOG] 🎙️ Recording started at $_recordingPath",
         );
       }
     } catch (e) {
+      isRecording.value = false;
       Utils.print("[VOICE_CALL_LOG] ❌ Recording error: $e");
     }
   }

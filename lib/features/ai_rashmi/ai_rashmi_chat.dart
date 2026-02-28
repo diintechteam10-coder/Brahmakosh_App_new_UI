@@ -11,6 +11,7 @@ import 'voice_agent_service.dart';
 import 'package:lottie/lottie.dart';
 import '../../core/services/storage_service.dart';
 import '../../core/constants/app_constants.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'deity_selection_service.dart';
 import 'package:brahmakosh/features/agent/controllers/agent_controller.dart';
@@ -18,16 +19,18 @@ import 'package:brahmakosh/features/agent/controllers/agent_controller.dart';
 import 'krishna_category_selection_view.dart';
 import 'rashmi_category_selection_view.dart'; // New Import
 import 'widgets/deity_selection_widget.dart'; // New Import
+import 'widgets/neon_voice_ring.dart';
 import '../gita/views/gita_chapter_screen.dart';
-import 'avatar_introduction_screen.dart';
 
 class RashmiChat extends StatelessWidget {
   final String? backgroundImage;
   final bool hideLearnGita;
+  final bool autoStartVoice;
   const RashmiChat({
     super.key,
     this.backgroundImage,
     this.hideLearnGita = false,
+    this.autoStartVoice = false,
   });
 
   @override
@@ -39,6 +42,7 @@ class RashmiChat extends StatelessWidget {
     return _RashmiChatView(
       backgroundImage: backgroundImage,
       hideLearnGita: hideLearnGita,
+      autoStartVoice: autoStartVoice,
     );
   }
 }
@@ -46,7 +50,12 @@ class RashmiChat extends StatelessWidget {
 class _RashmiChatView extends StatefulWidget {
   final String? backgroundImage;
   final bool hideLearnGita;
-  const _RashmiChatView({this.backgroundImage, this.hideLearnGita = false});
+  final bool autoStartVoice;
+  const _RashmiChatView({
+    this.backgroundImage,
+    this.hideLearnGita = false,
+    this.autoStartVoice = false,
+  });
 
   @override
   State<_RashmiChatView> createState() => _RashmiChatViewState();
@@ -105,6 +114,10 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
         final vm = Get.find<AiRashmiController>();
         vm.newChat();
         vm.addListener(_scrollToBottom);
+      }
+
+      if (widget.autoStartVoice) {
+        _toggleVoiceChat();
       }
     });
   }
@@ -1518,186 +1531,195 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
                     break;
                 }
 
-                return Column(
+                return Stack(
                   children: [
-                    // Top App Bar Area
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 20.0,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const SizedBox(width: 48), // Balance
-                          Text(
-                            "Voice Assistant",
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 1.1,
-                            ),
-                          ),
-                          GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            onTap: () {
-                              widget.voiceService.stopSession();
-                              Navigator.pop(
-                                context,
-                              ); // Triggers cleanup from caller
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.1),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.close,
-                                color: Colors.white,
-                                size: 24,
-                              ),
-                            ),
-                          ),
-                        ],
+                    // Neon Voice Ring Animation Background (Centered)
+                    Positioned.fill(
+                      child: NeonVoiceRing(
+                        isListening:
+                            widget.voiceService.state ==
+                            VoiceAgentState.LISTENING,
+                        isSpeaking:
+                            widget.voiceService.state ==
+                            VoiceAgentState.SPEAKING,
                       ),
                     ),
-
-                    const Spacer(),
-
-                    // Status and Lottie Waves
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 32),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Status Title
-                          Text(
-                            title,
-                            style: TextStyle(
-                              color: actionColor,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 1.5,
-                            ),
+                    Column(
+                      children: [
+                        // Top App Bar Area
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0,
+                            vertical: 20.0,
                           ),
-                          const SizedBox(height: 32),
-
-                          // Lottie Waves
-                          if (widget.voiceService.state ==
-                              VoiceAgentState.LISTENING)
-                            Lottie.asset(
-                              'assets/lotties/listening_waves.json',
-                              height: 120,
-                              width: double.infinity,
-                              fit: BoxFit.contain,
-                              errorBuilder: (_, __, ___) =>
-                                  const SizedBox(height: 120),
-                            )
-                          else if (widget.voiceService.state ==
-                                  VoiceAgentState.PROCESSING ||
-                              widget.voiceService.state ==
-                                  VoiceAgentState.CONNECTING)
-                            const SizedBox(
-                              height: 120,
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  color: Colors.white70,
-                                  strokeWidth: 3,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const SizedBox(width: 48), // Balance
+                              Text(
+                                "",
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.9),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 1.1,
                                 ),
                               ),
-                            )
-                          else if (widget.voiceService.state ==
-                              VoiceAgentState.SPEAKING)
-                            Lottie.asset(
-                              'assets/lotties/speaking_waves.json',
-                              height: 120,
-                              width: double.infinity,
-                              fit: BoxFit.contain,
-                              errorBuilder: (_, __, ___) =>
-                                  const SizedBox(height: 120),
-                            )
-                          else
-                            const SizedBox(height: 120),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 48),
-
-                    // Live Transcription / AI Text
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 32),
-                        alignment: Alignment.topCenter,
-                        child: SingleChildScrollView(
-                          physics: const BouncingScrollPhysics(),
-                          padding: const EdgeInsets.only(bottom: 20),
-                          child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 300),
-                            child: Text(
-                              isProcessingOrSpeaking
-                                  ? widget.voiceService.aiText
-                                  : widget.voiceService.interimText.isEmpty
-                                  ? "How can I help you today?"
-                                  : widget.voiceService.interimText,
-                              key: ValueKey<String>(
-                                isProcessingOrSpeaking
-                                    ? widget.voiceService.aiText
-                                    : widget.voiceService.interimText,
-                              ),
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 26,
-                                fontWeight: FontWeight.w300,
-                                height: 1.3,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const Spacer(),
-
-                    // Bottom Action Button
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 50.0),
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () {
-                          widget.voiceService.stopSession();
-                          Navigator.pop(context);
-                        },
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            color: actionColor.withOpacity(0.15),
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: actionColor.withOpacity(0.5),
-                              width: 2,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: actionColor.withOpacity(0.2),
-                                blurRadius: 20,
-                                spreadRadius: 5,
+                              GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: () => _showVoiceSettingsSheet(context),
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.1),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.settings,
+                                    color: Colors.white,
+                                    size: 24,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
-                          child: Icon(
-                            currentActionIcon == Icons.fiber_manual_record
-                                ? Icons.stop
-                                : Icons.close,
-                            color: actionColor,
-                            size: 36,
+                        ),
+
+                        const Spacer(),
+
+                        // Status and Lottie Waves
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 32),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Status Title
+                              Text(
+                                title,
+                                style: TextStyle(
+                                  color: actionColor,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 1.5,
+                                ),
+                              ),
+                              const SizedBox(height: 32),
+
+                              // Lottie Waves
+                              if (widget.voiceService.state ==
+                                  VoiceAgentState.LISTENING)
+                                Lottie.asset(
+                                  'assets/lotties/listening_waves.json',
+                                  height: 120,
+                                  width: double.infinity,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (_, __, ___) =>
+                                      const SizedBox(height: 120),
+                                )
+                              else if (widget.voiceService.state ==
+                                      VoiceAgentState.PROCESSING ||
+                                  widget.voiceService.state ==
+                                      VoiceAgentState.CONNECTING)
+                                const SizedBox(
+                                  height: 120,
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white70,
+                                      strokeWidth: 3,
+                                    ),
+                                  ),
+                                )
+                              else if (widget.voiceService.state ==
+                                  VoiceAgentState.SPEAKING)
+                                Lottie.asset(
+                                  'assets/lotties/speaking_waves.json',
+                                  height: 120,
+                                  width: double.infinity,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (_, __, ___) =>
+                                      const SizedBox(height: 120),
+                                )
+                              else
+                                const SizedBox(height: 120),
+                            ],
                           ),
                         ),
-                      ),
+
+                        const SizedBox(height: 48),
+
+                        // Live Transcription / AI Text
+                        // Expanded(
+                        //   child: Container(
+                        //     padding: const EdgeInsets.symmetric(horizontal: 32),
+                        //     alignment: Alignment.topCenter,
+                        //     child: SingleChildScrollView(
+                        //       physics: const BouncingScrollPhysics(),
+                        //       padding: const EdgeInsets.only(bottom: 20),
+                        //       child: AnimatedSwitcher(
+                        //         duration: const Duration(milliseconds: 300),
+                        //         child: Text(
+                        //           isProcessingOrSpeaking
+                        //               ? widget.voiceService.aiText
+                        //               : widget.voiceService.interimText.isEmpty
+                        //               ? "How can I help you today?"
+                        //               : widget.voiceService.interimText,
+                        //           key: ValueKey<String>(
+                        //             isProcessingOrSpeaking
+                        //                 ? widget.voiceService.aiText
+                        //                 : widget.voiceService.interimText,
+                        //           ),
+                        //           textAlign: TextAlign.center,
+                        //           style: const TextStyle(
+                        //             color: Colors.white,
+                        //             fontSize: 26,
+                        //             fontWeight: FontWeight.w300,
+                        //             height: 1.3,
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
+                        const Spacer(),
+
+                        // Bottom Action Button
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 50.0),
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () {
+                              widget.voiceService.stopSession();
+                              Navigator.pop(context);
+                            },
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: actionColor.withOpacity(0.15),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: actionColor.withOpacity(0.5),
+                                  width: 2,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: actionColor.withOpacity(0.2),
+                                    blurRadius: 20,
+                                    spreadRadius: 5,
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                currentActionIcon == Icons.fiber_manual_record
+                                    ? Icons.stop
+                                    : Icons.close,
+                                color: actionColor,
+                                size: 36,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 );
@@ -1706,6 +1728,123 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showVoiceSettingsSheet(BuildContext context) {
+    // List of available voices - adjust IDs based on your backend expectations
+    final voices = [
+      {'id': 'voice_1', 'name': 'Rashmi (Female 1)'},
+      {'id': 'voice_2', 'name': 'Priya (Female 2)'},
+      {'id': 'voice_3', 'name': 'Krishna (Male 1)'},
+      {'id': 'voice_4', 'name': 'Arjun (Male 2)'},
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext sheetContext) {
+        return Container(
+          padding: const EdgeInsets.all(24),
+          decoration: const BoxDecoration(
+            color: Color(0xFFFFE0B2), // Match other modals
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Voice Settings",
+                style: GoogleFonts.lora(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "Select your preferred AI voice:",
+                style: GoogleFonts.inter(fontSize: 14, color: Colors.black54),
+              ),
+              const SizedBox(height: 20),
+              ...voices.map((voice) {
+                // Get the currently saved voice (default to voice_1)
+                final currentVoice =
+                    StorageService.getString('ai_selected_voice') ?? 'voice_1';
+                final isSelected = currentVoice == voice['id'];
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: InkWell(
+                    onTap: () {
+                      StorageService.setString(
+                        'ai_selected_voice',
+                        voice['id']!,
+                      );
+                      Navigator.pop(sheetContext);
+                      Get.snackbar(
+                        "Voice Changed",
+                        "Switched to ${voice['name']}. Reconnect to apply.",
+                        snackPosition: SnackPosition.TOP,
+                        backgroundColor: const Color(0xFFA67C00),
+                        colorText: Colors.white,
+                        duration: const Duration(seconds: 2),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? Colors.white
+                            : Colors.white.withOpacity(0.5),
+                        border: Border.all(
+                          color: isSelected
+                              ? const Color(0xFFA67C00)
+                              : Colors.transparent,
+                          width: isSelected ? 2 : 1,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.record_voice_over,
+                            color: isSelected
+                                ? const Color(0xFFA67C00)
+                                : Colors.black54,
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Text(
+                              voice['name']!,
+                              style: GoogleFonts.inter(
+                                fontSize: 16,
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: isSelected
+                                    ? const Color(0xFFA67C00)
+                                    : Colors.black87,
+                              ),
+                            ),
+                          ),
+                          if (isSelected)
+                            const Icon(
+                              Icons.check_circle,
+                              color: Color(0xFFA67C00),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ],
+          ),
+        );
+      },
     );
   }
 }

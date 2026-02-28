@@ -4,8 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../ai_rashmi_chat.dart';
-import '../../agent/lemon_agent_page.dart';
-import '../deity_selection_service.dart';
 import 'package:brahmakosh/features/agent/controllers/agent_controller.dart';
 
 class AiGuideView extends StatefulWidget {
@@ -38,12 +36,12 @@ class _AiGuideViewState extends State<AiGuideView> {
   }
 
   void _onTapToTalk() {
-    final _deityService = DeitySelectionService();
-    final agentId = _deityService.selectedDeity?.agentId;
-    debugPrint(
-      'AiGuideView: Navigating to AvatarAgentPage with agentId: $agentId, deity: ${_deityService.selectedDeity?.name}',
+    Get.to(
+      () => RashmiChat(
+        backgroundImage: widget.chatBackgroundImage,
+        autoStartVoice: true,
+      ),
     );
-    Get.to(() => AvatarAgentPage(initialAgentId: agentId));
   }
 
   void _onTextToChat() {
