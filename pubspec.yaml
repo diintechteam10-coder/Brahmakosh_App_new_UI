@@ -88,14 +88,18 @@ dependencies:
   just_audio: ^0.10.5
   noise_meter: ^5.1.0
 
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^6.0.0
-  flutter_launcher_icons: ^0.13.1
+  flutter_launcher_icons: ^0.14.4
 
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/Logo.png"
+  remove_alpha_ios: true
 
 dependency_overrides:
   record_linux: ^1.2.1
@@ -113,11 +117,3 @@ flutter:
     - assets/images/landing_welcome.mp4
     - assets/lotties/
 
-flutter_launcher_icons:
-  android: true
-  ios: true
-  image_path_ios: "assets/images/Icon.png"
-  image_path_android: "assets/images/Icon.png"
-  remove_alpha_ios: true
-  adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: "assets/images/Icon.png"

@@ -19,6 +19,7 @@ class AuthController extends GetxController {
 
   var isLoading = false.obs;
   var isEmailLoading = false.obs;
+  var isLoginPasswordHidden = true.obs;
 
   User? get currentUser => _auth.currentUser;
 

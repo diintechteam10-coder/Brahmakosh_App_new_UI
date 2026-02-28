@@ -86,14 +86,24 @@ class LoginView extends StatelessWidget {
               const SizedBox(height: 20),
 
               // Password Field
-              AuthInputField(
-                controller: authController.passwordController,
-                hint: "Password",
-                icon: Icons.lock_outline,
-                obscure: true,
-                suffix: const Icon(
-                  Icons.visibility_off_outlined,
-                  color: Colors.black45,
+              Obx(
+                () => AuthInputField(
+                  controller: authController.passwordController,
+                  hint: "Password",
+                  icon: Icons.lock_outline,
+                  obscure: authController.isLoginPasswordHidden.value,
+                  suffix: GestureDetector(
+                    onTap: () {
+                      authController.isLoginPasswordHidden.value =
+                          !authController.isLoginPasswordHidden.value;
+                    },
+                    child: Icon(
+                      authController.isLoginPasswordHidden.value
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      color: Colors.black45,
+                    ),
+                  ),
                 ),
               ),
 
