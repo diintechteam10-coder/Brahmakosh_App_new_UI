@@ -174,6 +174,7 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
     });
 
     _initVideo();
+    _initAudio(); // Start initializing and buffering audio early
   }
 
   void _parseMediaUrls() {
@@ -336,15 +337,9 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
         print("Error resuming audio on auto-start: $e");
       }
     } else {
-      Future.delayed(const Duration(milliseconds: 800), () {
-        _entryController.forward();
-      });
-
-      Future.delayed(const Duration(milliseconds: 3500), () {
-        setState(() => showPlayImage = true);
-      });
-
-      _initAudio();
+      _entryController.forward();
+      setState(() => showPlayImage = true);
+      // No longer need to call _initAudio here as it was started in initState
     }
   }
 
@@ -586,11 +581,18 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
       _timerController.forward();
       _breathingController.repeat(reverse: true);
       _rippleController.repeat();
+
+      // NEW: If not initialized yet, wait for it
+      if (!_isAudioInitialized) {
+        debugPrint("⏳ Audio not ready, waiting for initialization...");
+        await _initAudio();
+      }
+
       if (_isAudioInitialized) {
         try {
           await _audioPlayer.resume();
         } catch (e) {
-          print("Error resuming audio: $e");
+          debugPrint("Error resuming audio: $e");
         }
       }
       // Ensure video plays
