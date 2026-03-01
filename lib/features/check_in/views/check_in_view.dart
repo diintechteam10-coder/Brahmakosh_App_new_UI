@@ -13,6 +13,7 @@ import 'package:brahmakosh/common/utils.dart';
 
 import 'dart:async';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'chanting_configuration_view.dart';
 import 'package:brahmakosh/features/check_in/views/spiritual_stats_screen.dart';
@@ -210,7 +211,11 @@ class _CheckInViewState extends State<CheckInView>
                                 Icons.share,
                                 color: Color(0xff7B4A12),
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                if (data != null) {
+                                  _shareCheckInDetails(data);
+                                }
+                              },
                             ),
                           ],
                         ),
@@ -513,6 +518,35 @@ class _CheckInViewState extends State<CheckInView>
         ),
       ],
     );
+  }
+
+  void _shareCheckInDetails(Data data) {
+    if (data.stats == null) {
+      Utils.showToast("No stats to share yet.");
+      return;
+    }
+
+    final stats = data.stats!;
+    final recent =
+        (data.recentActivities != null && data.recentActivities!.isNotEmpty)
+        ? data.recentActivities!.first
+        : null;
+
+    String shareMessage =
+        "I just completed my spiritual check-in on Brahmakosh! 🧘✨\n\n";
+    shareMessage += "📊 My Progress:\n";
+    shareMessage += "• Total Sessions: ${stats.sessions ?? 0}\n";
+    shareMessage += "• Karma Points: ${stats.points ?? 0}\n";
+
+    if (recent != null) {
+      shareMessage +=
+          "• Last Activity: ${recent.title ?? 'Spiritual Practice'}\n";
+    }
+
+    shareMessage +=
+        "\nJoin me on my spiritual journey! Download Brahmakosh now. #Brahmakosh #Spirituality";
+
+    Share.share(shareMessage);
   }
 
   Widget _buildCategoryStats(CategoryStats stats) {
