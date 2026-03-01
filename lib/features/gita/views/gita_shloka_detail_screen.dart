@@ -52,6 +52,15 @@ class _GitaShlokaDetailScreenState extends State<GitaShlokaDetailScreen> {
     }
     if (verse.shlokaNumber != null) {
       StorageService.setString('gita_last_verse_number', verse.shlokaNumber!);
+      // Save per-chapter completed verse count
+      if (verse.chapterNumber != null) {
+        final verseNum = int.tryParse(verse.shlokaNumber!) ?? 0;
+        final key = 'gita_chapter_${verse.chapterNumber}_completed';
+        final current = StorageService.getInt(key) ?? 0;
+        if (verseNum > current) {
+          StorageService.setInt(key, verseNum);
+        }
+      }
     }
   }
 

@@ -4,7 +4,7 @@ description: "A new Flutter project."
 publish_to: 'none' 
 
 
-version: 1.0.0+16
+version: 1.0.0+22
 
 environment:
   sdk: ^3.10.0-290.1.beta
@@ -86,14 +86,21 @@ dependencies:
   # socket_io_client: ^1.0.3
   socket_io_client_new: ^1.0.3
   fl_chart: ^1.1.1
-
+  just_audio: ^0.10.5
+  noise_meter: ^5.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
 
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/Logo.png"
+  remove_alpha_ios: true
 
 dependency_overrides:
   record_linux: ^1.2.1

@@ -35,23 +35,42 @@ class _GemstoneDetailViewState extends State<GemstoneDetailView>
       appBar: AppBar(
         title: Text(
           "Gemstone Details",
-          style: GoogleFonts.playfairDisplay(
+          style: GoogleFonts.lora(
+            fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF6D3A0C),
+            color: const Color(0xff4E342E),
           ),
         ),
         backgroundColor: const Color(0xFFFDF5E6),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF6D3A0C)),
-          onPressed: () => Get.back(),
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Color(0xff5D4037),
+              size: 20,
+            ),
+            onPressed: () => Get.back(),
+          ),
         ),
         bottom: TabBar(
           controller: _tabController,
-          labelColor: const Color(0xFF6D3A0C),
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: const Color(0xFFD4A373),
-          labelStyle: GoogleFonts.lora(fontWeight: FontWeight.bold),
+          labelColor: const Color(0xff4E342E),
+          unselectedLabelColor: const Color(0xff8D6E63),
+          indicatorColor: const Color(0xffff7438),
+          labelStyle: GoogleFonts.inter(
+            fontWeight: FontWeight.bold,
+            fontSize: 13,
+          ),
+          unselectedLabelStyle: GoogleFonts.inter(
+            fontWeight: FontWeight.w600,
+            fontSize: 13,
+          ),
           tabs: const [
             Tab(text: "Life"),
             Tab(text: "Benefic"),
@@ -95,10 +114,10 @@ class _GemstoneDetailViewState extends State<GemstoneDetailView>
           children: [
             Text(
               detail.name ?? "Gemstone",
-              style: GoogleFonts.playfairDisplay(
-                fontSize: 32,
+              style: GoogleFonts.lora(
+                fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF6D3A0C),
+                color: const Color(0xff4E342E),
               ),
             ),
             const SizedBox(height: 8),
@@ -134,20 +153,20 @@ class _GemstoneDetailViewState extends State<GemstoneDetailView>
             width: 120,
             child: Text(
               label,
-              style: GoogleFonts.lora(
-                fontSize: 16,
+              style: GoogleFonts.inter(
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF8D6E63),
+                color: const Color(0xff8D6E63),
               ),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: GoogleFonts.lora(
-                fontSize: 16,
+              style: GoogleFonts.inter(
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF6D3A0C),
+                color: const Color(0xff4E342E),
               ),
             ),
           ),
@@ -168,16 +187,28 @@ class RudrakshaDetailView extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           "Rudraksha Details",
-          style: GoogleFonts.playfairDisplay(
+          style: GoogleFonts.lora(
+            fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF6D3A0C),
+            color: const Color(0xff4E342E),
           ),
         ),
         backgroundColor: const Color(0xFFFDF5E6),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF6D3A0C)),
-          onPressed: () => Get.back(),
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Color(0xff5D4037),
+              size: 20,
+            ),
+            onPressed: () => Get.back(),
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -228,28 +259,28 @@ class RudrakshaDetailView extends StatelessWidget {
                 children: [
                   Text(
                     rudraksha.name ?? "Rudraksha",
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 32,
+                    style: GoogleFonts.lora(
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF6D3A0C),
+                      color: const Color(0xff4E342E),
                     ),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     "Recommendation",
-                    style: GoogleFonts.lora(
-                      fontSize: 14,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF8D6E63),
+                      color: const Color(0xff8D6E63),
                       letterSpacing: 1,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     rudraksha.recommend ?? "Recommended for you.",
-                    style: GoogleFonts.lora(
-                      fontSize: 16,
-                      color: const Color(0xFF5D4037),
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      color: const Color(0xff5D4037),
                       height: 1.5,
                       fontStyle: FontStyle.italic,
                     ),
@@ -257,19 +288,19 @@ class RudrakshaDetailView extends StatelessWidget {
                   const Divider(height: 32),
                   Text(
                     "Details & Benefits",
-                    style: GoogleFonts.lora(
-                      fontSize: 14,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF8D6E63),
+                      color: const Color(0xff8D6E63),
                       letterSpacing: 1,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     rudraksha.detail ?? "No additional details.",
-                    style: GoogleFonts.lora(
-                      fontSize: 16,
-                      color: const Color(0xFF5D4037),
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      color: const Color(0xff5D4037),
                       height: 1.6,
                     ),
                   ),
@@ -294,16 +325,28 @@ class PujaDetailView extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           "Puja Suggestions",
-          style: GoogleFonts.playfairDisplay(
+          style: GoogleFonts.lora(
+            fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF6D3A0C),
+            color: const Color(0xff4E342E),
           ),
         ),
         backgroundColor: const Color(0xFFFDF5E6),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF6D3A0C)),
-          onPressed: () => Get.back(),
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Color(0xff5D4037),
+              size: 20,
+            ),
+            onPressed: () => Get.back(),
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -327,18 +370,18 @@ class PujaDetailView extends StatelessWidget {
             children: [
               Text(
                 "Summary",
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 24,
+                style: GoogleFonts.lora(
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFFD4A373),
+                  color: const Color(0xffff7438),
                 ),
               ),
               const SizedBox(height: 12),
               Text(
                 puja.summary ?? "No summary available.",
-                style: GoogleFonts.lora(
-                  fontSize: 16,
-                  color: const Color(0xFF5D4037),
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  color: const Color(0xff5D4037),
                   height: 1.5,
                 ),
               ),
@@ -346,10 +389,10 @@ class PujaDetailView extends StatelessWidget {
                 const Divider(height: 32),
                 Text(
                   "Suggested Pujas",
-                  style: GoogleFonts.playfairDisplay(
-                    fontSize: 22,
+                  style: GoogleFonts.lora(
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFFD4A373),
+                    color: const Color(0xffff7438),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -372,9 +415,9 @@ class PujaDetailView extends StatelessWidget {
                           Expanded(
                             child: Text(
                               puja.suggestions![index].toString(),
-                              style: GoogleFonts.lora(
-                                fontSize: 16,
-                                color: const Color(0xFF3E2723),
+                              style: GoogleFonts.inter(
+                                fontSize: 15,
+                                color: const Color(0xff4E342E),
                               ),
                             ),
                           ),

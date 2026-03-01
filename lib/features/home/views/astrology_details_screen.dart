@@ -125,7 +125,7 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
           : Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                   child: _buildSummaryCard(astro),
                 ),
                 Container(
@@ -168,7 +168,7 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
+
                 Expanded(
                   child: TabBarView(
                     controller: _tabController,
@@ -232,7 +232,7 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
     final userName = _data?.data?.user?.profile?.name ?? "User";
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: const Color(0xFFFFF0D9), // Light pastel orange/beige
         borderRadius: BorderRadius.circular(24),
@@ -255,7 +255,7 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
           Text(
             userName,
             style: GoogleFonts.lora(
-              fontSize: 22,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
               color: const Color(0xFF5D4037),
             ),
@@ -267,7 +267,7 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
               color: const Color(0xFF8D6E63),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
           Row(
             children: [
               Expanded(
@@ -316,7 +316,7 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
           Row(
             children: [
               const Icon(
@@ -364,7 +364,7 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),

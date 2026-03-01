@@ -9,18 +9,21 @@ import 'package:brahmakosh/core/constants/app_constants.dart';
 import 'package:brahmakosh/common/utils.dart';
 
 class ChantingConfigurationView extends StatelessWidget {
-  const ChantingConfigurationView({super.key, required this.chantingCategoryId});
+  const ChantingConfigurationView({
+    super.key,
+    required this.chantingCategoryId,
+  });
   final String chantingCategoryId;
 
   // Hardcoded Category ID for "Chanting" from requirements
-//  static const String chantingCategoryId = "69787dcbbeaf7e42675a2212";
+  //  static const String chantingCategoryId = "69787dcbbeaf7e42675a2212";
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
           ChantingBloc(repository: SpiritualRepository())
-            ..add( LoadChantingConfigs(categoryId: chantingCategoryId)),
+            ..add(LoadChantingConfigs(categoryId: chantingCategoryId)),
       child: Scaffold(
         backgroundColor: const Color(0xffFFF8E7),
         body: SafeArea(
@@ -85,18 +88,18 @@ class ChantingConfigurationView extends StatelessWidget {
                                 const SizedBox(height: 5),
                                 Text(
                                   'Chanting',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 22,
+                                  style: GoogleFonts.lora(
+                                    fontSize: 24,
                                     fontWeight: FontWeight.bold,
-                                    color: const Color(0xff1E1E1E),
+                                    color: const Color(0xff4E342E),
                                   ),
                                 ),
                                 const SizedBox(height: 5),
                                 Text(
                                   'How are you feeling today?',
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.inter(
                                     fontSize: 14,
-                                    color: const Color(0xff1E1E1E),
+                                    color: const Color(0xff8D6E63),
                                   ),
                                 ),
                                 const SizedBox(height: 15),
@@ -112,7 +115,7 @@ class ChantingConfigurationView extends StatelessWidget {
                                 const SizedBox(height: 10),
                                 Text(
                                   'You can stop anytime',
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.inter(
                                     fontSize: 12,
                                     color: Colors.grey[600],
                                   ),
@@ -151,18 +154,21 @@ class ChantingConfigurationView extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
-            onPressed: () => Get.back(),
+          Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Color(0xff5D4037),
+                size: 20,
+              ),
+              onPressed: () => Get.back(),
+            ),
           ),
-          Text(
-            'Back',
-            style: GoogleFonts.poppins(fontSize: 16, color: Colors.black87),
-          ),
-          const Spacer(),
-          const Icon(Icons.more_vert, color: Colors.black87),
         ],
       ),
     );
@@ -183,7 +189,7 @@ class ChantingConfigurationView extends StatelessWidget {
   Widget _buildMantraSelector(BuildContext context, ChantingLoaded state) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
@@ -200,30 +206,37 @@ class ChantingConfigurationView extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(
-                Icons.music_note_outlined,
-                size: 20,
-                color: Colors.black87,
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: const Color(0xffFF9B44).withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.music_note_outlined,
+                  size: 18,
+                  color: Color(0xffFF9B44),
+                ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 10),
               Text(
                 'Mantra',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.lora(
                   fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xff4E342E),
                 ),
               ),
             ],
           ),
-          const SizedBox(width: 20),
+          const SizedBox(height: 12),
           if (state.filteredConfigurations.isEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 20),
               child: Center(
                 child: Text(
                   "No mantras available for this mood.",
-                  style: GoogleFonts.poppins(color: Colors.grey),
+                  style: GoogleFonts.inter(color: Colors.grey),
                 ),
               ),
             )
@@ -311,7 +324,7 @@ class ChantingConfigurationView extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
@@ -328,18 +341,25 @@ class ChantingConfigurationView extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(
-                Icons.check_circle_outline,
-                size: 20,
-                color: Colors.black87,
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: const Color(0xffFF9B44).withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.repeat,
+                  size: 18,
+                  color: Color(0xffFF9B44),
+                ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 10),
               Text(
                 'Select Count',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.lora(
                   fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xff4E342E),
                 ),
               ),
             ],
@@ -354,7 +374,7 @@ class ChantingConfigurationView extends StatelessWidget {
                   thumbColor: Colors.white,
                   overlayColor: const Color(0xffFF9B44).withOpacity(0.1),
                   valueIndicatorColor: const Color(0xffFF9B44),
-                  valueIndicatorTextStyle: GoogleFonts.poppins(
+                  valueIndicatorTextStyle: GoogleFonts.inter(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
@@ -386,11 +406,11 @@ class ChantingConfigurationView extends StatelessWidget {
                   children: [
                     Text(
                       '${availableCounts.first}',
-                      style: GoogleFonts.poppins(color: Colors.grey),
+                      style: GoogleFonts.inter(color: Colors.grey),
                     ),
                     Text(
                       '${availableCounts.last}',
-                      style: GoogleFonts.poppins(color: Colors.grey),
+                      style: GoogleFonts.inter(color: Colors.grey),
                     ),
                   ],
                 ),
@@ -403,57 +423,77 @@ class ChantingConfigurationView extends StatelessWidget {
   }
 
   Widget _buildSummary(BuildContext context, ChantingLoaded state) {
-    return Column(
-      children: [
-        Text(
-          'Summary',
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: const Color(0xff1E1E1E),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-        ),
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _summaryChip(
-              state.selectedEmotion != null
-                  ? (ChantingBloc.emotionEmojis[state.selectedEmotion] ?? '😐')
-                  : '😐',
-              'Mood',
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            'Summary',
+            style: GoogleFonts.lora(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xff4E342E),
             ),
-            const SizedBox(width: 24),
-            _summaryChip(
-              '📿', // Rosary/Mala icon
-              '${state.selectedCount} Counts',
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.star, color: Color(0xffFF9B44), size: 20),
-            const SizedBox(width: 8),
-            Text(
-              'Finish to earn ',
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                color: const Color(0xff1E1E1E),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _summaryChip(
+                state.selectedEmotion != null
+                    ? (ChantingBloc.emotionEmojis[state.selectedEmotion] ??
+                          '😐')
+                    : '😐',
+                'Mood',
               ),
+              const SizedBox(width: 24),
+              _summaryChip('📿', '${state.selectedCount} Counts'),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xffFFF5E6),
+              borderRadius: BorderRadius.circular(12),
             ),
-            Text(
-              '+${state.selectedConfig?.karmaPoints ?? 0} karma Points',
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xffFF9B44),
-              ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.star, color: Color(0xffFF9B44), size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  'Finish to earn ',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: const Color(0xff4E342E),
+                  ),
+                ),
+                Text(
+                  '+${state.selectedConfig?.karmaPoints ?? 0} karma Points',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xffFF9B44),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -464,7 +504,7 @@ class ChantingConfigurationView extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           label,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.inter(
             fontSize: 14,
             color: const Color(0xff1E1E1E),
           ),
@@ -474,24 +514,37 @@ class ChantingConfigurationView extends StatelessWidget {
   }
 
   Widget _buildStartButton(BuildContext context, ChantingLoaded state) {
-    return SizedBox(
+    return Container(
       width: double.infinity,
-      height: 56,
+      height: 52,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: const LinearGradient(
+          colors: [Color(0xffFF8C00), Color(0xffFFA040)],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xffFF8C00).withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: ElevatedButton(
         onPressed: () {
           context.read<ChantingBloc>().add(const StartChantingSession());
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xffFF8C00), // Orange
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
           foregroundColor: Colors.white,
-          elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
         ),
         child: Text(
           'Start',
-          style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
+          style: GoogleFonts.lora(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -613,7 +666,7 @@ class _EmotionListState extends State<_EmotionList> {
                     child: Text(
                       emotion,
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.inter(
                         fontSize: isSelected ? 16 : 12,
                         fontWeight: isSelected
                             ? FontWeight.bold

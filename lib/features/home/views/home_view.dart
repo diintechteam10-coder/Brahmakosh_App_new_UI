@@ -6,6 +6,7 @@ import 'package:brahmakosh/features/home/views/sponsor_card.dart';
 import '../../../common/utils.dart';
 import '../../../../core/common_imports.dart';
 import '../../dashboard/viewmodels/dashboard_viewmodel.dart';
+import '../../profile/viewmodels/profile_viewmodel.dart';
 
 // New Imports
 import 'home_top_bar.dart';
@@ -76,6 +77,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         context,
         listen: false,
       ).initLocationUpdate(this, forceRefresh: true),
+      Provider.of<ProfileViewModel>(context, listen: false).refreshProfile(),
     ]);
   }
 
@@ -131,7 +133,6 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
             // SliverToBoxAdapter(child: RepaintBoundary(child: PaharSection())),
             // const SliverToBoxAdapter(child: SizedBox(height: 20)),
-
             SliverToBoxAdapter(
               child: RepaintBoundary(child: LuckInFavourSection()),
             ),

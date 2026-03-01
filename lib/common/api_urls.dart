@@ -1,7 +1,8 @@
 class ApiUrls {
   /// 🔹 Base URL
   //static const String baseUrl = 'https://backend-jfg8.onrender.com';
-  static const String baseUrl = 'https://stage.brahmakosh.com';
+  //static const String baseUrl = 'https://stage.brahmakosh.com';
+  static const String baseUrl = 'https://prod.brahmakosh.com';
 
   /// 🔹 Common API path
   static const String apiUrl = '$baseUrl/api/mobile';
@@ -65,10 +66,21 @@ class ApiUrls {
   static const String redemptionHistory =
       '$baseUrl/api/reward-redemptions/history';
 
+  /// 🔹 Pooja APIs
+  static const String poojaList = '$baseUrl/api/puja-padhati';
+
+  /// 🔹 Sankalp APIs
+  static const String sankalpList = '$baseUrl/api/sankalp';
+  static const String userSankalps = '$baseUrl/api/user-sankalp/my-sankalpas';
+  static const String joinSankalp = '$baseUrl/api/user-sankalp/join';
+  static const String userSankalpBase = '$baseUrl/api/user-sankalp';
+
   /// 🔹 Chat & Socket APIs
   static const String chatPartners = '$chatApiUrl/partners';
   static const String chatHistory =
       '$chatApiUrl/partner/requests'; // Added for history
+  static const String callHistory =
+      '$chatApiUrl/voice/calls/history/user'; // Added for voice call history
   static const String createConversation = '$chatApiUrl/conversations';
   static const String getConversations = '$chatApiUrl/conversations';
   static const String getChatMessages =
@@ -82,4 +94,13 @@ class ApiUrls {
       '$chatApiUrl/conversations'; // /{id}/feedback
   static const String unreadCount = '$chatApiUrl/unread-count';
   static const String creditHistory = '$chatApiUrl/credits/history/user';
+  static const String voiceRecordingUploadUrl =
+      '$chatApiUrl/voice/recording/upload-url';
+  static const String voiceRecordingAttach =
+      '$chatApiUrl/conversations'; // /:conversationId/voice-recording
+  static const String notifications = '$baseUrl/api/notifications';
+
+  /// 🔹 Swapna Decoder APIs
+  static const String swapnaDecoder = '$baseUrl/api/swapna-decoder';
+  static const String dreamRequests = '$baseUrl/api/dream-requests';
 }

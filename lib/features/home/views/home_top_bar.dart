@@ -5,6 +5,7 @@ import '../../../../core/common_imports.dart';
 import 'package:brahmakosh/features/home/controllers/home_controller.dart';
 import 'package:brahmakosh/common/models/user_complete_details_model.dart';
 import 'package:brahmakosh/features/profile/viewmodels/profile_viewmodel.dart';
+import 'package:brahmakosh/features/notifications/views/notification_screen.dart';
 
 class HomeTopBar extends StatefulWidget {
   final Widget? bottomCard;
@@ -316,15 +317,26 @@ class _HomeTopBarState extends State<HomeTopBar> with TickerProviderStateMixin {
                                   ],
                                 ),
                               ),
-                              SizedBox(
-                                width: 40,
-                                child: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Icon(
-                                    Icons.notifications_sharp,
-                                    color: _currentPhase == DayPhase.night
-                                        ? Color(0xffFFFFFF)
-                                        : Color(0xFF6D3A0C),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const NotificationScreen(),
+                                    ),
+                                  );
+                                },
+                                child: SizedBox(
+                                  width: 40,
+                                  child: Align(
+                                    alignment: Alignment.centerRight,
+                                    child: Icon(
+                                      Icons.notifications_sharp,
+                                      color: _currentPhase == DayPhase.night
+                                          ? Color(0xffFFFFFF)
+                                          : Color(0xFF6D3A0C),
+                                    ),
                                   ),
                                 ),
                               ),

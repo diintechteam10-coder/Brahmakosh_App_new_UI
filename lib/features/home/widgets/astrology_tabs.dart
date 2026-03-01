@@ -511,14 +511,14 @@ class _BirthChartTabState extends State<BirthChartTab> {
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 8),
 
           NorthIndianChart(
             housesPlanets: currentHouses,
             ascendantSign: widget.astroDetails?.ascendant,
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 8),
           Text(
             "Planet Notations",
             style: GoogleFonts.lora(

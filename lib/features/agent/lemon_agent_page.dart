@@ -24,7 +24,6 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
   String? errorMessage;
   bool isDropdownOpen = false;
 
-
   @override
   void initState() {
     super.initState();
@@ -97,22 +96,34 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
           child: SafeArea(
             top: false,
             bottom: true,
-            child: Stack(
-              children: [
-                Positioned.fill(child: Image.network(selectedAgent!.imageUrl!)),
-                Column(
-                  children: [
-                    // Custom Header
-                    _buildHeader(activeAvatars, selectedAgent),
-                    Expanded(
-                      child: permissionsGranted
-                          ? _buildMainContent(selectedAgent, hasActive)
-                          : _buildPermissionDenied(),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+            child: selectedAgent == null
+                ? const Center(
+                    child: CircularProgressIndicator(color: Colors.orange),
+                  )
+                : Stack(
+                    children: [
+                      if (selectedAgent.imageUrl != null)
+                        Positioned.fill(
+                          child: Image.network(
+                            selectedAgent.imageUrl!,
+                            
+                            errorBuilder: (context, error, stackTrace) =>
+                                const SizedBox.shrink(),
+                          ),
+                        ),
+                      Column(
+                        children: [
+                          // Custom Header
+                          _buildHeader(activeAvatars, selectedAgent),
+                          Expanded(
+                            child: permissionsGranted
+                                ? _buildMainContent(selectedAgent, hasActive)
+                                : _buildPermissionDenied(),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
           ),
         ),
       );
@@ -154,9 +165,9 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
   }
 
   Widget _buildAgentSelector(
-      List<dynamic> activeAvatars,
-      dynamic selectedAgent,
-      ) {
+    List<dynamic> activeAvatars,
+    dynamic selectedAgent,
+  ) {
     return Column(
       children: [
         GestureDetector(
@@ -176,8 +187,7 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
               children: [
                 CircleAvatar(
                   radius: 16,
-                  backgroundImage:
-                  NetworkImage(selectedAgent.imageUrl ?? ''),
+                  backgroundImage: NetworkImage(selectedAgent.imageUrl ?? ''),
                 ),
                 const SizedBox(width: 8),
                 Text(
@@ -205,57 +215,103 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
           duration: const Duration(milliseconds: 250),
           child: isDropdownOpen
               ? Container(
-            margin: const EdgeInsets.only(top: 12),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFFE9D2B8),
-              borderRadius: BorderRadius.circular(25),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: activeAvatars.map((agent) {
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      isDropdownOpen = false;
-                    });
-                    _onAgentChanged(agent);
-                  },
-                  child: Container(
-                    width: 140,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 20, horizontal: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Image.network(
-                          agent.imageUrl ?? '',
-                          height: 100,
-                          fit: BoxFit.cover,
-                        ),
-                        const SizedBox(height: 16),
-
-                        /// ✅ FIXED TEXT
-                        Text(
-                          " ${agent.name}",
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF4E342E),
+                  margin: const EdgeInsets.only(top: 12),
+                  padding: const EdgeInsets.all(12),
+                  width: MediaQuery.of(context).size.width - 48,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE9D2B8),
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  child: Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    alignment: WrapAlignment.center,
+                    children: activeAvatars.map((agent) {
+                      final isSelected = agent == controller.selectedAgent;
+                      final cardWidth =
+                          (MediaQuery.of(context).size.width - 48 - 24 - 20) /
+                          3;
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isDropdownOpen = false;
+                          });
+                          _onAgentChanged(agent);
+                        },
+                        child: Container(
+                          width: cardWidth.clamp(80.0, 120.0),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? const Color(0xFFFFF0D6)
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: isSelected
+                                ? Border.all(
+                                    color: const Color(0xFFFF9800),
+                                    width: 2,
+                                  )
+                                : null,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.network(
+                                  agent.imageUrl ?? '',
+                                  height: 70,
+                                  width: 70,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Container(
+                                        height: 70,
+                                        width: 70,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF4E9E0),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: const Icon(
+                                          Icons.person,
+                                          color: Color(0xff8D6E63),
+                                          size: 32,
+                                        ),
+                                      ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                agent.name ?? '',
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.w500,
+                                  color: const Color(0xFF4E342E),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      );
+                    }).toList(),
                   ),
-                );
-              }).toList(),
-            ),
-          )
+                )
               : const SizedBox(),
         ),
       ],

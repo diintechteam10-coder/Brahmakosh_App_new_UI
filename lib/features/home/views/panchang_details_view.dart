@@ -471,21 +471,6 @@ class PanchangDetailsView extends StatelessWidget {
               children: [
                 if (extra1 != null) Text(extra1, style: GoogleFonts.lora()),
                 if (extra2 != null) Text(extra2, style: GoogleFonts.lora()),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFF5E6),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    "This period is considered variable...",
-                    style: GoogleFonts.lora(
-                      color: const Color(0xFF6D3A0C),
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ),
               ],
             ),
           ),

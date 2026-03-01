@@ -7,6 +7,7 @@ import '../controllers/chat_history_controller.dart';
 import 'conversation_messages_view.dart';
 import '../../../common/models/astrologist_model.dart';
 import 'astrology_chat_view.dart';
+import 'call_history_view.dart';
 import '../../../common/utils.dart';
 
 class ConversationHistoryView extends StatelessWidget {
@@ -34,6 +35,16 @@ class ConversationHistoryView extends StatelessWidget {
           ),
         ),
         centerTitle: false,
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.phone_in_talk_outlined,
+              color: AppTheme.textPrimary,
+            ),
+            onPressed: () => Get.to(() => const CallHistoryView()),
+            tooltip: 'Call Logs',
+          ),
+        ],
       ),
       body: Column(
         children: [

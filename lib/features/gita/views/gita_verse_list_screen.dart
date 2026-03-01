@@ -119,7 +119,12 @@ class _GitaVerseListViewState extends State<_GitaVerseListView> {
                     return Center(child: Text('Error: ${state.message}'));
                   } else if (state is GitaVerseLoaded) {
                     return ListView.builder(
-                      padding: const EdgeInsets.only(left: 16, right: 16,top: 16, bottom: 60),
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        top: 16,
+                        bottom: 60,
+                      ),
                       itemCount: state.verses.length,
                       itemBuilder: (context, index) {
                         final verse = state.verses[index];
@@ -215,22 +220,27 @@ class _GitaVerseListViewState extends State<_GitaVerseListView> {
             ),
             const SizedBox(height: 8),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  verse.sanskritShloka ?? '',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF5D4037),
-                    height: 1.6,
+                Expanded(
+                  child: Text(
+                    verse.sanskritShloka ?? '',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF5D4037),
+                      height: 1.6,
+                    ),
+                    textAlign: TextAlign.left,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  textAlign: TextAlign.left,
                 ),
-                Icon(
+                const SizedBox(width: 8),
+                const Icon(
                   Icons.arrow_forward_ios,
                   color: Color(0xFF8B4513),
-                  size: 20,
+                  size: 16,
                 ),
               ],
             ),

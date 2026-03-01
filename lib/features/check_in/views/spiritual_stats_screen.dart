@@ -33,13 +33,24 @@ class SpiritualStatsScreen extends StatelessWidget {
           surfaceTintColor: Colors.transparent,
           backgroundColor: Colors.transparent, // Transparent AppBar
           elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Color(0xff7B4A12)),
-            onPressed: () => Navigator.of(context).pop(),
+          leading: Container(
+            margin: const EdgeInsets.all(8),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Color(0xff7B4A12),
+                size: 20,
+              ),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
           ),
           title: Text(
             'MY CHECK-IN',
-            style: GoogleFonts.cinzel(
+            style: GoogleFonts.lora(
               color: const Color(0xff7B4A12),
               fontWeight: FontWeight.bold,
               fontSize: 18,
@@ -104,9 +115,10 @@ class SpiritualStatsScreen extends StatelessWidget {
               if (data.categoryStats != null) ...[
                 Text(
                   'ACTIVITY BREAKDOWN',
-                  style: GoogleFonts.cinzel(
+                  style: GoogleFonts.lora(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
                     color: const Color(0xff7B4A12),
                   ),
                 ),
@@ -118,9 +130,10 @@ class SpiritualStatsScreen extends StatelessWidget {
                   data.recentActivities!.isNotEmpty) ...[
                 Text(
                   'RECENT HISTORY',
-                  style: GoogleFonts.cinzel(
+                  style: GoogleFonts.lora(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
                     color: const Color(0xff7B4A12),
                   ),
                 ),
@@ -175,7 +188,7 @@ class SpiritualStatsScreen extends StatelessWidget {
           children: [
             Text(
               user.name ?? 'Seeker',
-              style: GoogleFonts.playfairDisplay(
+              style: GoogleFonts.lora(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: const Color(0xff7B4A12),

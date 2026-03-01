@@ -105,51 +105,107 @@ class _DashboardLayoutState extends State<DashboardLayout>
     }
   }
 
+  void _onPopInvoked(bool didPop) async {
+    if (didPop) return;
+
+    final viewModel = Provider.of<DashboardViewModel>(context, listen: false);
+
+    // If we're not on the Home Tab, intercept the back gesture
+    if (viewModel.currentIndex != 0) {
+      viewModel.changeTab(0);
+      return; // Prevent popping the app
+    }
+
+    // If we are on the Home Tab, confirm app exit
+    final shouldPop = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text(
+            'Exit App',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: const Text('Are you sure you want to exit the app?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text(
+                'No',
+                style: TextStyle(color: Colors.grey, fontSize: 16),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text(
+                'Yes',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+    if (shouldPop ?? false) {
+      SystemNavigator.pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBody: true,
-      drawer: const AppDrawer(),
-      body: Consumer<DashboardViewModel>(
-        builder: (context, viewModel, child) {
-          // Detect tab change and reset the NEW tab's scroll position
-          if (viewModel.currentIndex != _previousIndex) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              _resetScrollForTab(viewModel.currentIndex);
-            });
-            _previousIndex = viewModel.currentIndex;
-          }
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) => _onPopInvoked(didPop),
+      child: Scaffold(
+        extendBody: true,
+        drawer: const AppDrawer(),
+        body: Consumer<DashboardViewModel>(
+          builder: (context, viewModel, child) {
+            // Detect tab change and reset the NEW tab's scroll position
+            if (viewModel.currentIndex != _previousIndex) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                _resetScrollForTab(viewModel.currentIndex);
+              });
+              _previousIndex = viewModel.currentIndex;
+            }
 
-          return IndexedStack(
-            index: viewModel.currentIndex,
-            children: [
-              HomeView(scrollController: _homeScrollController),
-              CheckInView(scrollController: _checkInScrollController),
-              RashmiAi(),
-              AstrologyExpertsView(
-                screenTitle: "Connect",
-                scrollController: _connectScrollController,
-              ),
-              // Only load WebView when active to prevent crashes/memory issues
-              viewModel.currentIndex == 4
-                  ? RemediesWebView(onBack: () => viewModel.changeTab(0))
-                  : const SizedBox(),
-              ReportView(), // Keeping ReportView for My Kosh (Drawer navigation)
-            ],
-          );
-        },
-      ),
-      bottomNavigationBar: Consumer<DashboardViewModel>(
-        builder: (context, viewModel, child) {
-          // Hide bottom navigation bar when on RashmiAi (index 2) or Remedies (index 4)
-          if (viewModel.currentIndex == 2 || viewModel.currentIndex == 4) {
-            return const SizedBox.shrink();
-          }
-          return CustomBottomNavBar(
-            currentIndex: viewModel.currentIndex,
-            onTap: viewModel.changeTab,
-          );
-        },
+            return IndexedStack(
+              index: viewModel.currentIndex,
+              children: [
+                HomeView(scrollController: _homeScrollController),
+                CheckInView(scrollController: _checkInScrollController),
+                RashmiAi(),
+                AstrologyExpertsView(
+                  screenTitle: "Connect",
+                  scrollController: _connectScrollController,
+                ),
+                // Only load WebView when active to prevent crashes/memory issues
+                viewModel.currentIndex == 4
+                    ? RemediesWebView(onBack: () => viewModel.changeTab(0))
+                    : const SizedBox(),
+                ReportView(), // Keeping ReportView for My Kosh (Drawer navigation)
+              ],
+            );
+          },
+        ),
+        bottomNavigationBar: Consumer<DashboardViewModel>(
+          builder: (context, viewModel, child) {
+            // Hide bottom navigation bar when on Remedies (index 4)
+            if (viewModel.currentIndex == 4) {
+              return const SizedBox.shrink();
+            }
+            return CustomBottomNavBar(
+              currentIndex: viewModel.currentIndex,
+              onTap: viewModel.changeTab,
+            );
+          },
+        ),
       ),
     );
   }

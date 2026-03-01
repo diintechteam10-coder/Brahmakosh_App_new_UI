@@ -38,22 +38,40 @@ class _AllDashasScreenState extends State<AllDashasScreen>
           style: GoogleFonts.lora(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF6D3A0C),
+            color: const Color(0xff4E342E),
           ),
         ),
         backgroundColor: const Color(0xFFFFFBF5),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF6D3A0C)),
-          onPressed: () => Navigator.pop(context),
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Color(0xff5D4037),
+              size: 20,
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
         centerTitle: true,
         bottom: TabBar(
           controller: _tabController,
-          labelColor: const Color(0xFF6D3A0C),
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: const Color(0xFF6D3A0C),
-          labelStyle: GoogleFonts.lora(fontWeight: FontWeight.bold),
+          labelColor: const Color(0xff4E342E),
+          unselectedLabelColor: const Color(0xff8D6E63),
+          indicatorColor: const Color(0xffff7438),
+          labelStyle: GoogleFonts.inter(
+            fontWeight: FontWeight.bold,
+            fontSize: 13,
+          ),
+          unselectedLabelStyle: GoogleFonts.inter(
+            fontWeight: FontWeight.w600,
+            fontSize: 13,
+          ),
           tabs: const [
             Tab(text: "Vimshottari"),
             Tab(text: "Yogini"),
@@ -144,7 +162,7 @@ class _AllDashasScreenState extends State<AllDashasScreen>
                 padding: const EdgeInsets.only(left: 4, bottom: 8),
                 child: Text(
                   "${widget.dashas.currentChardasha!.dashaDate}",
-                  style: GoogleFonts.lora(fontSize: 12, color: Colors.grey),
+                  style: GoogleFonts.inter(fontSize: 12, color: Colors.grey),
                 ),
               ),
             const SizedBox(height: 12),
@@ -258,10 +276,10 @@ class _AllDashasScreenState extends State<AllDashasScreen>
               const SizedBox(width: 8),
               Text(
                 label.toUpperCase(),
-                style: GoogleFonts.lora(
+                style: GoogleFonts.inter(
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
-                  color: const Color(0xFF6D3A0C),
+                  color: const Color(0xff4E342E),
                   letterSpacing: 1.1,
                 ),
               ),
@@ -310,14 +328,14 @@ class _AllDashasScreenState extends State<AllDashasScreen>
                         ),
                       Text(
                         "${item.planet}",
-                        style: GoogleFonts.lora(
+                        style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: isCurrent
                               ? FontWeight.bold
                               : FontWeight.w500,
                           color: isCurrent
-                              ? const Color(0xFF6D3A0C)
-                              : const Color(0xFF4E342E),
+                              ? const Color(0xff4E342E)
+                              : const Color(0xff4E342E),
                         ),
                       ),
                     ],
@@ -349,9 +367,9 @@ class _AllDashasScreenState extends State<AllDashasScreen>
       child: Text(
         title,
         style: GoogleFonts.lora(
-          fontSize: 20,
+          fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: const Color(0xFF5D4037),
+          color: const Color(0xff4E342E),
         ),
       ),
     );
@@ -475,7 +493,7 @@ class _AllDashasScreenState extends State<AllDashasScreen>
                         children: [
                           Text(
                             label.toUpperCase(),
-                            style: GoogleFonts.lora(
+                            style: GoogleFonts.inter(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
                               color: Colors.grey[600],
@@ -488,7 +506,7 @@ class _AllDashasScreenState extends State<AllDashasScreen>
                             style: GoogleFonts.lora(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: const Color(0xFF4E342E),
+                              color: const Color(0xff4E342E),
                             ),
                           ),
                         ],
@@ -586,7 +604,7 @@ class _AllDashasScreenState extends State<AllDashasScreen>
                         style: GoogleFonts.lora(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFF4E342E),
+                          color: const Color(0xff4E342E),
                         ),
                       ),
                       if (formattedDate != null)
@@ -594,9 +612,9 @@ class _AllDashasScreenState extends State<AllDashasScreen>
                       else
                         Text(
                           item.dateRange,
-                          style: GoogleFonts.lora(
+                          style: GoogleFonts.inter(
                             fontSize: 12,
-                            color: const Color(0xFF8D6E63),
+                            color: const Color(0xff8D6E63),
                           ),
                         ),
                     ],
@@ -618,7 +636,10 @@ class _AllDashasScreenState extends State<AllDashasScreen>
       if (parts.length != 2) {
         return Text(
           dateStr,
-          style: GoogleFonts.lora(fontSize: 12, color: const Color(0xFF8D6E63)),
+          style: GoogleFonts.inter(
+            fontSize: 12,
+            color: const Color(0xff8D6E63),
+          ),
         );
       }
 
@@ -647,17 +668,17 @@ class _AllDashasScreenState extends State<AllDashasScreen>
           children: [
             Text(
               "${outFormat.format(start)} -",
-              style: GoogleFonts.lora(
+              style: GoogleFonts.inter(
                 fontSize: 10,
-                color: const Color(0xFFA1887F),
+                color: const Color(0xff8D6E63),
               ),
             ),
             Text(
               outFormat.format(end),
-              style: GoogleFonts.lora(
+              style: GoogleFonts.inter(
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF6D3A0C),
+                color: const Color(0xff4E342E),
               ),
             ),
           ],
@@ -675,7 +696,7 @@ class _AllDashasScreenState extends State<AllDashasScreen>
     } catch (e) {
       return Text(
         dateStr,
-        style: GoogleFonts.lora(fontSize: 12, color: const Color(0xFF8D6E63)),
+        style: GoogleFonts.inter(fontSize: 12, color: const Color(0xff8D6E63)),
       );
     }
   }
@@ -693,17 +714,17 @@ class _AllDashasScreenState extends State<AllDashasScreen>
         children: [
           Text(
             "$label: ",
-            style: GoogleFonts.lora(
+            style: GoogleFonts.inter(
               fontSize: 10,
-              color: const Color(0xFFA1887F),
+              color: const Color(0xff8D6E63),
             ),
           ),
           Text(
             date,
-            style: GoogleFonts.lora(
+            style: GoogleFonts.inter(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF6D3A0C),
+              color: const Color(0xff4E342E),
             ),
           ),
         ],
