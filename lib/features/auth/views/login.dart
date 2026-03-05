@@ -205,7 +205,10 @@ class LoginView extends StatelessWidget {
               // Continue with Google
               Obx(() {
                 return GestureDetector(
-                  onTap: authController.isLoading.value
+                  onTap:
+                      authController.isGoogleLoading.value ||
+                          authController.isAppleLoading.value ||
+                          authController.isEmailLoading.value
                       ? null
                       : () {
                           authController.signInWithGoogle();
@@ -233,7 +236,7 @@ class LoginView extends StatelessWidget {
                           width: 24,
                         ),
                         const SizedBox(width: 12),
-                        authController.isLoading.value
+                        authController.isGoogleLoading.value
                             ? const SizedBox(
                                 height: 24,
                                 width: 24,
@@ -248,6 +251,61 @@ class LoginView extends StatelessWidget {
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                   color: const Color(0xff755C3B),
+                                ),
+                              ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+
+              const SizedBox(height: 16),
+
+              // Continue with Apple
+              Obx(() {
+                return GestureDetector(
+                  onTap:
+                      authController.isGoogleLoading.value ||
+                          authController.isAppleLoading.value ||
+                          authController.isEmailLoading.value
+                      ? null
+                      : () {
+                          authController.signInWithApple();
+                        },
+                  child: Container(
+                    height: 54,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.apple, color: Colors.white, size: 28),
+                        const SizedBox(width: 12),
+                        authController.isAppleLoading.value
+                            ? const SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Text(
+                                "Continue with Apple",
+                                style: GoogleFonts.inter(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
                                 ),
                               ),
                       ],

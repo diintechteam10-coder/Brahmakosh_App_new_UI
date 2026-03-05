@@ -8,6 +8,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:brahmakosh/core/services/storage_service.dart';
 import 'package:brahmakosh/core/constants/app_constants.dart';
 import 'package:http/http.dart' as http;
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -15,9 +16,14 @@ class AuthController extends GetxController {
   final TextEditingController passwordController = TextEditingController();
 
   /// ❌ serverClientId ANDROID me bilkul mat do
-  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    clientId:
+        '449350149768-vk39rpmam4mph0sprle7uie8okbfe2u5.apps.googleusercontent.com',
+    scopes: ['email'],
+  );
 
-  var isLoading = false.obs;
+  var isGoogleLoading = false.obs;
+  var isAppleLoading = false.obs;
   var isEmailLoading = false.obs;
   var isLoginPasswordHidden = true.obs;
 
@@ -93,13 +99,13 @@ class AuthController extends GetxController {
   }
 
   Future<void> signInWithGoogle() async {
-    if (isLoading.value) {
+    if (isGoogleLoading.value || isAppleLoading.value || isEmailLoading.value) {
       print('⏳ Already loading, returning...');
       return;
     }
 
     print('🚀 Google Sign-In START');
-    isLoading.value = true;
+    isGoogleLoading.value = true;
 
     try {
       /// 🔥 CLEAR OLD SESSION
@@ -181,8 +187,8 @@ class AuthController extends GetxController {
       print('➡️ Navigating to mobile OTP with email: $userEmail');
       await Future.delayed(const Duration(milliseconds: 300));
 
-      /// 🔍 CHECK USER AFTER GOOGLE LOGIN
-      await _checkUserAfterGoogleLogin(userEmail);
+      /// 🔍 CHECK USER AFTER SOCIAL LOGIN
+      await _checkUserAfterSocialLogin(userEmail);
 
       print('🏁 Navigation complete');
     } catch (e, s) {
@@ -191,11 +197,67 @@ class AuthController extends GetxController {
       print(s);
     } finally {
       print('🔚 Google Sign-In END');
-      isLoading.value = false;
+      isGoogleLoading.value = false;
     }
   }
 
-  Future<void> _checkUserAfterGoogleLogin(String email) async {
+  Future<void> signInWithApple() async {
+    if (isGoogleLoading.value || isAppleLoading.value || isEmailLoading.value) {
+      print('⏳ Already loading, returning...');
+      return;
+    }
+
+    print('🚀 Apple Sign-In START');
+    isAppleLoading.value = true;
+
+    try {
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      print('✅ Apple credential received');
+
+      final oAuthProvider = OAuthProvider('apple.com');
+      final firebaseCredential = oAuthProvider.credential(
+        idToken: credential.identityToken,
+        accessToken: credential.authorizationCode,
+      );
+
+      print('🔥 Signing in to Firebase with Apple...');
+      final UserCredential userCredential = await _auth.signInWithCredential(
+        firebaseCredential,
+      );
+
+      final User? user = userCredential.user;
+      if (user == null) {
+        throw Exception('❌ Firebase user is NULL');
+      }
+
+      print('✅ Firebase UID   : ${user.uid}');
+      print('✅ Firebase Email : ${user.email}');
+
+      final userEmail = user.email ?? credential.email ?? '';
+
+      await StorageService.setBool(AppConstants.keyIsLoggedIn, true);
+      await StorageService.setString(AppConstants.keyUserId, user.uid);
+      await StorageService.setString(AppConstants.keyUserEmail, userEmail);
+
+      await Future.delayed(const Duration(milliseconds: 300));
+      await _checkUserAfterSocialLogin(userEmail);
+    } catch (e, s) {
+      print('❌ ERROR in Apple Sign-In');
+      print(e);
+      print(s);
+    } finally {
+      print('🔚 Apple Sign-In END');
+      isAppleLoading.value = false;
+    }
+  }
+
+  Future<void> _checkUserAfterSocialLogin(String email) async {
     try {
       print('🔍 Checking user status for email: $email');
 
