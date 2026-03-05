@@ -1,4 +1,5 @@
 import '../../../../core/common_imports.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../profile/viewmodels/profile_viewmodel.dart';
 import '../../profile/views/profile_details_view.dart';
 import '../../profile/views/update_profile_view.dart';
@@ -373,6 +374,16 @@ class AppDrawer extends StatelessWidget {
                                           Get.to(() => const AboutUsView());
                                         },
                                       ),
+                                      _menuItem(
+                                        icon: Icons.delete_outline,
+                                        label: "Delete Account",
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                          _launchDeleteAccountEmail(
+                                            profile?.email ?? '',
+                                          );
+                                        },
+                                      ),
                                     ],
                                   ),
 
@@ -536,6 +547,27 @@ class AppDrawer extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _launchDeleteAccountEmail(String userEmail) async {
+    const recipient = 'contact@brahmakosh.com';
+    const subject = 'Account Deletion Request - Brahmakosh App';
+    final body =
+        'Dear Brahmakosh Team,\n\n'
+        'I would like to request the deletion of my account associated with the following email address:\n\n'
+        'Registered Email: $userEmail\n\n'
+        'Please delete my account and all associated data from your platform.\n\n'
+        'Thank you.\n';
+
+    final Uri emailLaunchUri = Uri.parse(
+      'mailto:$recipient?subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}',
+    );
+
+    try {
+      await launchUrl(emailLaunchUri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint('Could not launch email: $e');
+    }
   }
 
   Widget _languageRow(BuildContext context) {
