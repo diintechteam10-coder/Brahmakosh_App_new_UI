@@ -1,4 +1,5 @@
 import '../../../../core/common_imports.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../profile/viewmodels/profile_viewmodel.dart';
 import '../../profile/views/profile_details_view.dart';
 import '../../profile/views/update_profile_view.dart';
@@ -12,6 +13,8 @@ import '../../wallet/views/recharge_plans_view.dart';
 import '../../sankalp/views/sankalp_screen.dart';
 import '../../pooja/views/pooja_list_screen.dart';
 import '../../swapna_decoder/views/swapna_decoder_screen.dart';
+import '../../support/views/help_support_view.dart';
+import '../../support/views/about_us_view.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -238,7 +241,7 @@ class AppDrawer extends StatelessWidget {
                                       Get.to(() => const ProfileDetailsView());
                                     },
                                   ),
-                                  _languageRow(),
+                                  _languageRow(context),
 
                                   const SizedBox(height: 16),
 
@@ -315,7 +318,12 @@ class AppDrawer extends StatelessWidget {
                                       _menuItem(
                                         icon: Icons.shopping_cart_outlined,
                                         label: "Orders",
-                                        onTap: () {},
+                                        onTap: () {
+                                          _showComingSoonPopup(
+                                            context,
+                                            "Orders",
+                                          );
+                                        },
                                       ),
                                       _menuItem(
                                         icon: Icons.receipt_long_outlined,
@@ -343,17 +351,38 @@ class AppDrawer extends StatelessWidget {
                                       _menuItem(
                                         icon: Icons.settings_outlined,
                                         label: "Settings",
-                                        onTap: () {},
+                                        onTap: () {
+                                          _showComingSoonPopup(
+                                            context,
+                                            "Settings",
+                                          );
+                                        },
                                       ),
                                       _menuItem(
                                         icon: Icons.help_outline,
                                         label: "Help & Support",
-                                        onTap: () {},
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                          Get.to(() => const HelpSupportView());
+                                        },
                                       ),
                                       _menuItem(
                                         icon: Icons.info_outline,
                                         label: "About Us",
-                                        onTap: () {},
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                          Get.to(() => const AboutUsView());
+                                        },
+                                      ),
+                                      _menuItem(
+                                        icon: Icons.delete_outline,
+                                        label: "Delete Account",
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                          _launchDeleteAccountEmail(
+                                            profile?.email ?? '',
+                                          );
+                                        },
                                       ),
                                     ],
                                   ),
@@ -481,35 +510,98 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  Widget _languageRow() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6), // Reduced padding
-      child: Row(
-        children: [
-          const Icon(Icons.translate, color: Color(0xff5D4037), size: 18),
-          const SizedBox(width: 12),
-          Expanded(
+  void _showComingSoonPopup(BuildContext context, String featureName) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: Colors.white,
+        title: Row(
+          children: [
+            const Icon(Icons.info_outline, color: AppTheme.primaryGold),
+            const SizedBox(width: 10),
+            Text(
+              "Coming Soon",
+              style: GoogleFonts.playfairDisplay(
+                fontWeight: FontWeight.bold,
+                color: const Color(0xff5D4037),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          "The $featureName feature is currently under development and will be available in a future update. Stay tuned!",
+          style: GoogleFonts.inter(fontSize: 15, color: Colors.black87),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
             child: Text(
-              "Change Language",
+              "Okay",
               style: GoogleFonts.inter(
-                fontSize: 15, // Reduced font size
-                fontWeight: FontWeight.w500,
-                color: const Color(0xff4E342E),
+                fontWeight: FontWeight.bold,
+                color: AppTheme.primaryGold,
               ),
             ),
           ),
-          Container(
-            padding: const EdgeInsets.all(2),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.grey.withOpacity(0.3)),
-            ),
-            child: Row(
-              children: [_langOption("En", true), _langOption("Hi", false)],
-            ),
-          ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _launchDeleteAccountEmail(String userEmail) async {
+    const recipient = 'contact@brahmakosh.com';
+    const subject = 'Account Deletion Request - Brahmakosh App';
+    final body =
+        'Dear Brahmakosh Team,\n\n'
+        'I would like to request the deletion of my account associated with the following email address:\n\n'
+        'Registered Email: $userEmail\n\n'
+        'Please delete my account and all associated data from your platform.\n\n'
+        'Thank you.\n';
+
+    final Uri emailLaunchUri = Uri.parse(
+      'mailto:$recipient?subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}',
+    );
+
+    try {
+      await launchUrl(emailLaunchUri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint('Could not launch email: $e');
+    }
+  }
+
+  Widget _languageRow(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6), // Reduced padding
+      child: InkWell(
+        onTap: () => _showComingSoonPopup(context, "Change Language"),
+        child: Row(
+          children: [
+            const Icon(Icons.translate, color: Color(0xff5D4037), size: 18),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                "Change Language",
+                style: GoogleFonts.inter(
+                  fontSize: 15, // Reduced font size
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xff4E342E),
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.grey.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [_langOption("En", true), _langOption("Hi", false)],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -200,6 +200,7 @@ class _SpiritualConfigurationViewState
     return SizedBox(
       height: 110,
       child: _EmotionList(
+        availableEmotions: state.availableEmotions,
         selectedEmotion: state.selectedEmotion,
         onSelect: (emotion) {
           context.read<SpiritualConfigBloc>().add(SelectEmotion(emotion));
@@ -459,10 +460,15 @@ class _SpiritualConfigurationViewState
 }
 
 class _EmotionList extends StatefulWidget {
+  final List<String> availableEmotions;
   final String? selectedEmotion;
   final Function(String) onSelect;
 
-  const _EmotionList({required this.selectedEmotion, required this.onSelect});
+  const _EmotionList({
+    required this.availableEmotions,
+    required this.selectedEmotion,
+    required this.onSelect,
+  });
 
   @override
   State<_EmotionList> createState() => _EmotionListState();
@@ -544,11 +550,10 @@ class _EmotionListState extends State<_EmotionList> {
       scrollDirection: Axis.horizontal,
       physics: const BouncingScrollPhysics(),
       padding: EdgeInsets.zero,
-      itemCount: _emotionsMap.length, // Finite count
+      itemCount: widget.availableEmotions.length, // Filtered count
       itemBuilder: (context, index) {
-        final entry = _emotionsMap.entries.elementAt(index);
-        final emotion = entry.key;
-        final emoji = entry.value;
+        final emotion = widget.availableEmotions[index];
+        final emoji = _emotionsMap[emotion] ?? '😐';
         final isSelected = widget.selectedEmotion == emotion;
 
         return SizedBox(

@@ -34,6 +34,7 @@ dependencies:
   google_places_flutter: ^2.1.1
   scratcher: ^2.5.0
   confetti: ^0.7.0
+  sizer: ^2.0.15
   
   # Local Storage
   shared_preferences: ^2.2.2
@@ -85,8 +86,9 @@ dependencies:
   # socket_io_client: ^1.0.3
   socket_io_client_new: ^1.0.3
   fl_chart: ^1.1.1
-  just_audio: ^0.10.5
   noise_meter: ^5.1.0
+  just_audio: 0.10.5
+  share_plus: ^10.1.4
 
 dev_dependencies:
   flutter_test:
