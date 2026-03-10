@@ -56,7 +56,7 @@ class AppDrawer extends StatelessWidget {
                                 const SizedBox(width: 16),
                                 Text(
                                   "Profile",
-                                  style: GoogleFonts.playfairDisplay(
+                                  style: GoogleFonts.lora(
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold,
                                     color: const Color(0xff5D4037),
@@ -186,7 +186,7 @@ class AppDrawer extends StatelessWidget {
                                     children: [
                                       Text(
                                         user?.name ?? 'User',
-                                        style: GoogleFonts.playfairDisplay(
+                                        style: GoogleFonts.lora(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
                                           color: const Color(0xff5D4037),
@@ -434,7 +434,7 @@ class AppDrawer extends StatelessWidget {
                                           const SizedBox(width: 6),
                                           Text(
                                             "Logout",
-                                            style: GoogleFonts.inter(
+                                            style: GoogleFonts.lora(
                                               fontSize: 13,
                                               fontWeight: FontWeight.w600,
                                               color: Colors.white,
@@ -467,7 +467,7 @@ class AppDrawer extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 6, top: 4),
       child: Text(
         title,
-        style: GoogleFonts.playfairDisplay(
+        style: GoogleFonts.lora(
           fontSize: 15, // Reduced font size
           fontWeight: FontWeight.bold,
           color: const Color(0xff5D4037),
@@ -496,7 +496,7 @@ class AppDrawer extends StatelessWidget {
             Expanded(
               child: Text(
                 label,
-                style: GoogleFonts.inter(
+                style: GoogleFonts.lora(
                   fontSize: 15, // Reduced font size
                   fontWeight: FontWeight.w500,
                   color: const Color(0xff4E342E),
@@ -522,7 +522,7 @@ class AppDrawer extends StatelessWidget {
             const SizedBox(width: 10),
             Text(
               "Coming Soon",
-              style: GoogleFonts.playfairDisplay(
+              style: GoogleFonts.lora(
                 fontWeight: FontWeight.bold,
                 color: const Color(0xff5D4037),
               ),
@@ -531,14 +531,14 @@ class AppDrawer extends StatelessWidget {
         ),
         content: Text(
           "The $featureName feature is currently under development and will be available in a future update. Stay tuned!",
-          style: GoogleFonts.inter(fontSize: 15, color: Colors.black87),
+          style: GoogleFonts.lora(fontSize: 15, color: Colors.black87),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
               "Okay",
-              style: GoogleFonts.inter(
+              style: GoogleFonts.lora(
                 fontWeight: FontWeight.bold,
                 color: AppTheme.primaryGold,
               ),
@@ -582,7 +582,7 @@ class AppDrawer extends StatelessWidget {
             Expanded(
               child: Text(
                 "Change Language",
-                style: GoogleFonts.inter(
+                style: GoogleFonts.lora(
                   fontSize: 15, // Reduced font size
                   fontWeight: FontWeight.w500,
                   color: const Color(0xff4E342E),
@@ -615,7 +615,7 @@ class AppDrawer extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: GoogleFonts.inter(
+        style: GoogleFonts.lora(
           fontSize: 11, // Reduced font size
           fontWeight: FontWeight.bold,
           color: isSelected ? Colors.black87 : Colors.black54,
@@ -647,7 +647,7 @@ class AppDrawer extends StatelessWidget {
                 // Text Part
                 Text(
                   "Karma Wallet",
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.lora(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: const Color(0xff5D4037),
@@ -666,7 +666,7 @@ class AppDrawer extends StatelessWidget {
                   ),
                   child: Text(
                     "$points", // Display real points
-                    style: GoogleFonts.playfairDisplay(
+                    style: GoogleFonts.lora(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xff5D4037),
@@ -676,7 +676,7 @@ class AppDrawer extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   "Your Karma Points",
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.lora(
                     fontSize: 10,
                     color: const Color(0xff5D4037).withOpacity(0.8),
                   ),
@@ -701,7 +701,7 @@ class AppDrawer extends StatelessWidget {
                 ),
                 child: Text(
                   "Redeem",
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.lora(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -743,7 +743,7 @@ class AppDrawer extends StatelessWidget {
                 // Text Part
                 Text(
                   "Credit Wallet",
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.lora(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: const Color(0xff5D4037),
@@ -762,7 +762,7 @@ class AppDrawer extends StatelessWidget {
                   ),
                   child: Text(
                     "$credits", // Display real credits
-                    style: GoogleFonts.playfairDisplay(
+                    style: GoogleFonts.lora(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xff5D4037),
@@ -772,7 +772,7 @@ class AppDrawer extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   "Your Credit Points",
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.lora(
                     fontSize: 10,
                     color: const Color(0xff5D4037).withOpacity(0.8),
                   ),
@@ -797,7 +797,7 @@ class AppDrawer extends StatelessWidget {
                 ),
                 child: Text(
                   "Add Credit",
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.lora(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -845,7 +845,7 @@ class AppDrawer extends StatelessWidget {
               ),
               title: Text(
                 'View Profile Picture',
-                style: GoogleFonts.inter(
+                style: GoogleFonts.lora(
                   fontWeight: FontWeight.w600,
                   fontSize: 16,
                 ),
@@ -870,7 +870,7 @@ class AppDrawer extends StatelessWidget {
               ),
               title: Text(
                 'Edit Profile Picture',
-                style: GoogleFonts.inter(
+                style: GoogleFonts.lora(
                   fontWeight: FontWeight.w600,
                   fontSize: 16,
                 ),

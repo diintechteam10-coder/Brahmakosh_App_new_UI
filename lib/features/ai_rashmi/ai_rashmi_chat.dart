@@ -1567,7 +1567,7 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
                               ),
                               GestureDetector(
                                 behavior: HitTestBehavior.opaque,
-                                onTap: () => _showVoiceSettingsSheet(context),
+                                //onTap: () => _showVoiceSettingsSheet(context),
                                 child: Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
