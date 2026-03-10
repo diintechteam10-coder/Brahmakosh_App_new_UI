@@ -1,7 +1,9 @@
 import '../../../../core/common_imports.dart';
+import '../../../../common/utils.dart';
 import '../../profile/viewmodels/profile_viewmodel.dart';
 import '../../profile/views/profile_details_view.dart';
 import '../../profile/views/update_profile_view.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../viewmodels/dashboard_viewmodel.dart';
@@ -343,17 +345,19 @@ class AppDrawer extends StatelessWidget {
                                       _menuItem(
                                         icon: Icons.settings_outlined,
                                         label: "Settings",
-                                        onTap: () {},
+                                        onTap: () => Utils.showToast('Coming soon'),
                                       ),
                                       _menuItem(
                                         icon: Icons.help_outline,
                                         label: "Help & Support",
-                                        onTap: () {},
+                                        onTap: () {
+                                          launchUrl(Uri.parse('https://www.brahmakosh.com/privacy-policy'));
+                                        },
                                       ),
                                       _menuItem(
                                         icon: Icons.info_outline,
                                         label: "About Us",
-                                        onTap: () {},
+                                        onTap: () => Utils.showToast('Coming soon'),
                                       ),
                                     ],
                                   ),

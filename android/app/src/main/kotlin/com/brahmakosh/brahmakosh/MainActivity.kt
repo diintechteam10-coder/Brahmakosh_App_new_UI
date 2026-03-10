@@ -1,4 +1,4 @@
-package com.brahmakosh.brahmakosh
+package com.brahmakosh.app
 
 import io.flutter.embedding.android.FlutterActivity
 
