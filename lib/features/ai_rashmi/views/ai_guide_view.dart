@@ -41,11 +41,15 @@ class _AiGuideViewState extends State<AiGuideView> {
         backgroundImage: widget.chatBackgroundImage,
         autoStartVoice: true,
       ),
+      transition: Transition.noTransition,
     );
   }
 
   void _onTextToChat() {
-    Get.to(() => RashmiChat(backgroundImage: widget.chatBackgroundImage));
+    Get.to(
+      () => RashmiChat(backgroundImage: widget.chatBackgroundImage),
+      transition: Transition.noTransition,
+    );
   }
 
   @override

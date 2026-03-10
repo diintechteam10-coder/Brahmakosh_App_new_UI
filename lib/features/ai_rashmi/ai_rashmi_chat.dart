@@ -148,6 +148,9 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
   void _toggleVoiceChat() async {
     if (_voiceService.state == VoiceAgentState.IDLE ||
         _voiceService.state == VoiceAgentState.ERROR) {
+      // Show overlay instantly
+      _showVoiceOverlay();
+
       final userId =
           StorageService.getString(AppConstants.keyUserId) ?? 'default_user';
       final vm = Get.find<AiRashmiController>();
@@ -162,7 +165,6 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
       }
 
       _voiceService.startSession(userId, chatId: vm.chatId);
-      _showVoiceOverlay();
     } else {
       _voiceService.stopSession();
     }
@@ -1504,6 +1506,10 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
 
                 switch (widget.voiceService.state) {
                   case VoiceAgentState.IDLE:
+                    title = "Connecting...";
+                    actionColor = Colors.orange;
+                    currentActionIcon = Icons.hourglass_empty;
+                    break;
                   case VoiceAgentState.ERROR:
                     title = "Disconnected";
                     break;
@@ -1567,7 +1573,7 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
                               ),
                               GestureDetector(
                                 behavior: HitTestBehavior.opaque,
-                                onTap: () => _showVoiceSettingsSheet(context),
+                                //onTap: () => _showVoiceSettingsSheet(context),
                                 child: Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(

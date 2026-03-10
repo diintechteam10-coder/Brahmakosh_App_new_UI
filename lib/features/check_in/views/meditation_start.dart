@@ -539,7 +539,10 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
                   ),
                   onPressed: () {
                     Navigator.pop(context); // Close dialog
-                    Get.offAllNamed(AppConstants.routeDashboard, arguments: 1);
+                    Get.until(
+                      (route) =>
+                          route.settings.name == AppConstants.routeDashboard,
+                    );
                   },
                   child: const Text(
                     "Got it",
@@ -791,7 +794,10 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
                   ),
                   onPressed: () {
                     Navigator.pop(context); // Close dialog
-                    Get.offAllNamed(AppConstants.routeDashboard, arguments: 1);
+                    Get.until(
+                      (route) =>
+                          route.settings.name == AppConstants.routeDashboard,
+                    );
                   },
                   child: const Text(
                     "DONE",

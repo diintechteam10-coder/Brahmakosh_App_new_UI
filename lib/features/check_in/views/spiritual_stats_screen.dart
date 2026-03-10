@@ -162,7 +162,9 @@ class SpiritualStatsScreen extends StatelessWidget {
           ),
           child: Consumer<ProfileViewModel>(
             builder: (context, profileVM, child) {
-              final profileImageUrl = profileVM.profile?.profileImageUrl;
+              final profileImageUrl =
+                  profileVM.profile?.profile?.profileImage ??
+                  profileVM.profile?.profileImageUrl;
 
               return CustomProfileAvatar(
                 imageUrl: profileImageUrl,
@@ -175,23 +177,29 @@ class SpiritualStatsScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 16),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              user.name ?? 'Seeker',
-              style: GoogleFonts.lora(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xff7B4A12),
-              ),
-            ),
-            if (user.email != null)
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Text(
-                user.email!,
-                style: GoogleFonts.lora(fontSize: 12, color: Colors.black54),
+                user.name ?? 'Seeker',
+                style: GoogleFonts.lora(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xff7B4A12),
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-          ],
+              if (user.email != null)
+                Text(
+                  user.email!,
+                  style: GoogleFonts.lora(fontSize: 12, color: Colors.black54),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+            ],
+          ),
         ),
       ],
     );
@@ -282,6 +290,8 @@ class SpiritualStatsScreen extends StatelessWidget {
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 4),
           Text(
@@ -291,6 +301,8 @@ class SpiritualStatsScreen extends StatelessWidget {
               fontWeight: FontWeight.w600,
               color: Colors.black54,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -433,6 +445,8 @@ class SpiritualStatsScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -441,6 +455,8 @@ class SpiritualStatsScreen extends StatelessWidget {
                         fontSize: 12,
                         color: Colors.black54,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
