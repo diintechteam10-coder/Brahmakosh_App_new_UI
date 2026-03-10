@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:brahmakosh/common/widgets/custom_profile_avatar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -162,22 +163,13 @@ class SpiritualStatsScreen extends StatelessWidget {
           child: Consumer<ProfileViewModel>(
             builder: (context, profileVM, child) {
               final profileImageUrl = profileVM.profile?.profileImageUrl;
-              final hasImage =
-                  profileImageUrl != null && profileImageUrl.isNotEmpty;
 
-              return CircleAvatar(
+              return CustomProfileAvatar(
+                imageUrl: profileImageUrl,
                 radius: 30,
                 backgroundColor: const Color(0xffFFF2D9),
-                backgroundImage: hasImage
-                    ? NetworkImage(profileImageUrl)
-                    : null,
-                child: !hasImage
-                    ? const Icon(
-                        Icons.person,
-                        size: 30,
-                        color: Color(0xff7B4A12),
-                      )
-                    : null,
+                borderColor: Colors.transparent,
+                borderWidth: 0,
               );
             },
           ),

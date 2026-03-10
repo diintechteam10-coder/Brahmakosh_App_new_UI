@@ -15,6 +15,7 @@ import '../../pooja/views/pooja_list_screen.dart';
 import '../../swapna_decoder/views/swapna_decoder_screen.dart';
 import '../../support/views/help_support_view.dart';
 import '../../support/views/about_us_view.dart';
+import '../../../common/widgets/custom_profile_avatar.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -132,23 +133,10 @@ class AppDrawer extends StatelessWidget {
                                               ),
                                             ],
                                           ),
-                                          child: CircleAvatar(
-                                            radius: 35,
-                                            backgroundColor: Colors.grey[200],
-                                            backgroundImage:
-                                                profile?.profileImageUrl != null
-                                                ? NetworkImage(
-                                                    profile!.profileImageUrl!,
-                                                  )
-                                                : null,
-                                            child:
-                                                profile?.profileImageUrl == null
-                                                ? const Icon(
-                                                    Icons.person,
-                                                    size: 35,
-                                                    color: AppTheme.primaryGold,
-                                                  )
-                                                : null,
+                                          child: CustomProfileAvatar(
+                                            imageUrl: profile?.profileImageUrl,
+                                            radius: 35.0,
+                                            borderWidth: 0.0,
                                           ),
                                         ),
                                       ),
@@ -380,6 +368,7 @@ class AppDrawer extends StatelessWidget {
                                         onTap: () {
                                           Navigator.pop(context);
                                           _launchDeleteAccountEmail(
+                                            context,
                                             profile?.email ?? '',
                                           );
                                         },
@@ -549,7 +538,8 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  Future<void> _launchDeleteAccountEmail(String userEmail) async {
+  Future<void> _launchDeleteAccountEmail(
+      BuildContext context, String userEmail) async {
     const recipient = 'contact@brahmakosh.com';
     const subject = 'Account Deletion Request - Brahmakosh App';
     final body =
@@ -564,9 +554,34 @@ class AppDrawer extends StatelessWidget {
     );
 
     try {
-      await launchUrl(emailLaunchUri, mode: LaunchMode.externalApplication);
+      final bool launched = await launchUrl(
+        emailLaunchUri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Could not open Mail app. Please email contact@brahmakosh.com directly.',
+              ),
+              backgroundColor: Colors.redAccent,
+            ),
+          );
+        }
+      }
     } catch (e) {
       debugPrint('Could not launch email: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Could not open Mail app. Please email contact@brahmakosh.com directly.',
+            ),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
     }
   }
 
