@@ -83,14 +83,24 @@ class EmailRegisterView extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              AuthInputField(
-                controller: controller.passwordController,
-                hint: "Password",
-                icon: Icons.lock_outline,
-                obscure: true,
-                suffix: const Icon(
-                  Icons.visibility_off_outlined,
-                  color: Colors.black45,
+              Obx(
+                () => AuthInputField(
+                  controller: controller.passwordController,
+                  hint: "Password",
+                  icon: Icons.lock_outline,
+                  obscure: controller.isPasswordHidden.value,
+                  suffix: GestureDetector(
+                    onTap: () {
+                      controller.isPasswordHidden.value =
+                          !controller.isPasswordHidden.value;
+                    },
+                    child: Icon(
+                      controller.isPasswordHidden.value
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      color: Colors.black45,
+                    ),
+                  ),
                 ),
               ),
 

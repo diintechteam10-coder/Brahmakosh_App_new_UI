@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:brahmakosh/common/api_urls.dart';
 import 'package:brahmakosh/core/common_imports.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,16 +7,20 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:brahmakosh/core/services/storage_service.dart';
 import 'package:brahmakosh/core/constants/app_constants.dart';
 import 'package:http/http.dart' as http;
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    serverClientId:
+        '449350149768-k2k2uu8uglq1ibntel03ai1kj9ddaqhb.apps.googleusercontent.com',
+    scopes: ['email'],
+  );
 
-  /// ❌ serverClientId ANDROID me bilkul mat do
-  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
-
-  var isLoading = false.obs;
+  var isGoogleLoading = false.obs;
+  var isAppleLoading = false.obs;
   var isEmailLoading = false.obs;
   var isLoginPasswordHidden = true.obs;
 
@@ -93,13 +96,13 @@ class AuthController extends GetxController {
   }
 
   Future<void> signInWithGoogle() async {
-    if (isLoading.value) {
+    if (isGoogleLoading.value || isAppleLoading.value || isEmailLoading.value) {
       print('⏳ Already loading, returning...');
       return;
     }
 
     print('🚀 Google Sign-In START');
-    isLoading.value = true;
+    isGoogleLoading.value = true;
 
     try {
       /// 🔥 CLEAR OLD SESSION
@@ -181,8 +184,8 @@ class AuthController extends GetxController {
       print('➡️ Navigating to mobile OTP with email: $userEmail');
       await Future.delayed(const Duration(milliseconds: 300));
 
-      /// 🔍 CHECK USER AFTER GOOGLE LOGIN
-      await _checkUserAfterGoogleLogin(userEmail);
+      /// 🔍 CHECK USER AFTER SOCIAL LOGIN
+      await _checkUserAfterSocialLogin(userEmail);
 
       print('🏁 Navigation complete');
     } catch (e, s) {
@@ -191,20 +194,156 @@ class AuthController extends GetxController {
       print(s);
     } finally {
       print('🔚 Google Sign-In END');
-      isLoading.value = false;
+      isGoogleLoading.value = false;
     }
   }
 
-  Future<void> _checkUserAfterGoogleLogin(String email) async {
+
+Future<void> signInWithApple() async {
+  if (isGoogleLoading.value || isAppleLoading.value || isEmailLoading.value) {
+    print('⏳ Already loading, returning...');
+    return;
+  }
+
+  print('🚀 Apple Sign-In START');
+  isAppleLoading.value = true;
+
+  try {
+    final credential = await SignInWithApple.getAppleIDCredential(
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
+      webAuthenticationOptions: WebAuthenticationOptions(
+        clientId: 'com.brahmakosh.service',
+        redirectUri: Uri.parse(
+          'https://brahmakosh.firebaseapp.com/__/auth/handler',
+        ),
+      ),
+    );
+
+    print("============== APPLE CREDENTIAL DEBUG ==============");
+    print("🍏 Apple Email: ${credential.email}");
+    print("🍏 Apple Given Name: ${credential.givenName}");
+    print("🍏 Apple Family Name: ${credential.familyName}");
+    print("🍏 Apple User ID: ${credential.userIdentifier}");
+    print("🍏 Apple IdentityToken: ${credential.identityToken}");
+    print("🍏 Apple AuthCode: ${credential.authorizationCode}");
+    print("====================================================");
+
+    /// Firebase credential
+    final oAuthProvider = OAuthProvider('apple.com');
+
+    final firebaseCredential = oAuthProvider.credential(
+      idToken: credential.identityToken,
+      accessToken: credential.authorizationCode,
+    );
+
+    print('🔥 Signing in to Firebase with Apple...');
+
+    final UserCredential userCredential =
+        await _auth.signInWithCredential(firebaseCredential);
+
+    final User? user = userCredential.user;
+
+    if (user == null) {
+      print("❌ Firebase user is NULL");
+      return;
+    }
+
+    print('✅ Firebase UID   : ${user.uid}');
+    print('✅ Firebase Email : ${user.email}');
+    print(
+        '✅ Is New User    : ${userCredential.additionalUserInfo?.isNewUser}');
+
+    /// Try to get email
+    String userEmail = user.email ?? credential.email ?? '';
+
+    /// If still empty try storage
+    if (userEmail.isEmpty) {
+      userEmail =
+          await StorageService.getString(AppConstants.keyUserEmail) ?? '';
+
+      print("📦 Email loaded from storage: $userEmail");
+    }
+
+    /// Extract from Apple JWT
+    if (userEmail.isEmpty && credential.identityToken != null) {
+      try {
+        final parts = credential.identityToken!.split('.');
+
+        if (parts.length == 3) {
+          final payload = parts[1];
+
+          final normalized = base64Url.normalize(payload);
+
+          final decoded = utf8.decode(base64Url.decode(normalized));
+
+          final payloadMap = jsonDecode(decoded);
+
+          print("🔍 Apple JWT Payload: $payloadMap");
+
+          userEmail = payloadMap['email'] ?? '';
+
+          print("✅ Extracted Email from JWT: $userEmail");
+        }
+      } catch (e) {
+        print("⚠️ Failed to decode Apple JWT: $e");
+      }
+    }
+
+    /// If still empty Apple didn't return email
+    if (userEmail.isEmpty) {
+      print(
+          "⚠️ Apple did not return email (normal after first login if hidden email selected)");
+    }
+
+    print("📧 Final Email Used: $userEmail");
+
+    /// Save session
+    await StorageService.setBool(AppConstants.keyIsLoggedIn, true);
+    await StorageService.setString(AppConstants.keyUserId, user.uid);
+
+    if (userEmail.isNotEmpty) {
+      await StorageService.setString(AppConstants.keyUserEmail, userEmail);
+    }
+
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    /// Backend check
+    if (userEmail.isNotEmpty) {
+      await _checkUserAfterSocialLogin(userEmail);
+    } else {
+      Get.snackbar(
+        "Apple Login",
+        "Email not available. Please login again or use another method.",
+      );
+    }
+  } catch (e, s) {
+    print("❌ APPLE LOGIN ERROR TYPE: ${e.runtimeType}");
+    print("❌ ERROR MESSAGE: $e");
+    print("❌ STACK TRACE: $s");
+
+    if (e is FirebaseAuthException) {
+      print("🔥 Firebase Error Code: ${e.code}");
+      print("🔥 Firebase Error Message: ${e.message}");
+    }
+
+    Get.snackbar("Apple Login Failed", e.toString());
+  } finally {
+    print('🔚 Apple Sign-In END');
+    isAppleLoading.value = false;
+  }
+}
+
+  Future<void> _checkUserAfterSocialLogin(String email) async {
     try {
       print('🔍 Checking user status for email: $email');
-
       final response = await http.post(
         Uri.parse(ApiUrls.checkUser),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({"email": email, "clientId": "CLI-KBHUMT"}),
       );
-
       print('📦 CheckUser Status: ${response.statusCode}');
       print('📦 CheckUser Body  : ${response.body}');
 

@@ -11,6 +11,7 @@ class RegisterController extends GetxController {
   final passwordController = TextEditingController();
 
   final isLoading = false.obs;
+  final isPasswordHidden = true.obs;
 
   /// 🔐 REGISTER STEP 1 (EMAIL + PASSWORD)
   Future<void> registerStep1() async {

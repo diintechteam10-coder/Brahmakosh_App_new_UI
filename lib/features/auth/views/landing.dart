@@ -63,17 +63,43 @@ class LandingView extends StatelessWidget {
               const Spacer(),
 
               // Continue with Google
-              _buildButton(
-                text: "Continue with Google",
-                imagePath: "assets/images/google.png",
-                onTap: authController.isLoading.value
-                    ? null
-                    : () {
-                        authController.signInWithGoogle();
-                      },
-                isLoading: authController.isLoading.value,
-                backgroundColor: const Color(0xffFDFDFD),
-                textColor: const Color(0xff755C3B),
+              Obx(
+                () => _buildButton(
+                  text: "Continue with Google",
+                  imagePath: "assets/images/google.png",
+                  onTap:
+                      authController.isGoogleLoading.value ||
+                          authController.isAppleLoading.value ||
+                          authController.isEmailLoading.value
+                      ? null
+                      : () {
+                          authController.signInWithGoogle();
+                        },
+                  isLoading: authController.isGoogleLoading.value,
+                  backgroundColor: const Color(0xffFDFDFD),
+                  textColor: const Color(0xff755C3B),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Continue with Apple
+              Obx(
+                () => _buildButton(
+                  text: "Continue with Apple",
+                  icon: Icons.apple,
+                  onTap:
+                      authController.isGoogleLoading.value ||
+                          authController.isAppleLoading.value ||
+                          authController.isEmailLoading.value
+                      ? null
+                      : () {
+                          authController.signInWithApple();
+                        },
+                  isLoading: authController.isAppleLoading.value,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white,
+                ),
               ),
 
               const SizedBox(height: 16),
@@ -153,6 +179,7 @@ class LandingView extends StatelessWidget {
     required String text,
     VoidCallback? onTap,
     String? imagePath,
+    IconData? icon,
     bool isLoading = false,
     required Color backgroundColor,
     required Color textColor,
@@ -178,6 +205,9 @@ class LandingView extends StatelessWidget {
           children: [
             if (imagePath != null) ...[
               Image.asset(imagePath, height: 24, width: 24),
+              const SizedBox(width: 12),
+            ] else if (icon != null) ...[
+              Icon(icon, color: textColor, size: 28),
               const SizedBox(width: 12),
             ],
 

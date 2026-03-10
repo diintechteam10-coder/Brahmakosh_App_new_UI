@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "449350149768-0aavk8vbulrq0ff93u265du4f3et71te.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.brahmakosh.app",
+            "certificate_hash": "36a49f49e46db485ca62e5a8e12b1a27fe37e697"
+          }
+        },
+        {
+          "client_id": "449350149768-0duelddue4jg30q2kkrqioncbn51f0gr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.brahmakosh.app",
+            "certificate_hash": "e614df989c0df80e578088713f412d58253c9776"
+          }
+        },
+        {
           "client_id": "449350149768-3f7cf520lik9o1s937ceo009e2iin87j.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -27,6 +43,14 @@
           "android_info": {
             "package_name": "com.brahmakosh.app",
             "certificate_hash": "e2a319dc3de01fe3fba215f426e1456a250bb45f"
+          }
+        },
+        {
+          "client_id": "449350149768-5veik912oiqrrm4t2gkut64jiqd7alho.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.brahmakosh.app",
+            "certificate_hash": "1f65fe9d090dd1c43b5c1e562db68ae3e358a587"
           }
         },
         {
@@ -54,6 +78,14 @@
           }
         },
         {
+          "client_id": "449350149768-vecvlv5eqavami1t13msclb8tm7jcg35.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.brahmakosh.app",
+            "certificate_hash": "9c350a4f3461e4cf6b985f4096952de51eb6feea"
+          }
+        },
+        {
           "client_id": "449350149768-k2k2uu8uglq1ibntel03ai1kj9ddaqhb.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -71,10 +103,86 @@
               "client_type": 3
             },
             {
-              "client_id": "449350149768-k6eppcma6sr7kvq4pib288025mpanlqk.apps.googleusercontent.com",
+              "client_id": "449350149768-52s0420o367lvjn7uvclfgj3ke5344q2.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.brahmakosh.app"
+                "bundle_id": "com.brahmakoshpartner.app"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:449350149768:android:c6211ebcaf7e593443213d",
+        "android_client_info": {
+          "package_name": "com.brahmakoshpartner.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "449350149768-2s0g730jgo96ivekvcforsrpls83r9p3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.brahmakoshpartner.app",
+            "certificate_hash": "a210fc601cbdc1ff2212e2a90029a6f9fef2db94"
+          }
+        },
+        {
+          "client_id": "449350149768-474jdmpq3qsfg8vfnj93hqfrrj2v32ks.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.brahmakoshpartner.app",
+            "certificate_hash": "9c350a4f3461e4cf6b985f4096952de51eb6feea"
+          }
+        },
+        {
+          "client_id": "449350149768-6mjclkoje5dm2sp47ha6ug4jqsr2ol2c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.brahmakoshpartner.app",
+            "certificate_hash": "36a49f49e46db485ca62e5a8e12b1a27fe37e697"
+          }
+        },
+        {
+          "client_id": "449350149768-84n31d88l3u7hg3g46pu7b289mmk0tp4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.brahmakoshpartner.app",
+            "certificate_hash": "66ad9786c8c3bc5e11ccf14ef9bd711ce7e2bc89"
+          }
+        },
+        {
+          "client_id": "449350149768-tdb78kvt44lh6un9vao7nlumcti6lelr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.brahmakoshpartner.app",
+            "certificate_hash": "0487c82545c68f90274f655f92b279385c088632"
+          }
+        },
+        {
+          "client_id": "449350149768-k2k2uu8uglq1ibntel03ai1kj9ddaqhb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5nNdCNACG7UKBLwigMcJ0poDmLJdj3Gw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "449350149768-a1a1qn8siakh4hq7tejj60ri81c6hh85.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "449350149768-52s0420o367lvjn7uvclfgj3ke5344q2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.brahmakoshpartner.app"
               }
             }
           ]
