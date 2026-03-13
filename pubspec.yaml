@@ -36,6 +36,7 @@ dependencies:
   confetti: ^0.7.0
   sizer: ^2.0.15
   just_audio: ^0.10.5
+  flutter_stripe: ^12.4.0
   # Local Storage
   shared_preferences: ^2.2.2
   video_player: ^2.10.1
