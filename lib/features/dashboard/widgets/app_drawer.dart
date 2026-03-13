@@ -338,16 +338,18 @@ class AppDrawer extends StatelessWidget {
                                           Get.to(() => const AvatarAgentPage());
                                         },
                                       ),
-                                      _menuItem(
-                                        icon: Icons.settings_outlined,
-                                        label: "Settings",
-                                        onTap: () {
-                                          _showComingSoonPopup(
-                                            context,
-                                            "Settings",
-                                          );
-                                        },
-                                      ),
+                                      // _menuItem(
+                                      //   icon: Icons.settings_outlined,
+                                      //   label: "Settings",
+                                      //   onTap: () {
+                                      //     _showComingSoonPopup(
+                                      //       context,
+                                      //       "Settings",
+                                      //     );
+                                      //   },
+                                      // ),
+                                      
+                                      
                                       _menuItem(
                                         icon: Icons.help_outline,
                                         label: "Help & Support",
