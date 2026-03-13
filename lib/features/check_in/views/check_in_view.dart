@@ -213,7 +213,7 @@ class _CheckInViewState extends State<CheckInView>
                               ),
                               onPressed: () {
                                 if (data != null) {
-                                  _shareCheckInDetails(data);
+                                  _shareCheckInDetails(context, data);
                                 }
                               },
                             ),
@@ -520,11 +520,15 @@ class _CheckInViewState extends State<CheckInView>
     );
   }
 
-  void _shareCheckInDetails(Data data) {
+  void _shareCheckInDetails(BuildContext context, Data data) {
     if (data.stats == null) {
       Utils.showToast("No stats to share yet.");
       return;
     }
+    const String playStoreUrl =
+        "https://play.google.com/store/apps/details?id=com.brahmakosh.app&pcampaignid=web_share";
+
+    // const String appStoreUrl = "";
 
     final stats = data.stats!;
     final recent =
@@ -534,6 +538,7 @@ class _CheckInViewState extends State<CheckInView>
 
     String shareMessage =
         "I just completed my spiritual check-in on Brahmakosh! 🧘✨\n\n";
+
     shareMessage += "📊 My Progress:\n";
     shareMessage += "• Total Sessions: ${stats.sessions ?? 0}\n";
     shareMessage += "• Karma Points: ${stats.points ?? 0}\n";
@@ -544,9 +549,18 @@ class _CheckInViewState extends State<CheckInView>
     }
 
     shareMessage +=
-        "\nJoin me on my spiritual journey! Download Brahmakosh now. #Brahmakosh #Spirituality";
+        "\nJoin me on my spiritual journey! Download Brahmakosh now.\n";
+    shareMessage += "Android:\n$playStoreUrl\n\n";
 
-    Share.share(shareMessage);
+    // shareMessage += "iOS:\n$appStoreUrl\n\n";
+
+    shareMessage += "#Brahmakosh #Spirituality";
+    final box = context.findRenderObject() as RenderBox?;
+
+    Share.share(
+      shareMessage,
+      sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+    );
   }
 
   Widget _buildCategoryStats(CategoryStats stats) {
