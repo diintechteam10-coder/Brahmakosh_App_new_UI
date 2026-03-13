@@ -1,6 +1,8 @@
 import '../../../../core/common_imports.dart';
+import '../../../../common/utils.dart';
 import '../viewmodels/profile_viewmodel.dart';
 import 'profile_details_view.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -155,9 +157,23 @@ class _ProfileViewState extends State<ProfileView> {
                           'Notifications',
                           badge: '7',
                         ),
-                        _menuItem(Icons.settings_outlined, 'Settings'),
-                        _menuItem(Icons.help_outline, 'Help & Support'),
-                        _menuItem(Icons.info_outline, 'About Us'),
+                        _menuItem(
+                          Icons.settings_outlined,
+                          'Settings',
+                          onTap: () => Utils.showToast('Coming soon'),
+                        ),
+                        _menuItem(
+                          Icons.help_outline,
+                          'Help & Support',
+                          onTap: () {
+                            launchUrl(Uri.parse('https://www.brahmakosh.com/privacy-policy'));
+                          },
+                        ),
+                        _menuItem(
+                          Icons.info_outline,
+                          'About Us',
+                          onTap: () => Utils.showToast('Coming soon'),
+                        ),
                         _logoutItem(),
                       ],
                     ),

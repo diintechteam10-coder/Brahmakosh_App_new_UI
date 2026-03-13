@@ -45,3 +45,12 @@ app.*.map.json
 /android/app/release
 android/local.properties
 android/app/ankurmaurya.jks
+
+# Logs
+*.log
+ios_build_log*.txt
+
+# Build artifacts
+**/build/
+**/XCBuildData/
+

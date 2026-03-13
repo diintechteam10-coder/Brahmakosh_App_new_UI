@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:brahmakosh/common_imports.dart';
 import 'package:brahmakosh/core/theme/app_theme.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../common/models/astrologist_model.dart';
 import '../../../common/api_services.dart';
 import '../../../common/api_urls.dart';
@@ -364,13 +365,7 @@ class AstrologyController extends GetxController {
   }
 
   void openFAQs() {
-    Get.snackbar(
-      "FAQs",
-      "Opening Help & Support...",
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: const Color(0xFFF59E0B),
-      colorText: Colors.white,
-    );
+    launchUrl(Uri.parse('https://www.brahmakosh.com/privacy-policy'));
   }
 
   @override
