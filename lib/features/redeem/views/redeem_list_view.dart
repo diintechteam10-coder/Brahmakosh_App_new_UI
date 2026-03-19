@@ -1,10 +1,10 @@
-import 'package:brahmakosh/core/theme/app_theme.dart';
 import 'package:brahmakosh/features/redeem/controllers/redeem_controller.dart';
 import 'package:brahmakosh/features/redeem/views/redemption_history_view.dart';
 import 'package:brahmakosh/features/redeem/widgets/redeem_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sizer/sizer.dart';
 
 class RedeemListView extends StatelessWidget {
   const RedeemListView({super.key});
@@ -15,66 +15,57 @@ class RedeemListView extends StatelessWidget {
     final RedeemController controller = Get.put(RedeemController());
 
     return Scaffold(
-      backgroundColor: AppTheme.landingBackground,
+      backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xff5D4037)),
+          icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 18.sp),
           onPressed: () => Get.back(),
         ),
         centerTitle: false,
         titleSpacing: 0,
-        title: Transform.translate(
-          offset: const Offset(-10, 0),
-          child: Text(
-            "Redeem",
-            style: GoogleFonts.lora(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xff5D4037),
-            ),
+        title: Text(
+          "Redeem",
+          style: GoogleFonts.lora(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
         actions: [
           Container(
-            margin: const EdgeInsets.only(right: 16, top: 10, bottom: 10),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            margin: EdgeInsets.only(right: 1.w, top: 1.h, bottom: 1.h),
+            padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 0.5.h),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: const Color(0xFF1A1A1A),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: const Color(0xff8D6E63).withOpacity(0.3),
+                color: const Color(0xFFD4AF37).withValues(alpha: 0.3),
               ),
             ),
             child: Obx(
               () => Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Image.asset(
-                    'assets/images/coin.png',
-                    width: 16,
-                    height: 16,
-                    errorBuilder: (_, __, ___) =>
-                        const Icon(Icons.circle, size: 16, color: Colors.amber),
-                  ),
-                  const SizedBox(width: 6),
+                   Icon(Icons.stars, color: const Color(0xFFD4AF37), size: 14.sp),
+                  SizedBox(width: 1.5.w),
                   RichText(
                     text: TextSpan(
                       children: [
                         TextSpan(
                           text: "${controller.userPoints.value} ",
                           style: GoogleFonts.poppins(
-                            color: const Color(0xff5D4037),
+                            color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 12,
+                            fontSize: 11.sp,
                           ),
                         ),
                         TextSpan(
-                          text: "Karma Points",
+                          text: "Karma",
                           style: GoogleFonts.poppins(
-                            color: const Color(0xff5D4037),
-                            fontSize: 10,
+                            color: Colors.white70,
+                            fontSize: 9.sp,
                           ),
                         ),
                       ],
@@ -88,7 +79,7 @@ class RedeemListView extends StatelessWidget {
             onPressed: () {
               Get.to(() => const RedemptionHistoryView());
             },
-            icon: const Icon(Icons.history, color: Color(0xff5D4037)),
+            icon: Icon(Icons.history, color: Colors.white, size: 18.sp),
           ),
         ],
       ),
@@ -96,20 +87,50 @@ class RedeemListView extends StatelessWidget {
         children: [
           // Banner Image (Mock)
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Image.asset(
-                'assets/images/redeem_poster.png',
-                width: double.infinity,
-                height: 160,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
+            padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 2.h),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFD4AF37).withValues(alpha: 0.1),
+                    blurRadius: 15,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.asset(
+                  'assets/images/redeem_poster.png',
                   width: double.infinity,
-                  height: 160,
-                  color: Colors.grey[300], // Placeholder color
-                  child: const Center(
-                    child: Icon(Icons.image, size: 40, color: Colors.grey),
+                  height: 18.h,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    width: double.infinity,
+                    height: 18.h,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [const Color(0xFF1A1A1A), const Color(0xFF0A0A0A)],
+                      ),
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.stars, size: 30.sp, color: const Color(0xFFD4AF37)),
+                          SizedBox(height: 1.h),
+                          Text(
+                            "Redeem Points for Sacred Offerings",
+                            style: GoogleFonts.lora(
+                              color: Colors.white,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -119,13 +140,13 @@ class RedeemListView extends StatelessWidget {
           // Filters
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: EdgeInsets.symmetric(horizontal: 5.w),
             child: Obx(
               () => Row(
                 children: controller.categories
                     .map(
                       (category) => Padding(
-                        padding: const EdgeInsets.only(right: 12),
+                        padding: EdgeInsets.only(right: 3.w),
                         child: _buildFilterChip(category, controller),
                       ),
                     )
@@ -134,20 +155,25 @@ class RedeemListView extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 20),
+          SizedBox(height: 2.h),
 
           // List
           Expanded(
             child: Obx(() {
               if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator(color: Color(0xFFD4AF37)));
               }
               final items = controller.filteredItems;
               if (items.isEmpty) {
-                return const Center(child: Text("No items found"));
+                return Center(
+                  child: Text(
+                    "No items found",
+                    style: GoogleFonts.poppins(color: Colors.white70, fontSize: 12.sp),
+                  ),
+                );
               }
               return ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: EdgeInsets.symmetric(horizontal: 5.w),
                 itemCount: items.length,
                 itemBuilder: (context, index) {
                   return RedeemCard(item: items[index]);
@@ -166,19 +192,19 @@ class RedeemListView extends StatelessWidget {
       return GestureDetector(
         onTap: () => controller.filterByCategory(label),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+          padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 1.h),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xffFF8C00) : Colors.white,
+            color: isSelected ? const Color(0xFFD4AF37) : const Color(0xFF1A1A1A),
             borderRadius: BorderRadius.circular(20),
             border: isSelected
                 ? null
                 : Border.all(
-                    color: Colors.transparent,
-                  ), // Can add border if needed
+                    color: Colors.white10,
+                  ),
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: const Color(0xffFF8C00).withOpacity(0.3),
+                      color: const Color(0xFFD4AF37).withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     ),
@@ -188,11 +214,9 @@ class RedeemListView extends StatelessWidget {
           child: Text(
             label,
             style: GoogleFonts.poppins(
-              fontSize: 14,
+              fontSize: 11.sp,
               fontWeight: FontWeight.bold,
-              color: isSelected
-                  ? Colors.white
-                  : const Color(0xff5D4037).withOpacity(0.6),
+              color: isSelected ? Colors.black : Colors.white70,
             ),
           ),
         ),

@@ -28,22 +28,22 @@ class SpiritualStatsScreen extends StatelessWidget {
         ),
       ],
       child: Scaffold(
-        backgroundColor: Colors.transparent, // Transparent to show gradient
-        extendBodyBehindAppBar: true, // Allow body to extend behind AppBar
+        backgroundColor: Colors.black, // Dark Theme Background
         appBar: AppBar(
           surfaceTintColor: Colors.transparent,
-          backgroundColor: Colors.transparent, // Transparent AppBar
+          backgroundColor: Colors.black, // Dark Theme Background
           elevation: 0,
           leading: Container(
             margin: const EdgeInsets.all(8),
-            decoration: const BoxDecoration(
-              color: Colors.white,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.05),
               shape: BoxShape.circle,
+              border: Border.all(color: Colors.white24),
             ),
             child: IconButton(
               icon: const Icon(
                 Icons.arrow_back,
-                color: Color(0xff7B4A12),
+                color: Colors.white,
                 size: 20,
               ),
               onPressed: () => Navigator.of(context).pop(),
@@ -52,26 +52,18 @@ class SpiritualStatsScreen extends StatelessWidget {
           title: Text(
             'MY CHECK-IN',
             style: GoogleFonts.lora(
-              color: const Color(0xff7B4A12),
+              color: const Color(0xFFD4AF37), // Primary Gold
               fontWeight: FontWeight.bold,
               fontSize: 18,
             ),
           ),
           centerTitle: true,
         ),
-        body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xffFFFDF8), Color(0xffFFF2D9), Color(0xffFFE4B5)],
-            ),
-          ),
-          child: BlocBuilder<SpiritualStatsBloc, SpiritualStatsState>(
+        body: BlocBuilder<SpiritualStatsBloc, SpiritualStatsState>(
             builder: (context, state) {
               if (state is SpiritualStatsLoading) {
                 return const Center(
-                  child: CircularProgressIndicator(color: Color(0xff7B4A12)),
+                  child: CircularProgressIndicator(color: Color(0xFFD4AF37)),
                 );
               } else if (state is SpiritualStatsError) {
                 return Center(
@@ -87,14 +79,13 @@ class SpiritualStatsScreen extends StatelessWidget {
             },
           ),
         ),
-      ),
-    );
-  }
+      );
+    }
 
   Widget _buildContent(BuildContext context, SpiritualStatsData data) {
     return SafeArea(
       child: RefreshIndicator(
-        color: const Color(0xff7B4A12),
+        color: const Color(0xFFD4AF37),
         onRefresh: () async {
           final completer = Completer<void>();
           context.read<SpiritualStatsBloc>().add(
@@ -120,7 +111,7 @@ class SpiritualStatsScreen extends StatelessWidget {
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1,
-                    color: const Color(0xff7B4A12),
+                    color: const Color(0xFFD4AF37),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -135,7 +126,7 @@ class SpiritualStatsScreen extends StatelessWidget {
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1,
-                    color: const Color(0xff7B4A12),
+                    color: const Color(0xFFD4AF37),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -158,7 +149,7 @@ class SpiritualStatsScreen extends StatelessWidget {
           padding: const EdgeInsets.all(3),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(color: const Color(0xff7B4A12), width: 2),
+            border: Border.all(color: const Color(0xFFD4AF37), width: 1.5),
           ),
           child: Consumer<ProfileViewModel>(
             builder: (context, profileVM, child) {
@@ -169,7 +160,7 @@ class SpiritualStatsScreen extends StatelessWidget {
               return CustomProfileAvatar(
                 imageUrl: profileImageUrl,
                 radius: 30,
-                backgroundColor: const Color(0xffFFF2D9),
+                backgroundColor: const Color(0xFF1C1C1E),
                 borderColor: Colors.transparent,
                 borderWidth: 0,
               );
@@ -186,7 +177,7 @@ class SpiritualStatsScreen extends StatelessWidget {
                 style: GoogleFonts.lora(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xff7B4A12),
+                  color: Colors.white,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -194,7 +185,7 @@ class SpiritualStatsScreen extends StatelessWidget {
               if (user.email != null)
                 Text(
                   user.email!,
-                  style: GoogleFonts.lora(fontSize: 12, color: Colors.black54),
+                  style: GoogleFonts.poppins(fontSize: 12, color: Colors.white70),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -215,7 +206,6 @@ class SpiritualStatsScreen extends StatelessWidget {
                 'Total Sessions',
                 '${stats.sessions ?? 0}',
                 Icons.spa,
-                const Color(0xffFFF2D9),
               ),
             ),
             const SizedBox(width: 16),
@@ -224,8 +214,6 @@ class SpiritualStatsScreen extends StatelessWidget {
                 'Karma Points',
                 '${stats.karmaPoints ?? 0}',
                 Icons.star,
-                const Color(0xffE8F5E9),
-                iconColor: Colors.green[700],
               ),
             ),
           ],
@@ -238,8 +226,6 @@ class SpiritualStatsScreen extends StatelessWidget {
                 'Minutes Spent',
                 '${stats.minutes ?? 0}',
                 Icons.timer,
-                const Color(0xffE3F2FD),
-                iconColor: Colors.blue[700],
               ),
             ),
             const SizedBox(width: 16),
@@ -248,8 +234,6 @@ class SpiritualStatsScreen extends StatelessWidget {
                 'Avg Completion',
                 '${stats.averageCompletion ?? 0}%',
                 Icons.pie_chart,
-                const Color(0xffFCE4EC),
-                iconColor: Colors.pink[700],
               ),
             ),
           ],
@@ -261,34 +245,30 @@ class SpiritualStatsScreen extends StatelessWidget {
   Widget _buildStatCard(
     String label,
     String value,
-    IconData icon,
-    Color bgColor, {
+    IconData icon, {
     Color? iconColor,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: bgColor,
+        color: const Color(0xFF141414), // Dark grey background
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(
+          color: const Color(0xFFD4AF37).withValues(alpha: 0.2), // Subtle gold border
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: iconColor ?? const Color(0xff7B4A12), size: 28),
+          Icon(icon, color: iconColor ?? const Color(0xFFD4AF37), size: 28),
           const SizedBox(height: 12),
           Text(
             value,
-            style: GoogleFonts.lora(
+            style: GoogleFonts.poppins(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: Colors.white,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -296,10 +276,10 @@ class SpiritualStatsScreen extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             label,
-            style: GoogleFonts.lora(
+            style: GoogleFonts.poppins(
               fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: Colors.black54,
+              fontWeight: FontWeight.w500,
+              color: Colors.white60,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -338,7 +318,7 @@ class SpiritualStatsScreen extends StatelessWidget {
       return Center(
         child: Text(
           "No category data available yet.",
-          style: GoogleFonts.lora(color: Colors.black54),
+          style: GoogleFonts.lora(color: Colors.white54),
         ),
       );
     }
@@ -347,9 +327,9 @@ class SpiritualStatsScreen extends StatelessWidget {
       height: 300,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFF141414),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xff7B4A12).withOpacity(0.1)),
+        border: Border.all(color: const Color(0xFFD4AF37).withValues(alpha: 0.1)),
       ),
       child: Column(
         children: [
@@ -364,7 +344,7 @@ class SpiritualStatsScreen extends StatelessWidget {
                     value: (cat['value'] as int).toDouble(),
                     title: '${cat['value']}',
                     radius: 50,
-                    titleStyle: GoogleFonts.lora(
+                    titleStyle: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -394,9 +374,10 @@ class SpiritualStatsScreen extends StatelessWidget {
                   const SizedBox(width: 8),
                   Text(
                     cat['name'],
-                    style: GoogleFonts.lora(
+                    style: GoogleFonts.poppins(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
+                      color: Colors.white70,
                     ),
                   ),
                 ],
@@ -419,16 +400,9 @@ class SpiritualStatsScreen extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xff7B4A12).withOpacity(0.1)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.02),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
+            color: const Color(0xFF141414),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white10),
           ),
           child: Row(
             children: [
@@ -440,10 +414,10 @@ class SpiritualStatsScreen extends StatelessWidget {
                   children: [
                     Text(
                       activity.title ?? 'Unknown Activity',
-                      style: GoogleFonts.lora(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -451,9 +425,9 @@ class SpiritualStatsScreen extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       _formatDate(activity.createdAt),
-                      style: GoogleFonts.lora(
+                      style: GoogleFonts.poppins(
                         fontSize: 12,
-                        color: Colors.black54,
+                        color: Colors.white38,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -471,27 +445,27 @@ class SpiritualStatsScreen extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xffFFF8E1),
+                        color: const Color(0xFFD4AF37).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         '+${activity.karmaPoints} Karma',
-                        style: GoogleFonts.lora(
+                        style: GoogleFonts.poppins(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xff7B4A12),
+                          color: const Color(0xFFD4AF37),
                         ),
                       ),
                     ),
                   const SizedBox(height: 4),
                   Text(
                     activity.status == 'completed' ? 'Completed' : 'Incomplete',
-                    style: GoogleFonts.lora(
+                    style: GoogleFonts.poppins(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: activity.status == 'completed'
-                          ? Colors.green
-                          : Colors.redAccent,
+                          ? const Color(0xFF2ECC71)
+                          : const Color(0xFFE74C3C),
                     ),
                   ),
                 ],
@@ -531,7 +505,7 @@ class SpiritualStatsScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: color.withValues(alpha: 0.15),
         shape: BoxShape.circle,
       ),
       child: Icon(icon, color: color, size: 20),

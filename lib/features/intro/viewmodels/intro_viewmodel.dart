@@ -8,22 +8,25 @@ class IntroViewModel extends ChangeNotifier {
 
   List<IntroPageData> introPages = [
     IntroPageData(
-      title: 'Welcome to Brahmakosh',
-      description: 'Your spiritual journey begins here. Discover peace, wisdom, and guidance.',
-      icon: Icons.spa,
+      title: 'Karma Points',
+      subtitle: "Help others with your's\nkarma points",
+      description: 'Your spiritual check-in earns karma points\nthat feed cows, educate children,\nand help those in need.',
+      assetPath: "assets/icons/Onboarding1.png",
       color: const Color(0xFFD4AF37), // Gold
     ),
     IntroPageData(
-      title: 'Expert Services',
-      description: 'Connect with experienced astrologers and spiritual guides for personalized consultations.',
-      icon: Icons.stars,
-      color: const Color(0xFFFF8C00), // Orange
+      title: 'Your Destiny, In Your Hands',
+      subtitle: 'Vedic astrology, tarot reading, vastu and\ncareer insights - tailored for you.',
+      description: '',
+      assetPath: "assets/icons/Onboarding Screen 2.png",
+      color: const Color(0xFFD4AF37), // Gold
     ),
     IntroPageData(
-      title: 'Rashmi AI Assistant',
-      description: 'Get instant answers to your spiritual questions with our AI-powered assistant.',
-      icon: Icons.smart_toy,
-      color: const Color(0xFF8208BF), // Purple
+      title: 'BRAHMAKOSH INTELLIGENCE',
+      subtitle: '(Krishna - Your Spiritual Guide)',
+      description: '',
+      assetPath: "assets/icons/Onboarding Screen 3.png",
+      color: const Color(0xFFD4AF37), // Gold
     ),
   ];
 
@@ -61,14 +64,16 @@ class IntroViewModel extends ChangeNotifier {
 
 class IntroPageData {
   final String title;
+  final String subtitle;
   final String description;
-  final IconData icon;
+  final String assetPath;
   final Color color;
 
   IntroPageData({
     required this.title,
+    required this.subtitle,
     required this.description,
-    required this.icon,
+    required this.assetPath,
     required this.color,
   });
 }

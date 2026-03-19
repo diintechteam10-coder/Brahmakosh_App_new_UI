@@ -17,6 +17,8 @@ class ApiUrls {
   static const String mobileVerify = '$apiUrl/user/register/step2/verify';
   static const String completeProfile = '$apiUrl/user/register/step3';
   static const String checkUser = '$apiUrl/user/check-email';
+  static const String resendEmailOtp = '$apiUrl/user/register/resend-email-otp';
+  static const String resendMobileOtp = '$apiUrl/user/register/resend-mobile-otp';
 
   ///
   static const String getProfile = '$apiUrl/user/profile';

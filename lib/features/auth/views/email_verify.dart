@@ -162,7 +162,7 @@ class EmailOtpView extends StatelessWidget {
                   
                   GestureDetector(
                     onTap: () {
-                      // Add resend logic if available in controller
+                      controller.resendOtp(email: email);
                     },
                     child: Text(
                       "Resend Code",

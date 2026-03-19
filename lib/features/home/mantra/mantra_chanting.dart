@@ -51,7 +51,7 @@ class MantraChantingView extends StatelessWidget {
               // Handle exit logic in dialog
             },
             child: Scaffold(
-              backgroundColor: Color(0xffFDF6E3),
+              backgroundColor: Colors.black, // Dark background
               body: Column(
                 children: [
                   _CompletionListener(
@@ -110,8 +110,11 @@ class MantraChantingView extends StatelessWidget {
           Row(
             children: [
               IconButton(
-                onPressed: () => _showExitConfirmation(context),
-                icon: const Icon(Icons.arrow_back, color: Color(0xff5D4037)),
+                onPressed: () {
+                  controller.pauseBackgroundAudio(); // Pause when dialog shows
+                  _showExitConfirmation(context);
+                },
+                icon: const Icon(Icons.arrow_back, color: Color(0xffD4AF37)),
               ),
             ],
           ),
@@ -120,7 +123,7 @@ class MantraChantingView extends StatelessWidget {
             style: GoogleFonts.merriweather(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: const Color(0xff5D4037),
+              color: const Color(0xffD4AF37), // Gold
             ),
           ),
           const SizedBox(height: 8),
@@ -130,7 +133,7 @@ class MantraChantingView extends StatelessWidget {
               mantraName,
               style: GoogleFonts.tiroDevanagariHindi(
                 fontSize: 18,
-                color: const Color(0xff5D4037),
+                color: Colors.white70,
                 fontWeight: FontWeight.w500,
               ),
             );
@@ -244,7 +247,7 @@ class MantraChantingView extends StatelessWidget {
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xff5D4037),
+                color: Colors.white70,
               ),
             ),
           ],
@@ -255,7 +258,7 @@ class MantraChantingView extends StatelessWidget {
             "Time : ${controller.formattedTime}",
             style: GoogleFonts.poppins(
               fontSize: 16,
-              color: const Color(0xff8D6E63),
+              color: Colors.white54,
             ),
           ),
         ),
@@ -263,71 +266,76 @@ class MantraChantingView extends StatelessWidget {
     );
   }
 
-  // Button
   Widget _buildChantButton(MantraChantingController controller) {
-    return GestureDetector(
-      onTap: controller.incrementCount,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          SizedBox(
-            width: 100,
-            height: 100,
-            child: Obx(() {
-              final total = controller.chantingMantra?.malaCount ?? 108;
-              final progress = total > 0
-                  ? (controller.chantCount.value / total)
-                  : 0.0;
-              return CircularProgressIndicator(
-                value: progress,
-                strokeWidth: 4,
-                valueColor: const AlwaysStoppedAnimation(Color(0xffD4AF37)),
-                backgroundColor: const Color(0xffD4AF37).withOpacity(0.2),
-              );
-            }),
-          ),
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: const LinearGradient(
-                colors: [Color(0xff5D4037), Color(0xff3E2723)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              border: Border.all(color: const Color(0xffD4AF37), width: 1.5),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xff3E2723).withOpacity(0.5),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
+    return Obx(() {
+      final isStarted = controller.isStarted.value;
+      return GestureDetector(
+        onTap: isStarted
+            ? controller.incrementCount
+            : controller.startChanting,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            SizedBox(
+              width: 100,
+              height: 100,
+              child: Builder(builder: (context) {
+                final total = controller.chantingMantra?.malaCount ?? 108;
+                final progress = total > 0
+                    ? (controller.chantCount.value / total)
+                    : 0.0;
+                return CircularProgressIndicator(
+                  value: progress,
+                  strokeWidth: 4,
+                  valueColor: const AlwaysStoppedAnimation(Color(0xffD4AF37)),
+                  backgroundColor: const Color(0xffD4AF37).withOpacity(0.2),
+                );
+              }),
+            ),
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: const LinearGradient(
+                  colors: [Color(0xffD4AF37), Color(0xffAA8F2E)], // Gold gradient
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-              ],
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              "Tap to\nChant",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
+                border: Border.all(color: const Color(0xffD4AF37), width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xffD4AF37).withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                isStarted ? "Tap to\nChant" : "Start",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: Colors.black87, // Dark text on gold button
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    });
   }
 
   // --- Logic & Dialogs ---
 
   Future<void> _showExitConfirmation(BuildContext context) async {
+    final controller = Get.find<MantraChantingController>();
     return Get.dialog(
       Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        backgroundColor: const Color(0xffFFF8E7),
+        backgroundColor: const Color(0xFF1C1C1E), // Dark dialog
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
@@ -336,7 +344,7 @@ class MantraChantingView extends StatelessWidget {
               const Icon(
                 Icons.warning_amber_rounded,
                 size: 48,
-                color: Color(0xff5D4037),
+                color: Color(0xffD4AF37), // Gold
               ),
               const SizedBox(height: 16),
               Text(
@@ -344,7 +352,7 @@ class MantraChantingView extends StatelessWidget {
                 style: GoogleFonts.merriweather(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xff5D4037),
+                  color: const Color(0xffD4AF37),
                 ),
               ),
               const SizedBox(height: 12),
@@ -353,7 +361,7 @@ class MantraChantingView extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                   fontSize: 14,
-                  color: const Color(0xff8D6E63),
+                  color: Colors.white70,
                 ),
               ),
               const SizedBox(height: 24),
@@ -361,11 +369,14 @@ class MantraChantingView extends StatelessWidget {
                 children: [
                   Expanded(
                     child: TextButton(
-                      onPressed: () => Get.back(),
+                      onPressed: () {
+                        controller.resumeBackgroundAudio(); // Resume music
+                        Get.back();
+                      },
                       child: Text(
-                        "Cancel",
+                        "Continue",
                         style: GoogleFonts.poppins(
-                          color: const Color(0xff8D6E63),
+                          color: Colors.white60,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -375,19 +386,20 @@ class MantraChantingView extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
+                        controller.stopBackgroundAudio(); // Stop music
                         Get.back();
                         _saveSession(context, incomplete: true);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xff5D4037),
-                        foregroundColor: Colors.white,
+                        backgroundColor: const Color(0xffD4AF37),
+                        foregroundColor: Colors.black,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                       child: Text(
                         "End",
-                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                        style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -397,6 +409,7 @@ class MantraChantingView extends StatelessWidget {
           ),
         ),
       ),
+      barrierDismissible: false,
     );
   }
 
@@ -414,7 +427,7 @@ class MantraChantingView extends StatelessWidget {
     Get.dialog(
       Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        backgroundColor: const Color(0xffFFF8E7),
+        backgroundColor: const Color(0xFF1C1C1E), // Dark dialog
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
@@ -423,7 +436,7 @@ class MantraChantingView extends StatelessWidget {
               Icon(
                 karma > 0 ? Icons.stars : Icons.info_outline,
                 size: 60,
-                color: karma > 0 ? Color(0xffFF8C00) : Colors.grey,
+                color: karma > 0 ? Color(0xffD4AF37) : Colors.grey,
               ),
               const SizedBox(height: 16),
               Text(
@@ -431,7 +444,7 @@ class MantraChantingView extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xff5D4037),
+                  color: Color(0xffD4AF37),
                   fontFamily: 'Merriweather',
                 ),
               ),
@@ -439,7 +452,7 @@ class MantraChantingView extends StatelessWidget {
               Text(
                 statusMessage, // Using status message from API (with emoji)
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Color(0xff8D6E63)),
+                style: TextStyle(fontSize: 16, color: Colors.white70),
               ),
               const SizedBox(height: 8),
               Text(
@@ -447,7 +460,7 @@ class MantraChantingView extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xffFF8C00),
+                  color: Color(0xffD4AF37),
                 ),
               ),
               const SizedBox(height: 24),
@@ -462,14 +475,14 @@ class MantraChantingView extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xff5D4037),
-                    foregroundColor: Colors.white,
+                    backgroundColor: const Color(0xffD4AF37),
+                    foregroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text("Done", style: TextStyle(fontSize: 16)),
+                  child: const Text("Done", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -567,7 +580,7 @@ class _CompletionListenerState extends State<_CompletionListener> {
     Get.dialog(
       Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        backgroundColor: const Color(0xffFFF8E7),
+        backgroundColor: const Color(0xFF1C1C1E), // Dark dialog
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
@@ -576,7 +589,7 @@ class _CompletionListenerState extends State<_CompletionListener> {
               const Icon(
                 Icons.check_circle_outline,
                 size: 60,
-                color: Color(0xff4CAF50),
+                color: Color(0xffD4AF37),
               ),
               const SizedBox(height: 16),
               const Text(
@@ -584,30 +597,33 @@ class _CompletionListenerState extends State<_CompletionListener> {
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xff5D4037),
+                  color: Color(0xffD4AF37),
                   fontFamily: 'Merriweather',
                 ),
               ),
-              // ... Rest of UI ...
+              const SizedBox(height: 12),
+              const Text(
+                "Great job! You have completed your chanting session.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, color: Colors.white70),
+              ),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
                     Get.back(); // Close local dialog
-                    // Call save via context
-                    // We need to access the helper _saveSession.
-                    // We can move _saveSession to be a static helper or specific class?
-                    // Let's just create the request here and call bloc.
-
                     _triggerSave(context, false);
                   },
-                  child: const Text("OK", style: TextStyle(fontSize: 16)),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xff5D4037),
-                    foregroundColor: Colors.white,
+                    backgroundColor: const Color(0xffD4AF37),
+                    foregroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
+                  child: const Text("OK", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
               ),
             ],

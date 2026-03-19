@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:brahmakosh/features/astrology/controllers/astrology_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -30,7 +32,8 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+
+        backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.chevron_left, color: Colors.white, size: 8.w),
@@ -43,6 +46,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
           ),
           const SizedBox(width: 8),
         ],
+        excludeHeaderSemantics: true,
       ),
       body: Column(
         children: [
@@ -130,7 +134,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
           children: [
             Expanded(
               child: _buildProfileStatCard(
-                "${expert.experience ?? 14}+ Years",
+                "${expert.experience ?? "No experience"}",
                 "Experience",
                 icon: Icons.auto_awesome,
               ),

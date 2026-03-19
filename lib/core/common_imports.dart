@@ -32,6 +32,8 @@ export 'package:get/get.dart';
 // UI & Styling
 export 'package:google_fonts/google_fonts.dart';
 export 'package:lottie/lottie.dart';
+export 'package:flutter_svg/flutter_svg.dart';
+export 'package:sizer/sizer.dart';
 
 // Routing
 export 'package:go_router/go_router.dart';

@@ -87,7 +87,7 @@ class LandingView extends StatelessWidget {
                   Obx(
                     () => _buildSocialButton(
 
-                      text: "Continuer with Google",
+                      text: "Continue with Google",
                       imagePath: "assets/images/google.png",
                       onTap: authController.isLoading
                           ? null
@@ -277,7 +277,8 @@ class LandingView extends StatelessWidget {
             if (await canLaunchUrl(url)) await launchUrl(url);
           },
           child: Text(
-            "Privacy and Policy",
+            "By Continue you agree to our Privacy and Policy",
+            textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
               fontSize: 13,
               color: AppTheme.authTextSecondary.withOpacity(0.7),

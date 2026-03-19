@@ -53,3 +53,5 @@ class FetchSankalpProgress extends SankalpEvent {
   @override
   List<Object> get props => [userSankalpId];
 }
+
+class ClearSankalpOperationStatus extends SankalpEvent {}

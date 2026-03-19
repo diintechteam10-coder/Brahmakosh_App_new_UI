@@ -11,6 +11,7 @@ class AppConstants {
   static const String routeLogin = '/login';
   static const String routeEmailLogin = '/login-email';
   static const String routeDashboard = '/dashboard';
+  static const String routeRegistrationSuccess = '/registrationSuccess';
   static const String routeRegister = '/register';
   static const String mobileOtp = '/mobileOtp';
   static const String avtarGenrate = '/avtarGenrate';
@@ -37,7 +38,7 @@ class AppConstants {
   static const String routeMeditationStart = '/meditationStart';
   static const String routeSpiritualConfiguration = '/spiritualConfiguration';
   // static const String routeChantingConfiguration = '/chantingConfiguration';
-  static const int splashDuration = 1;
+  static const int splashDuration = 3;
   static const String routeWalkthrough = '/walkthrough';
   static const String routeRedeem = '/redeem';
   static const String routeSankalp = '/sankalp';

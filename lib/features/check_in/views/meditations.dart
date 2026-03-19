@@ -1,6 +1,7 @@
 import 'package:brahmakosh/core/constants/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MeditateScreen extends StatefulWidget {
   const MeditateScreen({super.key});
@@ -12,12 +13,12 @@ class MeditateScreen extends StatefulWidget {
 class _MeditateScreenState extends State<MeditateScreen> {
   String _selectedMood = "Happy";
   double _selectedDuration = 7.0;
-  String _selectedGuide = "Rashmi";
+  final String _selectedGuide = "Rashmi";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF3DF),
+      backgroundColor: Colors.black, // Dark Theme Background
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -30,16 +31,22 @@ class _MeditateScreenState extends State<MeditateScreen> {
                   children: [
                     GestureDetector(
                       onTap: () => Get.back(),
-                      child: Row(
-                        children: const [
-                          Icon(Icons.arrow_back_ios, size: 16),
-                          SizedBox(width: 4),
-                          Text("Back", style: TextStyle(fontSize: 14)),
-                        ],
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.05),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white24),
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back_ios_new,
+                          color: Colors.white,
+                          size: 16,
+                        ),
                       ),
                     ),
                     const Spacer(),
-                    const Icon(Icons.more_vert),
+                    const Icon(Icons.more_vert, color: Colors.white),
                   ],
                 ),
 
@@ -48,24 +55,28 @@ class _MeditateScreenState extends State<MeditateScreen> {
                 /// 🧘 Title
                 Center(
                   child: Column(
-                    children: const [
+                    children: [
                       Text(
-                        "Mediate",
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w700,
+                        "MEDITATE",
+                        style: GoogleFonts.lora(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFFD4AF37), // Primary Gold
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Text(
                         "How are you feeling today?",
-                        style: TextStyle(fontSize: 15, color: Colors.black54),
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: Colors.white70,
+                        ),
                       ),
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 30),
 
                 /// 😀 Mood Selector
                 Row(
@@ -95,21 +106,26 @@ class _MeditateScreenState extends State<MeditateScreen> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: const Color(0xFF141414), // Dark Grey Background
                     borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: const Color(0xFFD4AF37).withValues(alpha: 0.1),
+                    ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        children: const [
-                          Icon(Icons.access_time, size: 18),
-                          SizedBox(width: 8),
+                        children: [
+                          const Icon(Icons.access_time_filled_rounded,
+                              color: Color(0xFFD4AF37), size: 20),
+                          const SizedBox(width: 10),
                           Text(
                             "Select Duration",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15,
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.white,
                             ),
                           ),
                         ],
@@ -139,17 +155,17 @@ class _MeditateScreenState extends State<MeditateScreen> {
                                       Expanded(
                                         child: SliderTheme(
                                           data: SliderThemeData(
-                                            trackHeight: 6,
-                                            activeTrackColor: Colors.orange,
-                                            inactiveTrackColor: Colors.orange
-                                                .withOpacity(0.3),
-                                            thumbColor: Colors.orange,
-                                            overlayColor: Colors.orange
-                                                .withOpacity(0.2),
+                                            trackHeight: 4,
+                                            activeTrackColor: const Color(0xFFD4AF37),
+                                            inactiveTrackColor: const Color(0xFFD4AF37)
+                                                .withValues(alpha: 0.2),
+                                            thumbColor: const Color(0xFFD4AF37),
+                                            overlayColor: const Color(0xFFD4AF37)
+                                                .withValues(alpha: 0.2),
                                             thumbShape:
                                                 const RoundSliderThumbShape(
-                                                  enabledThumbRadius: 8,
-                                                ),
+                                              enabledThumbRadius: 8,
+                                            ),
                                           ),
                                           child: Slider(
                                             value: _selectedDuration,
@@ -176,25 +192,25 @@ class _MeditateScreenState extends State<MeditateScreen> {
                                   duration: _selectedDuration.round(),
                                 ),
                               ),
-                              const Positioned(
+                              Positioned(
                                 left: 0,
                                 top: 68,
                                 child: Text(
                                   "3 Min",
-                                  style: TextStyle(
+                                  style: GoogleFonts.poppins(
                                     fontSize: 12,
-                                    color: Colors.grey,
+                                    color: Colors.white38,
                                   ),
                                 ),
                               ),
-                              const Positioned(
+                              Positioned(
                                 right: 0,
                                 top: 68,
                                 child: Text(
                                   "9 Min",
-                                  style: TextStyle(
+                                  style: GoogleFonts.poppins(
                                     fontSize: 12,
-                                    color: Colors.grey,
+                                    color: Colors.white38,
                                   ),
                                 ),
                               ),
@@ -209,30 +225,55 @@ class _MeditateScreenState extends State<MeditateScreen> {
                 const SizedBox(height: 40),
 
                 /// 📊 Summary
-                Center(
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF141414),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                   child: Column(
                     children: [
-                      const Text(
+                      Text(
                         "Summary",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 15,
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: Colors.white,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
                       Text(
-                        "${_selectedMood == 'Happy'
-                            ? '😊'
-                            : _selectedMood == 'Stressed'
-                            ? '😔'
-                            : '😐'} "
+                        "${_selectedMood == 'Happy' ? '😊' : _selectedMood == 'Stressed' ? '😔' : '😐'} "
                         "$_selectedMood  •  👧 $_selectedGuide  •  ⏱ ${_selectedDuration.round()} Mins",
-                        style: const TextStyle(fontSize: 13),
+                        style: GoogleFonts.poppins(fontSize: 13, color: Colors.white70),
                       ),
-                      const SizedBox(height: 10),
-                      const Text(
-                        "⭐ Finish to earn +10 karma Points",
-                        style: TextStyle(color: Colors.orange),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.star, color: Color(0xFFD4AF37), size: 16),
+                          const SizedBox(width: 6),
+                          Text(
+                            "Finish to earn ",
+                            style: GoogleFonts.poppins(fontSize: 13, color: Colors.white70),
+                          ),
+                          Text(
+                            "+10 ",
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFFD4AF37),
+                            ),
+                          ),
+                          Text(
+                            "karma Points",
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              color: const Color(0xFFD4AF37),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -241,24 +282,43 @@ class _MeditateScreenState extends State<MeditateScreen> {
                 const SizedBox(height: 40),
 
                 /// ▶ Start Button
-                SizedBox(
+                Container(
                   width: double.infinity,
                   height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(25),
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFD4AF37), Color(0xFFB8860B)],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFD4AF37).withValues(alpha: 0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(25),
                       ),
                     ),
                     onPressed: () {
-                      Get.toNamed(AppConstants.routeMeditationStart);
+                      Get.toNamed(AppConstants.routeMeditationStart, arguments: {
+                        'duration': _selectedDuration,
+                        'mood': _selectedMood,
+                      });
                     },
-                    child: const Text(
-                      "Start",
-                      style: TextStyle(
+                    child: Text(
+                      "START",
+                      style: GoogleFonts.poppins(
                         fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        letterSpacing: 1.2,
                       ),
                     ),
                   ),
@@ -267,10 +327,10 @@ class _MeditateScreenState extends State<MeditateScreen> {
                 const SizedBox(height: 24),
 
                 /// Footer
-                const Center(
+                Center(
                   child: Text(
                     "You can stop anytime",
-                    style: TextStyle(fontSize: 12, color: Colors.black54),
+                    style: GoogleFonts.poppins(fontSize: 12, color: Colors.white38),
                   ),
                 ),
 
@@ -288,15 +348,14 @@ class _MeditateScreenState extends State<MeditateScreen> {
     final isSelected = _selectedMood == text;
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected
-              ? Colors.orange.withOpacity(0.12)
-              : Colors.transparent,
+          color: isSelected ? const Color(0xFFD4AF37).withValues(alpha: 0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isSelected ? Colors.orange : Colors.transparent,
+            color: isSelected ? const Color(0xFFD4AF37) : Colors.white10,
             width: 1.5,
           ),
         ),
@@ -306,9 +365,10 @@ class _MeditateScreenState extends State<MeditateScreen> {
             const SizedBox(height: 6),
             Text(
               text,
-              style: TextStyle(
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                color: isSelected ? Colors.orange : Colors.black,
+              style: GoogleFonts.poppins(
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: isSelected ? const Color(0xFFD4AF37) : Colors.white70,
+                fontSize: 12,
               ),
             ),
           ],
@@ -320,10 +380,10 @@ class _MeditateScreenState extends State<MeditateScreen> {
   Widget _greyBar() {
     return Container(
       width: 40,
-      height: 6,
+      height: 4,
       decoration: BoxDecoration(
-        color: Colors.grey.shade300,
-        borderRadius: BorderRadius.circular(6),
+        color: Colors.white.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(2),
       ),
     );
   }
@@ -341,19 +401,30 @@ class _SelectedTime extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           decoration: BoxDecoration(
-            color: Colors.orange,
+            color: const Color(0xFFD4AF37),
             borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFD4AF37).withValues(alpha: 0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Text(
             "$duration Min",
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
+            style: GoogleFonts.poppins(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
             ),
           ),
         ),
-        const SizedBox(height: 6),
-        const CircleAvatar(radius: 4, backgroundColor: Colors.orange),
+        const SizedBox(height: 4),
+        const CircleAvatar(
+          radius: 3,
+          backgroundColor: Color(0xFFD4AF37),
+        ),
       ],
     );
   }

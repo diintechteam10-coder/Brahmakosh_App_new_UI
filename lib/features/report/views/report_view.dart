@@ -1,5 +1,7 @@
 import '../../../../core/common_imports.dart';
 import '../../dashboard/viewmodels/dashboard_viewmodel.dart';
+import '../../../common/widgets/custom_popups.dart';
+import 'package:get/get.dart';
 
 class ReportView extends StatelessWidget {
   const ReportView({super.key});
@@ -78,6 +80,7 @@ class ReportView extends StatelessWidget {
             icon: Icons.account_balance_wallet,
             color: AppTheme.chakraIndigo,
           ),
+          const SizedBox(height: 100), // Space for bottom navigation bar
         ],
       ),
     );
@@ -99,76 +102,79 @@ class _ReportCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.primaryGold.withOpacity(0.2)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [color.withOpacity(0.1), color.withOpacity(0.2)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(12),
+    return GestureDetector(
+      onTap: () => Get.dialog(ComingSoonPopup(feature: title)),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A1A1A),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppTheme.primaryGold.withOpacity(0.2)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-            child: Icon(icon, size: 24, color: color),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.lora(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [color.withOpacity(0.1), color.withOpacity(0.2)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  date,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.white70,
-                    letterSpacing: 0.2,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, size: 24, color: color),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.lora(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
                   ),
+                  const SizedBox(height: 2),
+                  Text(
+                    date,
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: Colors.white70,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Row(
+              children: [
+                _ActionButton(
+                  icon: Icons.download_rounded,
+                  color: AppTheme.textSecondary,
+                  onPressed: () => Get.dialog(ComingSoonPopup(feature: title)),
+                ),
+                const SizedBox(width: 8),
+                _ActionButton(
+                  icon: Icons.arrow_forward_ios_rounded,
+                  color: AppTheme.primaryGold,
+                  onPressed: () => Get.dialog(ComingSoonPopup(feature: title)),
+                  isPrimary: true,
                 ),
               ],
             ),
-          ),
-          Row(
-            children: [
-              _ActionButton(
-                icon: Icons.download_rounded,
-                color: AppTheme.textSecondary,
-                onPressed: () {},
-              ),
-              const SizedBox(width: 8),
-              _ActionButton(
-                icon: Icons.arrow_forward_ios_rounded,
-                color: AppTheme.primaryGold,
-                onPressed: () {},
-                isPrimary: true,
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

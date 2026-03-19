@@ -62,7 +62,7 @@ class _SankalpScreenState extends State<SankalpScreen>
               ),
               child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 16),
             ),
-            onPressed: () => Get.back(),
+            onPressed: () => Navigator.pop(context),
           ),
           actions: [
             IconButton(

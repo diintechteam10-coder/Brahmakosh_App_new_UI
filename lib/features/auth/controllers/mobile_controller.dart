@@ -37,7 +37,57 @@ class MobileOtpController extends GetxController {
 
   /// 🔁 RESEND OTP
   Future<void> resendOtp() async {
-    await sendOtp();
+    print("🔁 RESEND MOBILE OTP CALLED");
+
+    try {
+      isLoading.value = true;
+
+      // Determine OTP Method
+      String otpMethod = "whatsapp";
+      if (selectedChannel.value == "phone") {
+        otpMethod = "twilio";
+      }
+
+      final payload = {
+        "email": email.trim(),
+        "otpMethod": otpMethod,
+        "clientId": "CLI-KBHUMT",
+      };
+
+      print("➡️ API URL: ${ApiUrls.resendMobileOtp}");
+      print("➡️ PAYLOAD: $payload");
+
+      final res = await http.post(
+        Uri.parse(ApiUrls.resendMobileOtp),
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: jsonEncode(payload),
+      ).timeout(const Duration(seconds: 15), onTimeout: () {
+        print("⏳ REQUEST TIMEOUT - resendOtp");
+        throw http.ClientException("Request timed out");
+      });
+
+      print("⬅️ STATUS: ${res.statusCode}");
+      print("⬅️ RESPONSE: ${res.body}");
+
+      final data = jsonDecode(res.body);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        print("✅ MOBILE OTP RESENT SUCCESSFULLY");
+        Get.snackbar("Success", data['message'] ?? "OTP resent to mobile");
+      } else {
+        print("❌ OTP RESEND FAILED");
+        Get.snackbar("Error", data['message'] ?? "Failed to resend OTP");
+      }
+    } catch (e, stack) {
+      print("🔥 EXCEPTION: $e");
+      print("🔥 STACK TRACE: $stack");
+      Get.snackbar("Error", e is http.ClientException ? "Connection timeout" : "Server error");
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   Future<void> sendOtp() async {

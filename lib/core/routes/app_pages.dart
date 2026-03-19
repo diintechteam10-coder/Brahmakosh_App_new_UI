@@ -27,6 +27,7 @@ import '../../features/auth/controllers/login_controller.dart';
 import '../../features/auth/controllers/email_register_controller.dart';
 import '../../features/dashboard/views/dashboard_view.dart';
 import '../../features/intro/views/intro_view.dart';
+import '../../features/auth/views/registration_success_view.dart';
 import '../../features/splash/views/splash_view.dart';
 import '../constants/app_constants.dart';
 import '../services/storage_service.dart';
@@ -39,12 +40,14 @@ import 'package:brahmakosh/features/pooja/views/pooja_list_screen.dart';
 import 'package:brahmakosh/features/swapna_decoder/views/swapna_decoder_screen.dart';
 import 'package:brahmakosh/features/gita/views/gita_chapter_screen.dart';
 
-import 'package:brahmakosh/features/check_in/views/chanting_configuration_view.dart';
-
 class AppPages {
   static final List<GetPage> pages = [
     GetPage(name: AppConstants.routeSplash, page: () => const SplashView()),
     GetPage(name: AppConstants.routeIntro, page: () => const IntroView()),
+    GetPage(
+      name: AppConstants.routeRegistrationSuccess,
+      page: () => const RegistrationSuccessView(),
+    ),
     GetPage(name: AppConstants.routeLogin, page: () => LandingView()),
     GetPage(
       name: AppConstants.routeEmailLogin,

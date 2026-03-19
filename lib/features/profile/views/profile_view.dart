@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/common_imports.dart';
-import '../../../../common/utils.dart';
 import '../../../common/widgets/profile_image_view.dart';
 import '../../../common/widgets/custom_profile_avatar.dart';
 import '../viewmodels/profile_viewmodel.dart';
@@ -17,6 +16,8 @@ import 'dart:io';
 import '../../support/views/help_support_view.dart';
 import '../../support/views/about_us_view.dart';
 import '../../astrology/views/credit_history_view.dart';
+import '../../redeem/views/redeem_list_view.dart';
+import '../../../common/widgets/custom_popups.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProfileView extends StatefulWidget {
@@ -233,17 +234,22 @@ class _ProfileViewState extends State<ProfileView> {
                               ),
                             ),
                           ),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF1E1E1E),
-                              borderRadius: BorderRadius.circular(16),
+                          GestureDetector(
+                            onTap: () => Get.dialog(
+                              const ComingSoonPopup(feature: "Language Change"),
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                _buildLangToggle("En", true),
-                                _buildLangToggle("Hi", false),
-                              ],
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF1E1E1E),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  _buildLangToggle("En", true),
+                                  _buildLangToggle("Hi", false),
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -270,6 +276,7 @@ class _ProfileViewState extends State<ProfileView> {
                           subtitle: "Your Karma Points",
                           buttonLabel: "Redeem",
                           isKarma: true,
+                          onTap: () => Get.to(() => const RedeemListView()),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -307,7 +314,7 @@ class _ProfileViewState extends State<ProfileView> {
                     _buildListTile(
                       icon: Icons.shopping_cart_outlined,
                       title: "Orders",
-                      onTap: () => Utils.showToast('Coming soon'),
+                      onTap: () => Get.dialog(const ComingSoonPopup(feature: "Orders")),
                     ),
                     const Divider(color: Colors.white10, height: 1),
                     _buildListTile(
@@ -319,7 +326,7 @@ class _ProfileViewState extends State<ProfileView> {
                     _buildListTile(
                       icon: Icons.settings_outlined,
                       title: "Settings",
-                      onTap: () => Utils.showToast('Coming soon'),
+                      onTap: () => Get.dialog(const ComingSoonPopup(feature: "Settings")),
                     ),
                     const Divider(color: Colors.white10, height: 1),
                     _buildListTile(
@@ -338,9 +345,16 @@ class _ProfileViewState extends State<ProfileView> {
                       icon: Icons.delete_outline,
                       title: "Delete Account",
                       onTap: () {
-                        _launchDeleteAccountEmail(
-                          context,
-                          profile?.email ?? '',
+                        Get.dialog(
+                          ActionConfirmationPopup(
+                            title: "Delete Account",
+                            description: "Are you sure you want to delete your account?\nThis action will permanently remove your data from Brahmakosh.",
+                            confirmLabel: "Delete",
+                            onConfirm: () => _launchDeleteAccountEmail(
+                              context,
+                              profile?.email ?? '',
+                            ),
+                          ),
                         );
                       },
                     ),
@@ -355,7 +369,16 @@ class _ProfileViewState extends State<ProfileView> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: GestureDetector(
-                      onTap: _logout,
+                      onTap: () {
+                        Get.dialog(
+                          ActionConfirmationPopup(
+                            title: "Logout",
+                            description: "Are you sure you want to logout from Brahmakosh?",
+                            confirmLabel: "Logout",
+                            onConfirm: _logout,
+                          ),
+                        );
+                      },
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,

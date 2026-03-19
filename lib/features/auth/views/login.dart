@@ -328,7 +328,7 @@ class LoginView extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            "Or login with",
+            "or",
             style: GoogleFonts.poppins(
               color: Color(0xffD9D9D9),
               fontSize: 14,
