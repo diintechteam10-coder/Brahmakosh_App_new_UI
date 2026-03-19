@@ -29,7 +29,7 @@ class RedemptionHistoryView extends StatelessWidget {
         ),
         title: Text(
           "History",
-          style: GoogleFonts.playfairDisplay(
+          style: GoogleFonts.lora(
             color: const Color(0xff5D4037),
             fontSize: 22,
             fontWeight: FontWeight.bold,
@@ -53,7 +53,7 @@ class RedemptionHistoryView extends StatelessWidget {
                 const SizedBox(height: 16),
                 Text(
                   "No redemption history yet",
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     color: Colors.grey[600],
                     fontSize: 16,
                   ),
@@ -117,7 +117,7 @@ class RedemptionHistoryView extends StatelessWidget {
                       children: [
                         Text(
                           reward?.title ?? 'Unknown Reward',
-                          style: GoogleFonts.playfairDisplay(
+                          style: GoogleFonts.lora(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: const Color(0xff5D4037),
@@ -130,7 +130,7 @@ class RedemptionHistoryView extends StatelessWidget {
                           children: [
                             Text(
                               "Status: ",
-                              style: GoogleFonts.inter(
+                              style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 color: const Color(0xff5D4037).withOpacity(0.7),
                               ),
@@ -153,7 +153,7 @@ class RedemptionHistoryView extends StatelessWidget {
                               ),
                               child: Text(
                                 historyItem.status.toUpperCase(),
-                                style: GoogleFonts.inter(
+                                style: GoogleFonts.poppins(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
                                   color: _getStatusColor(historyItem.status),
@@ -168,7 +168,7 @@ class RedemptionHistoryView extends StatelessWidget {
                           children: [
                             Text(
                               _formatDate(historyItem.redeemedAt),
-                              style: GoogleFonts.inter(
+                              style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 color: Colors.grey[600],
                               ),
@@ -188,7 +188,7 @@ class RedemptionHistoryView extends StatelessWidget {
                                 const SizedBox(width: 4),
                                 Text(
                                   "-${historyItem.karmaPointsSpent}",
-                                  style: GoogleFonts.inter(
+                                  style: GoogleFonts.poppins(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.red[700],
@@ -232,3 +232,4 @@ class RedemptionHistoryView extends StatelessWidget {
     }
   }
 }
+

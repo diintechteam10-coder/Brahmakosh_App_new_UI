@@ -29,7 +29,7 @@ class RedeemListView extends StatelessWidget {
           offset: const Offset(-10, 0),
           child: Text(
             "Redeem",
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.lora(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: const Color(0xff5D4037),
@@ -64,7 +64,7 @@ class RedeemListView extends StatelessWidget {
                       children: [
                         TextSpan(
                           text: "${controller.userPoints.value} ",
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             color: const Color(0xff5D4037),
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
@@ -72,7 +72,7 @@ class RedeemListView extends StatelessWidget {
                         ),
                         TextSpan(
                           text: "Karma Points",
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             color: const Color(0xff5D4037),
                             fontSize: 10,
                           ),
@@ -187,7 +187,7 @@ class RedeemListView extends StatelessWidget {
           ),
           child: Text(
             label,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 14,
               fontWeight: FontWeight.bold,
               color: isSelected
@@ -200,3 +200,4 @@ class RedeemListView extends StatelessWidget {
     });
   }
 }
+

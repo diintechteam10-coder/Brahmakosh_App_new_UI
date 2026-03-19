@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:noise_meter/noise_meter.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:sizer/sizer.dart';
 
 class NeonVoiceRing extends StatefulWidget {
   final bool isListening;
@@ -150,16 +151,16 @@ class _NeonVoiceRingState extends State<NeonVoiceRing>
           final bool isGlowStrong =
               widget.isSpeaking || (_isRecording && _targetScale > 0.95);
           final double blurRadius = widget.isSpeaking
-              ? 45.0
-              : (isGlowStrong ? 30.0 : 15.0);
+              ? 11.25.w
+              : (isGlowStrong ? 7.5.w : 3.75.w);
           final double spreadRadius = widget.isSpeaking
-              ? 12.0
-              : (isGlowStrong ? 8.0 : 4.0);
+              ? 3.w
+              : (isGlowStrong ? 2.w : 1.w);
 
           final mainColor = widget.isSpeaking
               ? Colors.blueAccent
               : Colors.cyanAccent;
-          final coreSize = 140.0;
+          final coreSize = 35.w;
 
           return Center(
             child: Transform.scale(

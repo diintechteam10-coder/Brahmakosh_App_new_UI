@@ -45,7 +45,7 @@ class TithiView extends StatelessWidget {
       ),
       title: Text(
         'Tithi Details',
-        style: GoogleFonts.playfairDisplay(
+        style: GoogleFonts.lora(
           color: AppTheme.textPrimary,
           fontWeight: FontWeight.bold,
         ),
@@ -75,7 +75,7 @@ class TithiView extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             'Shukla Paksha Dashami',
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.lora(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: AppTheme.textPrimary,
@@ -108,7 +108,7 @@ class TithiView extends StatelessWidget {
         children: [
           Text(
             title,
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.lora(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: AppTheme.textPrimary,
@@ -128,3 +128,4 @@ class TithiView extends StatelessWidget {
     );
   }
 }
+

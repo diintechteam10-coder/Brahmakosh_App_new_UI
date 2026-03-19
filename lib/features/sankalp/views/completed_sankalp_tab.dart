@@ -281,7 +281,7 @@ class CompletedSankalpTab extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 "Great Job!",
-                style: GoogleFonts.playfairDisplay(
+                style: GoogleFonts.lora(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: const Color(0xff5D4037),
@@ -291,7 +291,7 @@ class CompletedSankalpTab extends StatelessWidget {
               Text(
                 message,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
+                style: GoogleFonts.poppins(
                   fontSize: 14,
                   color: const Color(0xff5D4037),
                 ),
@@ -314,3 +314,4 @@ class CompletedSankalpTab extends StatelessWidget {
     );
   }
 }
+

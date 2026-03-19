@@ -52,7 +52,7 @@ class NotificationDetailScreen extends StatelessWidget {
                     Expanded(
                       child: Text(
                         info.label,
-                        style: GoogleFonts.playfairDisplay(
+                        style: GoogleFonts.lora(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: const Color(0xFF3E2723),
@@ -131,7 +131,7 @@ class NotificationDetailScreen extends StatelessWidget {
                             children: [
                               Text(
                                 notification.title,
-                                style: GoogleFonts.playfairDisplay(
+                                style: GoogleFonts.lora(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   color: const Color(0xFF3E2723),
@@ -185,7 +185,7 @@ class NotificationDetailScreen extends StatelessWidget {
                       children: [
                         Text(
                           'Summary',
-                          style: GoogleFonts.playfairDisplay(
+                          style: GoogleFonts.lora(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: const Color(0xFF5D4037),
@@ -236,7 +236,7 @@ class NotificationDetailScreen extends StatelessWidget {
                               const SizedBox(width: 8),
                               Text(
                                 'Full Details',
-                                style: GoogleFonts.playfairDisplay(
+                                style: GoogleFonts.lora(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: const Color(0xFF5D4037),
@@ -399,3 +399,4 @@ class NotificationDetailScreen extends StatelessWidget {
     return '${date.day} ${months[date.month - 1]} ${date.year} • $hour:$minute $amPm';
   }
 }
+

@@ -105,7 +105,7 @@ class BrahmakoshBottomBar extends StatelessWidget {
             child: Center(
               child: Text(
                 'Ask BI',
-                style: GoogleFonts.inter(
+                style: GoogleFonts.poppins(
                   fontSize: 12,
                   fontWeight: currentIndex == 2 ? FontWeight.w600 : FontWeight.w400,
                   color: currentIndex == 2 ? AppTheme.primaryGold : Colors.white60,
@@ -140,7 +140,7 @@ class BrahmakoshBottomBar extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               label,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 11,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 color: isSelected ? AppTheme.primaryGold : Colors.white60,

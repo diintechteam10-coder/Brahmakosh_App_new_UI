@@ -1778,7 +1778,7 @@
 //               const SizedBox(height: 8),
 //               Text(
 //                 "Select your preferred AI voice:",
-//                 style: GoogleFonts.inter(fontSize: 14, color: Colors.black54),
+//                 style: GoogleFonts.poppins(fontSize: 14, color: Colors.black54),
 //               ),
 //               const SizedBox(height: 20),
 //               ...voices.map((voice) {
@@ -1832,7 +1832,7 @@
 //                           Expanded(
 //                             child: Text(
 //                               voice['name']!,
-//                               style: GoogleFonts.inter(
+//                               style: GoogleFonts.poppins(
 //                                 fontSize: 16,
 //                                 fontWeight: isSelected
 //                                     ? FontWeight.bold
@@ -1861,3 +1861,4 @@
 //     );
 //   }
 // }
+

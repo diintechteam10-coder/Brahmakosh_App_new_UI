@@ -105,7 +105,7 @@ class _SpiritualConfigurationViewState
                       color: Colors.red,
                     ),
                     const SizedBox(height: 16),
-                    Text(errorMessage, style: GoogleFonts.inter(color: Colors.white70)),
+                    Text(errorMessage, style: GoogleFonts.poppins(color: Colors.white70)),
                   ],
                 ),
               ),
@@ -140,7 +140,7 @@ class _SpiritualConfigurationViewState
                           const SizedBox(height: 5),
                           Text(
                             'How are you feeling today?',
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.poppins(
                               fontSize: 14,
                               color: Colors.white70,
                             ),
@@ -156,7 +156,7 @@ class _SpiritualConfigurationViewState
                           const SizedBox(height: 10),
                           Text(
                             'You can stop anytime',
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.poppins(
                               fontSize: 12,
                               color: Colors.white54,
                             ),
@@ -270,7 +270,7 @@ class _SpiritualConfigurationViewState
               const SizedBox(width: 10),
               Text(
                 'Select Duration',
-                style: GoogleFonts.inter(
+                style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -304,11 +304,11 @@ class _SpiritualConfigurationViewState
                       children: [
                         Text(
                           _formatDuration(durations.first),
-                          style: GoogleFonts.inter(color: Colors.white54, fontSize: 12),
+                          style: GoogleFonts.poppins(color: Colors.white54, fontSize: 12),
                         ),
                         Text(
                           _formatDuration(durations.last),
-                          style: GoogleFonts.inter(color: Colors.white54, fontSize: 12),
+                          style: GoogleFonts.poppins(color: Colors.white54, fontSize: 12),
                         ),
                       ],
                     ),
@@ -583,7 +583,7 @@ class _EmotionListState extends State<_EmotionList> {
                         child: Text(
                           emotion,
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             fontSize: isSelected ? 12 : 10,
                             fontWeight: isSelected
                                 ? FontWeight.bold
@@ -603,3 +603,4 @@ class _EmotionListState extends State<_EmotionList> {
     );
   }
 }
+

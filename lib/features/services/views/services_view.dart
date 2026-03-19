@@ -16,7 +16,7 @@ class ServicesView extends StatelessWidget {
         elevation: 0,
         title: Text(
           'Shadana',
-          style: GoogleFonts.playfairDisplay(
+          style: GoogleFonts.lora(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -290,3 +290,4 @@ class _ServiceCardState extends State<ServiceCard>
     );
   }
 }
+

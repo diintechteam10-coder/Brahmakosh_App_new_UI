@@ -175,7 +175,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar>
                   // const SizedBox(height: 8),
                   Text(
                     'Ask BI',
-                    style: GoogleFonts.cinzel(
+                    style: GoogleFonts.lora(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                       color: isRashmiSelected
@@ -224,7 +224,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar>
           const SizedBox(height: 3),
           AnimatedDefaultTextStyle(
             duration: const Duration(milliseconds: 250),
-            style: GoogleFonts.cinzel(
+            style: GoogleFonts.lora(
               fontSize: isSelected ? 11 : 10,
               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
               color: isSelected ? AppTheme.primaryGold : AppTheme.textSecondary,
@@ -237,3 +237,4 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar>
     );
   }
 }
+

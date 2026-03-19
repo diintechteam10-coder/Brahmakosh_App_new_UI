@@ -28,7 +28,7 @@ class ServiceDetailView extends StatelessWidget {
         ),
         title: Text(
           service.title,
-          style: GoogleFonts.playfairDisplay(
+          style: GoogleFonts.lora(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -100,7 +100,7 @@ class ServiceDetailView extends StatelessWidget {
                   ),
                   child: Text(
                     'Winter Sale!',
-                    style: GoogleFonts.playfairDisplay(
+                    style: GoogleFonts.lora(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: service.color,
@@ -186,7 +186,7 @@ class ServiceDetailView extends StatelessWidget {
           ),
           title: Text(
             itemName,
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.lora(
               fontSize: 15,
               fontWeight: FontWeight.bold,
               color: AppTheme.textPrimary,
@@ -256,7 +256,7 @@ class ServiceDetailView extends StatelessWidget {
         ),
         title: Text(
           service.title,
-          style: GoogleFonts.playfairDisplay(
+          style: GoogleFonts.lora(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -319,7 +319,7 @@ class ServiceDetailView extends StatelessWidget {
                 children: [
                   Text(
                     'About ${service.title}',
-                    style: GoogleFonts.playfairDisplay(
+                    style: GoogleFonts.lora(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: AppTheme.textPrimary,
@@ -430,7 +430,7 @@ class ServiceDetailView extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: GoogleFonts.playfairDisplay(
+                    style: GoogleFonts.lora(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: AppTheme.textPrimary,
@@ -529,3 +529,4 @@ class _TiltCardState extends State<_TiltCard>
     );
   }
 }
+

@@ -45,7 +45,7 @@ class NakshatraView extends StatelessWidget {
       ),
       title: Text(
         'Nakshatra Details',
-        style: GoogleFonts.playfairDisplay(
+        style: GoogleFonts.lora(
           color: AppTheme.textPrimary,
           fontWeight: FontWeight.bold,
         ),
@@ -75,7 +75,7 @@ class NakshatraView extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             'Rohini',
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.lora(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: AppTheme.textPrimary,
@@ -108,7 +108,7 @@ class NakshatraView extends StatelessWidget {
         children: [
           Text(
             title,
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.lora(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: AppTheme.textPrimary,
@@ -128,3 +128,4 @@ class NakshatraView extends StatelessWidget {
     );
   }
 }
+

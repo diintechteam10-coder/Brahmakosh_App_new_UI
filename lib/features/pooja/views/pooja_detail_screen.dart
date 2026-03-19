@@ -140,7 +140,7 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                                         Expanded(
                                           child: Text(
                                             "Best Timing: ${pooja.bestDay ?? "Friday"}",
-                                            style: GoogleFonts.inter(
+                                            style: GoogleFonts.poppins(
                                               fontSize: 13,
                                               fontWeight: FontWeight.w600,
                                               color: const Color(0xFFD4AF37),
@@ -153,7 +153,7 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                                   const SizedBox(height: 16),
                                   Text(
                                     pooja.description!,
-                                    style: GoogleFonts.inter(
+                                    style: GoogleFonts.poppins(
                                       fontSize: 14,
                                       color: Colors.white.withOpacity(0.5),
                                       height: 1.6,
@@ -168,7 +168,7 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                                   //     children: [
                                   //       Text(
                                   //         "Read More",
-                                  //         style: GoogleFonts.inter(
+                                  //         style: GoogleFonts.poppins(
                                   //           fontSize: 13,
                                   //           fontWeight: FontWeight.w600,
                                   //           color: const Color(0xFFD4AF37),
@@ -232,7 +232,7 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                                             children: [
                                               Text(
                                                 point.trim(),
-                                                style: GoogleFonts.inter(
+                                                style: GoogleFonts.poppins(
                                                   fontSize: 15,
                                                   fontWeight: FontWeight.bold,
                                                   color: Colors.white,
@@ -241,7 +241,7 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                                               const SizedBox(height: 4),
                                               Text(
                                                 "Benefit impact details",
-                                                style: GoogleFonts.inter(
+                                                style: GoogleFonts.poppins(
                                                   fontSize: 12,
                                                   color: Colors.white.withOpacity(0.4),
                                                 ),
@@ -301,7 +301,7 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                             const SizedBox(width: 8),
                             Text(
                               "Start Puja Vidhi",
-                              style: GoogleFonts.inter(
+                              style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
@@ -354,7 +354,7 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
         const SizedBox(width: 6),
         Text(
           text,
-          style: GoogleFonts.inter(
+          style: GoogleFonts.poppins(
             fontSize: 12,
             color: Colors.white.withOpacity(0.6),
             fontWeight: FontWeight.w500,
@@ -364,3 +364,4 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
     );
   }
 }
+

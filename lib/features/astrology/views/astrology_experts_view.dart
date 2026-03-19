@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:sizer/sizer.dart';
 import '../../../../core/theme/app_theme.dart';
 import 'package:brahmakosh/common/models/astrologist_model.dart';
 import 'package:brahmakosh/features/profile/viewmodels/profile_viewmodel.dart';
@@ -36,7 +37,7 @@ class AstrologyExpertsView extends StatelessWidget {
         backgroundColor: Colors.black,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 30),
+          icon: Icon(Icons.chevron_left, color: Colors.white, size: 8.w),
           onPressed: () {
             if (Navigator.of(context).canPop()) {
               Navigator.of(context).pop();
@@ -57,7 +58,7 @@ class AstrologyExpertsView extends StatelessWidget {
         title: Text(
           "Connect",
           style: GoogleFonts.lora(
-            fontSize: 20,
+            fontSize: 16.sp,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -76,20 +77,20 @@ class AstrologyExpertsView extends StatelessWidget {
         children: [
           // Search Bar
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 0.5.h),
             child: _buildSearchBar(context, controller),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 1.h),
 
           // Categories / Filters
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
             child: Container(
-              height: 44,
+              height: 5.5.h,
               decoration: BoxDecoration(
                 color: const Color(0xFF1A1A1A),
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: Colors.white.withOpacity(0.05)),
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
               ),
               child: Obx(() {
                 final allCategories = [
@@ -143,8 +144,8 @@ class AstrologyExpertsView extends StatelessWidget {
                       children: [
                         Icon(
                           Icons.search_off,
-                          size: 64,
-                          color: AppTheme.textSecondary.withOpacity(0.6),
+                          size: 15.w,
+                          color: AppTheme.textSecondary.withValues(alpha: 0.6),
                         ),
                         const SizedBox(height: 16),
                         Text(
@@ -160,10 +161,10 @@ class AstrologyExpertsView extends StatelessWidget {
                 return ListView.builder(
                   controller: scrollController,
                   padding: EdgeInsets.only(
-                    left: 16,
-                    top: 8,
-                    right: 16, // Fixed indentation
-                    bottom: 20 + MediaQuery.of(context).padding.bottom,
+                    left: 4.w,
+                    top: 1.h,
+                    right: 4.w,
+                    bottom: 2.h + MediaQuery.of(context).padding.bottom,
                   ),
                   itemCount: list.length,
                   itemBuilder: (context, index) {
@@ -180,19 +181,19 @@ class AstrologyExpertsView extends StatelessWidget {
 
   Widget _buildSearchBar(BuildContext context, AstrologyController controller) {
     return Container(
-      height: 48,
+      height: 6.h,
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color: const Color(0xFF141414),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: TextField(
         controller: controller.searchController,
-        style: GoogleFonts.inter(color: Colors.white),
+        style: GoogleFonts.poppins(color: Colors.white),
         decoration: InputDecoration(
           hintText: "Search",
-          hintStyle: GoogleFonts.inter(color: Colors.white.withOpacity(0.4)),
-          prefixIcon: Icon(Icons.search, color: Colors.white.withOpacity(0.4)),
+          hintStyle: GoogleFonts.poppins(color: Colors.white.withValues(alpha: 0.4)),
+          prefixIcon: Icon(Icons.search, color: Colors.white.withValues(alpha: 0.4)),
           filled: false,
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 12),
@@ -235,19 +236,19 @@ class AstrologyExpertsView extends StatelessWidget {
       borderRadius: BorderRadius.circular(18),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        margin: EdgeInsets.symmetric(vertical: 0.5.h, horizontal: 1.w),
+        padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 1.h),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFD4AF37) : Colors.transparent,
-          borderRadius: BorderRadius.circular(18),
+          color: isSelected ? const Color(0xFFFFD700) : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
         ),
         alignment: Alignment.center,
         child: Text(
           label.toUpperCase(),
-          style: GoogleFonts.inter(
-            fontSize: 11,
+          style: GoogleFonts.poppins(
+            fontSize: 9.sp,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-            color: isSelected ? Colors.black : Colors.white.withOpacity(0.5),
+            color: isSelected ? Colors.black : Colors.white.withValues(alpha: 0.5),
             letterSpacing: 0.5,
           ),
         ),
@@ -270,15 +271,18 @@ class AstrologyExpertsView extends StatelessWidget {
     final isBusy = status == 'busy';
 
     Color statusColor = Colors.grey;
-    if (isOnline) statusColor = Colors.green;
-    else if (isBusy) statusColor = Colors.orange;
+    if (isOnline) {
+      statusColor = Colors.green;
+    } else if (isBusy) {
+      statusColor = Colors.orange;
+    }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: 2.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF141414),
+        color: const Color(0xFF18151B),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Material(
         color: Colors.transparent,
@@ -297,27 +301,27 @@ class AstrologyExpertsView extends StatelessWidget {
                     Stack(
                       children: [
                         Container(
-                          width: 64,
-                          height: 64,
+                          width: 16.w,
+                          height: 16.w,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: const Color(0xFFD4AF37),
-                              width: 2,
+                              color: const Color(0xFFFFD700),
+                              width: 1.5,
                             ),
                           ),
                           child: CustomProfileAvatar(
                             imageUrl: expert.profilePhoto,
-                            radius: 30,
+                            radius: 8.w,
                             borderWidth: 0,
                           ),
                         ),
                         Positioned(
-                          right: 2,
-                          bottom: 2,
+                          right: 0,
+                          bottom: 0,
                           child: Container(
-                            width: 12,
-                            height: 12,
+                            width: 3.5.w,
+                            height: 3.5.w,
                             decoration: BoxDecoration(
                               color: statusColor,
                               shape: BoxShape.circle,
@@ -327,7 +331,7 @@ class AstrologyExpertsView extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(width: 16),
+                    SizedBox(width: 4.w),
                     // Details
                     Expanded(
                       child: Column(
@@ -340,7 +344,7 @@ class AstrologyExpertsView extends StatelessWidget {
                                 child: Text(
                                   expert.name ?? 'Astrologer',
                                   style: GoogleFonts.lora(
-                                    fontSize: 18,
+                                    fontSize: 14.sp,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),
@@ -348,13 +352,13 @@ class AstrologyExpertsView extends StatelessWidget {
                               ),
                               Row(
                                 children: [
-                                  const Icon(Icons.star, color: Color(0xFFD4AF37), size: 16),
-                                  const SizedBox(width: 4),
+                                  Icon(Icons.star, color: const Color(0xFFFFD700), size: 4.w),
+                                  SizedBox(width: 1.w),
                                   Text(
                                     "${expert.rating ?? 4.9}",
-                                    style: GoogleFonts.inter(
+                                    style: GoogleFonts.poppins(
                                       color: Colors.white,
-                                      fontSize: 13,
+                                      fontSize: 10.sp,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -365,21 +369,21 @@ class AstrologyExpertsView extends StatelessWidget {
                           const SizedBox(height: 4),
                           Text(
                             expert.expertise?.split(',').take(2).join(", ") ?? "Vedic Astrology",
-                            style: GoogleFonts.inter(
-                              fontSize: 13,
-                              color: Colors.white.withOpacity(0.5),
+                            style: GoogleFonts.poppins(
+                              fontSize: 10.sp,
+                              color: Colors.white.withValues(alpha: 0.5),
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 1.h),
                           Row(
                             children: [
-                              const Icon(Icons.work_outline, color: Color(0xFFD4AF37), size: 14),
-                              const SizedBox(width: 6),
+                              Icon(Icons.work_outline, color: const Color(0xFFFFD700), size: 3.5.w),
+                              SizedBox(width: 2.w),
                               Text(
                                 "${expert.experience ?? '0'}+ Years Exp.",
-                                style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  color: const Color(0xFFD4AF37),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 9.sp,
+                                  color: const Color(0xFFFFD700),
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -411,7 +415,7 @@ class AstrologyExpertsView extends StatelessWidget {
                     Expanded(
                       child: _buildActionButton(
                         icon: Icons.phone_outlined,
-                        price: "₹${expert.voiceCharge?.toInt() ?? 20}/min",
+                        price: "₹${expert.voiceCharge?.toInt() ?? 0}/min",
                         onTap: () {
                           if (status != 'online') {
                             _showExpertOfflineDialog(context);
@@ -453,10 +457,10 @@ class AstrologyExpertsView extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+        padding: EdgeInsets.symmetric(vertical: 0.8.h, horizontal: 2.w),
         decoration: BoxDecoration(
           border: Border.all(
-            color: const Color(0xFFD4AF37),
+            color: const Color(0xFFFFD700),
             width: 1,
           ),
           borderRadius: BorderRadius.circular(24),
@@ -465,17 +469,17 @@ class AstrologyExpertsView extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 14, color: const Color(0xFFD4AF37)),
-            const SizedBox(width: 6),
+            Icon(icon, size: 3.5.w, color: const Color(0xFFFFD700)),
+            SizedBox(width: 1.5.w),
             Flexible(
               child: Text(
                 price,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.inter(
-                  fontSize: 10,
+                style: GoogleFonts.poppins(
+                  fontSize: 8.sp,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFFD4AF37),
+                  color: const Color(0xFFFFD700),
                 ),
               ),
             ),
@@ -495,38 +499,48 @@ class AstrologyExpertsView extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
-          color: Color(0xFF141414), // Dark background
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        padding: EdgeInsets.all(6.w),
+        decoration: BoxDecoration(
+          color: const Color(0xFF18151B), // Premium Dark
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 0.5),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Center(
+              child: Container(
+                width: 12.w,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.white24,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+            SizedBox(height: 3.h),
             Row(
               children: [
-                // Chat Icon Box
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: EdgeInsets.all(2.w),
                   decoration: BoxDecoration(
                     color: const Color(0xFF262626),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.2)),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFFFD700).withValues(alpha: 0.2)),
                   ),
-                  child: const Icon(
-                    Icons.message,
-                    color: Color(0xFFD4AF37),
-                    size: 20,
+                  child: Icon(
+                    Icons.message_rounded,
+                    color: const Color(0xFFFFD700),
+                    size: 6.w,
                   ),
                 ),
-                const SizedBox(width: 16),
-                // Title
+                SizedBox(width: 4.w),
                 Expanded(
                   child: Text(
                     "START CHAT CONSULTATION",
-                    style: GoogleFonts.inter(
-                      fontSize: 18,
+                    style: GoogleFonts.lora(
+                      fontSize: 14.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                       letterSpacing: 0.5,
@@ -535,63 +549,58 @@ class AstrologyExpertsView extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 3.h),
 
             Text(
               "You're about to start a live chat session with your chosen Expert.",
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                color: Colors.white.withOpacity(0.7),
+              style: GoogleFonts.poppins(
+                fontSize: 11.sp,
+                color: Colors.white.withValues(alpha: 0.9),
                 height: 1.4,
               ),
             ),
-            const SizedBox(height: 16),
-            Divider(color: Colors.white.withOpacity(0.1), thickness: 1),
-            const SizedBox(height: 16),
+            SizedBox(height: 2.h),
+            Divider(color: Colors.white.withValues(alpha: 0.1), thickness: 1),
+            SizedBox(height: 2.h),
 
-            // Description
             Text(
               "Connect with an astrologer or guru through live chat and end the session at any time - credits are deducted only for the minutes used, so please ensure a stable internet connection for a smooth experience.",
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                color: Colors.white.withOpacity(0.6),
+              style: GoogleFonts.poppins(
+                fontSize: 10.sp,
+                color: Colors.white.withValues(alpha: 0.6),
                 height: 1.5,
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 4.h),
 
-            Divider(color: Colors.white.withOpacity(0.1), thickness: 1),
-            const SizedBox(height: 24),
-
-            // Buttons
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: const BorderSide(color: Color(0xFFB8860B)),
+                      padding: EdgeInsets.symmetric(vertical: 1.5.h),
+                      side: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
                     child: Text(
                       "CANCEL",
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                      style: GoogleFonts.poppins(
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white70,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 4.w),
                 Expanded(
                   child: Consumer<ProfileViewModel>(
                     builder: (context, profileVM, child) {
                       if (profileVM.isLoading) {
-                        return const Center(child: CircularProgressIndicator(color: Color(0xFFD4AF37)));
+                        return const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)));
                       }
 
                       return ElevatedButton(
@@ -607,8 +616,8 @@ class AstrologyExpertsView extends StatelessWidget {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: const Color(0xFFD4AF37),
+                          padding: EdgeInsets.symmetric(vertical: 1.5.h),
+                          backgroundColor: const Color(0xFFFFD700),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
                           ),
@@ -616,8 +625,8 @@ class AstrologyExpertsView extends StatelessWidget {
                         ),
                         child: Text(
                           "CONTINUE",
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
+                          style: GoogleFonts.poppins(
+                            fontSize: 11.sp,
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
@@ -628,7 +637,7 @@ class AstrologyExpertsView extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
+            SizedBox(height: MediaQuery.of(context).padding.bottom + 2.h),
           ],
         ),
       ),
@@ -645,36 +654,48 @@ class AstrologyExpertsView extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
-          color: Color(0xFF141414), // Dark background
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        padding: EdgeInsets.all(6.w),
+        decoration: BoxDecoration(
+          color: const Color(0xFF18151B), // Premium Dark
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 0.5),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Center(
+              child: Container(
+                width: 12.w,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.white24,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+            SizedBox(height: 3.h),
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: EdgeInsets.all(2.w),
                   decoration: BoxDecoration(
                     color: const Color(0xFF262626),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.2)),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFFFD700).withValues(alpha: 0.2)),
                   ),
-                  child: const Icon(
-                    Icons.phone_in_talk,
-                    color: Color(0xFFD4AF37),
-                    size: 20,
+                  child: Icon(
+                    Icons.phone_in_talk_rounded,
+                    color: const Color(0xFFFFD700),
+                    size: 6.w,
                   ),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 4.w),
                 Expanded(
                   child: Text(
                     "VOICE CONSULTATION",
-                    style: GoogleFonts.inter(
-                      fontSize: 18,
+                    style: GoogleFonts.lora(
+                      fontSize: 14.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                       letterSpacing: 0.5,
@@ -683,50 +704,58 @@ class AstrologyExpertsView extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 3.h),
 
             Text(
               "You're about to start a voice call session with your chosen Expert.",
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                color: Colors.white.withOpacity(0.7),
+              style: GoogleFonts.poppins(
+                fontSize: 11.sp,
+                color: Colors.white.withValues(alpha: 0.9),
                 height: 1.4,
               ),
             ),
-            const SizedBox(height: 16),
-            Divider(color: Colors.white.withOpacity(0.1), thickness: 1),
-            const SizedBox(height: 16),
+            SizedBox(height: 2.h),
+            Divider(color: Colors.white.withValues(alpha: 0.1), thickness: 1),
+            SizedBox(height: 2.h),
 
             Text(
               "Connect with an astrologer or guru through a live audio call and end the session at any time - credits are deducted only for the minutes used, so please ensure a stable internet connection for a smooth experience.",
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                color: Colors.white.withOpacity(0.6),
+              style: GoogleFonts.poppins(
+                fontSize: 10.sp,
+                color: Colors.white.withValues(alpha: 0.6),
                 height: 1.5,
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 3.h),
 
-            Text(
-              "This session will deduct ₹${expert.voiceCharge?.toInt() ?? 20} per minute",
-              style: GoogleFonts.inter(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFFD4AF37),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
+              decoration: BoxDecoration(
+                color: const Color(0xFF262626),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Session Cost",
+                    style: GoogleFonts.poppins(
+                      fontSize: 11.sp,
+                      color: Colors.white70,
+                    ),
+                  ),
+                  Text(
+                    "₹${expert.voiceCharge?.toInt() ?? 20} / min",
+                    style: GoogleFonts.poppins(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFFFFD700),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 8),
-
-            Text(
-              "Would you like to continue?",
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                color: Colors.white.withOpacity(0.5),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Divider(color: Colors.white.withOpacity(0.1), thickness: 1),
-            const SizedBox(height: 24),
+            SizedBox(height: 4.h),
 
             Row(
               children: [
@@ -734,28 +763,28 @@ class AstrologyExpertsView extends StatelessWidget {
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: const BorderSide(color: Color(0xFFB8860B)),
+                      padding: EdgeInsets.symmetric(vertical: 1.5.h),
+                      side: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
                     child: Text(
                       "CANCEL",
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                      style: GoogleFonts.poppins(
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white70,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 4.w),
                 Expanded(
                   child: Consumer<ProfileViewModel>(
                     builder: (context, profileVM, child) {
                       if (profileVM.isLoading) {
-                        return const Center(child: CircularProgressIndicator(color: Color(0xFFD4AF37)));
+                        return const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)));
                       }
                       return ElevatedButton(
                         onPressed: () {
@@ -777,8 +806,8 @@ class AstrologyExpertsView extends StatelessWidget {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: const Color(0xFFD4AF37),
+                          padding: EdgeInsets.symmetric(vertical: 1.5.h),
+                          backgroundColor: const Color(0xFFFFD700),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
                           ),
@@ -786,8 +815,8 @@ class AstrologyExpertsView extends StatelessWidget {
                         ),
                         child: Text(
                           "CONTINUE",
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
+                          style: GoogleFonts.poppins(
+                            fontSize: 11.sp,
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
@@ -798,7 +827,7 @@ class AstrologyExpertsView extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
+            SizedBox(height: MediaQuery.of(context).padding.bottom + 2.h),
           ],
         ),
       ),
@@ -808,24 +837,35 @@ class AstrologyExpertsView extends StatelessWidget {
   void _showExpertOfflineDialog(BuildContext context) {
     Get.dialog(
       AlertDialog(
-        backgroundColor: const Color(0xFF141414),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.white.withOpacity(0.05))),
+        backgroundColor: const Color(0xFF18151B),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.1), width: 0.5),
+        ),
         title: Text(
           "Expert Offline",
-          style: GoogleFonts.lora(fontWeight: FontWeight.bold, color: const Color(0xFFD4AF37)),
+          style: GoogleFonts.lora(
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFFFFD700),
+            fontSize: 14.sp,
+          ),
         ),
         content: Text(
           "This expert is currently offline. Please try again later.",
-          style: GoogleFonts.inter(color: Colors.white.withOpacity(0.7)),
+          style: GoogleFonts.poppins(
+            color: Colors.white70,
+            fontSize: 11.sp,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
             child: Text(
               "OK",
-              style: GoogleFonts.inter(
-                color: const Color(0xFFD4AF37),
+              style: GoogleFonts.poppins(
+                color: const Color(0xFFFFD700),
                 fontWeight: FontWeight.bold,
+                fontSize: 10.sp,
               ),
             ),
           ),
@@ -837,24 +877,35 @@ class AstrologyExpertsView extends StatelessWidget {
   void _showInitiateChatFirstDialog(BuildContext context) {
     Get.dialog(
       AlertDialog(
-        backgroundColor: const Color(0xFF141414),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.white.withOpacity(0.05))),
+        backgroundColor: const Color(0xFF18151B),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.1), width: 0.5),
+        ),
         title: Text(
           "Chat Required",
-          style: GoogleFonts.lora(fontWeight: FontWeight.bold, color: const Color(0xFFD4AF37)),
+          style: GoogleFonts.lora(
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFFFFD700),
+            fontSize: 14.sp,
+          ),
         ),
         content: Text(
           "Please initiate a chat with the expert first before making a call.",
-          style: GoogleFonts.inter(color: Colors.white.withOpacity(0.7)),
+          style: GoogleFonts.poppins(
+            color: Colors.white70,
+            fontSize: 11.sp,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
             child: Text(
               "OK",
-              style: GoogleFonts.inter(
-                color: const Color(0xFFD4AF37),
+              style: GoogleFonts.poppins(
+                color: const Color(0xFFFFD700),
                 fontWeight: FontWeight.bold,
+                fontSize: 10.sp,
               ),
             ),
           ),
@@ -868,65 +919,71 @@ class AstrologyExpertsView extends StatelessWidget {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
-          color: Color(0xFF141414),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        padding: EdgeInsets.all(6.w),
+        decoration: BoxDecoration(
+          color: const Color(0xFF18151B),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 0.5),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 40,
+              width: 12.w,
               height: 4,
               decoration: BoxDecoration(
                 color: Colors.white12,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 24),
-            const Icon(Icons.video_call_outlined,
-                color: Color(0xFFD4AF37), size: 48),
-            const SizedBox(height: 16),
+            SizedBox(height: 3.h),
+            Icon(
+              Icons.video_call_outlined,
+              color: const Color(0xFFFFD700),
+              size: 15.w,
+            ),
+            SizedBox(height: 2.h),
             Text(
               "Video Call Coming Soon!",
               style: GoogleFonts.lora(
-                fontSize: 20,
+                fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 1.5.h),
             Text(
               "We're working hard to bring video consultations to you. Stay tuned!",
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                color: Colors.white.withOpacity(0.6),
-                fontSize: 14,
+              style: GoogleFonts.poppins(
+                color: Colors.white.withValues(alpha: 0.6),
+                fontSize: 11.sp,
               ),
             ),
-            const SizedBox(height: 32),
+            SizedBox(height: 4.h),
             SizedBox(
               width: double.infinity,
+              height: 6.h,
               child: ElevatedButton(
                 onPressed: () => Get.back(),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFD4AF37),
+                  backgroundColor: const Color(0xFFFFD700),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  elevation: 0,
                 ),
                 child: Text(
                   "GOT IT",
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
+                    fontSize: 12.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
                 ),
               ),
             ),
-            SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
+            SizedBox(height: MediaQuery.of(context).padding.bottom + 2.h),
           ],
         ),
       ),
@@ -938,8 +995,8 @@ class AstrologyExpertsView extends StatelessWidget {
       baseColor: const Color(0xFF262626),
       highlightColor: const Color(0xFF333333),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        height: 160,
+        margin: EdgeInsets.only(bottom: 2.h),
+        height: 18.h,
         decoration: BoxDecoration(
           color: const Color(0xFF141414),
           borderRadius: BorderRadius.circular(24),
@@ -948,3 +1005,4 @@ class AstrologyExpertsView extends StatelessWidget {
     );
   }
 }
+

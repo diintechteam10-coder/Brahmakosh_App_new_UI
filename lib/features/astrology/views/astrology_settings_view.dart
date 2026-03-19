@@ -19,7 +19,7 @@ class AstrologySettingsView extends StatelessWidget {
         centerTitle: false,
         title: Text(
           "Settings",
-          style: GoogleFonts.playfairDisplay(
+          style: GoogleFonts.lora(
             fontSize: 22,
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -41,7 +41,7 @@ class AstrologySettingsView extends StatelessWidget {
 
             Text(
               "Account & Support",
-              style: GoogleFonts.playfairDisplay(
+              style: GoogleFonts.lora(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
                 color: const Color(0xFF2D2D2D),
@@ -131,7 +131,7 @@ class AstrologySettingsView extends StatelessWidget {
                       children: [
                         Text(
                           "Total Credits",
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             fontSize: 14,
                             color: Colors.grey[600],
                             fontWeight: FontWeight.w500,
@@ -140,7 +140,7 @@ class AstrologySettingsView extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           "\u20B9 150.80",
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             fontSize: 32,
                             color: const Color(0xFF1A1A1A),
                             fontWeight: FontWeight.w800,
@@ -183,7 +183,7 @@ class AstrologySettingsView extends StatelessWidget {
                       const SizedBox(width: 10),
                       Text(
                         "Recharge Wallet",
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                           fontSize: 16,
@@ -239,7 +239,7 @@ class AstrologySettingsView extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               title,
-              style: GoogleFonts.playfairDisplay(
+              style: GoogleFonts.lora(
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
                 color: const Color(0xFF1A1A1A),
@@ -248,7 +248,7 @@ class AstrologySettingsView extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               subtitle,
-              style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[500]),
+              style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[500]),
             ),
           ],
         ),
@@ -256,3 +256,4 @@ class AstrologySettingsView extends StatelessWidget {
     );
   }
 }
+

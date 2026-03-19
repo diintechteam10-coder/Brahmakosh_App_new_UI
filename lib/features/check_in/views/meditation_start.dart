@@ -2,6 +2,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:sizer/sizer.dart';
 import 'package:video_player/video_player.dart';
 
 import 'package:brahmakosh/features/check_in/models/spiritual_session_model.dart';
@@ -451,13 +453,14 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
       builder: (context) => Dialog(
         backgroundColor: Colors.transparent,
         child: Container(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(6.w),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: const Color(0xFF18151B), // Premium Dark
             borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: const Color(0xFFFFD700).withOpacity(0.2)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black26,
+                color: Colors.black.withOpacity(0.5),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -467,73 +470,76 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(4.w),
                 decoration: BoxDecoration(
                   color: Colors.green.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.check_circle_rounded,
                   color: Colors.green,
-                  size: 48,
+                  size: 12.w,
                 ),
               ),
-              const SizedBox(height: 24),
-              const Text(
+              SizedBox(height: 3.h),
+              Text(
                 "Session Completed!",
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 20,
+                style: GoogleFonts.lora(
+                  fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: const Color(0xFFFFD700), // Gold
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 1.5.h),
               Text(
                 "You have successfully completed a meditation session.",
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 14, color: Colors.black54),
+                style: GoogleFonts.poppins(
+                  fontSize: 11.sp, 
+                  color: Colors.white.withOpacity(0.7)
+                ),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 3.h),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
+                padding: EdgeInsets.symmetric(
+                  horizontal: 5.w,
+                  vertical: 1.5.h,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.amber.withOpacity(0.1),
+                  color: const Color(0xFFFFD700).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(50),
-                  border: Border.all(color: Colors.amber.withOpacity(0.3)),
+                  border: Border.all(color: const Color(0xFFFFD700).withOpacity(0.3)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.stars_rounded,
-                      color: Colors.amber,
-                      size: 24,
+                      color: const Color(0xFFFFD700),
+                      size: 6.w,
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 2.w),
                     Text(
                       "+$earnedKarma Karma Points",
-                      style: const TextStyle(
-                        fontSize: 16,
+                      style: GoogleFonts.poppins(
+                        fontSize: 12.sp,
                         fontWeight: FontWeight.w700,
-                        color: Colors.amber,
+                        color: const Color(0xFFFFD700),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
+              SizedBox(height: 4.h),
               SizedBox(
                 width: double.infinity,
-                height: 50,
+                height: 6.h,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black87,
+                    backgroundColor: const Color(0xFFFFD700),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(30),
                     ),
                     elevation: 0,
                   ),
@@ -544,12 +550,13 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
                           route.settings.name == AppConstants.routeDashboard,
                     );
                   },
-                  child: const Text(
-                    "Got it",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                  child: Text(
+                    "GOT IT",
+                    style: GoogleFonts.poppins(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black,
+                      letterSpacing: 1.1,
                     ),
                   ),
                 ),
@@ -646,14 +653,22 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Colors.grey[900],
-        title: const Text(
+        backgroundColor: const Color(0xFF18151B),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
           "Exit Session?",
-          style: TextStyle(color: Colors.white),
+          style: GoogleFonts.lora(
+            color: const Color(0xFFFFD700),
+            fontWeight: FontWeight.bold,
+            fontSize: 14.sp,
+          ),
         ),
-        content: const Text(
+        content: Text(
           "Are you sure you want to exit?\nYou will receive 0 Karma points.",
-          style: TextStyle(color: Colors.white70),
+          style: GoogleFonts.poppins(
+            color: Colors.white70,
+            fontSize: 11.sp,
+          ),
         ),
         actions: [
           TextButton(
@@ -663,9 +678,13 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
                 _toggleMeditation(); // Resume only if it was playing
               }
             },
-            child: const Text(
-              "Continue",
-              style: TextStyle(color: Colors.white60),
+            child: Text(
+              "CONTINUE",
+              style: GoogleFonts.poppins(
+                color: Colors.white60,
+                fontSize: 10.sp,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
           TextButton(
@@ -694,9 +713,13 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
               // Show Incomplete Dialog instead of direct exit
               _showIncompleteDialog(context, percent);
             },
-            child: const Text(
-              "Exit",
-              style: TextStyle(color: Colors.redAccent),
+            child: Text(
+              "EXIT",
+              style: GoogleFonts.poppins(
+                color: Colors.redAccent,
+                fontSize: 10.sp,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -711,82 +734,83 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
       builder: (context) => Dialog(
         backgroundColor: Colors.transparent,
         child: Container(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(6.w),
           decoration: BoxDecoration(
-            color: const Color(0xffFFF8E7), // Creamy background like screenshot
+            color: const Color(0xFF18151B), // Premium Dark
             borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.white.withOpacity(0.1)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               // Info Icon
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(3.w),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.grey, width: 3),
+                  border: Border.all(color: Colors.grey.withOpacity(0.5), width: 3),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.info_outline,
                   color: Colors.grey,
-                  size: 40,
+                  size: 10.w,
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 2.5.h),
 
-              const Text(
+              Text(
                 "Incomplete",
-                style: TextStyle(
-                  fontSize: 22,
+                style: GoogleFonts.lora(
+                  fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xff4A3B32), // Dark brown
+                  color: const Color(0xFFFFD700), // Gold
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 2.h),
 
               // Warning + Percent
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.warning_amber_rounded,
                     color: Colors.amber,
-                    size: 20,
+                    size: 5.w,
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 2.w),
                   Flexible(
                     child: Text(
                       "Session partially completed\n($percentage%)",
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Color(0xff6D5D53),
+                      style: GoogleFonts.poppins(
+                        fontSize: 12.sp,
+                        color: Colors.white.withOpacity(0.7),
                         height: 1.4,
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 2.h),
 
-              const Text(
+              Text(
                 "+0 Karma Points",
-                style: TextStyle(
-                  fontSize: 18,
+                style: GoogleFonts.poppins(
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xffFF9B44), // Orange
+                  color: const Color(0xFFFF9B44), // Orange
                 ),
               ),
-              const SizedBox(height: 30),
+              SizedBox(height: 4.h),
 
               // Done Button
               SizedBox(
                 width: double.infinity,
-                height: 50,
+                height: 6.h,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xff5D4037), // Dark Brown
+                    backgroundColor: const Color(0xFF423B36), // Muted brown/grey
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30), // Pill shape
                     ),
@@ -799,11 +823,11 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
                           route.settings.name == AppConstants.routeDashboard,
                     );
                   },
-                  child: const Text(
+                  child: Text(
                     "DONE",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                    style: GoogleFonts.poppins(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w700,
                       color: Colors.white,
                       letterSpacing: 1.0,
                     ),

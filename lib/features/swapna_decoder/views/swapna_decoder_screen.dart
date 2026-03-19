@@ -101,12 +101,12 @@ class _SwapnaDecoderScreenState extends State<SwapnaDecoderScreen>
               dividerColor: Colors.transparent,
               labelColor: Colors.black,
               unselectedLabelColor: Colors.grey,
-              labelStyle: GoogleFonts.inter(
+              labelStyle: GoogleFonts.poppins(
                 fontWeight: FontWeight.bold,
                 fontSize: 13,
                 letterSpacing: 0.5,
               ),
-              unselectedLabelStyle: GoogleFonts.inter(
+              unselectedLabelStyle: GoogleFonts.poppins(
                 fontWeight: FontWeight.w600,
                 fontSize: 13,
               ),
@@ -128,3 +128,4 @@ class _SwapnaDecoderScreenState extends State<SwapnaDecoderScreen>
     );
   }
 }
+

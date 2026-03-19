@@ -53,7 +53,7 @@ class AboutUsView extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 "Brahmakosh is your spiritual companion, bridging the gap between ancient wisdom and modern technology. Our mission is to guide you on your spiritual path through astrology, personalized guidance, and sacred practices.",
-                style: GoogleFonts.inter(
+                style: GoogleFonts.poppins(
                   fontSize: 16,
                   color: Colors.white.withOpacity(0.9),
                   height: 1.6,
@@ -71,7 +71,7 @@ class AboutUsView extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 "To make the esoteric knowledge of Vedic traditions accessible and practical for today's generation, fostering a deeper connection with the divine and one's true purpose.",
-                style: GoogleFonts.inter(
+                style: GoogleFonts.poppins(
                   fontSize: 16,
                   color: Colors.white.withOpacity(0.9),
                   height: 1.6,
@@ -113,7 +113,7 @@ class AboutUsView extends StatelessWidget {
                     Text(
                       "Visit our website for in-depth details, blog posts, and more services.",
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.poppins(
                         fontSize: 14,
                         color: Colors.white.withOpacity(0.95),
                       ),
@@ -135,7 +135,7 @@ class AboutUsView extends StatelessWidget {
                       ),
                       child: Text(
                         "Visit brahmakosh.com",
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
                         ),
@@ -148,7 +148,7 @@ class AboutUsView extends StatelessWidget {
               Center(
                 child: Text(
                   "Version 1.0.0",
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 12,
                     color: Colors.white38,
                     letterSpacing: 1.2,
@@ -163,3 +163,4 @@ class AboutUsView extends StatelessWidget {
     );
   }
 }
+

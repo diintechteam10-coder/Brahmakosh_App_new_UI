@@ -205,7 +205,7 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
                       // Duration Section
                       Text(
                         "Duration".toUpperCase(),
-                        style: GoogleFonts.cinzel(
+                        style: GoogleFonts.lora(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -264,7 +264,7 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
                             children: [
                               Text(
                                 "Start Sankalp",
-                                style: GoogleFonts.cinzel(
+                                style: GoogleFonts.lora(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -377,7 +377,7 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
         children: [
           Text(
             "Number of Days",
-            style: GoogleFonts.cinzel(
+            style: GoogleFonts.lora(
               color: Colors.white,
               fontSize: 14,
               fontWeight: FontWeight.bold,
@@ -431,7 +431,7 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
         children: [
           Text(
             "Daily Reminder".toUpperCase(),
-            style: GoogleFonts.cinzel(
+            style: GoogleFonts.lora(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Colors.white,
@@ -458,7 +458,7 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
                   const SizedBox(width: 12),
                   Text(
                     "Status Active",
-                    style: GoogleFonts.cinzel(
+                    style: GoogleFonts.lora(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -490,7 +490,7 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
               children: [
                 Text(
                   "Notify me at",
-                  style: GoogleFonts.cinzel(
+                  style: GoogleFonts.lora(
                     color: AppTheme.primaryGold.withOpacity(0.7),
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
@@ -586,3 +586,4 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
     );
   }
 }
+

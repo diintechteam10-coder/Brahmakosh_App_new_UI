@@ -84,7 +84,7 @@ class ConversationMessagesView extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         '${controller.currentPartnerExperience} Years of Experience', // Static context
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
                           color: Colors.white.withOpacity(0.6),
@@ -100,7 +100,7 @@ class ConversationMessagesView extends StatelessWidget {
                         const SizedBox(width: 2),
                         Text(
                           controller.currentPartnerRating.toStringAsFixed(1),
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
                             color: Colors.white.withOpacity(0.6),
@@ -134,7 +134,7 @@ class ConversationMessagesView extends StatelessWidget {
                 const SizedBox(height: 16),
                 Text(
                   'No messages in this conversation',
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 14,
                     color: Colors.white.withOpacity(0.5),
                   ),
@@ -206,7 +206,7 @@ class ConversationMessagesView extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       "New Chat",
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
@@ -259,7 +259,7 @@ class ConversationMessagesView extends StatelessWidget {
           children: [
             Text(
               msg.content,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 14,
                 color: isUser ? Colors.black : Colors.white,
                 height: 1.4,
@@ -268,7 +268,7 @@ class ConversationMessagesView extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               _formatTime(msg.createdAt),
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 10,
                 color: isUser
                     ? Colors.black.withOpacity(0.5)
@@ -369,7 +369,7 @@ class ConversationMessagesView extends StatelessWidget {
             Divider(height: 24, color: Colors.white.withOpacity(0.1)),
             Text(
               'Highlights',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: Colors.white.withOpacity(0.5),
@@ -378,7 +378,7 @@ class ConversationMessagesView extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               summary,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 13,
                 height: 1.5,
                 color: Colors.white.withOpacity(0.8),
@@ -395,7 +395,7 @@ class ConversationMessagesView extends StatelessWidget {
       children: [
         Text(
           value,
-          style: GoogleFonts.inter(
+          style: GoogleFonts.poppins(
             fontSize: 16,
             fontWeight: FontWeight.bold,
             color: AppTheme.primaryGold,
@@ -404,9 +404,10 @@ class ConversationMessagesView extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: 11, color: Colors.white.withOpacity(0.5)),
+          style: GoogleFonts.poppins(fontSize: 11, color: Colors.white.withOpacity(0.5)),
         ),
       ],
     );
   }
 }
+

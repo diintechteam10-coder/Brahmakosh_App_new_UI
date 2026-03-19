@@ -37,7 +37,7 @@ class ComingSoonView extends StatelessWidget {
             const SizedBox(height: 24),
             Text(
               title,
-              style: GoogleFonts.playfairDisplay(
+              style: GoogleFonts.lora(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
                 color: AppTheme.textPrimary,
@@ -70,3 +70,4 @@ class ComingSoonView extends StatelessWidget {
     );
   }
 }
+

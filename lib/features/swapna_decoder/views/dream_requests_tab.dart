@@ -90,7 +90,7 @@ class DreamRequestsView extends StatelessWidget {
                         const SizedBox(height: 12),
                         Text(
                           "Something went wrong",
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
@@ -99,7 +99,7 @@ class DreamRequestsView extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           state.message,
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             fontSize: 13,
                             color: Colors.grey[500],
                           ),
@@ -154,7 +154,7 @@ class DreamRequestsView extends StatelessWidget {
                           child: Text(
                             "Submit your dream symbol and our experts will decode its spiritual meaning for you.",
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.poppins(
                               fontSize: 14,
                               height: 1.5,
                               color: Colors.grey[500],
@@ -246,7 +246,7 @@ class DreamRequestsView extends StatelessWidget {
                                       request.additionalDetails,
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
-                                      style: GoogleFonts.inter(
+                                      style: GoogleFonts.poppins(
                                         fontSize: 13,
                                         height: 1.4,
                                         color: Colors.grey,
@@ -285,7 +285,7 @@ class DreamRequestsView extends StatelessWidget {
                                   Expanded(
                                     child: Text(
                                       "Decoded: ${request.completedDreamId?.symbolName}",
-                                      style: GoogleFonts.inter(
+                                      style: GoogleFonts.poppins(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w600,
                                         color: const Color(0xFFD4AF37),
@@ -338,7 +338,7 @@ class DreamRequestsView extends StatelessWidget {
       ),
       child: Text(
         status.toUpperCase(),
-        style: GoogleFonts.inter(
+        style: GoogleFonts.poppins(
           fontSize: 9,
           letterSpacing: 0.5,
           fontWeight: FontWeight.w800,
@@ -348,3 +348,4 @@ class DreamRequestsView extends StatelessWidget {
     );
   }
 }
+

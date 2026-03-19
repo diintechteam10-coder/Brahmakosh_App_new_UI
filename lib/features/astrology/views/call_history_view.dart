@@ -57,7 +57,7 @@ class CallHistoryView extends StatelessWidget {
                   const SizedBox(height: 16),
                   Text(
                     'Failed to load call logs',
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
@@ -89,7 +89,7 @@ class CallHistoryView extends StatelessWidget {
                   const SizedBox(height: 16),
                   Text(
                     'No voice calls yet',
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
@@ -98,7 +98,7 @@ class CallHistoryView extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     'Start a voice call with an expert to see it here',
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 13,
                       color: Colors.white.withOpacity(0.5),
                     ),
@@ -206,7 +206,7 @@ class CallHistoryView extends StatelessWidget {
                     children: [
                       Text(
                         name,
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -217,7 +217,7 @@ class CallHistoryView extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         date,
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontSize: 12,
                           color: Colors.white.withOpacity(0.5),
                         ),
@@ -225,7 +225,7 @@ class CallHistoryView extends StatelessWidget {
                       const SizedBox(height: 6),
                       Text(
                         statusLabel,
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: statusColor,
@@ -241,7 +241,7 @@ class CallHistoryView extends StatelessWidget {
                   children: [
                     Text(
                       '$billableMin Min',
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.poppins(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -250,7 +250,7 @@ class CallHistoryView extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       duration,
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.poppins(
                         fontSize: 12,
                         color: Colors.white.withOpacity(0.5),
                       ),
@@ -419,3 +419,4 @@ class CallHistoryView extends StatelessWidget {
     );
   }
 }
+

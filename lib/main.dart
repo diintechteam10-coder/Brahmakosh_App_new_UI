@@ -12,6 +12,7 @@ import 'core/widgets/in_app_notification_banner.dart';
 import 'package:brahmakosh/features/profile/viewmodels/profile_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'core/constants/app_constants.dart';
+import 'package:sizer/sizer.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,16 +56,20 @@ class MyApp extends StatelessWidget {
         viewModel.fetchProfile();
         return viewModel;
       },
-      child: GetMaterialApp(
-        title: 'Brahmakosh',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        initialRoute: initialRoute,
-        getPages: AppPages.pages,
-        defaultTransition: Transition.fadeIn,
-        builder: (context, child) {
-          return InAppNotificationBanner(
-            child: child ?? const SizedBox.shrink(),
+      child: Sizer(
+        builder: (context, orientation, deviceType) {
+          return GetMaterialApp(
+            title: 'Brahmakosh',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            initialRoute: initialRoute,
+            getPages: AppPages.pages,
+            defaultTransition: Transition.fadeIn,
+            builder: (context, child) {
+              return InAppNotificationBanner(
+                child: child ?? const SizedBox.shrink(),
+              );
+            },
           );
         },
       ),

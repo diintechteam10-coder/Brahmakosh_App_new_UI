@@ -23,7 +23,7 @@ class AppInputField extends StatelessWidget {
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(
+          style: GoogleFonts.poppins(
             fontSize: 11,
             fontWeight: FontWeight.w500,
             color: Colors.black54,
@@ -40,10 +40,10 @@ class AppInputField extends StatelessWidget {
           child: TextField(
             controller: controller,
             obscureText: obscure,
-            style: GoogleFonts.inter(fontSize: 13),
+            style: GoogleFonts.poppins(fontSize: 13),
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: GoogleFonts.inter(
+              hintStyle: GoogleFonts.poppins(
                 fontSize: 12,
                 color: Colors.black38,
               ),
@@ -58,3 +58,4 @@ class AppInputField extends StatelessWidget {
     );
   }
 }
+

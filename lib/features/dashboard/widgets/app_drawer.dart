@@ -183,7 +183,7 @@ class AppDrawer extends StatelessWidget {
                                       const SizedBox(height: 4),
                                       Text(
                                         profile?.email ?? '',
-                                        style: GoogleFonts.inter(
+                                        style: GoogleFonts.poppins(
                                           fontSize: 13,
                                           color: Colors.black54,
                                         ),
@@ -192,7 +192,7 @@ class AppDrawer extends StatelessWidget {
                                       const SizedBox(height: 2),
                                       Text(
                                         profile?.mobile ?? '',
-                                        style: GoogleFonts.inter(
+                                        style: GoogleFonts.poppins(
                                           fontSize: 13,
                                           color: Colors.black54,
                                         ),
@@ -946,3 +946,4 @@ class AppDrawer extends StatelessWidget {
     );
   }
 }
+

@@ -92,7 +92,7 @@ class CreditHistoryView extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             'No credit history yet',
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: Colors.white54,
@@ -101,7 +101,7 @@ class CreditHistoryView extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'Your credit usage will appear here',
-            style: GoogleFonts.inter(fontSize: 13, color: Colors.white38),
+            style: GoogleFonts.poppins(fontSize: 13, color: Colors.white38),
           ),
         ],
       ),
@@ -197,7 +197,7 @@ class CreditHistoryView extends StatelessWidget {
                     if (expertise.isNotEmpty)
                       Text(
                         expertise,
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontSize: 12,
                           color: Colors.white70,
                         ),
@@ -227,7 +227,7 @@ class CreditHistoryView extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text(
                       '$creditsUsed',
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.poppins(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                         color: AppTheme.primaryGold,
@@ -256,7 +256,7 @@ class CreditHistoryView extends StatelessWidget {
               // Time
               Text(
                 formattedTime,
-                style: GoogleFonts.inter(
+                style: GoogleFonts.poppins(
                   fontSize: 12,
                   color: const Color(0xFF8D6E63),
                 ),
@@ -276,7 +276,7 @@ class CreditHistoryView extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           text,
-          style: GoogleFonts.inter(
+          style: GoogleFonts.poppins(
             fontSize: 12,
             fontWeight: FontWeight.w500,
             color: Colors.white70,
@@ -292,3 +292,4 @@ class CreditHistoryView extends StatelessWidget {
     return '';
   }
 }
+

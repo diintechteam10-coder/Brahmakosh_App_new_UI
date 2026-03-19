@@ -58,7 +58,7 @@ class _RechargePlansViewState extends State<RechargePlansView> {
         ),
         title: Text(
           "Recharge Plans",
-          style: GoogleFonts.playfairDisplay(
+          style: GoogleFonts.lora(
             fontWeight: FontWeight.bold,
             fontSize: 22,
             color: const Color(0xFF6D3A0C),
@@ -157,7 +157,7 @@ class _RechargePlansViewState extends State<RechargePlansView> {
                   const SizedBox(height: 12),
                   Text(
                     "${plan['credits']}",
-                    style: GoogleFonts.playfairDisplay(
+                    style: GoogleFonts.lora(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFF6D3A0C),
@@ -256,7 +256,7 @@ class _RechargePlansViewState extends State<RechargePlansView> {
           //     AlertDialog(
           //       title: Text(
           //         "Request Sent",
-          //         style: GoogleFonts.playfairDisplay(
+          //         style: GoogleFonts.lora(
           //           fontWeight: FontWeight.bold,
           //           color: const Color(0xFF6D3A0C),
           //         ),
@@ -323,3 +323,4 @@ class _RechargePlansViewState extends State<RechargePlansView> {
     );
   }
 }
+

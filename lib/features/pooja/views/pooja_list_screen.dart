@@ -93,7 +93,7 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                     fillColor: Colors.transparent,
                     filled: true,
                     hintText: "Search rituals, puja, astrologers",
-                    hintStyle: GoogleFonts.inter(
+                    hintStyle: GoogleFonts.poppins(
                       fontSize: 14,
                       color: Colors.white.withOpacity(0.3),
                     ),
@@ -189,7 +189,7 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
         ),
         child: Text(
           label,
-          style: GoogleFonts.inter(
+          style: GoogleFonts.poppins(
             fontSize: 11,
             fontWeight: FontWeight.bold,
             color: isSelected ? Colors.black : Colors.white.withOpacity(0.3),
@@ -325,7 +325,7 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
         Expanded(
           child: Text(
             text,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 11,
               color: Colors.white.withOpacity(0.7),
               fontWeight: FontWeight.w500,
@@ -339,3 +339,4 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
     );
   }
 }
+

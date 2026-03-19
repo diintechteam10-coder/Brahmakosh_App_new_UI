@@ -71,7 +71,7 @@ class NotificationScreen extends StatelessWidget {
                     const SizedBox(width: 12),
                     Text(
                       'Notifications',
-                      style: GoogleFonts.playfairDisplay(
+                      style: GoogleFonts.lora(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                         color: const Color(0xFF3E2723),
@@ -327,3 +327,4 @@ class _NotificationCard extends StatelessWidget {
     }
   }
 }
+

@@ -45,7 +45,7 @@ class YogaView extends StatelessWidget {
       ),
       title: Text(
         'Yoga Details',
-        style: GoogleFonts.playfairDisplay(
+        style: GoogleFonts.lora(
           color: AppTheme.textPrimary,
           fontWeight: FontWeight.bold,
         ),
@@ -75,7 +75,7 @@ class YogaView extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             'Siddha',
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.lora(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: AppTheme.textPrimary,
@@ -108,7 +108,7 @@ class YogaView extends StatelessWidget {
         children: [
           Text(
             title,
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.lora(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: AppTheme.textPrimary,
@@ -128,3 +128,4 @@ class YogaView extends StatelessWidget {
     );
   }
 }
+

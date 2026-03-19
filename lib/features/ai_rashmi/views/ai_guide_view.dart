@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sizer/sizer.dart';
 
 
 import '../ai_rashmi_chat.dart';
@@ -93,12 +94,12 @@ class _AiGuideViewState extends State<AiGuideView> {
           // Safe area content
           SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
+              padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
               child: Column(
                 children: [
                   // Top bar with Back Button
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 28.0),
+                    padding: EdgeInsets.symmetric(vertical: 3.5.h),
                     child: Row(
                       children: [
                         IconButton(
@@ -108,10 +109,10 @@ class _AiGuideViewState extends State<AiGuideView> {
                               color: Colors.white.withOpacity(0.15),
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.arrow_back_ios_new,
                               color: Colors.white,
-                              size: 18,
+                              size: 4.5.w,
                             ),
                           ),
                           onPressed: () => Get.back(),
@@ -127,7 +128,7 @@ class _AiGuideViewState extends State<AiGuideView> {
                     "BRAHMAKOSH INTELLIGENCE",
                     textAlign: TextAlign.center,
                     style: GoogleFonts.lora(
-                      fontSize: 20,
+                      fontSize: 15.sp,
                       fontWeight: FontWeight.w600,
                       color: const Color(0xFFFFD700), // Gold color
                       letterSpacing: 1.2,
@@ -140,7 +141,7 @@ class _AiGuideViewState extends State<AiGuideView> {
                     "(${widget.deityName} - ${widget.subtitle})",
                     textAlign: TextAlign.center,
                     style: GoogleFonts.lora(
-                      fontSize: 15,
+                      fontSize: 11.25.sp,
                       fontWeight: FontWeight.w400,
                       color: Colors.white.withOpacity(0.9),
                       fontStyle: FontStyle.italic,
@@ -156,7 +157,7 @@ class _AiGuideViewState extends State<AiGuideView> {
                       "Ask ${widget.deityName} about destiny, Karma, Horoscope or life guidance",
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
-                        fontSize: 14,
+                        fontSize: 10.5.sp,
                         color: Colors.white.withOpacity(0.7),
                         fontWeight: FontWeight.w400,
                         height: 1.5,
@@ -199,16 +200,16 @@ class _AiGuideViewState extends State<AiGuideView> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.mic,
                                     color: Colors.black,
-                                    size: 18,
+                                    size: 4.5.w,
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
                                     "Tap To Talk",
                                     style: GoogleFonts.poppins(
-                                      fontSize: 13,
+                                      fontSize: 9.75.sp,
                                       fontWeight: FontWeight.w700,
                                       color: Colors.black,
                                     ),
@@ -236,16 +237,16 @@ class _AiGuideViewState extends State<AiGuideView> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.chat_bubble_outline,
                                     color: Color(0xFFFFD700),
-                                    size: 16,
+                                    size: 4.w,
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
                                     "Text To Chat",
                                     style: GoogleFonts.poppins(
-                                      fontSize: 13,
+                                      fontSize: 9.75.sp,
                                       fontWeight: FontWeight.w600,
                                       color: const Color(0xFFFFD700),
                                     ),

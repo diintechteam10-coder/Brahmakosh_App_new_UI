@@ -79,7 +79,7 @@ class ConversationHistoryView extends StatelessWidget {
                         const SizedBox(height: 16),
                         Text(
                           'No conversations yet',
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
@@ -88,7 +88,7 @@ class ConversationHistoryView extends StatelessWidget {
                         const SizedBox(height: 8),
                         Text(
                           'Start a chat with an expert to see it here',
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             fontSize: 13,
                             color: Colors.white.withOpacity(0.5),
                           ),
@@ -176,7 +176,7 @@ class ConversationHistoryView extends StatelessWidget {
                     children: [
                       Text(
                         name,
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
@@ -198,7 +198,7 @@ class ConversationHistoryView extends StatelessWidget {
                             ),
                             child: Text(
                               statusLabel,
-                              style: GoogleFonts.inter(
+                              style: GoogleFonts.poppins(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
                                 color: statusColor,
@@ -217,7 +217,7 @@ class ConversationHistoryView extends StatelessWidget {
                   children: [
                     Text(
                       date,
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.poppins(
                         fontSize: 11,
                         color: Colors.white.withOpacity(0.5),
                       ),
@@ -236,7 +236,7 @@ class ConversationHistoryView extends StatelessWidget {
                           ),
                           child: Text(
                             '$count',
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.poppins(
                               color: Colors.white,
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
@@ -366,7 +366,7 @@ class ConversationHistoryView extends StatelessWidget {
                   alignment: Alignment.center,
                   child: Text(
                     filter.toUpperCase(),
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 11,
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
                       color: isSelected ? Colors.black : Colors.white.withOpacity(0.5),
@@ -397,3 +397,4 @@ class ConversationHistoryView extends StatelessWidget {
     );
   }
 }
+

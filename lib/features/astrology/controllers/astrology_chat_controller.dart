@@ -932,7 +932,7 @@ class AstrologyChatController extends GetxController {
               const SizedBox(height: 12),
               Text(
                 "Are you sure you want to end your session with ${expert.name}?",
-                style: GoogleFonts.inter(
+                style: GoogleFonts.poppins(
                   fontSize: 14,
                   color: Colors.white70,
                   height: 1.5,
@@ -956,7 +956,7 @@ class AstrologyChatController extends GetxController {
                   ),
                   child: Text(
                     "End Chat",
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -978,7 +978,7 @@ class AstrologyChatController extends GetxController {
                   ),
                   child: Text(
                     "Continue",
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -1421,3 +1421,4 @@ class AstrologyChatController extends GetxController {
     super.onClose();
   }
 }
+

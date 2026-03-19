@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sizer/sizer.dart';
 
 import 'package:brahmakosh/features/agent/controllers/agent_controller.dart';
 
@@ -84,9 +85,9 @@ class _RashmiCategorySelectionViewState
               children: [
                 // Header
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 8.0,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 4.w,
+                    vertical: 1.h,
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -101,20 +102,20 @@ class _RashmiCategorySelectionViewState
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white.withOpacity(0.08)),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.arrow_back,
                             color: Colors.white,
-                            size: 16, // Reduced from 18
+                            size: 4.w,
                           ),
                         ),
                       ),
 
                       // Center "Krishna" Pill with Toggle
                       Container(
-                        height: 36, // Reduced from 40
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                        ), // Reduced from 12
+                        height: 4.5.h,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 2.5.w,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFF18151B),
                           borderRadius: BorderRadius.circular(24),
@@ -131,8 +132,8 @@ class _RashmiCategorySelectionViewState
                               children: [
                                 // Small Avatar Image
                                 Container(
-                                  width: 24, // Reduced from 28
-                                  height: 24, // Reduced from 28
+                                  width: 6.w,
+                                  height: 6.w,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     image: DecorationImage(
@@ -142,21 +143,21 @@ class _RashmiCategorySelectionViewState
                                   ),
                                 ),
                                 const SizedBox(width: 6),
-                                Text(
-                                  deityName,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12, // Reduced from 14
+                                  Text(
+                                    deityName,
+                                    style: GoogleFonts.lora(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 9.sp, // Reduced from 14
+                                    ),
                                   ),
-                                ),
                                 const SizedBox(width: 2),
                                 Icon(
                                   _isDeitySelectionOpen
                                       ? Icons.keyboard_arrow_up
                                       : Icons.keyboard_arrow_down,
                                   color: Colors.white,
-                                  size: 18, // Reduced from 20
+                                  size: 4.5.w,
                                 ),
                               ],
                             ),
@@ -178,10 +179,10 @@ class _RashmiCategorySelectionViewState
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white.withOpacity(0.08)),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.menu,
                             color: Colors.white,
-                            size: 16, // Reduced from 18 to match ai_rashmi_chat
+                            size: 4.w,
                           ),
                         ),
                       ),
@@ -195,7 +196,7 @@ class _RashmiCategorySelectionViewState
                 Text(
                   "Choose a Category",
                   style: GoogleFonts.lora(
-                    fontSize: 20, // Reduced from 24
+                    fontSize: 15.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -206,7 +207,7 @@ class _RashmiCategorySelectionViewState
                 // Categories List
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: EdgeInsets.symmetric(horizontal: 4.w),
                     children: [
                       _buildCategoryItem(
                         context,
@@ -254,12 +255,12 @@ class _RashmiCategorySelectionViewState
 
                 // Input Area
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    14,
+                  padding: EdgeInsets.fromLTRB(
+                    3.5.w,
                     0,
-                    14,
-                    12,
-                  ), // Reduced padding
+                    3.5.w,
+                    1.5.h,
+                  ),
                   child: widget.inputAreaBuilder(context, widget.vm),
                 ),
               ],
@@ -301,20 +302,20 @@ class _RashmiCategorySelectionViewState
           iconColor: Colors.white,
           leading: Icon(
             icon,
-            size: 22,
+            size: 5.5.w,
             color: const Color(0xFFF1C453),
-          ), // Reduced from 28
+          ),
           title: Text(
             title,
-            style: const TextStyle(
-              fontSize: 14, // Reduced from 16
+            style: GoogleFonts.poppins(
+              fontSize: 10.5.sp, // Reduced from 16
               fontWeight: FontWeight.w600,
               color: Colors.white,
             ),
           ),
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              padding: EdgeInsets.fromLTRB(4.w, 0, 4.w, 2.h),
               child: Column(
                 children: questions
                     .map((q) => _buildQuestionItem(widget.vm, q))
@@ -336,7 +337,7 @@ class _RashmiCategorySelectionViewState
       child: Container(
         width: double.infinity,
         margin: const EdgeInsets.only(bottom: 6), // Reduced from 8
-        padding: const EdgeInsets.all(10), // Reduced from 12
+        padding: EdgeInsets.all(2.5.w),
         decoration: BoxDecoration(
           color: const Color(0xFF100E13),
           borderRadius: BorderRadius.circular(12),
@@ -344,8 +345,8 @@ class _RashmiCategorySelectionViewState
         ),
         child: Text(
           question,
-          style: TextStyle(
-            fontSize: 12, // Reduced from 14
+          style: GoogleFonts.poppins(
+            fontSize: 9.sp, // Reduced from 14
             fontWeight: FontWeight.w500,
             color: Colors.grey.shade300,
           ),

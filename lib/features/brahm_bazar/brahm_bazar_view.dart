@@ -74,7 +74,7 @@ class BrahmBazarView extends StatelessWidget {
               const SizedBox(width: 12),
               Text(
                 'BrahmBazar',
-                style: GoogleFonts.playfairDisplay(
+                style: GoogleFonts.lora(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.textPrimary,
@@ -264,7 +264,7 @@ class BrahmBazarView extends StatelessWidget {
                         index == 0
                             ? 'Authentic\nRudraksha'
                             : 'Premium\nGemstones',
-                        style: GoogleFonts.playfairDisplay(
+                        style: GoogleFonts.lora(
                           color: Colors.white,
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -367,7 +367,7 @@ class BrahmBazarView extends StatelessWidget {
         children: [
           Text(
             title,
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.lora(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: AppTheme.textPrimary,
@@ -659,3 +659,4 @@ class BrahmBazarView extends StatelessWidget {
     );
   }
 }
+

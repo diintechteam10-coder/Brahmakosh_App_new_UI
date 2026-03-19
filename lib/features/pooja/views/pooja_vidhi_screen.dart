@@ -181,7 +181,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                       const SizedBox(width: 8),
                       Text(
                         "Auspicious Muhurat: ",
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                           color: Colors.white.withOpacity(0.9),
@@ -190,7 +190,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                       Expanded(
                         child: Text(
                           widget.pooja.muhurat!,
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                             color: const Color(0xFFD4AF37),
@@ -242,7 +242,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                             Expanded(
                               child: Text(
                                 "${item.itemName ?? ''} ${item.quantity != null ? '(${item.quantity})' : ''}",
-                                style: GoogleFonts.inter(
+                                style: GoogleFonts.poppins(
                                   fontSize: 14,
                                   color: Colors.white.withOpacity(0.6),
                                 ),
@@ -281,7 +281,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                       ),
                       child: Text(
                         "MANTRA",
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontSize: 10,
                           letterSpacing: 2,
                           fontWeight: FontWeight.w900,
@@ -292,7 +292,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                     const SizedBox(height: 12),
                     Text(
                       widget.pooja.pujaName ?? "Mantra",
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.poppins(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -324,7 +324,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                             Text(
                               "\"${widget.pooja.mantras![0].meaning!}\"",
                               textAlign: TextAlign.center,
-                              style: GoogleFonts.inter(
+                              style: GoogleFonts.poppins(
                                 fontSize: 13,
                                 color: Colors.white.withOpacity(0.9),
                                 fontStyle: FontStyle.italic,
@@ -398,7 +398,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                     ),
                     child: Text(
                       widget.pooja.specialInstructions!,
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.poppins(
                         fontSize: 14,
                         color: Colors.white.withOpacity(0.7),
                         height: 1.5,
@@ -476,7 +476,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
             child: Center(
               child: Text(
                 step.stepNumber?.toString().padLeft(2, '0') ?? "01",
-                style: GoogleFonts.inter(
+                style: GoogleFonts.poppins(
                   fontSize: 20,
                   fontWeight: FontWeight.w900,
                   color: const Color(0xFFD4AF37).withOpacity(0.6),
@@ -491,7 +491,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
               children: [
                 Text(
                   step.title ?? "",
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -500,7 +500,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                 const SizedBox(height: 6),
                 Text(
                   step.description ?? "",
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 13,
                     color: Colors.white.withOpacity(0.5),
                     height: 1.5,
@@ -536,7 +536,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
               const SizedBox(width: 8),
               Text(
                 "MANTRA TO CHANT",
-                style: GoogleFonts.inter(
+                style: GoogleFonts.poppins(
                   fontSize: 10,
                   fontWeight: FontWeight.w900,
                   color: Colors.white,
@@ -581,7 +581,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
               const SizedBox(width: 8),
               Text(
                 title,
-                style: GoogleFonts.inter(
+                style: GoogleFonts.poppins(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                   color: isDo ? const Color(0xFF81C784) : const Color(0xFFE57373),
@@ -592,7 +592,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
           const SizedBox(height: 12),
           Text(
             isDo ? "• Face East/North\n• Wear clean clothes\n• Maintain Silence" : "• Don't rush steps\n• No leather items\n• Avoid Interruptions",
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 12,
               color: isDo ? const Color(0xFF2E7D32).withOpacity(0.9) : const Color(0xFFC62828).withOpacity(0.9),
               height: 1.8,
@@ -618,3 +618,4 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
     );
   }
 }
+

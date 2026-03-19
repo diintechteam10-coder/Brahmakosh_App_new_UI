@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:brahmakosh/features/agent/lemon_agent_page.dart';
 import 'package:brahmakosh/features/ai_rashmi/deity_selection_service.dart';
+import 'package:sizer/sizer.dart';
 
 class AvatarIntroductionScreen extends StatefulWidget {
   final String? backgroundImage;
@@ -49,9 +50,9 @@ class _AvatarIntroductionScreenState extends State<AvatarIntroductionScreen> {
             right: 0,
             child: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14.0,
-                  vertical: 1.0,
+                padding: EdgeInsets.symmetric(
+                  horizontal: 3.5.w,
+                  vertical: 1.h,
                 ),
                 child: _buildHeader(context),
               ),
@@ -60,7 +61,7 @@ class _AvatarIntroductionScreenState extends State<AvatarIntroductionScreen> {
 
           // Talk Button
           Positioned(
-            bottom: 40,
+            bottom: 5.h,
             left: 0,
             right: 0,
             child: Center(
@@ -69,13 +70,13 @@ class _AvatarIntroductionScreenState extends State<AvatarIntroductionScreen> {
                   Get.to(() => const AvatarAgentPage());
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 40,
-                    vertical: 12,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10.w,
+                    vertical: 1.5.h,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
+                    borderRadius: BorderRadius.circular(8.w),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.2),
@@ -84,10 +85,10 @@ class _AvatarIntroductionScreenState extends State<AvatarIntroductionScreen> {
                       ),
                     ],
                   ),
-                  child: const Text(
+                  child: Text(
                     "Talk",
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 13.5.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
                     ),
@@ -132,29 +133,24 @@ class _AvatarIntroductionScreenState extends State<AvatarIntroductionScreen> {
             Navigator.pop(context); // Go back to drawer/previous screen
           },
           child: Container(
-            padding: const EdgeInsets.all(6),
-            decoration: const BoxDecoration(
-              color: Color(0xFFFFF8E7), // Off-white
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.arrow_back, color: Colors.black, size: 18),
+            child: Icon(Icons.arrow_back, color: Colors.black, size: 4.5.w),
           ),
         ),
 
         // Center "Krishna" Button/Dropdown (Static here, no toggle)
         Container(
-          height: 36,
-          padding: const EdgeInsets.symmetric(horizontal: 10),
+          height: 4.5.h,
+          padding: EdgeInsets.symmetric(horizontal: 2.5.w),
           decoration: BoxDecoration(
             color: const Color(0xFFFFF8E7),
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(6.w),
           ),
           child: Center(
             child: Row(
               children: [
                 Container(
-                  width: 24,
-                  height: 24,
+                  width: 6.w,
+                  height: 6.w,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     image: DecorationImage(
@@ -169,7 +165,7 @@ class _AvatarIntroductionScreenState extends State<AvatarIntroductionScreen> {
                   style: TextStyle(
                     color: Colors.orange.shade800,
                     fontWeight: FontWeight.bold,
-                    fontSize: 12,
+                    fontSize: 9.sp,
                   ),
                 ),
               ],

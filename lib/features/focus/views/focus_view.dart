@@ -98,7 +98,7 @@ class FocusView extends StatelessWidget {
           ),
            Text(
             'Life Focus',
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.lora(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: AppTheme.textPrimary,
@@ -126,7 +126,7 @@ class FocusView extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           'Choose an area to\nenhance today',
-          style: GoogleFonts.playfairDisplay(
+          style: GoogleFonts.lora(
             fontSize: 32,
             fontWeight: FontWeight.w800,
             color: AppTheme.textPrimary,
@@ -221,7 +221,7 @@ class FocusView extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   'Meditate for 10 mins to improving focus.',
-                  style: GoogleFonts.playfairDisplay(
+                  style: GoogleFonts.lora(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: AppTheme.textPrimary,
@@ -327,7 +327,7 @@ class _FocusCard extends StatelessWidget {
                     const SizedBox(height: 12), // Reduced spacing
                     Text(
                       item.title,
-                      style: GoogleFonts.playfairDisplay(
+                      style: GoogleFonts.lora(
                         fontSize: 16, // Reduced font size
                         fontWeight: FontWeight.bold,
                         color: AppTheme.textPrimary,
@@ -355,3 +355,4 @@ class _FocusCard extends StatelessWidget {
     );
   }
 }
+

@@ -54,7 +54,7 @@ class RedeemDetailView extends StatelessWidget {
                       children: [
                         TextSpan(
                           text: "${controller.userPoints.value} ",
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             color: const Color(0xff5D4037),
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
@@ -62,7 +62,7 @@ class RedeemDetailView extends StatelessWidget {
                         ),
                         TextSpan(
                           text: "Karma Points",
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             color: const Color(0xff5D4037),
                             fontSize: 10,
                           ),
@@ -118,7 +118,7 @@ class RedeemDetailView extends StatelessWidget {
             // Title
             Text(
               item.title,
-              style: GoogleFonts.playfairDisplay(
+              style: GoogleFonts.lora(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: const Color(0xff5D4037),
@@ -129,7 +129,7 @@ class RedeemDetailView extends StatelessWidget {
             // Detailed Description
             Text(
               item.detailedDescription,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 14,
                 height: 1.5,
                 color: const Color(0xff5D4037).withOpacity(0.8),
@@ -166,7 +166,7 @@ class RedeemDetailView extends StatelessWidget {
                   Expanded(
                     child: Text(
                       "${item.devoteesRedeemed} devotees have redeemed this offering",
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.poppins(
                         fontSize: 13,
                         color: const Color(0xff5D4037),
                         fontWeight: FontWeight.w500,
@@ -181,7 +181,7 @@ class RedeemDetailView extends StatelessWidget {
 
             Text(
               "Redeem Summary",
-              style: GoogleFonts.playfairDisplay(
+              style: GoogleFonts.lora(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: const Color(0xff5D4037),
@@ -211,7 +211,7 @@ class RedeemDetailView extends StatelessWidget {
                     children: [
                       Text(
                         "Karma Points Required",
-                        style: GoogleFonts.playfairDisplay(
+                        style: GoogleFonts.lora(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: const Color(0xff5D4037),
@@ -232,7 +232,7 @@ class RedeemDetailView extends StatelessWidget {
                           const SizedBox(width: 6),
                           Text(
                             "${item.requiredPoints}",
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.poppins(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               color: const Color(0xff5D4037),
@@ -294,7 +294,7 @@ class RedeemDetailView extends StatelessWidget {
                       ),
                       child: Text(
                         "Redeem Now",
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -317,7 +317,7 @@ class RedeemDetailView extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Text(
                     "What Happens Next",
-                    style: GoogleFonts.playfairDisplay(
+                    style: GoogleFonts.lora(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xff5D4037),
@@ -370,7 +370,7 @@ class RedeemDetailView extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 13,
               color: const Color(0xff5D4037).withOpacity(0.8),
               height: 1.4,
@@ -381,3 +381,4 @@ class RedeemDetailView extends StatelessWidget {
     );
   }
 }
+

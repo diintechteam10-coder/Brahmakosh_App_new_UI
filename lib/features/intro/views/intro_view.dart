@@ -63,7 +63,7 @@ class IntroView extends StatelessWidget {
                             const SizedBox(width: 8),
                             Text(
                               "Back",
-                              style: GoogleFonts.inter(
+                              style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                                 color: const Color(0xff5D4037),
@@ -103,7 +103,7 @@ class IntroView extends StatelessWidget {
                           children: [
                             Text(
                               "Next",
-                              style: GoogleFonts.inter(
+                              style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: const Color(0xff5D4037),
@@ -147,7 +147,7 @@ class IntroView extends StatelessWidget {
                           alignment: Alignment.center,
                           child: Text(
                             "Continue",
-                            style: GoogleFonts.cinzel(
+                            style: GoogleFonts.lora(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -182,3 +182,4 @@ class _FullScreenImage extends StatelessWidget {
     );
   }
 }
+

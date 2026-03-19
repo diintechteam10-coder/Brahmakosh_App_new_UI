@@ -1,6 +1,7 @@
 import 'package:brahmakosh/features/agent/controllers/agent_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sizer/sizer.dart';
 
 import '../../../../core/common_imports.dart';
 import '../../../../common/models/avtar_list.dart';
@@ -33,7 +34,7 @@ class AradhyaSelectionView extends StatelessWidget {
           children: [
             // Header with back button
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(4.w),
               child: Row(
                 children: [
                   IconButton(
@@ -44,8 +45,8 @@ class AradhyaSelectionView extends StatelessWidget {
                   Expanded(
                     child: Text(
                       'Select Aradhya',
-                      style: GoogleFonts.playfairDisplay(
-                        fontSize: 24,
+                      style: GoogleFonts.lora(
+                        fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
                         color: AppTheme.textPrimary,
                       ),
@@ -59,12 +60,12 @@ class AradhyaSelectionView extends StatelessWidget {
 
             // Subtitle
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              padding: EdgeInsets.symmetric(horizontal: 6.w),
               child: Text(
                 'Choose your divine guide to seek blessings and guidance',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.lora(
-                  fontSize: 16,
+                style: GoogleFonts.poppins(
+                  fontSize: 12.sp,
                   color: AppTheme.textSecondary,
                   height: 1.5,
                 ),
@@ -76,7 +77,7 @@ class AradhyaSelectionView extends StatelessWidget {
             // Deity Grid
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                padding: EdgeInsets.symmetric(horizontal: 6.w),
                 child: Obx(() {
                   if (agentController.isLoading &&
                       agentController.avatars.isEmpty) {
@@ -96,10 +97,10 @@ class AradhyaSelectionView extends StatelessWidget {
 
                   return GridView.builder(
                     gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
+                         SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          crossAxisSpacing: 20,
-                          mainAxisSpacing: 20,
+                          crossAxisSpacing: 5.w,
+                          mainAxisSpacing: 5.w,
                           childAspectRatio: 0.85,
                         ),
                     itemCount: agentController.avatars.length,
@@ -244,8 +245,8 @@ class _DeityCircleState extends State<_DeityCircle>
             children: [
               // Circular Image Container
               Container(
-                width: 100,
-                height: 100,
+                width: 25.w,
+                height: 25.w,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
@@ -306,8 +307,8 @@ class _DeityCircleState extends State<_DeityCircle>
               // Deity Name
               Text(
                 widget.name,
-                style: GoogleFonts.cinzel(
-                  fontSize: 16,
+                style: GoogleFonts.lora(
+                  fontSize: 12.sp,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.textPrimary,
                   letterSpacing: 0.5,

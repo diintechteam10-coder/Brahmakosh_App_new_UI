@@ -93,7 +93,7 @@ class _SankalpSuccessScreenState extends State<SankalpSuccessScreen> with Single
                   Text(
                     "Sankalp Created Successfully",
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.cinzel(
+                    style: GoogleFonts.lora(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: AppTheme.primaryGold,
@@ -140,7 +140,7 @@ class _SankalpSuccessScreenState extends State<SankalpSuccessScreen> with Single
                         children: [
                           Text(
                             "Start Sankalp",
-                            style: GoogleFonts.cinzel(
+                            style: GoogleFonts.lora(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
@@ -161,3 +161,4 @@ class _SankalpSuccessScreenState extends State<SankalpSuccessScreen> with Single
     );
   }
 }
+

@@ -88,7 +88,7 @@ class _CreateAvatarViewState extends State<CreateAvatarView> {
           const SizedBox(width: 16),
           Text(
             'Create Your Avatar',
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.lora(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: AppTheme.textPrimary,
@@ -159,7 +159,7 @@ class _CreateAvatarViewState extends State<CreateAvatarView> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: GoogleFonts.cinzel(
+      style: GoogleFonts.lora(
         fontSize: 16,
         fontWeight: FontWeight.w600,
         color: AppTheme.textPrimary,
@@ -308,3 +308,4 @@ class _CreateAvatarViewState extends State<CreateAvatarView> {
     );
   }
 }
+

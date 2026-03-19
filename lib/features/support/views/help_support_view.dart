@@ -57,7 +57,7 @@ class HelpSupportView extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               "For any assistance, queries, or technical support, please feel free to reach out to our dedicated support team. We're here to help you on your spiritual journey.",
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 16,
                 color: Colors.white.withOpacity(0.9),
                 height: 1.5,
@@ -86,7 +86,7 @@ class HelpSupportView extends StatelessWidget {
                 children: [
                   Text(
                     "Email Us At",
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Colors.white70,
@@ -106,7 +106,7 @@ class HelpSupportView extends StatelessWidget {
                         Expanded(
                           child: Text(
                             "contact@brahmakosh.com",
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.poppins(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: AppTheme.primaryGold,
@@ -127,3 +127,4 @@ class HelpSupportView extends StatelessWidget {
     );
   }
 }
+

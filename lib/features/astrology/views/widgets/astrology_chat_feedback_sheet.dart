@@ -56,7 +56,7 @@ class _AstrologyChatFeedbackSheetState
             const SizedBox(height: 8),
             Text(
               "How was your conversation?",
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 14,
                 color: Colors.white60,
               ),
@@ -124,11 +124,11 @@ class _AstrologyChatFeedbackSheetState
             // Comment Field
             TextField(
               controller: _commentController,
-              style: GoogleFonts.inter(color: Colors.white),
+              style: GoogleFonts.poppins(color: Colors.white),
               maxLines: 3,
               decoration: InputDecoration(
                 hintText: "Add a comment (optional)",
-                hintStyle: GoogleFonts.inter(color: Colors.white24),
+                hintStyle: GoogleFonts.poppins(color: Colors.white24),
                 filled: true,
                 fillColor: const Color(0xFF1A1A1A),
                 border: OutlineInputBorder(
@@ -173,7 +173,7 @@ class _AstrologyChatFeedbackSheetState
                 ),
                 child: Text(
                   "Submit Review",
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -216,7 +216,7 @@ class _AstrologyChatFeedbackSheetState
             const SizedBox(width: 8),
             Text(
               label,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 color: isSelected ? const Color(0xFFD4AF37) : Colors.white54,
@@ -228,3 +228,4 @@ class _AstrologyChatFeedbackSheetState
     );
   }
 }
+

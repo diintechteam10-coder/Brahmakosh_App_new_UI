@@ -31,7 +31,7 @@ class AstrologyAppBar extends StatelessWidget implements PreferredSizeWidget {
       titleSpacing: 0,
       title: Text(
         displayTitle,
-        style: GoogleFonts.cinzel(
+        style: GoogleFonts.lora(
           // Use Cinzel font for titles
           fontSize: 16,
           fontWeight: FontWeight.w500,
@@ -66,7 +66,7 @@ class AstrologyAppBar extends StatelessWidget implements PreferredSizeWidget {
               const SizedBox(width: 6),
               Text(
                 "2,500",
-                style: GoogleFonts.cinzel(
+                style: GoogleFonts.lora(
                   fontSize: 10,
                   fontWeight: FontWeight.w500,
                   color: AppTheme.textPrimary,
@@ -91,3 +91,4 @@ class AstrologyAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
+

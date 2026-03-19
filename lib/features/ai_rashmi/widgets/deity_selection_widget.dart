@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 class DeitySelectionWidget extends StatelessWidget {
   final VoidCallback onSelectKrishna;
@@ -14,10 +15,10 @@ class DeitySelectionWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(6.w),
       decoration: BoxDecoration(
         color: const Color(0xFF18151B), // Dark theme background
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(4.w),
         border: Border.all(color: Colors.white.withOpacity(0.08)),
         boxShadow: [
           BoxShadow(
@@ -40,7 +41,7 @@ class DeitySelectionWidget extends StatelessWidget {
                 "assets/images/Small_krishna.png",
                 onSelectKrishna,
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: 4.w),
               _buildDeityCard(
                 context,
                 "Ask Rashmi",
@@ -65,10 +66,10 @@ class DeitySelectionWidget extends StatelessWidget {
         onTap: onTap,
         child: Container(
           // Fixed aspect ratio or height to look like a card
-          height: 180,
+          height: 22.5.h,
           decoration: BoxDecoration(
             color: const Color(0xFF100E13), // Darker card background
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(4.w),
             border: Border.all(color: Colors.white.withOpacity(0.08), width: 1),
             boxShadow: [
               BoxShadow(
@@ -84,15 +85,15 @@ class DeitySelectionWidget extends StatelessWidget {
               // Image
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(12.0),
+                  padding: EdgeInsets.all(3.w),
                   child: Image.asset(
                     imagePath,
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
-                      return const Icon(
+                      return Icon(
                         Icons.person,
-                        size: 60,
-                        color: Color(0xFFF1C453),
+                        size: 15.w,
+                        color: const Color(0xFFF1C453),
                       );
                     },
                   ),
@@ -100,11 +101,11 @@ class DeitySelectionWidget extends StatelessWidget {
               ),
               // Text
               Padding(
-                padding: const EdgeInsets.fromLTRB(8, 0, 8, 16),
+                padding: EdgeInsets.fromLTRB(2.w, 0, 2.w, 2.h),
                 child: Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 14,
+                  style: TextStyle(
+                    fontSize: 10.5.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),

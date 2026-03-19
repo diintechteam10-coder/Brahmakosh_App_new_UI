@@ -73,7 +73,7 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
               const SizedBox(height: 12),
               Text(
                 "Failed to load details",
-                style: GoogleFonts.inter(
+                style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: const Color(0xff5D4037),
@@ -82,7 +82,7 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
               const SizedBox(height: 4),
               Text(
                 _error!,
-                style: GoogleFonts.inter(fontSize: 13, color: Colors.grey[500]),
+                style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey[500]),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -220,7 +220,7 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
               swapna.detailedInterpretation ??
                   swapna.shortDescription ??
                   '',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 15,
                 height: 1.6,
                 color: Colors.grey[300],
@@ -331,7 +331,7 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
         const SizedBox(width: 8),
         Text(
           text,
-          style: GoogleFonts.inter(
+          style: GoogleFonts.poppins(
             fontSize: 13,
             color: Colors.grey[400],
             fontWeight: FontWeight.w500,
@@ -381,7 +381,7 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -390,7 +390,7 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
                 const SizedBox(height: 4),
                 Text(
                   description,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 14,
                     height: 1.4,
                     color: Colors.grey[500],
@@ -427,7 +427,7 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
               const SizedBox(width: 10),
               Text(
                 title,
-                style: GoogleFonts.inter(
+                style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -450,7 +450,7 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
                   Expanded(
                     child: Text(
                       item,
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.poppins(
                         fontSize: 14,
                         height: 1.5,
                         color: Colors.grey[400],
@@ -466,3 +466,4 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
     );
   }
 }
+

@@ -34,7 +34,7 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
       appBar: AppBar(
         title: Text(
           "Progress",
-          style: GoogleFonts.playfairDisplay(
+          style: GoogleFonts.lora(
             fontSize: 20,
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -283,7 +283,7 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                     const SizedBox(height: 32),
                     Text(
                       "Your Journey",
-                      style: GoogleFonts.playfairDisplay(
+                      style: GoogleFonts.lora(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -326,7 +326,7 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                                 width: 50,
                                 child: Text(
                                   dayNum < 10 ? "0$dayNum" : "$dayNum",
-                                  style: GoogleFonts.cinzel(
+                                  style: GoogleFonts.lora(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
                                     color: isCompleted 
@@ -483,7 +483,7 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
               const SizedBox(height: 16),
               Text(
                 message.contains("Already") ? "Information" : "Great Job!",
-                style: GoogleFonts.playfairDisplay(
+                style: GoogleFonts.lora(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -524,3 +524,4 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
     );
   }
 }
+

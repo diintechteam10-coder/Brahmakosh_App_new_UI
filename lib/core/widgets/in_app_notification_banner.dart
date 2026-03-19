@@ -167,7 +167,7 @@ class _InAppNotificationBannerState extends State<InAppNotificationBanner>
                                 children: [
                                   Text(
                                     _notifService.notificationTitle.value,
-                                    style: GoogleFonts.cinzel(
+                                    style: GoogleFonts.lora(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w700,
                                       color: AppTheme.primaryGold,
@@ -178,7 +178,7 @@ class _InAppNotificationBannerState extends State<InAppNotificationBanner>
                                   const SizedBox(height: 3),
                                   Text(
                                     _notifService.notificationBody.value,
-                                    style: GoogleFonts.inter(
+                                    style: GoogleFonts.poppins(
                                       fontSize: 12,
                                       color: Colors.white70,
                                       height: 1.3,
@@ -219,3 +219,4 @@ class _InAppNotificationBannerState extends State<InAppNotificationBanner>
     );
   }
 }
+

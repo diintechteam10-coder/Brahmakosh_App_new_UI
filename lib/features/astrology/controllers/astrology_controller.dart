@@ -277,7 +277,7 @@ class AstrologyController extends GetxController {
               children: [
                 Text(
                   "RECHARGE WALLET",
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -293,7 +293,7 @@ class AstrologyController extends GetxController {
             const SizedBox(height: 8),
             Text(
               "Insufficient balance to start consultation. Minimum ₹100 is required.",
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 14,
                 color: Colors.white.withOpacity(0.7),
               ),
@@ -327,7 +327,7 @@ class AstrologyController extends GetxController {
                     ),
                     child: Text(
                       "₹$amount",
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: const Color(0xFFD4AF37),
@@ -353,7 +353,7 @@ class AstrologyController extends GetxController {
                 ),
                 child: Text(
                   "PROCEED TO PAY",
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
@@ -392,3 +392,4 @@ class AstrologyController extends GetxController {
     super.onClose();
   }
 }
+

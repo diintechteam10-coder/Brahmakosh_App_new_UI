@@ -143,7 +143,7 @@ class _ReportCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   date,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 12,
                     color: Colors.white70,
                     letterSpacing: 0.2,
@@ -272,7 +272,7 @@ class _MyKoshSection extends StatelessWidget {
                         const SizedBox(height: 6),
                         Text(
                           'Based on your chart, you are currently in a phase of significant professional growth. The position of Jupiter suggests new opportunities.',
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             fontSize: 13,
                             height: 1.4,
                             color: Colors.white.withOpacity(0.9),
@@ -347,3 +347,4 @@ class _MyKoshSection extends StatelessWidget {
     );
   }
 }
+

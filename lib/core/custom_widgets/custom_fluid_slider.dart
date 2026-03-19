@@ -144,7 +144,7 @@ class _SliderPainter extends CustomPainter {
     final textPainter = TextPainter(
       text: TextSpan(
         text: ' $label',
-        style: GoogleFonts.inter(
+        style: GoogleFonts.poppins(
           color: Colors.white,
           fontSize: 12,
           fontWeight: FontWeight.bold,
@@ -237,3 +237,4 @@ class _SliderPainter extends CustomPainter {
            oldDelegate.label != label;
   }
 }
+

@@ -2,6 +2,7 @@ import 'package:brahmakosh/features/astrology/controllers/astrology_controller.d
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sizer/sizer.dart';
 import 'package:brahmakosh/common/models/astrologist_model.dart';
 import 'package:brahmakosh/features/profile/viewmodels/profile_viewmodel.dart';
 import 'package:provider/provider.dart';
@@ -32,7 +33,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
         backgroundColor: Colors.black,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 30),
+          icon: Icon(Icons.chevron_left, color: Colors.white, size: 8.w),
           onPressed: () => Get.back(),
         ),
         actions: [
@@ -47,13 +48,13 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
         children: [
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+              padding: EdgeInsets.symmetric(horizontal: 0, vertical: 1.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header Section
                   _buildHeader(expert),
-                  const SizedBox(height: 32),
+                  SizedBox(height: 4.h),
 
                   // Custom Tab Bar
                   Stack(
@@ -66,11 +67,11 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                         right: 0,
                         child: Container(
                           height: 2,
-                          color: const Color(0xFFD4AF37),
+                          color: const Color(0xFFFFD700),
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        padding: EdgeInsets.symmetric(horizontal: 2.w),
                         child: Row(
                           children: [
                             Expanded(
@@ -101,14 +102,14 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 32),
+                  SizedBox(height: 4.h),
 
                   // Content based on selected tab
                   if (_selectedTabIndex == 0) _buildAboutContent(expert),
                   if (_selectedTabIndex == 1) _buildExpertiseContent(expert),
                   if (_selectedTabIndex == 2) _buildReviewsSection(expert),
                   
-                  const SizedBox(height: 100),
+                  SizedBox(height: 12.h),
                 ],
               ),
             ),
@@ -130,10 +131,11 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
             Expanded(
               child: _buildProfileStatCard(
                 "${expert.experience ?? 14}+ Years",
-                "Expertise",
+                "Experience",
+                icon: Icons.auto_awesome,
               ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 4.w),
             Expanded(
               child: _buildProfileStatCard(
                 "${expert.rating ?? 4.9}",
@@ -143,24 +145,24 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
             ),
           ],
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: 3.h),
 
         // Bio Card
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(6.w),
           decoration: BoxDecoration(
             color: const Color(0xFF141414),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.white.withOpacity(0.05)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           ),
           child: Text(
             expert.profileSummary ??
-                "${expert.name} is a Vedic Astrologer with ${expert.experience ?? 14}+ years of experience. Expert in Kundli analysis, career & marriage guidance, and dosha remedies. Known for accurate, clear insights that support confident life decisions.",
-            style: GoogleFonts.inter(
-              fontSize: 14,
+                "${expert.name} is a Vedic Astrologer with ${expert.experience ?? 14}+ years of experience. Expert in Kundli analysis, career guidance, and remedies. Known for accurate, clear insights that support confident life decisions.",
+            style: GoogleFonts.poppins(
+              fontSize: 10.sp,
               height: 1.6,
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withValues(alpha: 0.7),
             ),
           ),
         ),
@@ -178,30 +180,30 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
         Text(
           "Core Expertise",
           style: GoogleFonts.lora(
-            fontSize: 18,
+            fontSize: 14.sp,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 2.h),
         Wrap(
-          spacing: 12,
-          runSpacing: 12,
+          spacing: 3.w,
+          runSpacing: 1.5.h,
           children: skills.map((skill) => _buildExpertiseChip(skill)).toList(),
         ),
-        const SizedBox(height: 32),
+        SizedBox(height: 4.h),
         Text(
           "Languages",
           style: GoogleFonts.lora(
-            fontSize: 18,
+            fontSize: 14.sp,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 2.h),
         Wrap(
-          spacing: 12,
-          runSpacing: 12,
+          spacing: 3.w,
+          runSpacing: 1.5.h,
           children: languages.map((lang) => _buildExpertiseChip(lang, isLanguage: true)).toList(),
         ),
       ],
@@ -210,27 +212,27 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
 
   Widget _buildExpertiseChip(String label, {bool isLanguage = false}) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
       decoration: BoxDecoration(
         color: const Color(0xFF141414),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.3)),
+        border: Border.all(color: const Color(0xFFFFD700).withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
             isLanguage ? Icons.language : Icons.auto_awesome,
-            size: 14,
-            color: const Color(0xFFD4AF37),
+            size: 3.5.w,
+            color: const Color(0xFFFFD700),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 2.w),
           Text(
             label,
-            style: GoogleFonts.inter(
-              fontSize: 13,
+            style: GoogleFonts.poppins(
+              fontSize: 9.sp,
               fontWeight: FontWeight.w500,
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
             ),
           ),
         ],
@@ -244,13 +246,13 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
         children: [
           // Large Avatar with Golden Ring
           Container(
-            width: 150,
-            height: 150,
+            width: 38.w,
+            height: 38.w,
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Color(0xFFD4AF37),
+                  color: Color(0xFFFFD700),
                   blurRadius: 20,
                   spreadRadius: 2,
                 ),
@@ -258,30 +260,30 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
             ),
             child: CustomProfileAvatar(
               imageUrl: expert.profilePhoto,
-              radius: 75,
-              borderColor: const Color(0xFFD4AF37),
+              radius: 19.w,
+              borderColor: const Color(0xFFFFD700),
               borderWidth: 2,
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 2.5.h),
           // Name and Category
           Text(
             expert.name ?? "Acharya Dev",
             style: GoogleFonts.lora(
-              fontSize: 24,
+              fontSize: 18.sp,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFFD4AF37),
+              color: const Color(0xFFFFD700),
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 0.5.h),
           Text(
             expert.expertise?.split(',').firstOrNull ?? "Vedic Astrology",
-            style: GoogleFonts.inter(
-              fontSize: 16,
-              color: Colors.white.withOpacity(0.6),
+            style: GoogleFonts.poppins(
+              fontSize: 12.sp,
+              color: Colors.white.withValues(alpha: 0.6),
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 2.5.h),
           // Badges Row
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -289,15 +291,15 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
               _buildBadge(
                 Icons.check_circle,
                 "Verified Astrologer",
-                const Color(0xFF2E7D32).withOpacity(0.2),
+                const Color(0xFF2E7D32).withValues(alpha: 0.2),
                 const Color(0xFF2E7D32),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 3.w),
               _buildBadge(
                 null,
                 "15k+ Consults",
-                Colors.white.withOpacity(0.1),
-                Colors.white.withOpacity(0.6),
+                Colors.white.withValues(alpha: 0.1),
+                Colors.white.withValues(alpha: 0.6),
               ),
             ],
           ),
@@ -308,23 +310,23 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
 
   Widget _buildBadge(IconData? icon, String label, Color bgColor, Color textColor) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 0.8.h),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: textColor.withOpacity(0.1)),
+        border: Border.all(color: textColor.withValues(alpha: 0.1)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 14, color: textColor),
-            const SizedBox(width: 6),
+            Icon(icon, size: 3.5.w, color: textColor),
+            SizedBox(width: 1.5.w),
           ],
           Text(
             label,
-            style: GoogleFonts.inter(
-              fontSize: 11,
+            style: GoogleFonts.poppins(
+              fontSize: 8.sp,
               fontWeight: FontWeight.w600,
               color: textColor,
             ),
@@ -344,7 +346,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
             Text(
               "User Reviews",
               style: GoogleFonts.lora(
-                fontSize: 18,
+                fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
@@ -353,18 +355,18 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
               onPressed: () {},
               child: Text(
                 "See All",
-                style: GoogleFonts.inter(
-                  color: const Color(0xFFD4AF37),
-                  fontSize: 14,
+                style: GoogleFonts.poppins(
+                  color: const Color(0xFFFFD700),
+                  fontSize: 10.sp,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 2.h),
         _buildReviewCard("Rohan Sharma", "Very accurate and helpful insights. Highly recommended!"),
-        const SizedBox(height: 12),
+        SizedBox(height: 1.5.h),
         _buildReviewCard("Ananya Gupta", "Great session, clear guidance on my career path."),
       ],
     );
@@ -372,11 +374,11 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
 
   Widget _buildReviewCard(String name, String comment) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
         color: const Color(0xFF141414),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -385,23 +387,24 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
             children: [
               Text(
                 name,
-                style: GoogleFonts.inter(
+                style: GoogleFonts.poppins(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
+                  fontSize: 11.sp,
                 ),
               ),
               const Spacer(),
               Row(
-                children: List.generate(5, (index) => const Icon(Icons.star, color: Color(0xFFD4AF37), size: 12)),
+                children: List.generate(5, (index) => Icon(Icons.star, color: const Color(0xFFFFD700), size: 3.w)),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 1.h),
           Text(
             comment,
-            style: GoogleFonts.inter(
-              color: Colors.white.withOpacity(0.6),
-              fontSize: 13,
+            style: GoogleFonts.poppins(
+              color: Colors.white.withValues(alpha: 0.6),
+              fontSize: 9.sp,
               height: 1.4,
             ),
           ),
@@ -417,15 +420,15 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
   ) {
     return Container(
       padding: EdgeInsets.fromLTRB(
-        24,
-        24,
-        24,
-        10 + MediaQuery.of(context).padding.bottom,
+        6.w,
+        2.h,
+        6.w,
+        1.h + MediaQuery.of(context).padding.bottom,
       ),
       decoration: BoxDecoration(
         color: Colors.black,
         border: Border(
-          top: BorderSide(color: Colors.white.withOpacity(0.05)),
+          top: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
         ),
       ),
       child: Row(
@@ -444,7 +447,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
               }
             ),
           ),
-          const SizedBox(width: 20),
+          SizedBox(width: 5.w),
           Expanded(
             child: _buildBottomButton(
               Icons.phone_outlined,
@@ -481,21 +484,21 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
       onTap: onTap,
       borderRadius: BorderRadius.circular(30),
       child: Container(
-        height: 60,
+        height: 7.h,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: const Color(0xFFD4AF37), width: 1.5),
+          border: Border.all(color: const Color(0xFFFFD700), width: 1.5),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: const Color(0xFFD4AF37), size: 22),
-            const SizedBox(width: 12),
+            Icon(icon, color: const Color(0xFFFFD700), size: 5.w),
+            SizedBox(width: 2.w),
             Text(
               price,
-              style: GoogleFonts.inter(
-                color: const Color(0xFFD4AF37),
-                fontSize: 16,
+              style: GoogleFonts.poppins(
+                color: const Color(0xFFFFD700),
+                fontSize: 11.sp,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -514,9 +517,9 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
       ),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: EdgeInsets.symmetric(vertical: 1.h),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFD4AF37) : Colors.transparent,
+          color: isSelected ? const Color(0xFFFFD700) : Colors.transparent,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(15),
             topRight: Radius.circular(15),
@@ -524,17 +527,17 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
           border: isSelected
               ? null
               : Border.all(
-                  color: const Color(0xFFD4AF37).withOpacity(0.5),
+                  color: const Color(0xFFFFD700).withValues(alpha: 0.5),
                   width: 1,
                 ),
         ),
         child: Text(
           label,
           textAlign: TextAlign.center,
-          style: GoogleFonts.inter(
-            fontSize: 13,
+          style: GoogleFonts.poppins(
+            fontSize: 9.sp,
             fontWeight: FontWeight.bold,
-            color: isSelected ? Colors.black : const Color(0xFFD4AF37),
+            color: isSelected ? Colors.black : const Color(0xFFFFD700),
             letterSpacing: 0.5,
           ),
         ),
@@ -546,25 +549,25 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
     return Row(
       children: [
         if (icon != null) ...[
-          Icon(icon, color: const Color(0xFFD4AF37), size: 24),
-          const SizedBox(width: 12),
+          Icon(icon, color: const Color(0xFFFFD700), size: 6.w),
+          SizedBox(width: 3.w),
         ],
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               value,
-              style: GoogleFonts.inter(
-                fontSize: 18,
+              style: GoogleFonts.poppins(
+                fontSize: 14.sp,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),
             Text(
               label,
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                color: Colors.white.withOpacity(0.5),
+              style: GoogleFonts.poppins(
+                fontSize: 9.sp,
+                color: Colors.white.withValues(alpha: 0.5),
               ),
             ),
           ],
@@ -583,9 +586,9 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(6.w),
         decoration: const BoxDecoration(
-          color: Color(0xFF141414), // Dark background
+          color: Color(0xFF141414),
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
@@ -594,27 +597,25 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
           children: [
             Row(
               children: [
-                // Chat Icon Box
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: EdgeInsets.all(2.w),
                   decoration: BoxDecoration(
                     color: const Color(0xFF262626),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.2)),
+                    border: Border.all(color: const Color(0xFFFFD700).withValues(alpha: 0.2)),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.message,
-                    color: Color(0xFFD4AF37),
-                    size: 20,
+                    color: const Color(0xFFFFD700),
+                    size: 5.w,
                   ),
                 ),
-                const SizedBox(width: 16),
-                // Title
+                SizedBox(width: 4.w),
                 Expanded(
                   child: Text(
-                    "START CHAT CONSULTATION",
-                    style: GoogleFonts.inter(
-                      fontSize: 18,
+                    "CHAT CONSULTATION",
+                    style: GoogleFonts.lora(
+                      fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                       letterSpacing: 0.5,
@@ -623,89 +624,84 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 2.h),
 
             Text(
               "You're about to start a live chat session with your chosen Expert.",
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                color: Colors.white.withOpacity(0.7),
+              style: GoogleFonts.poppins(
+                fontSize: 10.sp,
+                color: Colors.white.withValues(alpha: 0.7),
                 height: 1.4,
               ),
             ),
-            const SizedBox(height: 16),
-            Divider(color: Colors.white.withOpacity(0.1), thickness: 1),
-            const SizedBox(height: 16),
+            SizedBox(height: 2.h),
+            Divider(color: Colors.white.withValues(alpha: 0.1), thickness: 1),
+            SizedBox(height: 2.h),
 
-            // Description
             Text(
               "Connect with an astrologer or guru through live chat and end the session at any time - credits are deducted only for the minutes used, so please ensure a stable internet connection for a smooth experience.",
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                color: Colors.white.withOpacity(0.6),
+              style: GoogleFonts.poppins(
+                fontSize: 9.sp,
+                color: Colors.white.withValues(alpha: 0.6),
                 height: 1.5,
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 3.h),
 
-            // // Price Warning
-            // Text(
-            //   "This session will deduct ₹${expert.chatCharge ?? 15} per minute",
-            //   style: GoogleFonts.inter(
-            //     fontSize: 15,
-            //     fontWeight: FontWeight.w600,
-            //     color: const Color(0xFFD4AF37),
-            //   ),
-            // ),
-            // const SizedBox(height: 8),
+            Text(
+              "This session will deduct ₹${expert.chatCharge ?? 15} per minute",
+              style: GoogleFonts.poppins(
+                fontSize: 11.sp,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFFFFD700),
+              ),
+            ),
+            SizedBox(height: 1.h),
 
-            // Text(
-            //   "Would you like to continue?",
-            //   style: GoogleFonts.inter(
-            //     fontSize: 14,
-            //     color: Colors.white.withOpacity(0.5),
-            //   ),
-            // ),
-            // const SizedBox(height: 24),
-            Divider(color: Colors.white.withOpacity(0.1), thickness: 1),
-            const SizedBox(height: 24),
+            Text(
+              "Would you like to continue?",
+              style: GoogleFonts.poppins(
+                fontSize: 10.sp,
+                color: Colors.white.withValues(alpha: 0.5),
+              ),
+            ),
+            SizedBox(height: 3.h),
+            Divider(color: Colors.white.withValues(alpha: 0.1), thickness: 1),
+            SizedBox(height: 3.h),
 
-            // Buttons
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: const BorderSide(color: Color(0xFFB8860B)),
+                      padding: EdgeInsets.symmetric(vertical: 2.h),
+                      side: const BorderSide(color: Color(0xFFFFD700)),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
                     child: Text(
                       "CANCEL",
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
+                      style: GoogleFonts.poppins(
+                        fontSize: 10.sp,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 4.w),
                 Expanded(
                   child: Consumer<ProfileViewModel>(
                     builder: (context, profileVM, child) {
                       if (profileVM.isLoading) {
-                        return const Center(child: CircularProgressIndicator(color: Color(0xFFD4AF37)));
+                        return const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)));
                       }
-
                       return ElevatedButton(
                         onPressed: () {
                           final credits = profileVM.profile?.credits ?? 0;
                           Navigator.pop(context);
-
                           if (credits >= 100) {
                             StorageService.setBool('chat_initiated_${expert.id}', true);
                             controller.startChat(expert);
@@ -714,8 +710,8 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: const Color(0xFFD4AF37),
+                          padding: EdgeInsets.symmetric(vertical: 2.h),
+                          backgroundColor: const Color(0xFFFFD700),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
                           ),
@@ -723,8 +719,8 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                         ),
                         child: Text(
                           "CONTINUE",
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
+                          style: GoogleFonts.poppins(
+                            fontSize: 10.sp,
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
@@ -735,7 +731,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                 ),
               ],
             ),
-            SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
+            SizedBox(height: MediaQuery.of(context).padding.bottom + 2.h),
           ],
         ),
       ),
@@ -752,7 +748,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(6.w),
         decoration: const BoxDecoration(
           color: Color(0xFF141414),
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -764,24 +760,24 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: EdgeInsets.all(2.w),
                   decoration: BoxDecoration(
                     color: const Color(0xFF262626),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.2)),
+                    border: Border.all(color: const Color(0xFFFFD700).withValues(alpha: 0.2)),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.phone_in_talk,
-                    color: Color(0xFFD4AF37),
-                    size: 20,
+                    color: const Color(0xFFFFD700),
+                    size: 5.w,
                   ),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 4.w),
                 Expanded(
                   child: Text(
                     "VOICE CONSULTATION",
-                    style: GoogleFonts.inter(
-                      fontSize: 18,
+                    style: GoogleFonts.lora(
+                      fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                       letterSpacing: 0.5,
@@ -790,50 +786,50 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 2.h),
 
             Text(
               "You're about to start a voice call session with your chosen Expert.",
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                color: Colors.white.withOpacity(0.7),
+              style: GoogleFonts.poppins(
+                fontSize: 10.sp,
+                color: Colors.white.withValues(alpha: 0.7),
                 height: 1.4,
               ),
             ),
-            const SizedBox(height: 16),
-            Divider(color: Colors.white.withOpacity(0.1), thickness: 1),
-            const SizedBox(height: 16),
+            SizedBox(height: 2.h),
+            Divider(color: Colors.white.withValues(alpha: 0.1), thickness: 1),
+            SizedBox(height: 2.h),
 
             Text(
               "Connect with an astrologer or guru through a live audio call and end the session at any time - credits are deducted only for the minutes used, so please ensure a stable internet connection for a smooth experience.",
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                color: Colors.white.withOpacity(0.6),
+              style: GoogleFonts.poppins(
+                fontSize: 9.sp,
+                color: Colors.white.withValues(alpha: 0.6),
                 height: 1.5,
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 3.h),
 
             Text(
               "This session will deduct ₹${expert.voiceCharge ?? 20} per minute",
-              style: GoogleFonts.inter(
-                fontSize: 15,
+              style: GoogleFonts.poppins(
+                fontSize: 11.sp,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFFD4AF37),
+                color: const Color(0xFFFFD700),
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 1.h),
 
             Text(
               "Would you like to continue?",
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                color: Colors.white.withOpacity(0.5),
+              style: GoogleFonts.poppins(
+                fontSize: 10.sp,
+                color: Colors.white.withValues(alpha: 0.5),
               ),
             ),
-            const SizedBox(height: 24),
-            Divider(color: Colors.white.withOpacity(0.1), thickness: 1),
-            const SizedBox(height: 24),
+            SizedBox(height: 3.h),
+            Divider(color: Colors.white.withValues(alpha: 0.1), thickness: 1),
+            SizedBox(height: 3.h),
 
             Row(
               children: [
@@ -841,36 +837,34 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: const BorderSide(color: Color(0xFFB8860B)),
+                      padding: EdgeInsets.symmetric(vertical: 2.h),
+                      side: const BorderSide(color: Color(0xFFFFD700)),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
                     child: Text(
                       "CANCEL",
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
+                      style: GoogleFonts.poppins(
+                        fontSize: 10.sp,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 4.w),
                 Expanded(
                   child: Consumer<ProfileViewModel>(
                     builder: (context, profileVM, child) {
                       if (profileVM.isLoading) {
-                        return const Center(child: CircularProgressIndicator(color: Color(0xFFD4AF37)));
+                        return const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)));
                       }
                       return ElevatedButton(
                         onPressed: () {
                           final credits = profileVM.profile?.credits ?? 0;
                           final minRequired = (expert.voiceCharge ?? 20) * 5;
-
                           Navigator.pop(context);
-
                           if (credits >= minRequired) {
                             Get.to(() => VoiceCallView(expert: expert.toAstrologist()));
                           } else {
@@ -884,8 +878,8 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: const Color(0xFFD4AF37),
+                          padding: EdgeInsets.symmetric(vertical: 2.h),
+                          backgroundColor: const Color(0xFFFFD700),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
                           ),
@@ -893,8 +887,8 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                         ),
                         child: Text(
                           "CONTINUE",
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
+                          style: GoogleFonts.poppins(
+                            fontSize: 10.sp,
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
@@ -905,7 +899,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                 ),
               ],
             ),
-            SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
+            SizedBox(height: MediaQuery.of(context).padding.bottom + 2.h),
           ],
         ),
       ),
@@ -916,23 +910,30 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
     Get.dialog(
       AlertDialog(
         backgroundColor: const Color(0xFF141414),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.white.withOpacity(0.05))),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+            side: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
         title: Text(
           "Expert Offline",
-          style: GoogleFonts.lora(fontWeight: FontWeight.bold, color: const Color(0xFFD4AF37)),
+          style: GoogleFonts.lora(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFFFFD700)),
         ),
         content: Text(
           "This expert is currently offline. Please try again later.",
-          style: GoogleFonts.inter(color: Colors.white.withOpacity(0.7)),
+          style: GoogleFonts.poppins(
+              fontSize: 10.sp, color: Colors.white.withValues(alpha: 0.7)),
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
             child: Text(
               "OK",
-              style: GoogleFonts.inter(
-                color: const Color(0xFFD4AF37),
+              style: GoogleFonts.poppins(
+                color: const Color(0xFFFFD700),
                 fontWeight: FontWeight.bold,
+                fontSize: 10.sp,
               ),
             ),
           ),
@@ -945,23 +946,30 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
     Get.dialog(
       AlertDialog(
         backgroundColor: const Color(0xFF141414),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.white.withOpacity(0.05))),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+            side: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
         title: Text(
           "Chat Required",
-          style: GoogleFonts.lora(fontWeight: FontWeight.bold, color: const Color(0xFFD4AF37)),
+          style: GoogleFonts.lora(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFFFFD700)),
         ),
         content: Text(
           "Please initiate a chat with the expert first before making a call.",
-          style: GoogleFonts.inter(color: Colors.white.withOpacity(0.7)),
+          style: GoogleFonts.poppins(
+              fontSize: 10.sp, color: Colors.white.withValues(alpha: 0.7)),
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
             child: Text(
               "OK",
-              style: GoogleFonts.inter(
-                color: const Color(0xFFD4AF37),
+              style: GoogleFonts.poppins(
+                color: const Color(0xFFFFD700),
                 fontWeight: FontWeight.bold,
+                fontSize: 10.sp,
               ),
             ),
           ),

@@ -43,7 +43,7 @@ class HealthFocusView extends StatelessWidget {
       ),
       title: Text(
         'Health & Vitality',
-        style: GoogleFonts.playfairDisplay(
+        style: GoogleFonts.lora(
           color: AppTheme.textPrimary,
           fontWeight: FontWeight.bold,
         ),
@@ -87,7 +87,7 @@ class HealthFocusView extends StatelessWidget {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: GoogleFonts.playfairDisplay(
+      style: GoogleFonts.lora(
         fontSize: 20,
         fontWeight: FontWeight.bold,
         color: AppTheme.textPrimary,
@@ -173,3 +173,4 @@ class _ChecklistItem extends StatelessWidget {
     );
   }
 }
+

@@ -21,55 +21,41 @@ class CustomProfileAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final formattedUrl = ApiUrls.getFormattedImageUrl(imageUrl);
-    
+
     return Container(
       width: radius * 2,
       height: radius * 2,
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: borderColor, // Outer border color
         shape: BoxShape.circle,
-        border: Border.all(
-          color: borderColor,
-          width: borderWidth,
-        ),
       ),
-      child: ClipOval(
-        child: (formattedUrl == null || formattedUrl.isEmpty)
-            ? _buildFallbackIcon()
-            : CachedNetworkImage(
-                imageUrl: formattedUrl,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => _buildFallbackIcon(),
-                errorWidget: (context, url, error) {
-                  debugPrint(
-                    "❌ CustomProfileAvatar Error loading: $url - Error: $error",
-                  );
-                  return _buildFallbackIcon();
-                },
-              ),
+      padding: EdgeInsets.all(borderWidth), // Outer border width
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.black, // Inner border color
+          shape: BoxShape.circle,
+        ),
+        padding: const EdgeInsets.all(2), // Inner border width/gap
+        child: ClipOval(
+          child: (formattedUrl == null || formattedUrl.isEmpty)
+              ? _buildFallbackIcon()
+              : CachedNetworkImage(
+                  imageUrl: formattedUrl,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => _buildFallbackIcon(),
+                  errorWidget: (context, url, error) {
+                    debugPrint(
+                      "❌ CustomProfileAvatar Error loading: $url - Error: $error",
+                    );
+                    return _buildFallbackIcon();
+                  },
+                ),
+        ),
       ),
     );
   }
 
   Widget _buildFallbackIcon() {
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Color(0xFFD4AF37),
-            Color(0xFFA67C00),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: const Icon(
-        Icons.person_rounded,
-        size: 24,
-        color: Colors.white,
-      ),
-    );
+    return Image.asset('assets/icons/User.jpg', fit: BoxFit.cover);
   }
 }

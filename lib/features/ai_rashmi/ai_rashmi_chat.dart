@@ -11,6 +11,7 @@ import 'package:lottie/lottie.dart';
 import '../../core/services/storage_service.dart';
 import '../../core/constants/app_constants.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sizer/sizer.dart';
 
 import 'deity_selection_service.dart';
 import 'package:brahmakosh/features/agent/controllers/agent_controller.dart';
@@ -248,7 +249,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
           shape: BoxShape.circle,
           border: Border.all(color: Colors.white.withOpacity(0.15)),
         ),
-        child: Icon(icon, color: iconColor, size: 20),
+        child: Icon(icon, color: iconColor, size: 5.w),
       ),
     );
   }
@@ -362,7 +363,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
               // Main UI Content
               Column(
                 children: [
-                  const SizedBox(height: 110), // Spacing for header
+                   SizedBox(height: 12.h), // Spacing for header
                   Expanded(
                     child: vm.messages.isEmpty
                         ? (isKrishnaChat
@@ -370,10 +371,10 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                               : _buildRashmiEmptyState(context, vm, theme))
                         : ListView.builder(
                             controller: _scrollController,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 16,
-                            ),
+                             padding: EdgeInsets.symmetric(
+                               horizontal: 3.w,
+                               vertical: 2.h,
+                             ),
                             itemCount:
                                 vm.messages.length + (vm.isSending ? 1 : 0),
                             itemBuilder: (context, index) {
@@ -388,7 +389,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                   SafeArea(
                     top: false,
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                      padding: EdgeInsets.fromLTRB(3.w, 0, 3.w, 1.5.h),
                       child: _buildInputArea(context, vm, theme),
                     ),
                   ),
@@ -403,9 +404,9 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                 right: 0,
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14.0,
-                      vertical: 1.0,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 3.5.w,
+                      vertical: 1.h,
                     ),
                     child: _buildHeader(context),
                   ),
@@ -465,7 +466,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
       // Compact inline input during active chat
       return Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+        padding: EdgeInsets.symmetric(horizontal: 1.5.w, vertical: 0.75.h),
         decoration: BoxDecoration(
           color: const Color(0xFF18151B).withOpacity(0.9),
           borderRadius: BorderRadius.circular(28),
@@ -490,8 +491,8 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                 keyboardType: TextInputType.multiline,
                 textInputAction: TextInputAction.newline,
                 textCapitalization: TextCapitalization.sentences,
-                style: const TextStyle(
-                  fontSize: 15,
+                style: TextStyle(
+                  fontSize: 11.sp,
                   fontWeight: FontWeight.w400,
                   color: Colors.white,
                   height: 1.4,
@@ -504,7 +505,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                   hintText: 'Send message...',
                   hintStyle: TextStyle(
                     color: Colors.grey.shade500,
-                    fontSize: 15,
+                    fontSize: 11.sp,
                     fontWeight: FontWeight.w400,
                   ),
                   border: InputBorder.none,
@@ -513,9 +514,9 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                   disabledBorder: InputBorder.none,
                   errorBorder: InputBorder.none,
                   focusedErrorBorder: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 10,
-                    horizontal: 12,
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 1.25.h,
+                    horizontal: 3.w,
                   ),
                 ),
               ),
@@ -540,7 +541,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                       },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.all(2.5.w),
                   decoration: BoxDecoration(
                     color: vm.isSending
                         ? Colors.grey.shade800
@@ -552,7 +553,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                         ? Icons.hourglass_top_rounded
                         : Icons.play_arrow_rounded,
                     color: vm.isSending ? Colors.grey.shade400 : Colors.black,
-                    size: 20,
+                    size: 5.w,
                   ),
                 ),
               ),
@@ -565,7 +566,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
     // Expanded input for empty state (first message)
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+      padding: EdgeInsets.all(3.w),
       decoration: BoxDecoration(
         color: const Color(0xFF18151B).withOpacity(0.9), // Dark color
         borderRadius: BorderRadius.circular(20),
@@ -589,8 +590,8 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
               minLines: 1,
               maxLines: 4,
               textCapitalization: TextCapitalization.sentences,
-              style: const TextStyle(
-                fontSize: 15,
+              style: TextStyle(
+                fontSize: 11.sp,
                 fontWeight: FontWeight.w500,
                 color: Colors.white,
                 height: 1.4,
@@ -601,7 +602,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                 hintText: 'Ask $deityName anything',
                 hintStyle: TextStyle(
                   color: Colors.grey.shade500,
-                  fontSize: 15,
+                  fontSize: 11.sp,
                   fontWeight: FontWeight.w400,
                 ),
                 border: InputBorder.none,
@@ -623,9 +624,9 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
+                padding: EdgeInsets.symmetric(
+                  horizontal: 4.w,
+                  vertical: 1.h,
                 ),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.white.withOpacity(0.15)),
@@ -636,14 +637,14 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                   children: [
                     Icon(
                       Icons.description_outlined,
-                      size: 16,
+                      size: 4.w,
                       color: Colors.grey.shade400,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       "FAQ's",
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 10.sp,
                         color: Colors.grey.shade400,
                         fontWeight: FontWeight.w500,
                       ),
@@ -651,7 +652,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                     const SizedBox(width: 4),
                     Icon(
                       Icons.keyboard_arrow_down,
-                      size: 18,
+                      size: 4.5.w,
                       color: Colors.grey.shade400,
                     ),
                   ],
@@ -671,15 +672,15 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                         }
                       },
                 child: Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: EdgeInsets.all(3.w),
                   decoration: const BoxDecoration(
                     color: Color(0xFFF1C453), // Yellow color from screenshot
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.play_arrow_rounded, // Play icon
                     color: Colors.black,
-                    size: 24,
+                    size: 6.w,
                   ),
                 ),
               ),
@@ -724,24 +725,24 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
             _scaffoldKey.currentState?.openDrawer();
           },
           child: Container(
-            padding: const EdgeInsets.all(6), // Reduced from 8
+            padding: EdgeInsets.all(1.5.w), // Reduced from 8
             decoration:  BoxDecoration(
-              color: Color(0xffFFFFFF).withOpacity(0.1), // Off-white
+              color: const Color(0xffFFFFFF).withOpacity(0.1), // Off-white
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.menu,
-              color: Color(0xFFFFF8E7),
-              size: 18,
+              color: const Color(0xFFFFF8E7),
+              size: 4.5.w,
             ), // Reduced from 20
           ),
         ),
 
         // Center "Krishna" Button/Dropdown with Toggle
         Container(
-          height: 36, // Reduced from 40
-          padding: const EdgeInsets.symmetric(
-            horizontal: 10,
+          height: 4.5.h, // Reduced from 40
+          padding: EdgeInsets.symmetric(
+            horizontal: 2.5.w,
           ), // Reduced from 12
           decoration: BoxDecoration(
             color: const Color(0xFF18151B), // Off-white
@@ -758,8 +759,8 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                 children: [
                   // Small Avatar Image
                   Container(
-                    width: 24, // Reduced from 28
-                    height: 24, // Reduced from 28
+                    width: 6.w, // Reduced from 28
+                    height: 6.w, // Reduced from 28
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       image: DecorationImage(
@@ -771,10 +772,10 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                   const SizedBox(width: 6),
                   Text(
                     deityName,
-                    style: TextStyle(
+                    style: GoogleFonts.lora(
                       color: Colors.orange.shade800,
                       fontWeight: FontWeight.bold,
-                      fontSize: 12, // Reduced from 14
+                      fontSize: 9.sp, // Reduced from 14
                     ),
                   ),
                   const SizedBox(width: 2),
@@ -783,7 +784,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                         ? Icons.keyboard_arrow_up
                         : Icons.keyboard_arrow_down,
                     color: Colors.orange.shade800,
-                    size: 18, // Reduced from 20
+                    size: 4.5.w, // Reduced from 20
                   ),
                 ],
               ),
@@ -796,15 +797,15 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
             Get.back();
           },
           child: Container(
-            padding: const EdgeInsets.all(6), // Reduced from 8
+            padding: EdgeInsets.all(1.5.w), // Reduced from 8
             decoration: BoxDecoration(
-              color: Color(0xffFFFFFF).withOpacity(0.1), // Off-white
+              color: const Color(0xffFFFFFF).withOpacity(0.1), // Off-white
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.close,
               color: Colors.white,
-              size: 16, // Reduced from 18
+              size: 4.w, // Reduced from 18
             ),
           ),
         ),
@@ -824,7 +825,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
           children: [
             // The main image is already in background, so we just add the card overlays
             SizedBox(
-              height: MediaQuery.of(context).size.height * 0.39,
+              height: 39.h,
             ), // Push cards down
 
             if (!widget.hideLearnGita)
@@ -894,7 +895,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
           children: [
             // The main image is already in background, so we just add the card overlays
             SizedBox(
-              height: MediaQuery.of(context).size.height * 0.50,
+              height: 50.h,
             ), // Push cards down
 
             _buildKrishnaOptionCard(
@@ -951,7 +952,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(4.w),
         decoration: BoxDecoration(
           color: const Color(0xFF18151B).withOpacity(0.9),
           borderRadius: BorderRadius.circular(20),
@@ -968,7 +969,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [Icon(icon, color: const Color(0xFFF1C453), size: 24)],
+              children: [Icon(icon, color: const Color(0xFFF1C453), size: 6.w)],
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -977,8 +978,8 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      fontSize: 16,
+                    style: GoogleFonts.lora(
+                      fontSize: 12.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -986,7 +987,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: TextStyle(fontSize: 13, color: Colors.grey.shade400),
+                    style: GoogleFonts.poppins(fontSize: 10.sp, color: Colors.grey.shade400),
                   ),
                 ],
               ),
@@ -1019,10 +1020,10 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
         : Color(0xff705500);
     final textColor = Colors.white;
     final radius = BorderRadius.only(
-      topLeft: const Radius.circular(18),
-      topRight: const Radius.circular(18),
-      bottomLeft: Radius.circular(isUser ? 18 : 4),
-      bottomRight: Radius.circular(isUser ? 4 : 18),
+      topLeft: Radius.circular(4.5.w),
+      topRight: Radius.circular(4.5.w),
+      bottomLeft: Radius.circular(isUser ? 4.5.w : 1.w),
+      bottomRight: Radius.circular(isUser ? 1.w : 4.5.w),
     );
 
     return Padding(
@@ -1031,7 +1032,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
         alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * 0.75,
+            maxWidth: 75.w,
           ),
           child: DecoratedBox(
             decoration: BoxDecoration(
@@ -1046,7 +1047,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
               ],
             ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: EdgeInsets.symmetric(horizontal: 3.5.w, vertical: 1.25.h),
               child: isUser
                   ? Text(
                       msg.content,
@@ -1057,32 +1058,32 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                       selectable: true,
                       shrinkWrap: true,
                       styleSheet: MarkdownStyleSheet(
-                        p: TextStyle(
+                        p: GoogleFonts.poppins(
                           color: textColor,
                           height: 1.4,
-                          fontSize: 14,
+                          fontSize: 10.5.sp,
                         ),
-                        strong: TextStyle(
+                        strong: GoogleFonts.poppins(
                           color: textColor,
                           fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                          fontSize: 10.5.sp,
                         ),
-                        h1: TextStyle(
+                        h1: GoogleFonts.lora(
                           color: textColor,
                           fontWeight: FontWeight.bold,
-                          fontSize: 20,
+                          fontSize: 15.sp,
                         ),
-                        h2: TextStyle(
+                        h2: GoogleFonts.lora(
                           color: textColor,
                           fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                          fontSize: 13.5.sp,
                         ),
-                        h3: TextStyle(
+                        h3: GoogleFonts.lora(
                           color: textColor,
                           fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                          fontSize: 12.sp,
                         ),
-                        listBullet: TextStyle(color: textColor, fontSize: 14),
+                         listBullet: GoogleFonts.poppins(color: textColor, fontSize: 10.5.sp),
                         blockSpacing: 8,
                       ),
                     ),
@@ -1123,7 +1124,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
           // Custom Header
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
+            padding: EdgeInsets.fromLTRB(5.w, 6.h, 5.w, 2.5.h),
             decoration: const BoxDecoration(
               color: Color(0xFF18151B), // Dark theme header
             ),
@@ -1134,22 +1135,22 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                   children: [
                     CircleAvatar(
                       backgroundColor: Colors.white,
-                      radius: 24,
+                      radius: 6.w,
                       backgroundImage: AssetImage(imageAsset),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 2.h),
                     Text(
                       deityName,
-                      style: const TextStyle(
-                        fontSize: 24,
+                      style: GoogleFonts.lora(
+                        fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
                         color: Colors.white, // Updated for dark theme
                       ),
                     ),
-                    const Text(
+                    Text(
                       'Powered By BI',
-                      style: TextStyle(
-                        fontSize: 14,
+                      style: GoogleFonts.poppins(
+                        fontSize: 10.5.sp,
                         color: Colors.white70,
                       ), // Updated
                     ),
@@ -1170,7 +1171,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                       ),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.1), // Updated
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(5.w),
                         border: Border.all(
                           color: Colors.white.withOpacity(0.08),
                         ), // Updated
@@ -1178,16 +1179,16 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
+                           Icon(
                             Icons.swap_horiz,
-                            size: 16,
+                            size: 4.w,
                             color: Colors.white, // Updated
                           ),
                           const SizedBox(width: 4),
                           Text(
                             "Avatar",
-                            style: const TextStyle(
-                              fontSize: 12,
+                            style: GoogleFonts.poppins(
+                              fontSize: 9.sp,
                               fontWeight: FontWeight.w600,
                               color: Colors.white, // Updated
                             ),
@@ -1209,7 +1210,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                 children: [
                   // New Chat Button
                   Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: EdgeInsets.all(4.w),
                     child: Material(
                       color: const Color(0xFF18151B), // Dark theme
                       borderRadius: BorderRadius.circular(12),
@@ -1226,9 +1227,9 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                               color: Colors.white.withOpacity(0.1),
                             ),
                           ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 4.w,
+                            vertical: 1.5.h,
                           ),
                           child: Row(
                             children: [
@@ -1239,8 +1240,8 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                               const SizedBox(width: 12),
                               Text(
                                 'New Chat',
-                                style: TextStyle(
-                                  fontSize: 14,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 10.5.sp,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.white, // White text
                                 ),
@@ -1253,11 +1254,11 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                   ),
 
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
-                    child: Text(
+                    padding: EdgeInsets.fromLTRB(5.w, 1.h, 5.w, 1.h),
+                    child:                    Text(
                       'HISTORY',
-                      style: TextStyle(
-                        fontSize: 12,
+                      style: GoogleFonts.lora(
+                        fontSize: 9.sp,
                         fontWeight: FontWeight.w600,
                         color: Colors.grey[600],
                         letterSpacing: 1.2,
@@ -1275,19 +1276,19 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                     )
                   else if (vm.history.isEmpty)
                     Padding(
-                      padding: const EdgeInsets.all(20.0),
+                      padding: EdgeInsets.all(5.w),
                       child: Center(
                         child: Column(
                           children: [
                             Icon(
                               Icons.chat_bubble_outline,
-                              size: 48,
+                              size: 12.w,
                               color: Colors.grey[300],
                             ),
-                            const SizedBox(height: 12),
+                            SizedBox(height: 1.5.h),
                             Text(
                               'No chat history',
-                              style: TextStyle(color: Colors.grey[500]),
+                              style: TextStyle(color: Colors.grey[500], fontSize: 10.sp),
                             ),
                           ],
                         ),
@@ -1312,8 +1313,8 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                             borderRadius: BorderRadius.circular(12),
                             child: ListTile(
                               dense: true, // Reduces vertical height
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 12,
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 3.w,
                                 vertical: 0,
                               ),
                               visualDensity: const VisualDensity(
@@ -1321,9 +1322,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                                 vertical: -4,
                               ), // Further compact
                               leading: Container(
-                                padding: const EdgeInsets.all(
-                                  6,
-                                ), // Reduced from 8
+                                padding: EdgeInsets.all(1.5.w), // Reduced from 8
                                 decoration: BoxDecoration(
                                   color: isSelected
                                       ? const Color(0xFFF1C453).withOpacity(
@@ -1336,7 +1335,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                                   chat.title.toLowerCase().contains('voice')
                                       ? Icons.mic
                                       : Icons.chat_bubble_outline,
-                                  size: 16, // Reduced from 18
+                                  size: 4.w, // Reduced from 18
                                   color: isSelected
                                       ? const Color(
                                           0xFFF1C453,
@@ -1344,27 +1343,27 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                                       : Colors.grey[500],
                                 ),
                               ),
-                              title: Text(
-                                chat.title,
-                                style: TextStyle(
-                                  fontSize: 13, // Reduced size
-                                  fontWeight: isSelected
-                                      ? FontWeight.bold
-                                      : FontWeight.w500,
-                                  color: isSelected
-                                      ? Colors.white
-                                      : Colors.grey[400],
+                                title: Text(
+                                  chat.title,
+                                  style: GoogleFonts.lora(
+                                    fontSize: 9.75.sp, // Reduced size
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.w500,
+                                    color: isSelected
+                                        ? Colors.white
+                                        : Colors.grey[400],
+                                  ),
                                 ),
-                              ),
-                              subtitle: Text(
-                                chat.lastMessage,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 11, // Reduced from 12
-                                  color: Colors.grey[600],
+                                subtitle: Text(
+                                  chat.lastMessage,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 8.25.sp, // Reduced from 12
+                                    color: Colors.grey[600],
+                                  ),
                                 ),
-                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 side: isSelected
@@ -1442,7 +1441,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(5.w),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -1460,10 +1459,10 @@ class _TypingIndicatorState extends State<TypingIndicator>
               animation: _animations[index],
               builder: (context, child) {
                 return Transform.translate(
-                  offset: Offset(0, -4 * _animations[index].value),
+                  offset: Offset(0, -1.h * _animations[index].value),
                   child: Container(
-                    width: 6,
-                    height: 6,
+                    width: 1.5.w,
+                    height: 1.5.w,
                     decoration: BoxDecoration(
                       color: Colors.grey.withOpacity(
                         0.6 + (0.4 * _animations[index].value),
@@ -1629,9 +1628,9 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
                       children: [
                         // Top App Bar Area
                         Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0,
-                            vertical: 20.0,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 4.w,
+                            vertical: 2.5.h,
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1641,7 +1640,7 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
                                 "",
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.9),
-                                  fontSize: 18,
+                                  fontSize: 13.5.sp,
                                   fontWeight: FontWeight.w600,
                                   letterSpacing: 1.1,
                                 ),
@@ -1650,15 +1649,15 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
                                 behavior: HitTestBehavior.opaque,
                                 onTap: () => _showVoiceSettingsSheet(context),
                                 child: Container(
-                                  padding: const EdgeInsets.all(8),
+                                  padding: EdgeInsets.all(2.w),
                                   decoration: BoxDecoration(
                                     color: Colors.white.withOpacity(0.1),
                                     shape: BoxShape.circle,
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.settings,
                                     color: Colors.white,
-                                    size: 24,
+                                    size: 6.w,
                                   ),
                                 ),
                               ),
@@ -1670,7 +1669,7 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
 
                         // Status and Lottie Waves
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 32),
+                          padding: EdgeInsets.symmetric(horizontal: 8.w),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -1679,12 +1678,12 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
                                 title,
                                 style: TextStyle(
                                   color: actionColor,
-                                  fontSize: 14,
+                                  fontSize: 10.5.sp,
                                   fontWeight: FontWeight.w600,
                                   letterSpacing: 1.5,
                                 ),
                               ),
-                              const SizedBox(height: 32),
+                              SizedBox(height: 4.h),
 
                               // Lottie Waves
                               if (widget.voiceService.state ==
@@ -1726,7 +1725,7 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
                           ),
                         ),
 
-                        const SizedBox(height: 48),
+                        SizedBox(height: 6.h),
 
                         // Live Transcription / AI Text
                         // Expanded(
@@ -1765,7 +1764,7 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
 
                         // Bottom Action Button
                         Padding(
-                          padding: const EdgeInsets.only(bottom: 50.0),
+                          padding: EdgeInsets.only(bottom: 6.h),
                           child: GestureDetector(
                             behavior: HitTestBehavior.opaque,
                             onTap: () {
@@ -1774,7 +1773,7 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
                             },
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 300),
-                              padding: const EdgeInsets.all(24),
+                              padding: EdgeInsets.all(6.w),
                               decoration: BoxDecoration(
                                 color: actionColor.withOpacity(0.15),
                                 shape: BoxShape.circle,
@@ -1795,7 +1794,7 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
                                     ? Icons.stop
                                     : Icons.close,
                                 color: actionColor,
-                                size: 36,
+                                size: 9.w,
                               ),
                             ),
                           ),
@@ -1826,10 +1825,10 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
       backgroundColor: Colors.transparent,
       builder: (BuildContext sheetContext) {
         return Container(
-          padding: const EdgeInsets.all(24),
-          decoration: const BoxDecoration(
-            color: Color(0xFFFFE0B2), // Match other modals
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          padding: EdgeInsets.all(6.w),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFE0B2), // Match other modals
+            borderRadius: BorderRadius.vertical(top: Radius.circular(6.w)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -1838,7 +1837,7 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
               Text(
                 "Voice Settings",
                 style: GoogleFonts.lora(
-                  fontSize: 20,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
                 ),
@@ -1846,7 +1845,7 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
               const SizedBox(height: 8),
               Text(
                 "Select your preferred AI voice:",
-                style: GoogleFonts.inter(fontSize: 14, color: Colors.black54),
+                style: GoogleFonts.poppins(fontSize: 10.5.sp, color: Colors.black54),
               ),
               const SizedBox(height: 20),
               ...voices.map((voice) {
@@ -1875,7 +1874,7 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
                     },
                     borderRadius: BorderRadius.circular(12),
                     child: Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: EdgeInsets.all(4.w),
                       decoration: BoxDecoration(
                         color: isSelected
                             ? Colors.white
@@ -1900,8 +1899,8 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
                           Expanded(
                             child: Text(
                               voice['name']!,
-                              style: GoogleFonts.inter(
-                                fontSize: 16,
+                              style: GoogleFonts.poppins(
+                                fontSize: 12.sp,
                                 fontWeight: isSelected
                                     ? FontWeight.bold
                                     : FontWeight.normal,
@@ -1929,3 +1928,4 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
     );
   }
 }
+

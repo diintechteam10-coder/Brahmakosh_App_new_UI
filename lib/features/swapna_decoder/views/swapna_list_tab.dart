@@ -43,7 +43,7 @@ class SwapnaListView extends StatelessWidget {
                 const SizedBox(height: 12),
                 Text(
                   "Something went wrong",
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: const Color(0xff5D4037),
@@ -52,7 +52,7 @@ class SwapnaListView extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   state.message,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 13,
                     color: Colors.grey[500],
                   ),
@@ -91,7 +91,7 @@ class SwapnaListView extends StatelessWidget {
                       const SizedBox(height: 6),
                       Text(
                         "Pull down to refresh",
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontSize: 13,
                           color: const Color(0xff8D6E63),
                         ),
@@ -185,7 +185,7 @@ class SwapnaListView extends StatelessWidget {
                         Expanded(
                           child: Text(
                             swapna.shortDescription ?? swapna.category,
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.poppins(
                               fontSize: 11,
                               color: Colors.grey,
                               height: 1.3,
@@ -206,7 +206,7 @@ class SwapnaListView extends StatelessWidget {
                           child: Center(
                             child: Text(
                               "REVEAL MEANING",
-                              style: GoogleFonts.inter(
+                              style: GoogleFonts.poppins(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
@@ -227,3 +227,4 @@ class SwapnaListView extends StatelessWidget {
     );
   }
 }
+

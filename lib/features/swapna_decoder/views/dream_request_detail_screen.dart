@@ -73,7 +73,7 @@ class DreamRequestDetailScreen extends StatelessWidget {
                       const SizedBox(width: 10),
                       Text(
                         "Dream Symbol",
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                           color: const Color(0xff8D6E63),
@@ -108,7 +108,7 @@ class DreamRequestDetailScreen extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         "Your Description",
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: const Color(0xff8D6E63),
@@ -126,7 +126,7 @@ class DreamRequestDetailScreen extends StatelessWidget {
                     ),
                     child: Text(
                       request.additionalDetails,
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.poppins(
                         fontSize: 15,
                         height: 1.6,
                         color: Colors.grey[300],
@@ -150,7 +150,7 @@ class DreamRequestDetailScreen extends StatelessWidget {
                     children: [
                       Text(
                         "Status",
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
@@ -219,7 +219,7 @@ class DreamRequestDetailScreen extends StatelessWidget {
                     Text(
                       "Your dream has been decoded as '${request.completedDreamId?.symbolName}'.",
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.poppins(
                         fontSize: 14,
                         height: 1.4,
                         color: const Color(0xff2E7D32),
@@ -260,7 +260,7 @@ class DreamRequestDetailScreen extends StatelessWidget {
                           children: [
                             Text(
                               "View Interpretation",
-                              style: GoogleFonts.inter(
+                              style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                                 fontSize: 15,
@@ -321,7 +321,7 @@ class DreamRequestDetailScreen extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             status,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 13,
               fontWeight: FontWeight.w700,
               color: color,
@@ -332,3 +332,4 @@ class DreamRequestDetailScreen extends StatelessWidget {
     );
   }
 }
+

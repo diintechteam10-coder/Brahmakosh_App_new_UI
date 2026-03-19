@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:brahmakosh/features/home/controllers/home_controller.dart';
+import 'package:sizer/sizer.dart';
 import 'package:brahmakosh/features/astrology/controllers/astrology_controller.dart';
 import 'package:brahmakosh/features/profile/viewmodels/profile_viewmodel.dart';
 import 'package:brahmakosh/core/common_imports.dart';
@@ -59,6 +60,10 @@ class _NewHomeViewState extends State<NewHomeView> {
   bool _isCheckInLoading = false;
   String _selectedRemedyTab = "MUST HAVE";
 
+  // Focus management
+  final FocusNode _searchFocusNode = FocusNode();
+  final FocusNode _swapnaFocusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -66,7 +71,15 @@ class _NewHomeViewState extends State<NewHomeView> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _handleRefresh();
       _fetchCheckInData();
+      _unfocusAll(); // Initial clean state
     });
+  }
+
+  void _unfocusAll() {
+    _searchFocusNode.unfocus();
+    _swapnaFocusNode.unfocus();
+    // Also global unfocus just in case
+    FocusManager.instance.primaryFocus?.unfocus();
   }
 
   Future<void> _fetchCheckInData() async {
@@ -97,6 +110,8 @@ class _NewHomeViewState extends State<NewHomeView> {
   @override
   void dispose() {
     _bannerController.dispose();
+    _searchFocusNode.dispose();
+    _swapnaFocusNode.dispose();
     super.dispose();
   }
 
@@ -171,7 +186,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                           text: "Namaste ",
                           style: GoogleFonts.poppins(
                             color: Colors.white,
-                            fontSize: 20,
+                            fontSize: 15.sp,
                             fontWeight: FontWeight.w400,
                           ),
                         ),
@@ -179,7 +194,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                           text: firstName,
                           style: GoogleFonts.poppins(
                             color: const Color(0xFFD4AF37),
-                            fontSize: 20,
+                            fontSize: 15.sp,
                             fontWeight: FontWeight.w400,
                           ),
                         ),
@@ -193,24 +208,26 @@ class _NewHomeViewState extends State<NewHomeView> {
                 children: [
                   // Notification Bell with red dot badge
                   GestureDetector(
-                    onTap: () => Get.toNamed(AppConstants.routeNotifications),
+                    onTap: () {
+                      _unfocusAll();
+                      Get.toNamed(AppConstants.routeNotifications);
+                    },
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
                         Container(
-                          padding: EdgeInsets.all(8),
-                          width: 42,
-                          height: 42,
+                          padding: EdgeInsets.all(2.w),
+                          width: 10.w,
+                          height: 10.w,
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.05),
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
                           ),
                           child: SvgPicture.asset(
-                          'assets/icons/notification.svg',
-                        color: Colors.white,
-                        ),
-                      
+                            'assets/icons/notification.svg',
+                            color: Colors.white,
+                          ),
                         ),
                         // Red badge dot
                         Positioned(
@@ -232,6 +249,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                   // Profile Avatar with gold ring
                   GestureDetector(
                     onTap: () async {
+                      _unfocusAll();
                       final result = await Get.to(
                         () => const brahmakosh_profile.ProfileView(),
                       );
@@ -246,8 +264,9 @@ class _NewHomeViewState extends State<NewHomeView> {
                       builder: (context, profileVM, child) {
                         return CustomProfileAvatar(
                           imageUrl: profileVM.profile?.profileImageUrl,
-                          radius: 20.0,
+                          radius: 5.w,
                           borderWidth: 1.5,
+                          borderColor: AppTheme.primaryGold,
                         );
                       },
                     ),
@@ -264,29 +283,36 @@ class _NewHomeViewState extends State<NewHomeView> {
  Widget _buildSearchBar() {
   return SliverToBoxAdapter(
     child: Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+      padding: EdgeInsets.fromLTRB(4.w, 1.5.h, 4.w, 1.5.h),
       child: Container(
-        height: 44,
+        height: 5.5.h,
         decoration: BoxDecoration(
           color: const Color(0xFF1C1C1E),
           borderRadius: BorderRadius.circular(16),
         ),
         child: TextField(
+          focusNode: _searchFocusNode,
           textAlignVertical: TextAlignVertical.center, // Keeps icon/text aligned
-          style: const TextStyle(color: Colors.white, fontSize: 14),
+          style: TextStyle(color: Colors.white, fontSize: 11.sp),
           decoration: InputDecoration(
             filled: true,
             fillColor: Colors.transparent,
             hintText: "Search rituals, puja, astrologers",
             hintStyle: GoogleFonts.poppins(
               color: Colors.white.withOpacity(0.35),
-              fontSize: 16,
+              fontSize: 12.sp,
               fontWeight: FontWeight.w500,
             ),
-            prefixIcon: Icon(
-              Icons.search_sharp, // Rounded variant looks cleaner
-              color: Colors.white.withOpacity(0.5),
-              size: 30,
+            prefixIcon: Padding(
+              padding: EdgeInsets.all(1.4.h),
+              child: SvgPicture.asset(
+                'assets/icons/search.svg',
+                colorFilter: ColorFilter.mode(
+                  Colors.white.withOpacity(0.35),
+                  BlendMode.srcIn,
+                ),
+             
+              ),
             ),
             // Use OutlineInputBorder to get the surrounding ring
             border: OutlineInputBorder(
@@ -304,7 +330,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                 width: 1.2,
               ),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 8),
           ),
         ),
       ),
@@ -315,13 +341,13 @@ class _NewHomeViewState extends State<NewHomeView> {
   Widget _buildTitle() {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+        padding: EdgeInsets.fromLTRB(4.w, 1.5.h, 4.w, 1.5.h),
         child: Center(
           child: Text(
             "BRAHMAKOSH",
             style: GoogleFonts.lora(
               color: const Color(0xFFD4AF37),
-              fontSize: 24,
+              fontSize: 18.sp,
               fontWeight: FontWeight.bold,
               letterSpacing: 3,
             ),
@@ -334,7 +360,7 @@ class _NewHomeViewState extends State<NewHomeView> {
   Widget _buildMainBanner(double screenWidth) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: EdgeInsets.symmetric(vertical: 1.5.h),
         child: Obx(() {
         final message = homeController.activeFounderMessage;
         final krishaImageUrl =
@@ -356,29 +382,35 @@ class _NewHomeViewState extends State<NewHomeView> {
                   _buildBannerItem(
                     krishaImageUrl,
                     "Talk to Krishna",
-                    () => Get.to(
-                      () => const AiGuideView(
-                        deityName: "Krishna",
-                        subtitle: "Divine Cosmic Intelligence",
-                        backgroundImage: 'assets/images/rashmi_background.jpeg',
-                        characterImagePath: 'assets/images/Krishana_new.png',
-                        chatBackgroundImage: 'assets/images/Krishna_chat.png',
-                      ),
-                    ),
+                    () {
+                      _unfocusAll();
+                      Get.to(
+                        () => const AiGuideView(
+                          deityName: "Krishna",
+                          subtitle: "Divine Cosmic Intelligence",
+                          backgroundImage: 'assets/images/rashmi_background.jpeg',
+                          characterImagePath: 'assets/images/Krishana_new.png',
+                          chatBackgroundImage: 'assets/images/Krishna_chat.png',
+                        ),
+                      );
+                    },
                     isNetwork: message?.founderImage != null,
                   ),
                   _buildBannerItem(
                     'assets/images/TalkToRashmiBack.png',
                     "Talk to Rashmi",
-                    () => Get.to(
-                      () => const AiGuideView(
-                        deityName: "Rashmi",
-                        subtitle: "Your Spiritual Guide",
-                        backgroundImage: 'assets/images/rashmi_background.jpeg',
-                        characterImagePath: 'assets/images/Rashmi_new.png',
-                        chatBackgroundImage: 'assets/images/Rashmi_chat.png',
-                      ),
-                    ),
+                    () {
+                      _unfocusAll();
+                      Get.to(
+                        () => const AiGuideView(
+                          deityName: "Rashmi",
+                          subtitle: "Your Spiritual Guide",
+                          backgroundImage: 'assets/images/rashmi_background.jpeg',
+                          characterImagePath: 'assets/images/Rashmi_new.png',
+                          chatBackgroundImage: 'assets/images/Rashmi_chat.png',
+                        ),
+                      );
+                    },
                     isNetwork: false,
                   ),
                 ],
@@ -450,11 +482,11 @@ class _NewHomeViewState extends State<NewHomeView> {
                     ),
                   ),
                   onPressed: onPressed,
-                  icon: const Icon(Icons.call_rounded, size: 20),
+                  icon: Icon(Icons.call_rounded, size: 5.w),
                   label: Text(
                     buttonText,
                     style: GoogleFonts.poppins(
-                      fontSize: 16,
+                      fontSize: 12.sp,
                       fontWeight: FontWeight.w500),
                   ),
                 ),
@@ -476,7 +508,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
         Align(
           alignment: Alignment.center,
           child: Container(
-            height: 80,
+            height: 10.h,
             width: double.infinity,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
@@ -485,29 +517,44 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.white.withOpacity(0.4), // Visible border at top
+                  Colors.white.withOpacity(0.2), // Visible border at top
                   Colors.white.withOpacity(0.05),           // Fades out at bottom
                 ],
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.white.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
             ),
             // The Inner Content (Padding creates the border thickness)
             padding: const EdgeInsets.all(1.2), 
             child: Container(
               decoration: BoxDecoration(
+                gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xff1E1E1E), // Visible border at top
+                  Color(0xff000000),           // Fades out at bottom
+                ],
+              ),
                 borderRadius: BorderRadius.circular(15), // slightly smaller
-                color: const Color(0xFF0A0A0A), // Solid dark inner background
+                // color: const Color(0xFF0A0A0A), // Solid dark inner background
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 12.0),
+                    padding: EdgeInsets.only(bottom: 1.h,),
                     child: Text(
                       title,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
                         color: Colors.white,
-                        fontSize: 12,
+                        fontSize: 12.sp,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -538,8 +585,8 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
               ),
               child: Image.asset(
                 iconPath,
-                width: 75,
-                height: 75,
+                width: 18.w,
+                height: 18.w,
                 fit: BoxFit.contain,
               ),
             ),
@@ -551,50 +598,68 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
 }
   Widget _buildFeatureGrid(bool isTablet) {
     return SliverPadding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+      padding: EdgeInsets.fromLTRB(4.w, 1.5.h, 4.w, 1.5.h),
       sliver: SliverGrid(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: isTablet ? 4 : 3,
-          mainAxisSpacing: 30, // Space between rows
-          crossAxisSpacing: 12, // Space between columns
+          mainAxisSpacing: 3.5.h, // Space between rows
+          crossAxisSpacing: 3.w, // Space between columns
           childAspectRatio: 0.82, // Adjusted to fit the icon + card height
         ),
         delegate: SliverChildListDelegate([
           _buildGridItem(
             "Check - In",
             "assets/icons/check_in.png",
-            onTap: () => Get.toNamed(AppConstants.routeCheckIn),
+            onTap: () {
+              _unfocusAll();
+              Get.toNamed(AppConstants.routeCheckIn);
+            },
           ),
           _buildGridItem(
             "Astrology",
             "assets/icons/astrology.png",
-            onTap: () => Get.toNamed(AppConstants.routeAstrologyDetails),
+            onTap: () {
+              _unfocusAll();
+              Get.toNamed(AppConstants.routeAstrologyDetails);
+            },
           ),
           _buildGridItem(
             "Expert Connect",
             "assets/icons/expert_connect.png",
-            onTap: () => Provider.of<DashboardViewModel>(
-              context,
-              listen: false,
-            ).changeTab(3),
+            onTap: () {
+              _unfocusAll();
+              Provider.of<DashboardViewModel>(
+                context,
+                listen: false,
+              ).changeTab(3);
+            },
           ),
           _buildGridItem(
             "Remedies",
             "assets/icons/remedies.png",
-            onTap: () => Provider.of<DashboardViewModel>(
-              context,
-              listen: false,
-            ).changeTab(4),
+            onTap: () {
+              _unfocusAll();
+              Provider.of<DashboardViewModel>(
+                context,
+                listen: false,
+              ).changeTab(4);
+            },
           ),
           _buildGridItem(
             "Sankalp Tracker",
             "assets/icons/sankalptracker.png",
-            onTap: () => Get.toNamed(AppConstants.routeSankalp),
+            onTap: () {
+              _unfocusAll();
+              Get.toNamed(AppConstants.routeSankalp);
+            },
           ),
           _buildGridItem(
             "Puja Vidi",
             "assets/icons/puja_vidhi.png",
-            onTap: () => Get.toNamed(AppConstants.routePoojaList),
+            onTap: () {
+              _unfocusAll();
+              Get.toNamed(AppConstants.routePoojaList);
+            },
           ),
         ]),
       ),
@@ -605,9 +670,9 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
  Widget _buildSpiritualCheckIn() {
   return SliverToBoxAdapter(
     child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(5.w),
         decoration: BoxDecoration(
           color: const Color(0xFF111111), // Match dark background
           borderRadius: BorderRadius.circular(24),
@@ -623,7 +688,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                   "ARE YOU SPRITUAL ?",
                   style: GoogleFonts.poppins( // Cleaner look
                     color: Colors.white.withOpacity(0.6),
-                    fontSize: 15,
+                    fontSize: 11.sp,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.5,
                   ),
@@ -632,7 +697,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                   "${_selectedCheckInIndex + 1}/${_checkInActivities.length}",
                   style: GoogleFonts.poppins(
                     color: const Color(0xFFFFD447), // Brighter gold
-                    fontSize: 15,
+                    fontSize: 11.sp,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -664,12 +729,11 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                   }),
                 ),
               ),
-            const SizedBox(height: 24),
-
+            SizedBox(height: 3.h),
             // The White Action Button
             SizedBox(
-              width: 185,
-              height: 36,
+              width: 45.w,
+              height: 4.5.h,
               // Specific width from image
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -687,7 +751,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                   "CHECK-IN NOW",
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w600,
-                    fontSize: 16,
+                    fontSize: 12.sp,
                     letterSpacing: 0.2,
                   ),
                 ),
@@ -716,6 +780,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
   }
 
   void _onCheckInNowPressed() {
+    _unfocusAll();
     if (_checkInActivities.isEmpty || _selectedCheckInIndex == -1) {
       Get.toNamed(AppConstants.routeCheckIn);
       return;
@@ -740,7 +805,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
   }
 
 Widget _buildActivityItem(String title, String imagePath, {bool isSelected = false}) {
-  final double size = isSelected ? 105 : 90;
+  final double size = isSelected ? 26.w : 22.w;
   return Column(
     mainAxisSize: MainAxisSize.min,
     children: [
@@ -777,7 +842,7 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
         title,
         style: GoogleFonts.poppins(
           color: isSelected ? Colors.white : Colors.white.withOpacity(0.5),
-          fontSize: isSelected ? 16 : 14,
+          fontSize: isSelected ? 12.sp : 10.sp,
           fontWeight: isSelected ? FontWeight.w400 : FontWeight.w400,
         ),
       ),
@@ -790,12 +855,12 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
         builder: (context, profileVM, child) {
           final karmaPoints = profileVM.profile?.karmaPoints ?? 0;
           return Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 12.0,
+            padding: EdgeInsets.symmetric(
+              horizontal: 4.w,
+              vertical: 1.5.h,
             ),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+              padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 3.h),
               decoration: BoxDecoration(
                 color: const Color(0xFF111111),
                 borderRadius: BorderRadius.circular(24),
@@ -811,17 +876,20 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
                         "KARMA DASHBOARD",
                         style: GoogleFonts.poppins(
                           color: Color(0xff8E8E93),
-                          fontSize: 16,
+                          fontSize: 12.sp,
                           fontWeight: FontWeight.w500,
                           letterSpacing: 0.5,
                         ),
                       ),
                       GestureDetector(
-                        onTap: () => Get.toNamed(AppConstants.routeRedeem),
+                        onTap: () {
+                          _unfocusAll();
+                          Get.toNamed(AppConstants.routeRedeem);
+                        },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 8,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 5.w,
+                            vertical: 1.h,
                           ),
                           decoration: BoxDecoration(
                             color: Color(0xFFD4AF37).withOpacity(0.10),
@@ -842,7 +910,7 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
                             "REDEEM",
                             style: GoogleFonts.poppins(
                               color: const Color(0xFFD4AF37),
-                              fontSize: 12,
+                              fontSize: 9.sp,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.5,
                             ),
@@ -851,7 +919,7 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
                       ),
                     ],
                   ),
-                  const SizedBox(height: 32),
+                  SizedBox(height: 4.h),
                   Row(
                     children: [
                       // Karma Points
@@ -901,9 +969,9 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
 
   Widget _buildVerticalDivider() {
     return Container(
-      height: 40,
+      height: 5.h,
       width: 1,
-      margin: const EdgeInsets.symmetric(horizontal: 12),
+      margin: EdgeInsets.symmetric(horizontal: 3.w),
       color: Colors.white.withOpacity(0.1),
     );
   }
@@ -921,7 +989,7 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
           label,
           style: GoogleFonts.poppins(
             color: Colors.white.withOpacity(0.5),
-            fontSize: 10,
+            fontSize: 7.5.sp,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -934,7 +1002,7 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
               value,
               style: GoogleFonts.poppins(
                 color: suffix != null ? const Color(0xFFFFD447) : Colors.white,
-                fontSize: 20,
+                fontSize: 15.sp,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -942,8 +1010,8 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
               const SizedBox(width: 4),
               SvgPicture.asset(
                 iconPath,
-                width: 16,
-                height: 16,
+                width: 4.w,
+                height: 4.w,
                 colorFilter: const ColorFilter.mode(
                   Color(0xFFFFD447),
                   BlendMode.srcIn,
@@ -990,10 +1058,13 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
                     ),
                   ),
                   GestureDetector(
-                    onTap: () => Provider.of<DashboardViewModel>(
-                      context,
-                      listen: false,
-                    ).changeTab(3),
+                    onTap: () {
+                      _unfocusAll();
+                      Provider.of<DashboardViewModel>(
+                        context,
+                        listen: false,
+                      ).changeTab(3);
+                    },
                     child: Text(
                       "View All",
                       style: GoogleFonts.poppins(
@@ -1052,7 +1123,10 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
         expert.status?.toLowerCase() == 'online' ||
         expert.status?.toLowerCase() == 'available';
     return GestureDetector(
-      onTap: () => astrologyController.navigateToProfile(expert),
+      onTap: () {
+        _unfocusAll();
+        astrologyController.navigateToProfile(expert);
+      },
       child: Container(
         width: screenWidth * 0.7, // Adaptive width
         margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
@@ -1077,7 +1151,7 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
                         ),
                         ),
                         child: CircleAvatar(
-                      radius: 25,
+                      radius: 6.w,
                       backgroundColor: Colors.white.withOpacity(0.1),
                       backgroundImage: () {
                         if (expert.profilePhoto == null || expert.profilePhoto!.isEmpty) {
@@ -1110,7 +1184,7 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
                               expert.name ?? "Expert",
                               style: GoogleFonts.poppins(
                                 color: Colors.white,
-                                fontSize: 16,
+                                fontSize: 12.sp,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -1195,7 +1269,10 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
                 Expanded(
                    flex: 0,
                   child: GestureDetector(
-                    onTap: () => astrologyController.startChat(expert),
+                    onTap: () {
+                      _unfocusAll();
+                      astrologyController.startChat(expert);
+                    },
                     child: _buildExpertActionButton("CHAT"),
                   ),
                 ),
@@ -1203,7 +1280,10 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
                 Expanded(
                    flex: 0,
                   child: GestureDetector(
-                    onTap: () => astrologyController.navigateToProfile(expert),
+                    onTap: () {
+                      _unfocusAll();
+                      astrologyController.navigateToProfile(expert);
+                    },
                     child: _buildExpertActionButton("TALK", isPrimary: true),
                   ),
                 ),
@@ -1263,7 +1343,7 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
                     "TODAY'S MUHURAT",
                     style: GoogleFonts.poppins(
                       color: Color(0xff8E8E93),
-                    fontSize: 18,
+                    fontSize: 13.sp,
                     fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -1382,7 +1462,10 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
               const SizedBox(height: 16),
               Center(
                 child: GestureDetector(
-                  onTap: () => Get.toNamed(AppConstants.routePanchang),
+                  onTap: () {
+                    _unfocusAll();
+                    Get.toNamed(AppConstants.routePanchang);
+                  },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 24,
@@ -1424,7 +1507,7 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
 
  Widget _buildMuhuratTimeCard(String label, String time1, String time2, IconData icon, Color themeColor) {
   return Container(
-    padding: const EdgeInsets.all(16),
+    padding: EdgeInsets.all(4.w),
     decoration: BoxDecoration(
       color: const Color(0xFF121212), // Dark card background
       borderRadius: BorderRadius.circular(20),
@@ -1452,7 +1535,7 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
               ),
             ),
             // The Icon
-            Icon(icon, color: themeColor, size: 32),
+            Icon(icon, color: themeColor, size: 8.w),
           ],
         ),
         const SizedBox(height: 16),
@@ -1461,7 +1544,7 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
           label,
           style: GoogleFonts.poppins(
             color: Colors.white.withOpacity(0.4),
-            fontSize: 10,
+            fontSize: 7.5.sp,
             fontWeight: FontWeight.w500,
             letterSpacing: 0.5,
           ),
@@ -1475,19 +1558,19 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
               time1,
               style: GoogleFonts.poppins(
                 color: Colors.white,
-                fontSize: 12,
+                fontSize: 9.sp,
                 fontWeight: FontWeight.w600,
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6),
-              child: Icon(Icons.circle, color: Colors.white.withOpacity(0.4), size: 4),
+              padding: EdgeInsets.symmetric(horizontal: 1.w),
+              child: Icon(Icons.circle, color: Colors.white.withOpacity(0.4), size: 1.w),
             ),
             Text(
               time2,
               style: GoogleFonts.poppins(
                 color: Colors.white,
-                fontSize: 12,
+                fontSize: 9.sp,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -1518,8 +1601,8 @@ String formatTimeToAMPM(String? time) {
     Color statusColor,
   ) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(bottom: 1.5.h),
+      padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
         color: const Color(0xFF141414),
         borderRadius: BorderRadius.circular(16),
@@ -1535,7 +1618,7 @@ String formatTimeToAMPM(String? time) {
                 title,
                 style: GoogleFonts.poppins(
                   color: Colors.white,
-                  fontSize: 18,
+                  fontSize: 13.5.sp,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -1550,7 +1633,7 @@ String formatTimeToAMPM(String? time) {
                   status,
                   style: GoogleFonts.poppins(
                     color: statusColor,
-                    fontSize: 12,
+                    fontSize: 9.sp,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
@@ -1562,7 +1645,7 @@ String formatTimeToAMPM(String? time) {
             time,
             style: GoogleFonts.poppins(
               color: const Color(0xFFD4AF37),
-              fontSize: 20,
+              fontSize: 15.sp,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -1581,7 +1664,7 @@ String formatTimeToAMPM(String? time) {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+          padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
           child: Row(
             children: [
               Container(
@@ -1594,7 +1677,7 @@ String formatTimeToAMPM(String? time) {
                 title,
                 style: GoogleFonts.poppins(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 10.5.sp,
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -1603,7 +1686,7 @@ String formatTimeToAMPM(String? time) {
                 value,
                 style: GoogleFonts.poppins(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 10.5.sp,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -1613,7 +1696,7 @@ String formatTimeToAMPM(String? time) {
                   tag,
                   style: GoogleFonts.poppins(
                     color: tagColor,
-                    fontSize: 12,
+                    fontSize: 9.sp,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -1681,7 +1764,7 @@ String formatTimeToAMPM(String? time) {
                 "PERSONALIZED REMEDIES",
               style: GoogleFonts.poppins(
                 color: Color(0xff8E8E93),
-                    fontSize: 18,
+                    fontSize: 13.sp,
                     fontWeight: FontWeight.w500,
               ),
             ),
@@ -1725,7 +1808,7 @@ String formatTimeToAMPM(String? time) {
           ),
           const SizedBox(height: 16),
           SizedBox(
-            height: 280,
+            height: 35.h,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -1754,7 +1837,7 @@ String formatTimeToAMPM(String? time) {
       onTap: onTap,
       child: Container(
     
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: EdgeInsets.symmetric(vertical: 1.25.h),
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: isSelected
@@ -1773,7 +1856,7 @@ String formatTimeToAMPM(String? time) {
           label,
           style: GoogleFonts.poppins(
             color: isSelected ? Colors.black : Colors.white.withOpacity(0.5),
-            fontSize: 13,
+            fontSize: 9.75.sp,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -1804,7 +1887,7 @@ String formatTimeToAMPM(String? time) {
           ClipRRect(
             borderRadius: BorderRadius.circular(18),
             child: SizedBox(
-              height: 140,
+              height: 17.5.h,
               width: double.infinity,
               child: isNetwork
                   ? Image.network(
@@ -1828,7 +1911,7 @@ String formatTimeToAMPM(String? time) {
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.poppins(
               color: Colors.white,
-              fontSize: 14,
+              fontSize: 10.5.sp,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -1839,7 +1922,7 @@ String formatTimeToAMPM(String? time) {
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.poppins(
               color: Colors.white.withOpacity(0.4),
-              fontSize: 11,
+              fontSize: 8.25.sp,
               height: 1.3,
             ),
           ),
@@ -1851,7 +1934,7 @@ String formatTimeToAMPM(String? time) {
                 "₹$price",
                 style: GoogleFonts.poppins(
                   color: const Color(0xFFD4AF37),
-                  fontSize: 15,
+                  fontSize: 11.25.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -1899,7 +1982,7 @@ String formatTimeToAMPM(String? time) {
                   "PUJA VIDHI",
                 style: GoogleFonts.poppins(
                   color: Color(0xff8E8E93),
-                    fontSize: 18,
+                    fontSize: 13.5.sp,
                     fontWeight: FontWeight.w500,
                 ),
               ),
@@ -1908,9 +1991,9 @@ String formatTimeToAMPM(String? time) {
             BlocBuilder<PoojaBloc, PoojaState>(
               builder: (context, state) {
                 if (state is PoojaLoading) {
-                  return const SizedBox(
-                    height: 180,
-                    child: Center(
+                  return SizedBox(
+                    height: 22.5.h,
+                    child: const Center(
                       child: CircularProgressIndicator(color: Color(0xFFD4AF37)),
                     ),
                   );
@@ -1927,7 +2010,7 @@ String formatTimeToAMPM(String? time) {
                     );
                   }
                   return SizedBox(
-                    height: 180,
+                    height: 22.5.h,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -1962,6 +2045,7 @@ String formatTimeToAMPM(String? time) {
   Widget _buildRealPujaCard(PoojaModel pooja, double screenWidth) {
     return GestureDetector(
       onTap: () {
+        _unfocusAll();
         Get.to(() => PoojaDetailScreen(poojaId: pooja.sId ?? ""));
       },
       child: Container(
@@ -1989,10 +2073,10 @@ String formatTimeToAMPM(String? time) {
           children: [
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.auto_awesome,
                   color: Color(0xFFD4AF37),
-                  size: 20,
+                  size: 5.w,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -2013,7 +2097,7 @@ String formatTimeToAMPM(String? time) {
                         pooja.subcategory ?? pooja.category ?? "Ritual",
                         style: GoogleFonts.lora(
                           color: const Color(0xFFD4AF37),
-                          fontSize: 10,
+                          fontSize: 7.5.sp,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -2029,7 +2113,7 @@ String formatTimeToAMPM(String? time) {
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.lora(
                 color: Colors.white.withOpacity(0.7),
-                fontSize: 10,
+                fontSize: 7.5.sp,
               ),
             ),
           ],
@@ -2051,7 +2135,7 @@ String formatTimeToAMPM(String? time) {
               "SANKALP TRACKER",
               style: GoogleFonts.poppins(
                 color: const Color(0xff8E8E93),
-                fontSize: 18,
+                fontSize: 13.5.sp,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -2076,7 +2160,7 @@ String formatTimeToAMPM(String? time) {
                               "Morning Prayer",
                               style: GoogleFonts.poppins(
                                 color: Colors.white,
-                                fontSize: 18,
+                                fontSize: 13.5.sp,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -2085,7 +2169,7 @@ String formatTimeToAMPM(String? time) {
                               "A peaceful start to your spiritual journey.",
                               style: GoogleFonts.poppins(
                                 color: Colors.white.withOpacity(0.6),
-                                fontSize: 13,
+                                fontSize: 9.75.sp,
                               ),
                             ),
                           ],
@@ -2108,8 +2192,8 @@ String formatTimeToAMPM(String? time) {
                         ),
                         child: SvgPicture.asset(
                           'assets/icons/pray_new.svg',
-                          width: 32,
-                          height: 32,
+                          width: 8.w,
+                          height: 8.w,
                         ),
                       ),
                     ],
@@ -2149,10 +2233,10 @@ String formatTimeToAMPM(String? time) {
                       minHeight: 8,
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 3.h),
                   SizedBox(
                     width: double.infinity,
-                    height: 42,
+                    height: 5.h,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFD4AF37),
@@ -2162,7 +2246,10 @@ String formatTimeToAMPM(String? time) {
                           borderRadius: BorderRadius.circular(100),
                         ),
                       ),
-                      onPressed: () => Get.toNamed(AppConstants.routeSankalp),
+                      onPressed: () {
+                        _unfocusAll();
+                        Get.toNamed(AppConstants.routeSankalp);
+                      },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -2192,7 +2279,7 @@ String formatTimeToAMPM(String? time) {
   Widget _buildSwapnaDecoder() {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -2200,7 +2287,7 @@ String formatTimeToAMPM(String? time) {
               "SWAPNA DECODER",
               style: GoogleFonts.poppins(
                 color: const Color(0xff8E8E93),
-                fontSize: 18,
+                fontSize: 13.5.sp,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -2233,7 +2320,7 @@ String formatTimeToAMPM(String? time) {
                         child: Icon(
                           Icons.nightlight_outlined,
                           color: const Color(0xFFD4AF37),
-                          size: 32,
+                          size: 8.w,
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -2249,7 +2336,7 @@ String formatTimeToAMPM(String? time) {
                                     "Decode Your Dream",
                                     style: GoogleFonts.poppins(
                                       color: Colors.white,
-                                      fontSize: 18,
+                                      fontSize: 13.5.sp,
                                       fontWeight: FontWeight.w700,
                                     ),
                                     overflow: TextOverflow.ellipsis,
@@ -2270,7 +2357,7 @@ String formatTimeToAMPM(String? time) {
                               "What did you see in your sleep last night?",
                               style: GoogleFonts.poppins(
                                 color: Colors.white.withOpacity(0.6),
-                                fontSize: 13,
+                                fontSize: 9.75.sp,
                               ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -2283,19 +2370,20 @@ String formatTimeToAMPM(String? time) {
                   const SizedBox(height: 20),
                   // Dream Input Field
                   Container(
-                    height: 44,
+                    height: 5.5.h,
                     decoration: BoxDecoration(
                       color: const Color(0xFF0A0A0A),
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(color: Colors.white.withOpacity(0.1),width: 1),
                     ),
                     child: TextField(
-                      style: GoogleFonts.poppins(color: Colors.white, fontSize: 14),
+                      focusNode: _swapnaFocusNode,
+                      style: GoogleFonts.poppins(color: Colors.white, fontSize: 10.5.sp),
                       decoration: InputDecoration(
                         fillColor: const Color(0xFF0A0A0A),
                         filled: true,
                         hintText: "Enter your dream....",
-                        hintStyle: GoogleFonts.poppins(color: Colors.white30, fontSize: 14),
+                        hintStyle: GoogleFonts.poppins(color: Colors.white30, fontSize: 10.5.sp),
                         border: InputBorder.none,
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
@@ -2313,8 +2401,11 @@ String formatTimeToAMPM(String? time) {
                               shape: BoxShape.circle,
                             ),
                             child: IconButton(
-                              onPressed: () => Get.toNamed(AppConstants.routeSwapnaDecoder),
-                              icon: const Icon(Icons.send_rounded, color: Color(0xFFD4AF37), size: 22),
+                              onPressed: () {
+                                _unfocusAll();
+                                Get.toNamed(AppConstants.routeSwapnaDecoder);
+                              },
+                              icon: Icon(Icons.send_rounded, color: Color(0xFFD4AF37), size: 5.5.w),
                             ),
                           ),
                         ),
@@ -2333,7 +2424,7 @@ String formatTimeToAMPM(String? time) {
   Widget _buildGitaBanner(double screenWidth) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(28, 12, 28, 12),
+        padding: EdgeInsets.fromLTRB(7.w, 1.5.h, 7.w, 1.5.h),
         child: Container(
           height: screenWidth * 1.0,
           decoration: BoxDecoration(
@@ -2363,7 +2454,7 @@ String formatTimeToAMPM(String? time) {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.lora(
                       color: const Color(0xFFD4AF37),
-                      fontSize: 24,
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -2372,7 +2463,7 @@ String formatTimeToAMPM(String? time) {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.lora(
                       color: Color(0xff8E8E93),
-                      fontSize: 16,
+                      fontSize: 12.sp,
                       fontWeight: FontWeight.w400,
                     ),
                   ),
@@ -2388,12 +2479,15 @@ String formatTimeToAMPM(String? time) {
                           borderRadius: BorderRadius.circular(16),
                         ),
                       ),
-                      onPressed: () => Get.toNamed(AppConstants.routeGita),
-                      child: Text(
+                        onPressed: () {
+                          _unfocusAll();
+                          Get.toNamed(AppConstants.routeGita);
+                        },
+                        child: Text(
                         "START YOUR JOURNEY",
                         style: GoogleFonts.poppins(
                           fontWeight: FontWeight.w400,
-                          fontSize: 14,
+                          fontSize: 10.5.sp,
 
                         ),
                       ),
@@ -2414,15 +2508,15 @@ String formatTimeToAMPM(String? time) {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 12.0,
+            padding: EdgeInsets.symmetric(
+              horizontal: 4.w,
+              vertical: 1.5.h,
             ),
             child: Text(
               "PERSONALITY & SELF-DISCOVERY",
               style: GoogleFonts.lora(
                 color: Colors.white.withOpacity(0.7),
-                fontSize: 14,
+                fontSize: 10.5.sp,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -2453,7 +2547,7 @@ String formatTimeToAMPM(String? time) {
                         color: isSelected
                             ? Colors.black
                             : Colors.white.withOpacity(0.6),
-                        fontSize: 11,
+                        fontSize: 8.25.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -2526,7 +2620,7 @@ String formatTimeToAMPM(String? time) {
                       textAlign: TextAlign.center,
                       style: GoogleFonts.lora(
                         color: Colors.white.withOpacity(0.8),
-                        fontSize: 13,
+                        fontSize: 9.75.sp,
                         height: 1.6,
                       ),
                     ),
@@ -2581,7 +2675,7 @@ String formatTimeToAMPM(String? time) {
                 style: GoogleFonts.lora(
                   fontWeight: FontWeight.bold,
                   color: Colors.white.withOpacity(0.7),
-                  fontSize: 14,
+                  fontSize: 10.5.sp,
                 ),
               ),
             ),

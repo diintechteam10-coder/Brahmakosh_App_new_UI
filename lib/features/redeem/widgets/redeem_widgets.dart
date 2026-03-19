@@ -70,7 +70,7 @@ class RedeemCard extends StatelessWidget {
                       children: [
                         TextSpan(
                           text: item.title.split(' (')[0],
-                          style: GoogleFonts.playfairDisplay(
+                          style: GoogleFonts.lora(
                             fontSize: 16, // Reduced from 18
                             fontWeight: FontWeight.bold,
                             color: const Color(0xff5D4037),
@@ -79,7 +79,7 @@ class RedeemCard extends StatelessWidget {
                         if (item.title.contains(' ('))
                           TextSpan(
                             text: ' (${item.title.split(' (')[1]}',
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.poppins(
                               fontSize: 12, // Reduced from 14
                               color: const Color(0xff8D6E63),
                             ),
@@ -90,7 +90,7 @@ class RedeemCard extends StatelessWidget {
                   const SizedBox(height: 4), // Reduced from 6
                   Text(
                     item.description,
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 11, // Reduced from 12
                       color: const Color(0xff5D4037).withOpacity(0.8),
                       height: 1.3,
@@ -107,7 +107,7 @@ class RedeemCard extends StatelessWidget {
                         children: [
                           Text(
                             "Required Karma Points",
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.poppins(
                               fontSize: 9, // Reduced from 10
                               color: const Color(0xff8D6E63),
                               fontWeight: FontWeight.w600,
@@ -128,7 +128,7 @@ class RedeemCard extends StatelessWidget {
                               const SizedBox(width: 3),
                               Text(
                                 "${item.requiredPoints}",
-                                style: GoogleFonts.inter(
+                                style: GoogleFonts.poppins(
                                   fontSize: 14, // Reduced from 16
                                   fontWeight: FontWeight.bold,
                                   color: const Color(0xff5D4037),
@@ -159,7 +159,7 @@ class RedeemCard extends StatelessWidget {
                         ),
                         child: Text(
                           "Redeem Now",
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             fontWeight: FontWeight.bold,
                             fontSize: 11, // Reduced from 12
                           ),
@@ -211,7 +211,7 @@ class ConfirmationPopup extends StatelessWidget {
                 const SizedBox(width: 24), // Spacer for title centering
                 Text(
                   "Confirmation",
-                  style: GoogleFonts.playfairDisplay(
+                  style: GoogleFonts.lora(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: const Color(0xff5D4037),
@@ -227,7 +227,7 @@ class ConfirmationPopup extends StatelessWidget {
             Text(
               "You’re about to offer a sacred act using\nyour earned Karma Points.",
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 14,
                 color: const Color(0xff5D4037).withOpacity(0.8),
                 height: 1.4,
@@ -246,7 +246,7 @@ class ConfirmationPopup extends StatelessWidget {
                 children: [
                   RichText(
                     text: TextSpan(
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.poppins(
                         fontSize: 14,
                         color: const Color(0xff5D4037),
                       ),
@@ -304,7 +304,7 @@ class ConfirmationPopup extends StatelessWidget {
                 ),
                 child: Text(
                   "Redeem Now",
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -316,7 +316,7 @@ class ConfirmationPopup extends StatelessWidget {
             Text(
               "Once redeemed, this offering will be\nperformed on your behalf.",
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 11,
                 color: const Color(0xff5D4037).withOpacity(0.6),
               ),
@@ -333,7 +333,7 @@ class ConfirmationPopup extends StatelessWidget {
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(
+          style: GoogleFonts.poppins(
             fontSize: 14,
             fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
             color: const Color(0xff5D4037),
@@ -351,7 +351,7 @@ class ConfirmationPopup extends StatelessWidget {
             const SizedBox(width: 6),
             Text(
               value,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: const Color(0xff5D4037),
@@ -389,7 +389,7 @@ class SuccessPopup extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               "Blessing Received",
-              style: GoogleFonts.playfairDisplay(
+              style: GoogleFonts.lora(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: const Color(0xff5D4037),
@@ -399,7 +399,7 @@ class SuccessPopup extends StatelessWidget {
             Text(
               "Your Karma Points has been redeemed\nsuccessfully.",
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 14,
                 color: const Color(0xff5D4037).withOpacity(0.8),
                 height: 1.4,
@@ -411,3 +411,4 @@ class SuccessPopup extends StatelessWidget {
     );
   }
 }
+

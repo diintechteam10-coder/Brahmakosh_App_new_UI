@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
+import 'package:sizer/sizer.dart';
 
 import 'ai_rashmi_view_model.dart';
 import 'deity_selection_service.dart';
@@ -87,7 +88,7 @@ class _RashmiVoicePageState extends State<RashmiVoicePage> {
                   children: [
                     // Top Bar with Back Button
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      padding: EdgeInsets.symmetric(horizontal: 1.w),
                       child: Row(
                         children: [
                           IconButton(
@@ -97,9 +98,9 @@ class _RashmiVoicePageState extends State<RashmiVoicePage> {
                           const Spacer(),
                           Text(
                             _deityService.selectedDeityName,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
-                              fontSize: 18,
+                              fontSize: 13.5.sp,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -108,12 +109,11 @@ class _RashmiVoicePageState extends State<RashmiVoicePage> {
                         ],
                       ),
                     ),
-
-                    const SizedBox(height: 20),
+                    SizedBox(height: 2.5.h),
 
                     // Status Indicators
                     if (vm.isInitializing)
-                      const LinearProgressIndicator(minHeight: 2),
+                      LinearProgressIndicator(minHeight: 0.25.h),
 
                     if (vm.isRecording)
                       Container(
@@ -123,19 +123,20 @@ class _RashmiVoicePageState extends State<RashmiVoicePage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
-                              width: 12,
-                              height: 12,
+                              width: 3.w,
+                              height: 3.w,
                               decoration: const BoxDecoration(
                                 color: Colors.green,
                                 shape: BoxShape.circle,
                               ),
                             ),
                             const SizedBox(width: 8),
-                            const Text(
+                            Text(
                               'Listening... Tap to stop',
                               style: TextStyle(
                                 color: Colors.green,
                                 fontWeight: FontWeight.w500,
+                                fontSize: 10.5.sp,
                               ),
                             ),
                           ],
@@ -144,14 +145,14 @@ class _RashmiVoicePageState extends State<RashmiVoicePage> {
 
                     if (vm.isProcessingVoice)
                       Container(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        padding: EdgeInsets.symmetric(vertical: 1.h),
                         color: Colors.blue.withOpacity(0.1),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SizedBox(
-                              width: 16,
-                              height: 16,
+                              width: 4.w,
+                              height: 4.w,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
                                 valueColor: AlwaysStoppedAnimation<Color>(
@@ -165,6 +166,7 @@ class _RashmiVoicePageState extends State<RashmiVoicePage> {
                               style: TextStyle(
                                 color: Colors.blue,
                                 fontWeight: FontWeight.w500,
+                                fontSize: 10.5.sp,
                               ),
                             ),
                           ],
@@ -173,15 +175,15 @@ class _RashmiVoicePageState extends State<RashmiVoicePage> {
 
                     if (vm.isPlayingAudio)
                       Container(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        padding: EdgeInsets.symmetric(vertical: 1.h),
                         color: Colors.purple.withOpacity(0.1),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
                               Icons.volume_up,
                               color: Colors.purple,
-                              size: 16,
+                              size: 4.w,
                             ),
                             SizedBox(width: 8),
                             Text(
@@ -189,6 +191,7 @@ class _RashmiVoicePageState extends State<RashmiVoicePage> {
                               style: TextStyle(
                                 color: Colors.purple,
                                 fontWeight: FontWeight.w500,
+                                fontSize: 10.5.sp,
                               ),
                             ),
                           ],
@@ -197,13 +200,13 @@ class _RashmiVoicePageState extends State<RashmiVoicePage> {
 
                     if (vm.error != null)
                       Container(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
+                        margin: EdgeInsets.symmetric(
+                          horizontal: 3.w,
+                          vertical: 1.h,
                         ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 3.w,
+                          vertical: 1.25.h,
                         ),
                         decoration: BoxDecoration(
                           color: Colors.red.shade50,
@@ -218,7 +221,7 @@ class _RashmiVoicePageState extends State<RashmiVoicePage> {
                             Icon(
                               Icons.error_outline,
                               color: Colors.red.shade700,
-                              size: 20,
+                              size: 5.w,
                             ),
                             const SizedBox(width: 8),
                             Expanded(
@@ -226,7 +229,7 @@ class _RashmiVoicePageState extends State<RashmiVoicePage> {
                                 vm.error!,
                                 style: TextStyle(
                                   color: Colors.red.shade900,
-                                  fontSize: 13,
+                                  fontSize: 9.75.sp,
                                 ),
                               ),
                             ),
@@ -234,7 +237,7 @@ class _RashmiVoicePageState extends State<RashmiVoicePage> {
                               icon: Icon(
                                 Icons.close,
                                 color: Colors.red.shade700,
-                                size: 18,
+                                size: 4.5.w,
                               ),
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
@@ -267,8 +270,8 @@ class _RashmiVoicePageState extends State<RashmiVoicePage> {
                               await vm.startVoiceRecording();
                             },
                       child: Container(
-                        width: 120,
-                        height: 120,
+                        width: 30.w,
+                        height: 30.w,
                         decoration: BoxDecoration(
                           color: vm.isRecording
                               ? Colors.green
@@ -286,9 +289,9 @@ class _RashmiVoicePageState extends State<RashmiVoicePage> {
                           ],
                         ),
                         child: vm.isProcessingVoice
-                            ? const Padding(
-                                padding: EdgeInsets.all(30),
-                                child: CircularProgressIndicator(
+                            ? Padding(
+                                padding: EdgeInsets.all(7.5.w),
+                                child: const CircularProgressIndicator(
                                   strokeWidth: 3,
                                   valueColor: AlwaysStoppedAnimation<Color>(
                                     Colors.white,
@@ -298,25 +301,24 @@ class _RashmiVoicePageState extends State<RashmiVoicePage> {
                             : Icon(
                                 vm.isRecording ? Icons.stop : Icons.mic,
                                 color: Colors.white,
-                                size: 50,
+                                size: 12.5.w,
                               ),
                       ),
                     ),
-
-                    const SizedBox(height: 20),
+                    SizedBox(height: 2.5.h),
 
                     // Instruction Text
                     Text(
                       vm.isRecording
                           ? 'Streaming to AI... Tap to stop'
                           : 'Tap to start listening',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white70,
-                        fontSize: 14,
+                        fontSize: 10.5.sp,
                       ),
                     ),
 
-                    const SizedBox(height: 40),
+                    SizedBox(height: 5.h),
                   ],
                 ),
               ),

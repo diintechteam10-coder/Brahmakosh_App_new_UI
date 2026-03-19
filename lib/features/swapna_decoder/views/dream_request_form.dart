@@ -110,7 +110,7 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
                     Center(
                       child: Text(
                         "Tell us about your dream",
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontSize: 14,
                           color: Colors.grey,
                         ),
@@ -133,13 +133,13 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
                       ),
                       child: TextFormField(
                         controller: _symbolController,
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontSize: 15,
                           color: Colors.white,
                         ),
                         decoration: InputDecoration(
                           hintText: "e.g., Snake, Ocean, Flying",
-                          hintStyle: GoogleFonts.inter(
+                          hintStyle: GoogleFonts.poppins(
                             fontSize: 14,
                             color: Colors.grey,
                           ),
@@ -195,14 +195,14 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
                       child: TextFormField(
                         controller: _detailsController,
                         maxLines: 5,
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontSize: 15,
                           color: Colors.white,
                         ),
                         decoration: InputDecoration(
                           hintText:
                               "Describe the context, your feelings, surroundings...",
-                          hintStyle: GoogleFonts.inter(
+                          hintStyle: GoogleFonts.poppins(
                             fontSize: 14,
                             color: Colors.grey,
                           ),
@@ -286,7 +286,7 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
                                 children: [
                                   Text(
                                     "Submit Request",
-                                    style: GoogleFonts.inter(
+                                    style: GoogleFonts.poppins(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black,
@@ -319,7 +319,7 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
         const SizedBox(width: 6),
         Text(
           label,
-          style: GoogleFonts.inter(
+          style: GoogleFonts.poppins(
             fontSize: 14,
             fontWeight: FontWeight.w600,
             color: Colors.white,
@@ -329,3 +329,4 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
     );
   }
 }
+

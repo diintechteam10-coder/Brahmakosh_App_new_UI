@@ -118,7 +118,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
       child: Center(
         child: Text(
           dateStr.toUpperCase(),
-          style: GoogleFonts.inter(
+          style: GoogleFonts.poppins(
             fontSize: 10,
             fontWeight: FontWeight.w600,
             color: Colors.white54,
@@ -144,7 +144,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                 controller.isRequestAccepted.value
                     ? controller.formatTime(controller.chatDuration.value)
                     : "00:00",
-                style: GoogleFonts.inter(
+                style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFFD4AF37),
@@ -202,7 +202,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
               children: [
                 Text(
                   expert.name,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -217,7 +217,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                       final status = controller.onlineStatus.value;
                       return Text(
                         status,
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                           color: status == "ONLINE" ? Colors.green : Colors.grey,
@@ -264,7 +264,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                   ),
                   child: Text(
                     controller.isRequestAccepted.value ? "END" : "CANCEL",
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                       color: controller.isRequestAccepted.value
@@ -319,7 +319,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
             Text(
               "Thank you for consulting with\n${expert.name}",
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 16,
                 color: Colors.white70,
                 height: 1.5,
@@ -344,7 +344,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                   children: [
                     Text(
                       "DURATION",
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.poppins(
                         fontSize: 12,
                         color: const Color(0xFFD4AF37),
                         letterSpacing: 1.5,
@@ -354,7 +354,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                     const SizedBox(height: 8),
                     Text(
                       controller.formatTime(controller.chatDuration.value),
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.poppins(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -378,7 +378,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                 ),
                 child: Text(
                   "New Chat",
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
@@ -407,7 +407,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                 ),
                 child: Text(
                   "Give Feedback",
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: const Color(0xFFD4AF37),
@@ -454,7 +454,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
           Text(
             "The expert is currently unavailable and has declined your request.\nPlease try again later or consult another expert.",
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 16,
               color: Colors.white70,
               height: 1.5,
@@ -476,7 +476,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
               ),
               child: Text(
                 "Find Another Expert",
-                style: GoogleFonts.inter(
+                style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
@@ -500,7 +500,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
               ),
               child: Text(
                 "Go Back",
-                style: GoogleFonts.inter(
+                style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -559,7 +559,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
             ),
             Text(
               'Highlights',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: const Color(0xFFD4AF37),
@@ -568,7 +568,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
             const SizedBox(height: 8),
             Text(
               summary,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 14,
                 height: 1.5,
                 color: Colors.white70,
@@ -585,7 +585,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
       children: [
         Text(
           value,
-          style: GoogleFonts.inter(
+          style: GoogleFonts.poppins(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: const Color(0xFFD4AF37),
@@ -594,7 +594,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
         const SizedBox(height: 4),
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: 11, color: Colors.white54),
+          style: GoogleFonts.poppins(fontSize: 11, color: Colors.white54),
         ),
       ],
     );
@@ -607,7 +607,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
         children: [
           Text(
             "WHAT YOU WOULD LIKE TO DISCUS?",
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: Colors.white38,
@@ -682,7 +682,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
             const SizedBox(width: 16),
             Text(
               label,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
                 color: Colors.white,
@@ -748,7 +748,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                       Expanded(
                         child: Text(
                           question,
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             fontSize: 14,
                             color: Colors.white,
                             height: 1.4,
@@ -795,7 +795,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
           children: [
             Text(
               msg.content,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 14,
                 color: isUser ? Colors.black : Colors.white,
                 height: 1.4,
@@ -807,7 +807,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
               children: [
                 Text(
                   "${msg.createdAt.hour}:${msg.createdAt.minute.toString().padLeft(2, '0')}",
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 10,
                     color: isUser ? Colors.black54 : Colors.white54,
                   ),
@@ -856,7 +856,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
               const SizedBox(width: 12),
               Text(
                 "Waiting for expert to accept...",
-                style: GoogleFonts.inter(
+                style: GoogleFonts.poppins(
                   fontSize: 14,
                   color: Colors.white54,
                   fontWeight: FontWeight.w500,
@@ -896,10 +896,10 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                   minLines: 1,
                   controller: controller.messageController,
                   cursorColor: Colors.white,
-                  style: GoogleFonts.inter(color: Colors.white, fontSize: 14),
+                  style: GoogleFonts.poppins(color: Colors.white, fontSize: 14),
                   decoration: InputDecoration(
                     hintText: "Ask about your......",
-                    hintStyle: GoogleFonts.inter(color: Colors.white30, fontSize: 14),
+                    hintStyle: GoogleFonts.poppins(color: Colors.white30, fontSize: 14),
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,
                     focusedBorder: InputBorder.none,
@@ -928,3 +928,4 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
     });
   }
 }
+

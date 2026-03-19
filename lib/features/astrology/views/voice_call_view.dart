@@ -114,7 +114,7 @@ class _VoiceCallViewState extends State<VoiceCallView> {
                               const SizedBox(width: 8),
                               Text(
                                 "Recording...",
-                                style: GoogleFonts.inter(
+                                style: GoogleFonts.poppins(
                                   color: Colors.white,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -137,7 +137,7 @@ class _VoiceCallViewState extends State<VoiceCallView> {
                     children: [
                       Text(
                         "Voice Consultation",
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.white70,
@@ -196,7 +196,7 @@ class _VoiceCallViewState extends State<VoiceCallView> {
                         if (controller.isEnded.value) {
                           return Text(
                             "Call Ended",
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.poppins(
                               fontSize: 18,
                               color: Colors.redAccent,
                             ),
@@ -204,7 +204,7 @@ class _VoiceCallViewState extends State<VoiceCallView> {
                         } else if (controller.isConnecting.value) {
                           return Text(
                             "Connecting...",
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.poppins(
                               fontSize: 18,
                               color: AppTheme.primaryGold,
                             ),
@@ -212,7 +212,7 @@ class _VoiceCallViewState extends State<VoiceCallView> {
                         } else if (controller.isRinging.value) {
                           return Text(
                             "Ringing...",
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.poppins(
                               fontSize: 18,
                               color: Colors.white70,
                             ),
@@ -220,7 +220,7 @@ class _VoiceCallViewState extends State<VoiceCallView> {
                         } else {
                           return Text(
                             _formatDuration(controller.duration.value),
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.poppins(
                               fontSize: 22,
                               fontWeight: FontWeight.w500,
                               color: Colors.white,
@@ -321,9 +321,10 @@ class _VoiceCallViewState extends State<VoiceCallView> {
         const SizedBox(height: 8),
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: 12, color: Colors.white70),
+          style: GoogleFonts.poppins(fontSize: 12, color: Colors.white70),
         ),
       ],
     );
   }
 }
+

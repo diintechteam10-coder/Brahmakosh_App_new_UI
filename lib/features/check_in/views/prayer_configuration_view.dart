@@ -102,7 +102,7 @@ class PrayerConfigurationView extends StatelessWidget {
                                 const SizedBox(height: 5),
                                 Text(
                                   'How are you feeling today?',
-                                  style: GoogleFonts.inter(
+                                  style: GoogleFonts.poppins(
                                     fontSize: 14,
                                     color: Colors.white70,
                                   ),
@@ -118,7 +118,7 @@ class PrayerConfigurationView extends StatelessWidget {
                                 const SizedBox(height: 10),
                                 Text(
                                   'You can stop anytime',
-                                  style: GoogleFonts.inter(
+                                  style: GoogleFonts.poppins(
                                     fontSize: 12,
                                     color: Colors.white54,
                                   ),
@@ -247,7 +247,7 @@ class PrayerConfigurationView extends StatelessWidget {
               const SizedBox(width: 10),
               Text(
                 'Prayer',
-                style: GoogleFonts.inter(
+                style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -262,7 +262,7 @@ class PrayerConfigurationView extends StatelessWidget {
               child: Center(
                 child: Text(
                   "No prayers available for this mood.",
-                  style: GoogleFonts.inter(color: Colors.grey),
+                  style: GoogleFonts.poppins(color: Colors.grey),
                 ),
               ),
             )
@@ -572,7 +572,7 @@ class _EmotionListState extends State<_EmotionList> {
                     child: Text(
                       emotion,
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.poppins(
                         fontSize: isSelected ? 12 : 10,
                         fontWeight: isSelected
                             ? FontWeight.bold
@@ -590,3 +590,4 @@ class _EmotionListState extends State<_EmotionList> {
     );
   }
 }
+

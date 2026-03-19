@@ -21,7 +21,7 @@ class ProfileImageView extends StatelessWidget {
         elevation: 0,
         title: Text(
           "Profile Picture",
-          style: GoogleFonts.inter(color: Colors.white),
+          style: GoogleFonts.poppins(color: Colors.white),
         ),
       ),
       body: Center(
@@ -62,3 +62,4 @@ class ProfileImageView extends StatelessWidget {
     );
   }
 }
+
