@@ -78,7 +78,7 @@ class _DoshaDashaRemediesSectionState extends State<DoshaDashaRemediesSection> {
                             : null,
                         child: Text(
                           _tabs[index],
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             fontSize: 14 * scale,
                             fontWeight: FontWeight.bold,
                             color: const Color(0xff4E342E),
@@ -194,7 +194,7 @@ class _DoshaDashaRemediesSectionState extends State<DoshaDashaRemediesSection> {
                 SizedBox(width: 4 * scale),
                 Text(
                   "Yogini Dasha",
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 12 * scale,
                     fontWeight: FontWeight.bold,
                     color: const Color(0xff4E342E),
@@ -683,7 +683,7 @@ class _DoshaDashaRemediesSectionState extends State<DoshaDashaRemediesSection> {
           SizedBox(height: 8 * scale),
           Text(
             customDescription ?? detail.description ?? "",
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 12 * scale,
               color: const Color(0xff5D4037),
               height: 1.4,
@@ -709,7 +709,7 @@ class _DoshaDashaRemediesSectionState extends State<DoshaDashaRemediesSection> {
                 children: [
                   Text(
                     "View Details",
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 11 * scale,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFFE65100),
@@ -842,7 +842,7 @@ class _DoshaDashaRemediesSectionState extends State<DoshaDashaRemediesSection> {
               icon: Icons.spa_outlined,
               content: Text(
                 remedies.rudraksha!.recommend ?? "Recommended for you.",
-                style: GoogleFonts.inter(
+                style: GoogleFonts.poppins(
                   fontSize: 12 * scale,
                   color: const Color(0xff4E342E),
                   height: 1.4,
@@ -869,7 +869,7 @@ class _DoshaDashaRemediesSectionState extends State<DoshaDashaRemediesSection> {
               content: Text(
                 remedies.puja!.summary ??
                     "Puja recommendations based on your chart.",
-                style: GoogleFonts.inter(
+                style: GoogleFonts.poppins(
                   fontSize: 12 * scale,
                   color: const Color(0xffff7438),
                   height: 1.4,
@@ -896,7 +896,7 @@ class _DoshaDashaRemediesSectionState extends State<DoshaDashaRemediesSection> {
           children: [
             TextSpan(
               text: "$label: ",
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 12 * scale,
                 fontWeight: FontWeight.bold,
                 color: const Color(0xFF1565C0),
@@ -904,7 +904,7 @@ class _DoshaDashaRemediesSectionState extends State<DoshaDashaRemediesSection> {
             ),
             TextSpan(
               text: name ?? "N/A",
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 12 * scale,
                 color: const Color(0xff4E342E),
               ),
@@ -957,7 +957,7 @@ class _DoshaDashaRemediesSectionState extends State<DoshaDashaRemediesSection> {
                     SizedBox(width: 6 * scale),
                     Text(
                       title,
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.poppins(
                         fontSize: 11 * scale,
                         fontWeight: FontWeight.bold,
                         color: const Color(0xff4E342E),
@@ -981,7 +981,7 @@ class _DoshaDashaRemediesSectionState extends State<DoshaDashaRemediesSection> {
                 children: [
                   Text(
                     "View Details",
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 11 * scale,
                       fontWeight: FontWeight.bold,
                       color: themeColor,

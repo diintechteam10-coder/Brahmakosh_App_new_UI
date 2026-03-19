@@ -108,12 +108,12 @@ class SwapnaListView extends StatelessWidget {
               context.read<SwapnaBloc>().add(FetchSwapnaList());
             },
             child: GridView.builder(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 100),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 0.75,
-                crossAxisSpacing: 14,
-                mainAxisSpacing: 14,
+                childAspectRatio: 0.62,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
               ),
               itemCount: state.swapnas.length,
               itemBuilder: (context, index) {
@@ -129,114 +129,92 @@ class SwapnaListView extends StatelessWidget {
                     );
                   },
                   child: Container(
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
+                      color: const Color(0xFF1C1C1E),
                       borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xff5D4037).withOpacity(0.08),
-                          blurRadius: 16,
-                          offset: const Offset(0, 6),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Image part
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(15),
+                          child: AspectRatio(
+                            aspectRatio: 1,
+                            child: CachedNetworkImage(
+                              imageUrl: swapna.thumbnailUrl ?? '',
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => Container(
+                                color: Colors.black,
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.nights_stay_outlined,
+                                    color: Color(0xFFD4AF37),
+                                    size: 24,
+                                  ),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) => Container(
+                                color: Colors.black,
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.nights_stay_outlined,
+                                    color: Color(0xFFD4AF37),
+                                    size: 24,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        // Title
+                        Text(
+                          swapna.symbolName,
+                          style: GoogleFonts.lora(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        // Short description
+                        Expanded(
+                          child: Text(
+                            swapna.shortDescription ?? swapna.category,
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              color: Colors.grey,
+                              height: 1.3,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        // Button
+                        Container(
+                          width: double.infinity,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFD4AF37),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Center(
+                            child: Text(
+                              "REVEAL MEANING",
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
                         ),
                       ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          // Full card image
-                          CachedNetworkImage(
-                            imageUrl: swapna.thumbnailUrl ?? '',
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => Container(
-                              color: const Color(0xffF4E9E0),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.nights_stay_outlined,
-                                  color: Color(0xffFEDA87),
-                                  size: 32,
-                                ),
-                              ),
-                            ),
-                            errorWidget: (context, url, error) => Container(
-                              color: const Color(0xffF4E9E0),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.nights_stay_outlined,
-                                  color: Color(0xffFEDA87),
-                                  size: 32,
-                                ),
-                              ),
-                            ),
-                          ),
-                          // Gradient overlay for text readability
-                          Positioned.fill(
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.transparent,
-                                    Colors.transparent,
-                                    Colors.black.withOpacity(0.15),
-                                    Colors.black.withOpacity(0.65),
-                                  ],
-                                  stops: const [0.0, 0.4, 0.6, 1.0],
-                                ),
-                              ),
-                            ),
-                          ),
-                          // Category chip (top-right)
-                          Positioned(
-                            top: 10,
-                            right: 10,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.9),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                swapna.category,
-                                style: GoogleFonts.inter(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xff5D4037),
-                                ),
-                              ),
-                            ),
-                          ),
-                          // Symbol name (bottom)
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: Text(
-                                swapna.symbolName,
-                                style: GoogleFonts.lora(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  shadows: [
-                                    Shadow(
-                                      color: Colors.black.withOpacity(0.5),
-                                      blurRadius: 4,
-                                    ),
-                                  ],
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
                   ),
                 );

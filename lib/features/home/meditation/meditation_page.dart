@@ -13,7 +13,7 @@ class StartDhyanaView extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           "Meditations",
-          style: GoogleFonts.playfairDisplay(
+          style: GoogleFonts.lora(
             fontWeight: FontWeight.w700,
             color: AppTheme.textPrimary,
           ),
@@ -148,7 +148,7 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       title,
-      style: GoogleFonts.playfairDisplay(
+      style: GoogleFonts.lora(
         fontSize: 20,
         fontWeight: FontWeight.bold,
         color: const Color(0xff2C3E50),
@@ -220,7 +220,7 @@ class _FeaturedCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   Text(
                     duration,
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       color: Colors.white,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -232,7 +232,7 @@ class _FeaturedCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               title,
-              style: GoogleFonts.playfairDisplay(
+              style: GoogleFonts.lora(
                 color: Colors.white,
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
@@ -240,7 +240,7 @@ class _FeaturedCard extends StatelessWidget {
             ),
             Text(
               subtitle,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 color: Colors.white.withOpacity(0.9),
                 fontSize: 14,
               ),
@@ -299,7 +299,7 @@ class _SquareCard extends StatelessWidget {
 
             Text(
               title,
-              style: GoogleFonts.playfairDisplay(
+              style: GoogleFonts.lora(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: const Color(0xff2C3E50),
@@ -310,7 +310,7 @@ class _SquareCard extends StatelessWidget {
               children: [
                 Text(
                   "Start",
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: Colors.grey.shade400,
@@ -381,7 +381,7 @@ class _ListTileItem extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: GoogleFonts.playfairDisplay(
+                    style: GoogleFonts.lora(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: const Color(0xff2C3E50),
@@ -389,7 +389,7 @@ class _ListTileItem extends StatelessWidget {
                   ),
                   Text(
                     subtitle,
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 13,
                       color: Colors.grey.shade600,
                     ),
@@ -486,7 +486,7 @@ class MeditationPlayerView extends StatelessWidget {
                         const SizedBox(height: 16),
                         Text(
                           "$durationMinutes:00",
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             color: Colors.white,
                             fontSize: 32,
                             fontWeight: FontWeight.w200,
@@ -502,7 +502,7 @@ class MeditationPlayerView extends StatelessWidget {
                 // Text
                 Text(
                   title,
-                  style: GoogleFonts.playfairDisplay(
+                  style: GoogleFonts.lora(
                     color: Colors.white,
                     fontSize: 28,
                     fontWeight: FontWeight.w600,
@@ -511,7 +511,7 @@ class MeditationPlayerView extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   "Guided by Rashmi",
-                  style: GoogleFonts.inter(color: Colors.white70, fontSize: 14),
+                  style: GoogleFonts.poppins(color: Colors.white70, fontSize: 14),
                 ),
 
                 const SizedBox(height: 48),

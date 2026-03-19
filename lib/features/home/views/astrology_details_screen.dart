@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:brahmakosh/common/api_services.dart';
 import 'package:brahmakosh/common/models/user_complete_details_model.dart';
@@ -17,6 +18,19 @@ class AstrologyDetailsScreen extends StatefulWidget {
 
   @override
   State<AstrologyDetailsScreen> createState() => _AstrologyDetailsScreenState();
+}
+
+class DetailsScreenColors {
+  static const Color bgDark = Colors.black;
+  static const Color cardDark = Color(0xFF1A1A3E);
+  static const Color cardBorder = Color(0xFF2A2A5A);
+  static const Color textPrimary = Colors.white;
+  static const Color textSecondary = Color(0xFFB0B0CC);
+  static const Color textMuted = Color(0xFF7A7A9E);
+  static const Color accentGold = Color(0xFFD4A373);
+  static const Color tabSelected = Colors.white;
+  static const Color tabUnselected = Color(0xFF7A7A9E);
+  static const Color sectionLine = Color(0xFF2A2A5A);
 }
 
 class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
@@ -49,32 +63,9 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
       return;
     }
 
-    /* // Temporarily bypass cache for debugging
-    final cachedData = StorageService.getString('astrology_data_$userId');
-    if (cachedData != null) {
-      try {
-        final jsonMap = jsonDecode(cachedData);
-        final data = UserCompleteDetailsModel.fromJson(jsonMap);
-        if (mounted) {
-          setState(() {
-            _data = data;
-            _isLoading = false;
-          });
-        }
-        return;
-      } catch (e) {
-        debugPrint("Error parsing cached astrology data: $e");
-      }
-    }
-    */
-
-    // Fetch from API if not cached or error parsing
     final data = await getUserCompleteDetails(this, userId);
 
     if (data != null) {
-      // Cache the data
-      // Note: Assuming getUserCompleteDetails returns the model directly.
-      // If we want to cache the raw JSON, we might need to adjust the service or serialize the model back to JSON.
       try {
         StorageService.setString(
           'astrology_data_$userId',
@@ -98,305 +89,216 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
     final astro = _data?.data?.astrology;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFBF5),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFFFFBF5),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF6D3A0C)),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          "Astrology Details",
-          style: GoogleFonts.lora(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFF6D3A0C),
-          ),
-        ),
-        centerTitle: true,
-      ),
+      backgroundColor: DetailsScreenColors.bgDark,
       body: _isLoading
           ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFF6D3A0C)),
+              child: CircularProgressIndicator(
+                color: DetailsScreenColors.accentGold,
+              ),
             )
           : astro == null
-          ? Center(child: Text("No Data", style: GoogleFonts.lora()))
-          : Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  child: _buildSummaryCard(astro),
-                ),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: const Color(0xFFD4A373).withOpacity(0.3),
+              ? Center(
+                  child: Text(
+                    "No Data",
+                    style: GoogleFonts.lora(
+                      color: DetailsScreenColors.textPrimary,
                     ),
                   ),
-                  child: TabBar(
-                    tabAlignment: TabAlignment.start,
-                    controller: _tabController,
-                    labelColor: Colors.white,
-                    unselectedLabelColor: const Color(0xFF6D3A0C),
-                    indicator: BoxDecoration(
-                      borderRadius: BorderRadius.circular(24),
-                      color: const Color(0xFFD4A373),
+                )
+              : Column(
+                  children: [
+                    _buildHeader(astro),
+                    _buildTabBar(),
+                    Expanded(
+                      child: TabBarView(
+                        controller: _tabController,
+                        children: [
+                          BasicInfoTab(
+                            astroDetails:
+                                astro.astroDetails ?? AstroDetails(),
+                            ghatChakra: astro.ghatChakra,
+                            ayanamsha: astro.ayanamsha,
+                          ),
+                          PlanetsTab(
+                            planets: astro.planets ?? [],
+                            onViewAllTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      PlanetPositionsScreen(
+                                    planets: astro.planets ?? [],
+                                    planetsExtended:
+                                        astro.planetsExtended ?? [],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          BirthChartTab(
+                            birthChart: astro.birthChart!,
+                            birthExtendedChart: astro.birthExtendedChart,
+                            astroDetails: astro.astroDetails,
+                          ),
+                          BhavChalitTab(
+                            bhavMadhya:
+                                astro.bhavMadhya ?? BhavMadhya(),
+                          ),
+                          DoshasTab(
+                            doshas: _data?.data?.doshas ?? Doshas(),
+                            sadhesatiLifeDetails:
+                                astro.sadhesatiLifeDetails,
+                            pitraDoshaReport: astro.pitraDoshaReport,
+                          ),
+                          DashasTab(dashas: _getEffectiveDashas()),
+                          SarvashtakTab(
+                            sarvashtak:
+                                astro.sarvashtak ?? SarvAshtak(),
+                            ascendantSign:
+                                astro.astroDetails?.ascendant,
+                          ),
+                          AshtakvargaTab(
+                            planetAshtak: astro.planetAshtak,
+                            ascendantSign:
+                                astro.astroDetails?.ascendant,
+                          ),
+                          RemediesTab(
+                            gemstoneSuggestion:
+                                astro.gemstoneSuggestion,
+                          ),
+                        ],
+                      ),
                     ),
-                    indicatorSize: TabBarIndicatorSize.tab,
-                    isScrollable: true,
-                    labelPadding: const EdgeInsets.symmetric(horizontal: 12),
-                    padding: EdgeInsets.zero,
-                    labelStyle: GoogleFonts.lora(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 10,
-                    ),
-                    dividerColor: Colors.transparent,
-                    tabs: const [
-                      Tab(text: "Basic Info"),
-                      Tab(text: "Planets"),
-                      Tab(text: "Birth Chart"),
-                      Tab(text: "Bhav Chalit"), // New Tab
-                      Tab(text: "Doshas"),
-                      Tab(text: "Dashas"),
-                      Tab(text: "Sarvashtak"),
-                      Tab(text: "Ashtakvarga"),
-                      Tab(text: "Remedies"),
-                    ],
-                  ),
+                  ],
                 ),
-
-                Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      BasicInfoTab(
-                        astroDetails: astro.astroDetails ?? AstroDetails(),
-                        ghatChakra: astro.ghatChakra,
-                        ayanamsha: astro.ayanamsha,
-                      ),
-                      PlanetsTab(
-                        planets: astro.planets ?? [],
-                        onViewAllTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PlanetPositionsScreen(
-                                planets: astro.planets ?? [],
-                                planetsExtended: astro.planetsExtended ?? [],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                      BirthChartTab(
-                        birthChart: astro.birthChart!,
-                        birthExtendedChart: astro.birthExtendedChart,
-                        astroDetails: astro.astroDetails,
-                      ),
-                      BhavChalitTab(
-                        bhavMadhya: astro.bhavMadhya ?? BhavMadhya(),
-                      ),
-                      DoshasTab(
-                        doshas: _data?.data?.doshas ?? Doshas(),
-                        sadhesatiLifeDetails: astro.sadhesatiLifeDetails,
-                        pitraDoshaReport: astro.pitraDoshaReport,
-                      ),
-                      DashasTab(dashas: _getEffectiveDashas()),
-                      SarvashtakTab(
-                        sarvashtak: astro.sarvashtak ?? SarvAshtak(),
-                        ascendantSign: astro.astroDetails?.ascendant,
-                      ),
-                      AshtakvargaTab(
-                        planetAshtak: astro.planetAshtak,
-                        // sarvashtak removed from here
-                        ascendantSign: astro.astroDetails?.ascendant,
-                      ),
-
-                      RemediesTab(gemstoneSuggestion: astro.gemstoneSuggestion),
-                    ],
-                  ),
-                ),
-              ],
-            ),
     );
   }
 
-  Widget _buildSummaryCard(Astrology astro) {
+  Widget _buildHeader(Astrology astro) {
     final astroDetails = astro.astroDetails;
-    final birthDetails = astro.birthDetails;
-    // Attempt to get name from data, default to "Personal Horoscope" if null
     final userName = _data?.data?.user?.profile?.name ?? "User";
 
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFF0D9), // Light pastel orange/beige
-        borderRadius: BorderRadius.circular(24),
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFFF0D9), Color(0xFFFFE0B2)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.orange.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return SafeArea(
+      bottom: false,
+      // top: false,
+      child: Stack(
         children: [
-          Text(
-            userName,
-            style: GoogleFonts.lora(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF5D4037),
+          // Background zodiac decoration
+          Positioned(
+            top: -6,
+            right: -100,
+            child: Opacity(
+              opacity: 0.4,
+              child: SvgPicture.asset(
+                'assets/icons/Top zodaic sign.svg',
+                width: 130,
+                height: 130,
+                // colorFilter: const ColorFilter.mode(
+                //   Colors.white,
+                //   BlendMode.srcIn,
+                // ),
+              ),
             ),
           ),
-          Text(
-            "Personal Horoscope",
-            style: GoogleFonts.lora(
-              fontSize: 14,
-              color: const Color(0xFF8D6E63),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildSummaryItem(
-                  icon: Icons.nightlight_round,
-                  title: "Moon Sign",
-                  value: astroDetails?.sign ?? "-",
-                  color: const Color(0xFF5E35B1), // Deep Purple
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildSummaryItem(
-                  icon: Icons.star, // Placeholder for Virgo-like symbol
-                  title:
-                      "Sun Sign", // Assuming Virgo refers to Sun/Ascendant or just another sign data
-                  value:
-                      astroDetails?.ascendant ??
-                      "-", // Using Ascendant as secondary important sign
-                  color: const Color(0xFF546E7A), // Blue Grey
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildSummaryItem(
-                  icon: Icons.auto_awesome,
-                  title: "Nakshatra",
-                  value: astroDetails?.nakshatra ?? "-",
-                  color: const Color(0xFFFFB74D), // Orange
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildSummaryItem(
-                  icon: Icons.public,
-                  title: "Ruling Planet",
-                  value:
-                      astroDetails?.signLord ??
-                      "-", // Usually sign lord is considered ruling
-                  color: const Color(0xFFE57373), // Red
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              const Icon(
-                Icons.calendar_today,
-                size: 14,
-                color: Color(0xFF8D6E63),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                "${birthDetails?.day} ${_getMonthName(birthDetails?.month)} ${birthDetails?.year}, ${birthDetails?.hour}:${birthDetails?.minute}",
-                style: GoogleFonts.lora(
-                  fontSize: 12,
-                  color: const Color(0xFF8D6E63),
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              const Icon(Icons.location_on, size: 14, color: Color(0xFF8D6E63)),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  "Lat: ${birthDetails?.latitude}, Lon: ${birthDetails?.longitude}",
-                  style: GoogleFonts.lora(
-                    fontSize: 12,
-                    color: const Color(0xFF8D6E63),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSummaryItem({
-    required IconData icon,
-    required String title,
-    required String value,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 4, 4, 12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: GoogleFonts.lora(
-                    fontSize: 12,
-                    color: Colors.grey[600],
+                // Back button
+                IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back_ios_new,
+                    color: DetailsScreenColors.textPrimary,
+                    size: 20,
                   ),
+                  onPressed: () => Navigator.pop(context),
                 ),
-                Text(
-                  value,
-                  style: GoogleFonts.lora(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF333333),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        userName,
+                        style: GoogleFonts.lora(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: DetailsScreenColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        "Personal Horoscope",
+                        style: GoogleFonts.lora(
+                          fontSize: 14,
+                          color: DetailsScreenColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Info chips - Row 1
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildInfoChip(
+                              iconAsset: 'assets/icons/moon.png',
+                              title: "Moon Sign",
+                              value: astroDetails?.sign ?? "-",
+                              gradientColors: const [
+                                Color(0xFF2D1B69),
+                                Color(0xFF1A1145),
+                              ],
+                              borderColor: const Color(0xFF4A3399),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: _buildInfoChip(
+                              iconAsset: 'assets/icons/sun.png',
+                              title: "Sun Sign",
+                              value: astroDetails?.ascendant ?? "-",
+                              gradientColors: const [
+                                Color(0xFF2D1B69),
+                                Color(0xFF1A1145),
+                              ],
+                              borderColor: const Color(0xFF4A3399),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      // Info chips - Row 2
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildInfoChip(
+                              iconAsset: 'assets/icons/star.png',
+                              title: "Nakshatra",
+                              value: astroDetails?.nakshatra ?? "-",
+                              gradientColors: const [
+                                Color(0xFF2D1B69),
+                                Color(0xFF1A1145),
+                              ],
+                              borderColor: const Color(0xFF4A3399),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: _buildInfoChip(
+                              iconAsset: 'assets/icons/planet.png',
+  
+                              title: "Ruling Planet",
+                              value: astroDetails?.signLord ?? "-",
+                              gradientColors: const [
+                                Color(0xFF2D1B69),
+                                Color(0xFF1A1145),
+                              ],
+                              borderColor: const Color(0xFF4A3399),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -407,36 +309,148 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
     );
   }
 
-  String _getMonthName(int? month) {
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    if (month != null && month >= 1 && month <= 12) {
-      return months[month - 1];
-    }
-    return "";
+  Widget _buildInfoChip({
+    required String iconAsset,
+    required String title,
+    required String value,
+    required List<Color> gradientColors,
+    required Color borderColor,
+  }) {
+    return SizedBox(
+      height: 66,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: gradientColors,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: borderColor.withOpacity(0.5), width: 1),
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 42,
+              height: 42,
+              child: Image.asset(
+                iconAsset,
+                fit: BoxFit.contain,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.lora(
+                      fontSize: 10,
+                      color: DetailsScreenColors.textMuted,
+                    ),
+                  ),
+                  Text(
+                    value,
+                    style: GoogleFonts.lora(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: DetailsScreenColors.textPrimary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
-  /// Constructs an effective Dashas object by merging data from
-  /// data.dashas (top-level) and data.astrology (embedded dasha fields).
-  /// This handles the case where the API returns dasha data under the
-  /// astrology object instead of a separate dashas object.
+ Widget _buildTabBar() {
+  final List<String> tabTitles = [
+    "BASIC INFO", "PLANETS", "BIRTH CHART", "BHAV CHALIT",
+    "DOSHAS", "DASHAS", "SARVASHTAK", "ASHTAKVARGA", "REMEDIES"
+  ];
+
+  return Container(
+    // This is the main bottom line
+    decoration: const BoxDecoration(
+      border: Border(
+        bottom: BorderSide(
+          color: Color(0xFF6B4EFF),
+          width: 1.5,
+        ),
+      ),
+    ),
+    child: TabBar(
+      tabAlignment: TabAlignment.start,
+      controller: _tabController,
+      labelColor: Colors.white,
+      unselectedLabelColor: const Color(0xFF8A8A8D),
+      indicatorSize: TabBarIndicatorSize.label,
+      // We set the indicator to transparent because we are 
+      // drawing the "active" look inside the AnimatedBuilder
+      indicator: const BoxDecoration(), 
+      dividerColor: Colors.transparent,
+      isScrollable: true,
+      
+      // CRITICAL: Remove extra padding that causes the "gap"
+      labelPadding: EdgeInsets.zero, 
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      
+      tabs: tabTitles.asMap().entries.map((entry) {
+        final title = entry.value;
+        final index = entry.key;
+        return Tab(
+          height: 30, // Increased slightly to match the UI feel
+          child: AnimatedBuilder(
+            animation: _tabController,
+            builder: (context, _) {
+              // Use indexIsChanging to handle the animation state correctly
+              final isSelected = _tabController.index == index;
+              
+              return Container(
+                margin: const EdgeInsets.only(right: 8), // Gap between tabs
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: isSelected ? const Color(0xFF6B4EFF) : Colors.transparent,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                  border: Border.all(
+                    color: const Color(0xFF6B4EFF),
+                    width: 1.5,
+                  ),
+                ),
+                // This offset moves the tab down by 1.5px to overlap 
+                // the parent container's bottom border
+                transform: Matrix4.translationValues(0, 1.5, 0),
+                alignment: Alignment.center,
+                child: Text(
+                  title,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 11,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      }).toList(),
+    ),
+  );
+}
+
+
   Dashas _getEffectiveDashas() {
     final topLevelDashas = _data?.data?.dashas;
     final astro = _data?.data?.astrology;
 
-    // Construct a merged Dasha object
     return Dashas(
       currentYogini:
           topLevelDashas?.currentYogini ?? astro?.astrologyCurrentYoginiDasha,

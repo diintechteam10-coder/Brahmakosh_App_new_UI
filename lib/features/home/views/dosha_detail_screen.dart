@@ -8,6 +8,13 @@ class DoshaDetailScreen extends StatelessWidget {
   final String doshaType;
   final dynamic data;
 
+  static const Color _bgDark = Colors.black;
+  static const Color _cardDark = Color(0xFF0F0F2D);
+  static const Color _cardBorder = Color(0xFF1E1E4D);
+  static const Color _textPrimary = Colors.white;
+  static const Color _textSecondary = Color(0xFFB0B0CC);
+  static const Color _accentGold = Color(0xFFD4AF37);
+
   const DoshaDetailScreen({
     super.key,
     required this.title,
@@ -18,28 +25,28 @@ class DoshaDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFBF5),
+      backgroundColor: _bgDark,
       appBar: AppBar(
         title: Text(
           title,
-          style: GoogleFonts.lora(
+          style: GoogleFonts.poppins(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: const Color(0xff4E342E),
+            color: _textPrimary,
           ),
         ),
-        backgroundColor: const Color(0xFFFFFBF5),
+        backgroundColor: _bgDark,
         elevation: 0,
         leading: Container(
           margin: const EdgeInsets.all(8),
           decoration: const BoxDecoration(
-            color: Colors.white,
+            color: _cardDark,
             shape: BoxShape.circle,
           ),
           child: IconButton(
             icon: const Icon(
               Icons.arrow_back,
-              color: Color(0xff5D4037),
+              color: Colors.white,
               size: 20,
             ),
             onPressed: () => Navigator.pop(context),
@@ -85,14 +92,14 @@ class DoshaDetailScreen extends StatelessWidget {
         return Center(
           child: Text(
             "Details for $title not available",
-            style: GoogleFonts.inter(),
+            style: GoogleFonts.poppins(color: _textSecondary),
           ),
         );
     }
   }
 
   Widget _buildManglikContent(RawManglik? manglik) {
-    if (manglik == null) return const Text("No Data");
+    if (manglik == null) return Text("No Data", style: GoogleFonts.poppins(color: _textSecondary));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -133,7 +140,7 @@ class DoshaDetailScreen extends StatelessWidget {
   }
 
   Widget _buildKalsarpaContent(RawKalsarpa? kalsarpa) {
-    if (kalsarpa == null) return const Text("No Data");
+    if (kalsarpa == null) return Text("No Data", style: GoogleFonts.poppins(color: _textSecondary));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -147,7 +154,7 @@ class DoshaDetailScreen extends StatelessWidget {
   }
 
   Widget _buildSadeSatiCurrentContent(RawSadeSatiCurrent? current) {
-    if (current == null) return const Text("No Data");
+    if (current == null) return Text("No Data", style: GoogleFonts.poppins(color: _textSecondary));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -165,7 +172,7 @@ class DoshaDetailScreen extends StatelessWidget {
   }
 
   Widget _buildSadeSatiLifeContent(List<SadhesatiLifeDetail> life) {
-    if (life.isEmpty) return const Text("No Life Cycles Data");
+    if (life.isEmpty) return Text("No Life Cycles Data", style: GoogleFonts.poppins(color: _textSecondary));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,7 +219,7 @@ class DoshaDetailScreen extends StatelessWidget {
                     width: 2,
                     color: isFirst
                         ? Colors.transparent
-                        : const Color(0xFFD7CCC8),
+                        : _cardBorder,
                   ),
                 ),
                 // Dot
@@ -223,9 +230,7 @@ class DoshaDetailScreen extends StatelessWidget {
                     color: phaseColor,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: const Color(
-                        0xFFFFFBF5,
-                      ), // Background color for gap
+                      color: _bgDark, // Background color for gap
                       width: 2,
                     ),
                     boxShadow: [
@@ -243,7 +248,7 @@ class DoshaDetailScreen extends StatelessWidget {
                     width: 2,
                     color: isLast
                         ? Colors.transparent
-                        : const Color(0xFFD7CCC8),
+                        : _cardBorder,
                   ),
                 ),
               ],
@@ -256,7 +261,7 @@ class DoshaDetailScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: _cardDark,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
@@ -277,7 +282,7 @@ class DoshaDetailScreen extends StatelessWidget {
                           child: Text(
                             (item.type?.replaceAll('_', ' ') ?? "Cycle")
                                 .toUpperCase(),
-                            style: GoogleFonts.lora(
+                            style: GoogleFonts.poppins(
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                               color: phaseColor,
@@ -290,18 +295,18 @@ class DoshaDetailScreen extends StatelessWidget {
                     const SizedBox(height: 6),
                     Text(
                       "Date: ${item.date}",
-                      style: GoogleFonts.lora(
+                      style: GoogleFonts.poppins(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: const Color(0xFF8D6E63),
+                        color: _textSecondary,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       "${item.summary}",
-                      style: GoogleFonts.lora(
+                      style: GoogleFonts.poppins(
                         fontSize: 14,
-                        color: const Color(0xFF4E342E),
+                        color: _textPrimary,
                         height: 1.5,
                       ),
                     ),
@@ -316,20 +321,20 @@ class DoshaDetailScreen extends StatelessWidget {
   }
 
   Color _getPhaseColor(String? type) {
-    if (type == null) return const Color(0xFF6D3A0C);
+    if (type == null) return _accentGold;
     final lowerType = type.toLowerCase();
     if (lowerType.contains('rising')) {
-      return const Color(0xFFE65100); // Warm Orange for Rising
+      return const Color(0xFFFFB74D); // Lighter Orange/Gold
     } else if (lowerType.contains('peak')) {
-      return const Color(0xFFB71C1C); // Deep Red for Peak
+      return _accentGold; // Peak is Gold
     } else if (lowerType.contains('setting')) {
-      return const Color(0xFF2E7D32); // Green for Setting/Cooling
+      return const Color(0xFFAED581); // Soft Light Green (Subtle) - or just Gold tints
     }
-    return const Color(0xFF6D3A0C); // Default Brown
+    return _accentGold;
   }
 
   Widget _buildPitraContent(RawPitra? pitra) {
-    if (pitra == null) return const Text("No Data");
+    if (pitra == null) return Text("No Data", style: GoogleFonts.poppins(color: _textSecondary));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -365,10 +370,10 @@ class DoshaDetailScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Text(
         title,
-        style: GoogleFonts.lora(
+        style: GoogleFonts.poppins(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: const Color(0xff4E342E),
+          color: _accentGold,
         ),
       ),
     );
@@ -380,27 +385,27 @@ class DoshaDetailScreen extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _cardDark,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFEFEBE9)),
+        border: Border.all(color: _cardBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: const Color(0xff8D6E63),
+              color: _textSecondary,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             content,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 14,
-              color: const Color(0xff4E342E),
+              color: _textPrimary,
               height: 1.5,
             ),
           ),
@@ -417,15 +422,15 @@ class DoshaDetailScreen extends StatelessWidget {
         children: [
           const Padding(
             padding: EdgeInsets.only(top: 6.0),
-            child: Icon(Icons.circle, size: 6, color: Color(0xFF8D6E63)),
+            child: Icon(Icons.circle, size: 6, color: _accentGold),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               text,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 14,
-                color: const Color(0xff4E342E),
+                color: _textPrimary,
                 height: 1.4,
               ),
             ),

@@ -1,3 +1,45 @@
+
+class UserProfile {
+  final String? name;
+  final String? dob;
+  final String? gowthra;
+  final String? placeOfBirth;
+  final String? timeOfBirth;
+  final String? profileImage;
+
+  UserProfile({
+    this.name,
+    this.dob,
+    this.gowthra,
+    this.placeOfBirth,
+    this.timeOfBirth,
+    this.profileImage,
+  });
+
+  factory UserProfile.fromJson(Map<String, dynamic> json) {
+    final profileImageField = json['profile_image'] ?? json['profileImage'] ?? json['profileImageUrl'] ?? json['image'];
+    return UserProfile(
+      name: json['name'],
+      dob: json['dob'],
+      gowthra: json['gowthra'],
+      placeOfBirth: json['placeOfBirth'],
+      timeOfBirth: json['timeOfBirth'],
+      profileImage: profileImageField,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'dob': dob,
+      'gowthra': gowthra,
+      'placeOfBirth': placeOfBirth,
+      'timeOfBirth': timeOfBirth,
+      'profile_image': profileImage,
+    };
+  }
+}
+
 class ProfileModel {
   final String id;
   final String email;
@@ -15,8 +57,6 @@ class ProfileModel {
   final String role;
   final int credits;
   final int karmaPoints;
-
-  /// 👇 ADD THIS
   final UserProfile? profile;
 
   ProfileModel({
@@ -40,6 +80,13 @@ class ProfileModel {
   });
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
+    final profileImageField = json['profileImageUrl'] ??
+                              json['profileImage'] ?? 
+                              json['profile_image'] ?? 
+                              json['image'] ??
+                              json['profile']?['profile_image'] ??
+                              json['profile']?['profileImage'];
+    
     return ProfileModel(
       id: json['_id'] ?? '',
       email: json['email'] ?? '',
@@ -52,56 +99,14 @@ class ProfileModel {
       createdAt: json['createdAt'] ?? '',
       updatedAt: json['updatedAt'] ?? '',
       mobile: json['mobile'],
-      profileImage: json['profileImage'],
-      profileImageUrl: json['profileImageUrl'],
+      profileImage: profileImageField,
+      profileImageUrl: profileImageField,
       role: json['role'] ?? 'user',
       credits: (json['credits'] as num?)?.toInt() ?? 0,
       karmaPoints: (json['karmaPoints'] as num?)?.toInt() ?? 0,
-
-      /// 👇 MAP PROFILE SAFELY
       profile: json['profile'] != null
           ? UserProfile.fromJson(json['profile'])
           : null,
     );
-  }
-}
-
-class UserProfile {
-  final String? name;
-  final String? dob;
-  final String? gowthra;
-  final String? placeOfBirth;
-  final String? timeOfBirth;
-  final String? profileImage;
-
-  UserProfile({
-    this.name,
-    this.dob,
-    this.gowthra,
-    this.placeOfBirth,
-    this.timeOfBirth,
-    this.profileImage,
-  });
-
-  factory UserProfile.fromJson(Map<String, dynamic> json) {
-    return UserProfile(
-      name: json['name'],
-      dob: json['dob'],
-      gowthra: json['gowthra'],
-      placeOfBirth: json['placeOfBirth'],
-      timeOfBirth: json['timeOfBirth'],
-      profileImage: json['profile_image'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'dob': dob,
-      'gowthra': gowthra,
-      'placeOfBirth': placeOfBirth,
-      'timeOfBirth': timeOfBirth,
-      'profile_image': profileImage,
-    };
   }
 }

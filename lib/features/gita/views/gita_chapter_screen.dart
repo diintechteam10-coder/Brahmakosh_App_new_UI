@@ -1,7 +1,10 @@
+import 'package:brahmakosh/features/gita/widgets/header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
+
 import '../../ai_rashmi/ai_rashmi_chat.dart';
+
 import '../data/repositories/gita_repository.dart';
 import '../data/models/chapter_model.dart';
 import '../bloc/chapter/gita_chapter_bloc.dart';
@@ -45,7 +48,7 @@ class _GitaChapterViewState extends State<_GitaChapterView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF5E6), // Light orange/cream background
+      backgroundColor: Colors.black, // Dark background
       floatingActionButton: FloatingActionButton.extended(
         extendedPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
         backgroundColor: const Color(0xFFFF9800),
@@ -69,7 +72,7 @@ class _GitaChapterViewState extends State<_GitaChapterView> {
             ),
           ),
         ),
-        label: Text(
+        label: const Text(
           "ASK KRISHNA",
           style: TextStyle(
             color: Color(0xFF8B4513),
@@ -80,7 +83,6 @@ class _GitaChapterViewState extends State<_GitaChapterView> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: SafeArea(
-        top: false,
         child: Column(
           children: [
             _buildHeader(context),
@@ -95,13 +97,13 @@ class _GitaChapterViewState extends State<_GitaChapterView> {
                     return Center(child: Text('Error: ${state.message}'));
                   } else if (state is GitaChapterLoaded) {
                     return ListView.builder(
-                      padding: const EdgeInsets.only(
-                        left: 16,
-                        right: 16,
-                        top: 16,
-                        bottom: 60,
-                      ),
-                      itemCount: state.chapters.length,
+                        padding: const EdgeInsets.only(
+                          left: 16,
+                          right: 16,
+                          top: 16,
+                          bottom: 24,
+                        ),
+                        itemCount: state.chapters.length,
                       itemBuilder: (context, index) {
                         final chapter = state.chapters[index];
                         return _buildChapterCard(context, chapter, index + 1);
@@ -131,41 +133,22 @@ class _GitaChapterViewState extends State<_GitaChapterView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Top Image
-        Stack(
-          children: [
-            Container(
-              height: 220,
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/geeta_background.png'),
-                  fit: BoxFit.cover,
-                ),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                ),
-              ),
-            ),
-            Positioned(
-              top: 30,
-              left: 12,
-              child: _roundIcon(
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _roundIcon(
                 Icons.arrow_back_ios_new_outlined,
                 () => Navigator.pop(context),
               ),
-            ),
-            Positioned(
-              top: 30,
-              right: 12,
-              child: _roundIcon(Icons.menu, () {}),
-            ),
-          ],
+              _roundIcon(Icons.menu, () {}),
+            ],
+          ),
         ),
-
+        const SizedBox(height: 8),
         Padding(
-          padding: const EdgeInsets.only(left: 16, bottom: 16, top: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -178,7 +161,7 @@ class _GitaChapterViewState extends State<_GitaChapterView> {
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF8B4513),
+                      color: Color(0xFFF1C453), // Gold text
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -186,8 +169,7 @@ class _GitaChapterViewState extends State<_GitaChapterView> {
                     '18 Chapters',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Color(0xFF8B4513),
-                      fontWeight: FontWeight.bold,
+                      color: Colors.grey,
                     ),
                   ),
                 ],
@@ -222,37 +204,30 @@ class _GitaChapterViewState extends State<_GitaChapterView> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
-                    vertical: 12,
+                    vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFF9F2D),
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(20),
-                      topLeft: Radius.circular(20),
-                    ),
+                    color: const Color(0xFFF1C453), // Gold button
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Continue',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 2),
-                          Text(
-                            lastReadLabel,
-                            style: TextStyle(
-                              color: Color(0xFF8B4513),
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                      const Text(
+                        'Continue',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        lastReadLabel,
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 10,
+                        ),
                       ),
                     ],
                   ),
@@ -261,6 +236,12 @@ class _GitaChapterViewState extends State<_GitaChapterView> {
             ],
           ),
         ),
+        const SizedBox(height: 24),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: WavyDivider(),
+        ),
+        const SizedBox(height: 8),
       ],
     );
   }
@@ -272,15 +253,24 @@ class _GitaChapterViewState extends State<_GitaChapterView> {
         height: 36,
         width: 36,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.9),
+          color: Colors.white.withOpacity(0.08),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, size: 18),
+        child: Icon(icon, size: 18, color: Colors.white),
       ),
     );
   }
 
   Widget _buildChapterCard(BuildContext context, dynamic chapter, int index) {
+    final completedVerses = StorageService.getInt('gita_chapter_${chapter.chapterNumber}_completed') ?? 0;
+    final total = chapter.shlokaCount ?? 1;
+
+    // Simulate formatting last read details as shown in design if completed
+    final bool hasProgress = completedVerses > 0;
+    final String lastReadVerseStr = hasProgress ? "Last Read - Verse ${chapter.chapterNumber}.$completedVerses" : "";
+    // Note: Currently no recorded timestamp for reading stored in StorageService by default logic. Leaving blank or simulated.
+    final String lastReadTimestamp = hasProgress ? "Recent" : "";
+
     return GestureDetector(
       onTap: () async {
         await Get.to(() => GitaVerseListScreen(chapter: chapter));
@@ -292,115 +282,112 @@ class _GitaChapterViewState extends State<_GitaChapterView> {
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 14),
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          color: const Color(0xFF131313), // Dark item background
+          borderRadius: BorderRadius.circular(16),
         ),
-        child: Row(
+        child: Column(
           children: [
-            // Index
-            Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFF1DE),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Center(
-                child: Text(
-                  index.toString().padLeft(2, '0'),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF8B4513),
+            Row(
+              children: [
+                // Index
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2C2C2C), // Slightly lighter dark background
+                    borderRadius: BorderRadius.circular(14),
                   ),
-                ),
-              ),
-            ),
-
-            const SizedBox(width: 14),
-
-            // Content
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    chapter.name ?? '',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF5D4037),
+                  child: Center(
+                    child: Text(
+                      index.toString().padLeft(2, '0'),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Color(0xFFF1C453), // Gold text
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${chapter.shlokaCount ?? 0} Verses',
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                  const SizedBox(height: 8),
+                ),
 
-                  // Progress
-                  Row(
+                const SizedBox(width: 16),
+
+                // Content
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Builder(
-                          builder: (context) {
-                            final completedVerses =
-                                StorageService.getInt(
-                                  'gita_chapter_${chapter.chapterNumber}_completed',
-                                ) ??
-                                0;
-                            final total = chapter.shlokaCount ?? 1;
-                            return ClipRRect(
+                      Text(
+                        chapter.name ?? '',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${chapter.shlokaCount ?? 0} Verses',
+                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Progress
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ClipRRect(
                               borderRadius: BorderRadius.circular(4),
                               child: LinearProgressIndicator(
                                 value: completedVerses / total,
                                 minHeight: 4,
-                                backgroundColor: Colors.grey.shade200,
+                                backgroundColor: const Color(0xFF2C2C2C),
                                 valueColor: const AlwaysStoppedAnimation(
-                                  Color(0xFFFF9F2D),
+                                  Color(0xFFE0E0E0),
                                 ),
                               ),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '${StorageService.getInt('gita_chapter_${chapter.chapterNumber}_completed') ?? 0}/${chapter.shlokaCount ?? 0}',
-                        style: const TextStyle(
-                          fontSize: 10,
-                          color: Colors.grey,
-                        ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '$completedVerses/${chapter.shlokaCount ?? 0}',
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-
-                  // Align(
-                  //   alignment: Alignment.centerRight,
-                  //   child: Text(
-                  //     '3/${chapter.shlokaCount ?? 0}',
-                  //     style: const TextStyle(
-                  //       fontSize: 10,
-                  //       color: Colors.grey,
-                  //     ),
-                  //   ),
-                  // ),
+                ),
+                const SizedBox(width: 16),
+                const Icon(Icons.arrow_forward_ios, color: Color(0xFFF1C453), size: 14),
+              ],
+            ),
+            
+            // "Last read" bottom info row
+            if (hasProgress) ...[
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    lastReadVerseStr,
+                    style: const TextStyle(fontSize: 10, color: Colors.grey),
+                  ),
+                  Text(
+                    lastReadTimestamp,
+                    style: const TextStyle(fontSize: 10, color: Colors.grey),
+                  ),
                 ],
               ),
-            ),
-            const SizedBox(width: 14),
-            Icon(Icons.arrow_forward_ios, color: Color(0xFF8B4513), size: 14),
+            ]
           ],
         ),
       ),
     );
   }
 }
+
+

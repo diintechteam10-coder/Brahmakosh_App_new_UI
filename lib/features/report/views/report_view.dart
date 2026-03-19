@@ -1,5 +1,4 @@
 import '../../../../core/common_imports.dart';
-import '../../../../common/colors.dart';
 import '../../dashboard/viewmodels/dashboard_viewmodel.dart';
 
 class ReportView extends StatelessWidget {
@@ -8,13 +7,12 @@ class ReportView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.lightPinkColor,
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: CustomColors.lightPinkColor,
+        backgroundColor: Colors.black,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          color: AppTheme.textPrimary,
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             // Navigate back to Home tab (index 0)
             Provider.of<DashboardViewModel>(
@@ -25,10 +23,10 @@ class ReportView extends StatelessWidget {
         ),
         title: Text(
           'My Kosh',
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 20,
+          style: GoogleFonts.lora(
+            fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: AppTheme.textPrimary,
+            color: Colors.white,
           ),
         ),
       ),
@@ -39,10 +37,10 @@ class ReportView extends StatelessWidget {
           const SizedBox(height: 24),
           Text(
             'Available Reports',
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.lora(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              color: AppTheme.primaryGold,
             ),
           ),
           const SizedBox(height: 16),
@@ -104,12 +102,12 @@ class _ReportCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: AppTheme.cardBackground,
+        color: const Color(0xFF1A1A1A),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.lightGold.withOpacity(0.5)),
+        border: Border.all(color: AppTheme.primaryGold.withOpacity(0.2)),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primaryGold.withOpacity(0.05),
+            color: Colors.black.withOpacity(0.2),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -136,18 +134,18 @@ class _ReportCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.playfairDisplay(
+                  style: GoogleFonts.lora(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary,
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   date,
-                  style: GoogleFonts.lora(
+                  style: GoogleFonts.inter(
                     fontSize: 12,
-                    color: AppTheme.textSecondary.withOpacity(0.8),
+                    color: Colors.white70,
                     letterSpacing: 0.2,
                   ),
                 ),
@@ -227,12 +225,12 @@ class _MyKoshSection extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: const Color(0xFF1A1A1A),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppTheme.lightGold),
+            border: Border.all(color: AppTheme.primaryGold.withOpacity(0.3)),
             boxShadow: [
               BoxShadow(
-                color: AppTheme.primaryGold.withOpacity(0.08),
+                color: Colors.black.withOpacity(0.2),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -249,13 +247,13 @@ class _MyKoshSection extends StatelessWidget {
                     margin: const EdgeInsets.only(top: 2),
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryGold.withOpacity(0.15),
+                      color: AppTheme.primaryGold.withOpacity(0.2),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.psychology,
                       size: 16,
-                      color: AppTheme.textPrimary,
+                      color: AppTheme.primaryGold,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -265,19 +263,19 @@ class _MyKoshSection extends StatelessWidget {
                       children: [
                         Text(
                           'Kundali Summary',
-                          style: GoogleFonts.playfairDisplay(
+                          style: GoogleFonts.lora(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
-                            color: AppTheme.textPrimary,
+                            color: AppTheme.primaryGold,
                           ),
                         ),
                         const SizedBox(height: 6),
                         Text(
                           'Based on your chart, you are currently in a phase of significant professional growth. The position of Jupiter suggests new opportunities.',
-                          style: GoogleFonts.lora(
+                          style: GoogleFonts.inter(
                             fontSize: 13,
                             height: 1.4,
-                            color: AppTheme.textSecondary,
+                            color: Colors.white.withOpacity(0.9),
                           ),
                         ),
                       ],
@@ -287,7 +285,7 @@ class _MyKoshSection extends StatelessWidget {
               ),
 
               const SizedBox(height: 16),
-              const Divider(height: 1, thickness: 0.5),
+              Divider(height: 1, thickness: 0.5, color: Colors.white.withOpacity(0.1)),
               const SizedBox(height: 12),
 
               // 2. Download Report

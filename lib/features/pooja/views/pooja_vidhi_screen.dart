@@ -2,7 +2,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../common/colors.dart';
+
 import '../models/pooja_model.dart';
 
 class PoojaVidhiScreen extends StatefulWidget {
@@ -121,29 +121,29 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.lightPinkColor,
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: Text(
           "Vidhi",
           style: GoogleFonts.lora(
             fontSize: 20,
-            color: const Color(0xff4E342E),
+            color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.black,
         elevation: 0,
         leading: Container(
           margin: const EdgeInsets.all(8),
-          decoration: const BoxDecoration(
-            color: Colors.white,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
             shape: BoxShape.circle,
           ),
           child: IconButton(
             icon: const Icon(
-              Icons.arrow_back,
-              color: Color(0xff5D4037),
-              size: 20,
+              Icons.arrow_back_ios_new,
+              color: Colors.white,
+              size: 18,
             ),
             onPressed: () => Get.back(),
           ),
@@ -156,73 +156,87 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
           children: [
             // Auspicious Muhurat Header
             if (widget.pooja.muhurat != null)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xffE8F5E9),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: const Color(0xffA5D6A7),
-                    style: BorderStyle.none,
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
                   ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.access_time,
-                      size: 16,
-                      color: Color(0xff2E7D32),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFD4AF37).withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: const Color(0xFFD4AF37).withOpacity(0.4),
+                      width: 1,
                     ),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        "Auspicious Muhurat: ${widget.pooja.muhurat}",
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.access_time,
+                        size: 16,
+                        color: Color(0xFFD4AF37),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        "Auspicious Muhurat: ",
                         style: GoogleFonts.inter(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xff1B5E20),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white.withOpacity(0.9),
                         ),
                       ),
-                    ),
-                  ],
+                      Expanded(
+                        child: Text(
+                          widget.pooja.muhurat!,
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFFD4AF37),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             const SizedBox(height: 24),
 
             // Puja Vidhi Steps
             _sectionHeader("Puja Vidhi"),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             if (widget.pooja.pujaVidhi != null)
-              ...widget.pooja.pujaVidhi!.map((step) => _buildStepCard(step)),
+              ..._buildVidhiContent(),
 
             const SizedBox(height: 24),
 
             // Required Samagri
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
+                color: const Color(0xFF111111),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.white.withOpacity(0.05)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _sectionHeader("Required Samagri"),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                   if (widget.pooja.samagriList != null)
                     ...widget.pooja.samagriList!.map(
                       (item) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.only(bottom: 10),
                         child: Row(
                           children: [
-                            const Icon(
-                              Icons.circle,
-                              size: 8,
-                              color: Color(0xffff9800),
+                            Container(
+                              width: 6,
+                              height: 6,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFD4AF37),
+                                shape: BoxShape.circle,
+                              ),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
@@ -230,7 +244,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                                 "${item.itemName ?? ''} ${item.quantity != null ? '(${item.quantity})' : ''}",
                                 style: GoogleFonts.inter(
                                   fontSize: 14,
-                                  color: const Color(0xff5D4037),
+                                  color: Colors.white.withOpacity(0.6),
                                 ),
                               ),
                             ),
@@ -244,42 +258,54 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
 
             const SizedBox(height: 24),
 
-            // Mantra Card (Showing first mantra if available)
-            if (widget.pooja.mantras != null &&
-                widget.pooja.mantras!.isNotEmpty)
+            // Main Audio Player (Redesigned Design 3 Large Gold Card)
+            if (widget.pooja.mantras != null && widget.pooja.mantras!.isNotEmpty)
               Container(
-                padding: const EdgeInsets.all(16),
+                width: double.infinity,
+                padding: const EdgeInsets.all(28),
                 decoration: BoxDecoration(
-                  color: const Color(0xffFF9800),
-                  borderRadius: BorderRadius.circular(16),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF6B3E11), Color(0xFF91631B)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(30),
                 ),
                 child: Column(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 4,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.white.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         "MANTRA",
                         style: GoogleFonts.inter(
                           fontSize: 10,
-                          fontWeight: FontWeight.bold,
+                          letterSpacing: 2,
+                          fontWeight: FontWeight.w900,
                           color: Colors.white,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
+                    Text(
+                      widget.pooja.pujaName ?? "Mantra",
+                      style: GoogleFonts.inter(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
                     Container(
-                      padding: const EdgeInsets.all(16),
                       width: double.infinity,
+                      padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.white.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.white.withOpacity(0.2)),
                       ),
                       child: Column(
                         children: [
@@ -287,19 +313,19 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                             widget.pooja.mantras![0].mantraText ?? "",
                             textAlign: TextAlign.center,
                             style: GoogleFonts.notoSans(
-                              // Using NotoSans for Hindi/Sanskrit
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
+                              height: 1.4,
                             ),
                           ),
                           if (widget.pooja.mantras![0].meaning != null) ...[
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 12),
                             Text(
-                              widget.pooja.mantras![0].meaning!,
+                              "\"${widget.pooja.mantras![0].meaning!}\"",
                               textAlign: TextAlign.center,
                               style: GoogleFonts.inter(
-                                fontSize: 14,
+                                fontSize: 13,
                                 color: Colors.white.withOpacity(0.9),
                                 fontStyle: FontStyle.italic,
                               ),
@@ -308,54 +334,51 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    // Audio controls
+                    const SizedBox(height: 24),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        IconButton(
-                          onPressed: _seekBackward,
-                          icon: const Icon(
-                            Icons.replay_10,
-                            color: Colors.white,
-                          ),
-                        ),
+                        _buildPlayerAction(Icons.replay_10, _seekBackward),
+                        const SizedBox(width: 24),
                         GestureDetector(
                           onTap: _playPause,
                           child: Container(
-                            padding: const EdgeInsets.all(8),
+                            width: 56,
+                            height: 56,
                             decoration: const BoxDecoration(
                               color: Colors.white,
                               shape: BoxShape.circle,
                             ),
                             child: _isLoading
-                                ? const SizedBox(
-                                    width: 30,
-                                    height: 30,
-                                    child: CircularProgressIndicator(
-                                      color: Color(0xffFF9800),
-                                      strokeWidth: 2,
-                                    ),
-                                  )
+                                ? const Center(child: CircularProgressIndicator(color: Colors.black, strokeWidth: 3))
                                 : Icon(
                                     _isPlaying ? Icons.pause : Icons.play_arrow,
-                                    color: const Color(0xffFF9800),
+                                    color: Colors.black,
                                     size: 30,
                                   ),
                           ),
                         ),
-                        IconButton(
-                          onPressed: _seekForward,
-                          icon: const Icon(
-                            Icons.forward_10,
-                            color: Colors.white,
-                          ),
-                        ),
+                        const SizedBox(width: 24),
+                        _buildPlayerAction(Icons.forward_10, _seekForward),
                       ],
                     ),
                   ],
                 ),
               ),
+
+            const SizedBox(height: 32),
+
+            // Guidelines (Do's & Don'ts Layout)
+            _sectionHeader("Puja Guidelines"),
+            const SizedBox(height: 16),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: _buildGuidelineCard("Do's", true)),
+                const SizedBox(width: 12),
+                Expanded(child: _buildGuidelineCard("Don'ts", false)),
+              ],
+            ),
 
             const SizedBox(height: 24),
 
@@ -369,14 +392,15 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: const Color(0xffE8F5E9),
+                      color: const Color(0xFF131313),
                       borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.white.withOpacity(0.05)),
                     ),
                     child: Text(
                       widget.pooja.specialInstructions!,
                       style: GoogleFonts.inter(
                         fontSize: 14,
-                        color: const Color(0xff1B5E20),
+                        color: Colors.white.withOpacity(0.7),
                         height: 1.5,
                       ),
                     ),
@@ -394,79 +418,202 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
   Widget _sectionHeader(String title) {
     return Row(
       children: [
-        Container(width: 3, height: 18, color: const Color(0xffff9800)),
+        Container(
+          width: 2,
+          height: 16,
+          decoration: BoxDecoration(
+            color: const Color(0xFFD4AF37),
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
         const SizedBox(width: 8),
         Text(
           title,
           style: GoogleFonts.lora(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: const Color(0xff4E342E),
+            color: Colors.white,
           ),
         ),
       ],
     );
   }
 
+  List<Widget> _buildVidhiContent() {
+    List<Widget> content = [];
+    final steps = widget.pooja.pujaVidhi ?? [];
+    
+    for (int i = 0; i < steps.length; i++) {
+      content.add(_buildStepCard(steps[i]));
+      
+      // Inject Mantra To Chant Card after step 2 (index 1) if available
+      if (i == 1 && widget.pooja.mantras != null && widget.pooja.mantras!.isNotEmpty) {
+        content.add(_buildMantraToChantCard(widget.pooja.mantras![0]));
+      }
+    }
+    return content;
+  }
+
   Widget _buildStepCard(PujaVidhi step) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: const Color(0xFF111111),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 36,
-                height: 36,
-                alignment: Alignment.center,
-                decoration: const BoxDecoration(
-                  color: Color(0xffff9800),
-                  shape: BoxShape.circle,
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Center(
+              child: Text(
+                step.stepNumber?.toString().padLeft(2, '0') ?? "01",
+                style: GoogleFonts.inter(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  color: const Color(0xFFD4AF37).withOpacity(0.6),
                 ),
-                child: Text(
-                  "${step.stepNumber ?? 0}",
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  step.title ?? "",
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      step.title ?? "",
-                      style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xff4E342E),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      step.description ?? "",
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        color: const Color(0xff5D4037),
-                        height: 1.4,
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 6),
+                Text(
+                  step.description ?? "",
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    color: Colors.white.withOpacity(0.5),
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMantraToChantCard(Mantras mantra) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF8B4513), Color(0xFFD4AF37)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.music_note, color: Colors.white, size: 14),
+              const SizedBox(width: 8),
+              Text(
+                "MANTRA TO CHANT",
+                style: GoogleFonts.inter(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                  letterSpacing: 1.5,
                 ),
               ),
             ],
           ),
+          const SizedBox(height: 20),
+          Text(
+            mantra.mantraText ?? "",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.notoSans(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              height: 1.5,
+            ),
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildGuidelineCard(String title, bool isDo) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDo ? const Color(0xFFE8F5E9).withOpacity(0.15) : const Color(0xFFFFEBEE).withOpacity(0.15),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                isDo ? Icons.check_circle : Icons.cancel,
+                size: 18,
+                color: isDo ? const Color(0xFF81C784) : const Color(0xFFE57373),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: isDo ? const Color(0xFF81C784) : const Color(0xFFE57373),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            isDo ? "• Face East/North\n• Wear clean clothes\n• Maintain Silence" : "• Don't rush steps\n• No leather items\n• Avoid Interruptions",
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              color: isDo ? const Color(0xFF2E7D32).withOpacity(0.9) : const Color(0xFFC62828).withOpacity(0.9),
+              height: 1.8,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlayerAction(IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.1),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, color: Colors.white, size: 24),
       ),
     );
   }

@@ -126,7 +126,7 @@ class LuckyScratchOverlay extends StatelessWidget {
                                   const SizedBox(height: 16),
                                   Text(
                                     title,
-                                    style: GoogleFonts.playfairDisplay(
+                                    style: GoogleFonts.lora(
                                       fontSize: 28,
                                       fontWeight: FontWeight.bold,
                                       color: AppTheme.textPrimary,
@@ -354,7 +354,7 @@ class LuckyScratchOverlay extends StatelessWidget {
                                               const SizedBox(width: 8),
                                               Text(
                                                 'Revealed!',
-                                                style: GoogleFonts.cinzel(
+                                                style: GoogleFonts.lora(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.bold,
                                                   color: Colors.white,

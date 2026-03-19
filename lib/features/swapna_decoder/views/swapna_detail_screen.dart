@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
-import '../../../../common/colors.dart';
 import '../models/swapna_model.dart';
 import '../repositories/swapna_repository.dart';
 
@@ -54,17 +53,17 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Scaffold(
-        backgroundColor: CustomColors.lightPinkColor,
-        body: const Center(
-          child: CircularProgressIndicator(color: Color(0xffFF7438)),
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: CircularProgressIndicator(color: Color(0xFFD4AF37)),
         ),
       );
     }
 
     if (_error != null) {
       return Scaffold(
-        backgroundColor: CustomColors.lightPinkColor,
+        backgroundColor: Colors.black,
         appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
         body: Center(
           child: Column(
@@ -99,178 +98,136 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
     final swapna = _swapna!;
 
     return Scaffold(
-      backgroundColor: CustomColors.lightPinkColor,
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            backgroundColor: CustomColors.lightPinkColor,
-            elevation: 0,
-            expandedHeight: 300,
-            pinned: true,
-            leading: Padding(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: IconButton(
+            icon: Container(
               padding: const EdgeInsets.all(8),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 8,
-                    ),
-                  ],
-                ),
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.arrow_back,
-                    color: Color(0xff5D4037),
-                    size: 20,
-                  ),
-                  onPressed: () => Get.back(),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
+            ),
+            onPressed: () => Get.back(),
+          ),
+        ),
+        title: Text(
+          swapna.symbolName,
+          style: GoogleFonts.lora(
+            fontSize: 20,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Main Hero Card
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: const Color(0xFF1C1C1E),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.05),
                 ),
               ),
-            ),
-            flexibleSpace: FlexibleSpaceBar(
-              background: Stack(
-                fit: StackFit.expand,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CachedNetworkImage(
-                    imageUrl: swapna.thumbnailUrl ?? '',
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) =>
-                        Container(color: const Color(0xffF4E9E0)),
-                    errorWidget: (context, url, error) => Container(
-                      color: const Color(0xffF4E9E0),
-                      child: const Icon(
-                        Icons.nights_stay_outlined,
-                        size: 60,
-                        color: Color(0xffFEDA87),
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                    child: CachedNetworkImage(
+                      imageUrl: swapna.thumbnailUrl ?? '',
+                      height: 220,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        height: 220,
+                        color: const Color(0xFF2C2C2E),
+                        child: const Center(
+                          child: CircularProgressIndicator(color: Color(0xFFD4AF37)),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        height: 220,
+                        color: const Color(0xFF2C2C2E),
+                        child: const Icon(
+                          Icons.nights_stay_outlined,
+                          size: 60,
+                          color: Color(0xFFD4AF37),
+                        ),
                       ),
                     ),
                   ),
-                  // Bottom gradient for smooth transition
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: 80,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.transparent,
-                            CustomColors.lightPinkColor.withOpacity(0.8),
-                            CustomColors.lightPinkColor,
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          swapna.symbolName,
+                          style: GoogleFonts.lora(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        if (swapna.symbolNameHindi.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            swapna.symbolNameHindi,
+                            style: GoogleFonts.notoSans(
+                              fontSize: 16,
+                              color: Colors.grey[400],
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            _buildMetadataItem(
+                              Icons.category_outlined,
+                              swapna.category,
+                            ),
+                            const SizedBox(width: 16),
+                            if (swapna.subcategory.isNotEmpty)
+                              _buildMetadataItem(
+                                Icons.auto_awesome_outlined,
+                                swapna.subcategory,
+                              ),
                           ],
                         ),
-                      ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-          SliverToBoxAdapter(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xffFFFDF5),
-                    Colors.white,
-                  ],
-                ),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+            const SizedBox(height: 24),
+            // Interpretation
+            _buildSectionTitle("Detailed Significance", Icons.info_outline),
+            const SizedBox(height: 16),
+            Text(
+              swapna.detailedInterpretation ??
+                  swapna.shortDescription ??
+                  '',
+              style: GoogleFonts.inter(
+                fontSize: 15,
+                height: 1.6,
+                color: Colors.grey[300],
               ),
-              padding: const EdgeInsets.fromLTRB(24, 20, 24, 40),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Drag handle
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: const Color(0xffFEDA87),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
+            ),
+            const SizedBox(height: 32),
 
-                  // Symbol name
-                  Text(
-                    swapna.symbolName,
-                    style: GoogleFonts.lora(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xff4E342E),
-                    ),
-                  ),
-
-                  // Hindi name
-                  if (swapna.symbolNameHindi.isNotEmpty) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      swapna.symbolNameHindi,
-                      style: GoogleFonts.notoSans(
-                        fontSize: 18,
-                        color: const Color(0xff8D6E63),
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ],
-
-                  // Category badge
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          const Color(0xffFEDA87).withOpacity(0.4),
-                          const Color(0xffFEDA87).withOpacity(0.2),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: const Color(0xffFEDA87).withOpacity(0.6),
-                      ),
-                    ),
-                    child: Text(
-                      swapna.category,
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xff5D4037),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Interpretation
-                  _buildSectionTitle("Interpretation", Icons.auto_stories_outlined),
-                  const SizedBox(height: 12),
-                  Text(
-                    swapna.detailedInterpretation ??
-                        swapna.shortDescription ??
-                        '',
-                    style: GoogleFonts.inter(
-                      fontSize: 15,
-                      height: 1.7,
-                      color: const Color(0xff4E342E),
-                    ),
-                  ),
-
-                  const SizedBox(height: 28),
 
                   // Positive Aspects
                   if (swapna.positiveAspects != null &&
@@ -284,8 +241,7 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
                       (e) => _buildAspectCard(
                         e.point,
                         e.description,
-                        const Color(0xff2E7D32),
-                        const Color(0xffE8F5E9),
+                        const Color(0xff4CAF50),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -303,48 +259,42 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
                       (e) => _buildAspectCard(
                         e.point,
                         e.description,
-                        const Color(0xffC62828),
-                        const Color(0xffFFEBEE),
+                        const Color(0xffF44336),
                       ),
                     ),
                     const SizedBox(height: 24),
                   ],
 
-                  // Remedies
-                  if (swapna.remedies != null) ...[
-                    _buildSectionTitle("Remedies", Icons.self_improvement),
-                    const SizedBox(height: 12),
+            // Remedies
+            if (swapna.remedies != null) ...[
+              _buildSectionTitle("Remedies & Precautions", Icons.self_improvement),
+              const SizedBox(height: 16),
 
-                    // Mantras
-                    if (swapna.remedies!.mantras != null &&
-                        swapna.remedies!.mantras!.isNotEmpty) ...[
-                      _buildRemedyCard(
-                        "Mantras",
-                        "🕉",
-                        swapna.remedies!.mantras!,
-                        const Color(0xffFF7438),
-                        const Color(0xffFFF3E0),
-                      ),
-                      const SizedBox(height: 12),
-                    ],
+              // Mantras
+              if (swapna.remedies!.mantras != null &&
+                  swapna.remedies!.mantras!.isNotEmpty) ...[
+                _buildRemedyCard(
+                  "Sacred Mantras",
+                  Icons.self_improvement,
+                  swapna.remedies!.mantras!,
+                  const Color(0xFFD4AF37),
+                ),
+                const SizedBox(height: 16),
+              ],
 
-                    // Precautions
-                    if (swapna.remedies!.precautions != null &&
-                        swapna.remedies!.precautions!.isNotEmpty) ...[
-                      _buildRemedyCard(
-                        "Precautions",
-                        "⚠️",
-                        swapna.remedies!.precautions!,
-                        const Color(0xffF57F17),
-                        const Color(0xffFFFDE7),
-                      ),
-                    ],
-                  ],
-                ],
-              ),
-            ),
-          ),
-        ],
+              // Precautions
+              if (swapna.remedies!.precautions != null &&
+                  swapna.remedies!.precautions!.isNotEmpty) ...[
+                _buildRemedyCard(
+                  "Important Precautions",
+                  Icons.warning_amber_rounded,
+                  swapna.remedies!.precautions!,
+                  const Color(0xFFFFB300),
+                ),
+              ],
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -353,22 +303,38 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
     return Row(
       children: [
         Container(
-          width: 4,
-          height: 24,
+          width: 3,
+          height: 18,
           decoration: BoxDecoration(
-            color: const Color(0xffFF7438),
+            color: const Color(0xFFD4AF37),
             borderRadius: BorderRadius.circular(2),
           ),
         ),
         const SizedBox(width: 10),
-        Icon(icon, size: 20, color: const Color(0xff8D6E63)),
-        const SizedBox(width: 8),
         Text(
           title,
           style: GoogleFonts.lora(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: const Color(0xff4E342E),
+            color: const Color(0xFFD4AF37),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMetadataItem(IconData icon, String text) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 16, color: const Color(0xFFD4AF37)),
+        const SizedBox(width: 8),
+        Text(
+          text,
+          style: GoogleFonts.inter(
+            fontSize: 13,
+            color: Colors.grey[400],
+            fontWeight: FontWeight.w500,
           ),
         ),
       ],
@@ -379,36 +345,58 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
     String title,
     String description,
     Color accentColor,
-    Color bgColor,
   ) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(14),
-        border: Border(
-          left: BorderSide(color: accentColor, width: 4),
+        color: const Color(0xFF1C1C1E),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.05),
         ),
       ),
-      padding: const EdgeInsets.all(14),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: accentColor.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              accentColor == const Color(0xff4CAF50)
+                  ? Icons.check_circle_outline
+                  : Icons.error_outline,
+              size: 20,
               color: accentColor,
             ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            description,
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              height: 1.5,
-              color: const Color(0xff4E342E),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    height: 1.4,
+                    color: Colors.grey[500],
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -418,60 +406,54 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
 
   Widget _buildRemedyCard(
     String title,
-    String emoji,
+    IconData icon,
     List<String> items,
     Color accentColor,
-    Color bgColor,
   ) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: accentColor.withOpacity(0.2)),
+        color: const Color(0xFF1C1C1E),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Text(emoji, style: const TextStyle(fontSize: 20)),
-              const SizedBox(width: 8),
+              Icon(icon, size: 20, color: accentColor),
+              const SizedBox(width: 10),
               Text(
                 title,
                 style: GoogleFonts.inter(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: accentColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 16),
           ...items.map(
             (item) => Padding(
-              padding: const EdgeInsets.only(bottom: 6),
+              padding: const EdgeInsets.only(bottom: 10),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    margin: const EdgeInsets.only(top: 7),
-                    width: 5,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: accentColor,
-                      shape: BoxShape.circle,
-                    ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Icon(Icons.circle, size: 6, color: accentColor),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       item,
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         height: 1.5,
-                        color: const Color(0xff4E342E),
+                        color: Colors.grey[400],
                       ),
                     ),
                   ),

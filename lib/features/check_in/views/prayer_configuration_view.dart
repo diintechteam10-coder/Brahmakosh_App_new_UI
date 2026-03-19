@@ -19,7 +19,7 @@ class PrayerConfigurationView extends StatelessWidget {
           PrayerBloc(repository: SpiritualRepository())
             ..add(LoadPrayerConfigs(categoryId: prayerCategoryId)),
       child: Scaffold(
-        backgroundColor: const Color(0xffFFF8E7),
+        backgroundColor: Colors.black,
         body: SafeArea(
           bottom: false,
           child: BlocConsumer<PrayerBloc, PrayerState>(
@@ -92,11 +92,11 @@ class PrayerConfigurationView extends StatelessWidget {
                               children: [
                                 const SizedBox(height: 5),
                                 Text(
-                                  "Prayer",
+                                  "PRAYER",
                                   style: GoogleFonts.lora(
-                                    fontSize: 24,
+                                    fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    color: const Color(0xff4E342E),
+                                    color: const Color(0xFFD4AF37),
                                   ),
                                 ),
                                 const SizedBox(height: 5),
@@ -104,7 +104,7 @@ class PrayerConfigurationView extends StatelessWidget {
                                   'How are you feeling today?',
                                   style: GoogleFonts.inter(
                                     fontSize: 14,
-                                    color: const Color(0xff8D6E63),
+                                    color: Colors.white70,
                                   ),
                                 ),
                                 const SizedBox(height: 15),
@@ -120,7 +120,7 @@ class PrayerConfigurationView extends StatelessWidget {
                                   'You can stop anytime',
                                   style: GoogleFonts.inter(
                                     fontSize: 12,
-                                    color: Colors.grey[600],
+                                    color: Colors.white54,
                                   ),
                                 ),
                                 const SizedBox(height: 10),
@@ -132,9 +132,9 @@ class PrayerConfigurationView extends StatelessWidget {
                     ),
                     if (loadedState.isStarting)
                       Container(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black.withOpacity(0.5),
                         child: const Center(
-                          child: CircularProgressIndicator(color: Colors.white),
+                          child: CircularProgressIndicator(color: Color(0xFFD4AF37)),
                         ),
                       ),
                   ],
@@ -142,7 +142,7 @@ class PrayerConfigurationView extends StatelessWidget {
               }
 
               if (state is PrayerError) {
-                return Center(child: Text(state.message));
+                return Center(child: Text(state.message, style: TextStyle(color: Colors.white)));
               }
 
               return const SizedBox();
@@ -157,19 +157,42 @@ class PrayerConfigurationView extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.05),
               shape: BoxShape.circle,
+              border: Border.all(color: Colors.white24),
             ),
             child: IconButton(
+              padding: EdgeInsets.zero,
               icon: const Icon(
-                Icons.arrow_back,
-                color: Color(0xff5D4037),
-                size: 20,
+                Icons.arrow_back_ios_new,
+                color: Colors.white,
+                size: 16,
               ),
               onPressed: () => Get.back(),
+            ),
+          ),
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.05),
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white24),
+            ),
+            child: IconButton(
+              padding: EdgeInsets.zero,
+              icon: const Icon(
+                Icons.more_vert,
+                color: Colors.white,
+                size: 18,
+              ),
+              onPressed: () {},
             ),
           ),
         ],
@@ -192,13 +215,13 @@ class PrayerConfigurationView extends StatelessWidget {
   Widget _buildPrayerSelector(BuildContext context, PrayerLoaded state) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        color: const Color(0xFF141414), // Dark Background
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(0.2),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -212,22 +235,22 @@ class PrayerConfigurationView extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: const Color(0xffFF9B44).withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.white, // White Icon Background
+                  shape: BoxShape.circle,
                 ),
                 child: const Icon(
-                  Icons.volunteer_activism_outlined,
-                  size: 18,
-                  color: Color(0xffFF9B44),
+                  Icons.volunteer_activism_rounded,
+                  size: 16,
+                  color: Color(0xffE67E22), // Orange icon
                 ),
               ),
               const SizedBox(width: 10),
               Text(
                 'Prayer',
-                style: GoogleFonts.lora(
+                style: GoogleFonts.inter(
                   fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xff4E342E),
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
             ],
@@ -266,12 +289,12 @@ class PrayerConfigurationView extends StatelessWidget {
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? const Color(0xffFFF3E0)
-                            : Colors.grey[100],
+                            ? const Color(0xFF1C1C1E)
+                            : Colors.black54,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: isSelected
-                              ? const Color(0xffFF9B44)
+                              ? const Color(0xFFD4AF37)
                               : Colors.transparent,
                           width: 1.5,
                         ),
@@ -287,8 +310,8 @@ class PrayerConfigurationView extends StatelessWidget {
                             style: GoogleFonts.tiroDevanagariHindi(
                               fontSize: 16,
                               color: isSelected
-                                  ? const Color(0xffFF9B44)
-                                  : Colors.black87,
+                                  ? const Color(0xFFD4AF37)
+                                  : Colors.white70,
                               fontWeight: isSelected
                                   ? FontWeight.bold
                                   : FontWeight.normal,
@@ -325,26 +348,19 @@ class PrayerConfigurationView extends StatelessWidget {
   Widget _buildSummary(BuildContext context, PrayerLoaded state) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        color: const Color(0xFF141414), // Dark Background
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         children: [
           Text(
             'Summary',
-            style: GoogleFonts.lora(
-              fontSize: 18,
+            style: GoogleFonts.poppins(
+              fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: const Color(0xff4E342E),
+              color: Colors.white,
             ),
           ),
           const SizedBox(height: 16),
@@ -359,35 +375,37 @@ class PrayerConfigurationView extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: BoxDecoration(
-              color: const Color(0xffFFF5E6),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.star, color: Color(0xffFF9B44), size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  'Finish to earn ',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    color: const Color(0xff4E342E),
-                  ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.star, color: Color(0xFFD4AF37), size: 16),
+              const SizedBox(width: 6),
+              Text(
+                'Finish to earn ',
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  color: Colors.white70,
                 ),
-                Text(
-                  '+${state.selectedConfig?.karmaPoints ?? 0} karma Points',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xffFF9B44),
-                  ),
+              ),
+              Text(
+                '+${state.selectedConfig?.karmaPoints ?? 0} ',
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFFD4AF37),
                 ),
-              ],
-            ),
+              ),
+              const Icon(Icons.stars, color: Color(0xFFD4AF37), size: 13),
+              const SizedBox(width: 4),
+              Text(
+                'karma Points',
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  color: const Color(0xFFD4AF37),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -398,12 +416,12 @@ class PrayerConfigurationView extends StatelessWidget {
     return Row(
       children: [
         Text(icon, style: const TextStyle(fontSize: 18)),
-        const SizedBox(width: 8),
+        const SizedBox(width: 6),
         Text(
           label,
-          style: GoogleFonts.inter(
+          style: GoogleFonts.poppins(
             fontSize: 14,
-            color: const Color(0xff1E1E1E),
+            color: Colors.white70,
           ),
         ),
       ],
@@ -413,19 +431,10 @@ class PrayerConfigurationView extends StatelessWidget {
   Widget _buildStartButton(BuildContext context, PrayerLoaded state) {
     return Container(
       width: double.infinity,
-      height: 52,
+      height: 48,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: const LinearGradient(
-          colors: [Color(0xffFF8C00), Color(0xffFFA040)],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xffFF8C00).withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(24),
+        color: const Color(0xffE67E22), // Orange Button
       ),
       child: ElevatedButton(
         onPressed: () {
@@ -436,12 +445,12 @@ class PrayerConfigurationView extends StatelessWidget {
           shadowColor: Colors.transparent,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(24),
           ),
         ),
         child: Text(
-          'Start',
-          style: GoogleFonts.lora(fontSize: 18, fontWeight: FontWeight.bold),
+          'START',
+          style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1),
         ),
       ),
     );
@@ -564,11 +573,11 @@ class _EmotionListState extends State<_EmotionList> {
                       emotion,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.inter(
-                        fontSize: isSelected ? 16 : 12,
+                        fontSize: isSelected ? 12 : 10,
                         fontWeight: isSelected
                             ? FontWeight.bold
-                            : FontWeight.w500,
-                        color: const Color(0xff1E1E1E),
+                            : FontWeight.normal,
+                        color: isSelected ? Colors.white : Colors.white54,
                       ),
                     ),
                   ),

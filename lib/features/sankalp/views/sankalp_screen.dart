@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../common/colors.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../blocs/sankalp_bloc.dart';
 import '../blocs/sankalp_event.dart';
 import '../repositories/sankalp_repository.dart';
@@ -40,111 +40,118 @@ class _SankalpScreenState extends State<SankalpScreen>
           SankalpBloc(repository: SankalpRepository())
             ..add(FetchUserSankalps()),
       child: Scaffold(
-        backgroundColor: CustomColors.lightPinkColor,
+        backgroundColor: Colors.black,
         appBar: AppBar(
           title: Text(
             "My Sankalp",
-            style: GoogleFonts.lora(
-              fontSize: 22,
-              color: const Color(0xff4E342E),
-              fontWeight: FontWeight.bold,
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
             ),
           ),
           backgroundColor: Colors.transparent,
           elevation: 0,
-          centerTitle: false,
-          leading: Container(
-            margin: const EdgeInsets.all(8),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Color(0xff5D4037), size: 20),
-              onPressed: () => Get.back(),
-            ),
-          ),
-          actions: [
-            Container(
-              margin: const EdgeInsets.only(right: 8),
-              decoration: const BoxDecoration(
-                color: Colors.white,
+          centerTitle: true,
+          leading: IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.05),
                 shape: BoxShape.circle,
               ),
-              child: IconButton(
-                icon: const Icon(Icons.notifications_none, color: Color(0xff5D4037), size: 20),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const NotificationScreen(),
+              child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 16),
+            ),
+            onPressed: () => Get.back(),
+          ),
+          actions: [
+            IconButton(
+              icon: Stack(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.05),
+                      shape: BoxShape.circle,
                     ),
-                  );
-                },
+                    child: const Icon(Icons.notifications_none_rounded, color: Colors.white, size: 20),
+                  ),
+                  Positioned(
+                    right: 8,
+                    top: 8,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                ],
               ),
+              onPressed: () => Get.to(() => const NotificationScreen()),
             ),
           ],
         ),
-        body: Column(
+        body: Stack(
           children: [
-            const SizedBox(height: 15),
-            // Custom Tab Bar Container
-            Container(
-              height: 46,
-              margin: const EdgeInsets.symmetric(horizontal: 24),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(25),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: TabBar(
-                controller: _tabController,
-                indicator: BoxDecoration(
-                  borderRadius: BorderRadius.circular(25),
-                  gradient: const LinearGradient(
-                    colors: [Color(0xffFEDA87), Color(0xffFFD54F)],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xffFEDA87).withOpacity(0.4),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+            // Background Image
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.1,
+                child: Image.asset(
+                  'assets/icons/sankalpbg.png',
+                  fit: BoxFit.cover,
                 ),
-                indicatorSize: TabBarIndicatorSize.tab,
-                dividerColor: Colors.transparent,
-                labelColor: const Color(0xff5D4037),
-                unselectedLabelColor: const Color(0xff8D6E63),
-                labelStyle: GoogleFonts.inter(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                ),
-                unselectedLabelStyle: GoogleFonts.inter(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                ),
-                tabs: const [
-                  Tab(text: "MY SANKALP"),
-                  Tab(text: "COMPLETED"),
-                ],
               ),
             ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  const MySankalpTab(),
-                  const CompletedSankalpTab(),
-                ],
-              ),
+            Column(
+              children: [
+                const SizedBox(height: 15),
+                // Custom Tab Bar Container
+                Container(
+                  height: 48,
+                  margin: const EdgeInsets.symmetric(horizontal: 40),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1C1C1E).withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: TabBar(
+                    controller: _tabController,
+                    indicator: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30),
+                      color: AppTheme.primaryGold,
+                    ),
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    dividerColor: Colors.transparent,
+                    labelColor: Colors.black,
+                    unselectedLabelColor: Colors.white.withOpacity(0.4),
+                    labelStyle: GoogleFonts.poppins(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                    unselectedLabelStyle: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                    tabs: const [
+                      Tab(text: "MY SANKALP"),
+                      Tab(text: "COMPLETED"),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      const MySankalpTab(),
+                      const CompletedSankalpTab(),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ],
         ),

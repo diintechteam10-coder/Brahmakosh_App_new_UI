@@ -52,7 +52,7 @@ class _AskBiViewState extends State<AskBiView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFBE6D0),
+      backgroundColor: Colors.black,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -68,11 +68,11 @@ class _AskBiViewState extends State<AskBiView> {
                   ),
                   child: Row(
                     children: [
-                      IconButton(
-                        icon: const Icon(
-                          Icons.arrow_back,
-                          color: AppTheme.textPrimary,
-                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.arrow_back,
+                            color: Colors.white,
+                          ),
                         onPressed: () {
                           Provider.of<DashboardViewModel>(
                             context,
@@ -92,7 +92,7 @@ class _AskBiViewState extends State<AskBiView> {
                   style: GoogleFonts.lora(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.primaryGold,
                     letterSpacing: 1.2,
                   ),
                 ),
@@ -108,7 +108,7 @@ class _AskBiViewState extends State<AskBiView> {
                         style: GoogleFonts.lora(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFFD97706),
+                          color: Colors.white,
                         ),
                       ),
                       TextSpan(
@@ -116,7 +116,7 @@ class _AskBiViewState extends State<AskBiView> {
                         style: GoogleFonts.lora(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: AppTheme.textPrimary,
+                          color: AppTheme.primaryGold,
                         ),
                       ),
                     ],
@@ -139,12 +139,12 @@ class _AskBiViewState extends State<AskBiView> {
                       ),
                     ),
                     child: Text(
-                      "CHOOSE YOURS SPIRITUAL GUIDE TO PROCEED",
+                      "CHOOSE YOUR SPIRITUAL GUIDE TO PROCEED",
                       textAlign: TextAlign.center,
                       style: GoogleFonts.lora(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: AppTheme.textPrimary,
+                        color: Colors.white70,
                       ),
                     ),
                   ),
@@ -168,36 +168,24 @@ class _AskBiViewState extends State<AskBiView> {
                           title: name,
                           subtitle: agent.description ?? "",
                           description: agent.firstMessage ?? "",
-                          buttonText: isKrishna ? "Unlock To Talk" : "Explore",
-                          buttonGradient: isKrishna
-                              ? const LinearGradient(
-                                  colors: [
-                                    Color(0xFFE6C17A),
-                                    Color(0xFFC79E59),
-                                  ],
-                                )
-                              : const LinearGradient(
-                                  colors: [
-                                    Color(0xFF4A90E2),
-                                    Color(0xFF357ABD),
-                                  ],
-                                ),
+                          buttonText: "Explore",
+                          buttonGradient: const LinearGradient(
+                            colors: [
+                              Color(0xFFFDB913),
+                              Color(0xFF9E7B15),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
                           characterImagePath: isKrishna
                               ? 'assets/images/Krishana_new.png'
                               : 'assets/images/Rashmi_new.png',
-                          backgroundColor: isKrishna
-                              ? const Color(0xFF5F66B6)
-                              : const Color(0xFFF0E5D8),
-                          textColor: isKrishna
-                              ? Colors.white
-                              : AppTheme.textPrimary,
-                          dividerColor: isKrishna
-                              ? Colors.white.withOpacity(0.5)
-                              : AppTheme.textSecondary.withOpacity(0.3),
-                          isLockIcon: isKrishna,
-                          buttonTextColor: isKrishna
-                              ? AppTheme.textPrimary
-                              : Colors.white,
+                          backgroundColor: const Color(0xFF1A1A1A),
+                          textColor: Colors.white,
+                          dividerColor: AppTheme.primaryGold.withOpacity(0.3),
+                          // isLockIcon: isKrishna,
+                          borderColor: isKrishna ? AppTheme.primaryGold : Colors.transparent,
+                          buttonTextColor: Colors.white,
                           onTap: () async {
                             if (!Get.isRegistered<AgentController>()) {
                               Get.put(AgentController());
@@ -269,7 +257,7 @@ print("Saved Agent ID: ${StorageService.getString('ai_selected_agent_id')}");
                     textAlign: TextAlign.center,
                     style: GoogleFonts.rozhaOne(
                       fontSize: 20,
-                      color: AppTheme.textPrimary,
+                      color: AppTheme.primaryGold,
                       height: 1.4,
                     ),
                   ),
@@ -294,7 +282,8 @@ print("Saved Agent ID: ${StorageService.getString('ai_selected_agent_id')}");
     required VoidCallback onTap,
     required Color textColor,
     required Color dividerColor,
-    required bool isLockIcon,
+    // required bool isLockIcon,
+    required Color borderColor,
     Color buttonTextColor = Colors.white,
   }) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -308,9 +297,13 @@ print("Saved Agent ID: ${StorageService.getString('ai_selected_agent_id')}");
           decoration: BoxDecoration(
             color: backgroundColor,
             borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: borderColor.withOpacity(0.5),
+              width: 1,
+            ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withOpacity(0.3),
                 blurRadius: 10,
                 offset: const Offset(0, 5),
               ),
@@ -388,14 +381,14 @@ print("Saved Agent ID: ${StorageService.getString('ai_selected_agent_id')}");
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              if (isLockIcon) ...[
-                                Icon(
-                                  Icons.lock,
-                                  size: 10,
-                                  color: buttonTextColor,
-                                ),
-                                const SizedBox(width: 4),
-                              ],
+                              // if (isLockIcon) ...[
+                              //   Icon(
+                              //     Icons.lock,
+                              //     size: 10,
+                              //     color: buttonTextColor,
+                              //   ),
+                              //   const SizedBox(width: 4),
+                              // ],
 
                               Text(
                                 buttonText,

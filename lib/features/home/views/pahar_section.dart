@@ -121,7 +121,7 @@ class _PaharSectionState extends State<PaharSection> {
                               children: [
                                 TextSpan(
                                   text: "Pradosh Pahar ",
-                                  style: GoogleFonts.playfairDisplay(
+                                  style: GoogleFonts.lora(
                                     fontSize: 22 * scale,
                                     fontWeight: FontWeight.w500,
                                     color: Colors.white,

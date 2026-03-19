@@ -1,4 +1,4 @@
-import 'package:brahmakosh/common/colors.dart';
+import 'package:brahmakosh/features/gita/widgets/header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -126,7 +126,7 @@ class _GitaDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF5E6),
+      backgroundColor: Colors.black,
       // appBar: AppBar(
       //   backgroundColor: Colors.transparent,
       //   elevation: 0,
@@ -138,12 +138,23 @@ class _GitaDetailView extends StatelessWidget {
       floatingActionButton: FloatingActionButton.extended(
         extendedPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
         backgroundColor: const Color(0xFFFF9800),
-        onPressed: () => Get.to(
-          () => const RashmiChat(
-            backgroundImage: 'assets/images/Krishna_chat.png',
-            hideLearnGita: true,
-          ),
-        ),
+        onPressed: () {
+          final state = context.read<GitaDetailBloc>().state;
+          VerseModel? currentVerse = verse;
+          if (state is GitaDetailLoaded) {
+            currentVerse = state.verse;
+          }
+          final prompt =
+              "Can you please explain this Gita verse to me?\n\n'${currentVerse?.sanskritShloka}'\n\n(Chapter ${currentVerse?.chapterNumber}, Verse ${currentVerse?.shlokaNumber})";
+          Get.to(
+            () => RashmiChat(
+              backgroundImage: 'assets/images/Krishna_chat.png',
+              hideLearnGita: true,
+              initialMessage: prompt,
+              autoAsk: true,
+            ),
+          );
+        },
         icon: Container(
           width: 35, // Size of the circular container
           height: 35,
@@ -168,9 +179,8 @@ class _GitaDetailView extends StatelessWidget {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      extendBodyBehindAppBar: true,
       body: SafeArea(
-        top: false,
+        top: true,
         child: BlocBuilder<GitaDetailBloc, GitaDetailState>(
           builder: (context, state) {
             VerseModel? displayVerse = verse;
@@ -195,6 +205,11 @@ class _GitaDetailView extends StatelessWidget {
               child: Column(
                 children: [
                   _buildHeader(context, displayVerse),
+                 const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: WavyDivider(),
+        ),
+        const SizedBox(height: 8),
 
                   // _buildNavigationButtons(),
                   Padding(
@@ -210,24 +225,25 @@ class _GitaDetailView extends StatelessWidget {
                     ),
                   ),
                   _buildContentCard(
-                    backgroundColor: CustomColors.gradientBlueStart.withOpacity(
-                      0.3,
-                    ),
+                    backgroundColor: const Color(0xFF133621), // Dark Teal-Green for Sanskrit
                     displayVerse.sanskritShloka,
                     isSanskrit: true,
+                    textColor: Colors.white,
                   ),
                   _buildContentCard(
-                    // 'SANSKRIT TRANSLITERATION',
+                    backgroundColor: const Color(0xFF2E2E2E), // Dark Grey for Transliteration
                     displayVerse.sanskritTransliteration,
+                    textColor: Colors.white70,
                   ),
                   _buildContentCard(
-                    backgroundColor: CustomColors.buttonColor.withOpacity(0.3),
-                    // 'HINDI TRANSLATION',
+                    backgroundColor: const Color(0xFF7A4A06), // Dark Brown/Gold for Hindi
                     displayVerse.hindiMeaning,
+                    textColor: Colors.white,
                   ),
                   _buildContentCard(
-                    // 'ENGLISH TRANSLATION',
+                    backgroundColor: const Color(0xFF2E2E2E), // Dark Grey for English
                     displayVerse.englishMeaning,
+                    textColor: Colors.white70,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -242,9 +258,9 @@ class _GitaDetailView extends StatelessWidget {
                     ),
                   ),
                   _buildContentCard(
-                    backgroundColor: CustomColors.dayStart.withOpacity(0.3),
-                    // 'EXPLANATION',
+                    backgroundColor: const Color(0xFF2D1B69), // Deep Indigo/Violet for Explanation
                     displayVerse.explanation,
+                    textColor: Colors.white,
                   ),
                   const SizedBox(height: 60),
                 ],
@@ -260,78 +276,66 @@ class _GitaDetailView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Top Image
-        Stack(
-          children: [
-            Container(
-              height: 220,
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/geeta_background.png'),
-                  fit: BoxFit.cover,
-                ),
-                // borderRadius: BorderRadius.only(
-                //     bottomLeft: Radius.circular(20),
-                //     bottomRight: Radius.circular(20)
-                // )
-              ),
-            ),
-            Positioned(
-              top: 30,
-              left: 12,
-              child: _roundIcon(
+        // Back + Menu row — same style as GitaHeader
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _roundIcon(
                 Icons.arrow_back_ios_new_outlined,
                 () => Navigator.pop(context),
               ),
-            ),
-            Positioned(
-              top: 30,
-              right: 12,
-              child: _roundIcon(Icons.menu, () {}),
-            ),
-          ],
+              _roundIcon(Icons.menu, () {}),
+            ],
+          ),
         ),
-
+        const SizedBox(height: 8),
+        // Title row with verse navigation
         Padding(
-          padding: EdgeInsets.only(left: 16, bottom: 8, right: 20, top: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    verse.chapterName ?? '',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF8B4513),
+              // Left: chapter name + subtitle
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      verse.chapterName ?? '',
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFFF1C453), // Gold — same as GitaHeader
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Chapter ${verse.chapterNumber}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF8B4513),
-                      fontWeight: FontWeight.bold,
+                    const SizedBox(height: 4),
+                    Text(
+                      'Chap ${verse.chapterNumber != null ? '0${verse.chapterNumber}' : ''} -',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-
+              const SizedBox(width: 12),
+              // Right: Verse number + prev/next arrows
               Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    'Verse ${verse.shlokaNumber}', // Should be 1.1 etc format if possible?
+                    'Verse ${verse.chapterNumber}.${verse.shlokaNumber}',
                     style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF8B4513),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFFF1C453), // Gold
                     ),
                   ),
+                  const SizedBox(height: 6),
                   Row(
                     children: [
                       _roundIcon(
@@ -339,15 +343,17 @@ class _GitaDetailView extends StatelessWidget {
                         hasPrev ? onPrev : () {},
                         backgroundColor: Colors.orange.withOpacity(0.3),
                         size: 30,
-                        iconSize: 18,
+                        iconSize: 16,
+                        iconColor: Colors.white,
                       ),
-                      SizedBox(width: 20),
+                      const SizedBox(width: 10),
                       _roundIcon(
                         Icons.arrow_forward_ios_outlined,
                         hasNext ? onNext : () {},
                         backgroundColor: Colors.orange,
                         size: 30,
-                        iconSize: 18,
+                        iconSize: 16,
+                        iconColor: Colors.white,
                       ),
                     ],
                   ),
@@ -356,6 +362,7 @@ class _GitaDetailView extends StatelessWidget {
             ],
           ),
         ),
+        const SizedBox(height: 24),
       ],
     );
   }
@@ -363,10 +370,8 @@ class _GitaDetailView extends StatelessWidget {
   Widget _roundIcon(
     IconData icon,
     VoidCallback onTap, {
-    Color backgroundColor = const Color(
-      0xE6FFFFFF,
-    ), // ≈ Colors.white.withOpacity(0.9)
-    Color iconColor = Colors.black,
+    Color backgroundColor = const Color(0x14FFFFFF), // white.withOpacity(0.08)
+    Color iconColor = Colors.white,
     double size = 36,
     double iconSize = 18,
   }) {
@@ -476,54 +481,31 @@ class _GitaDetailView extends StatelessWidget {
   Widget _buildContentCard(
     String? content, {
     bool isSanskrit = false,
-    Color backgroundColor = const Color(0xFFE8DCCA),
+    Color backgroundColor = const Color(0xFF2E2E2E),
+    Color textColor = Colors.white70,
   }) {
     if (content == null || content.isEmpty) return const SizedBox.shrink();
 
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.all(14),
-      padding: const EdgeInsets.all(14),
+      margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: backgroundColor,
-        // Different colors for cards
-        borderRadius: BorderRadius.circular(
-          20,
-        ), // Asymmetric corners in design? Standard for now
+        borderRadius: BorderRadius.circular(16),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Container(
-          //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          //   decoration: BoxDecoration(
-          //     color: const Color(0xFFDAA520), // Golden/Dark Orange
-          //     borderRadius: BorderRadius.circular(8),
-          //   ),
-          //   child: Text(
-          //     title,
-          //     style: const TextStyle(
-          //       color: Colors.white,
-          //       fontWeight: FontWeight.bold,
-          //       fontSize: 12,
-          //     ),
-          //   ),
-          // ),
-          // const SizedBox(height: 24),
-          Align(
-            alignment: Alignment.center,
-            child: Text(
-              content,
-              style: TextStyle(
-                fontSize: 16,
-                color: isSanskrit ? Color(0xFF8B4513) : Colors.black87,
-                height: 1.5,
-                fontWeight: isSanskrit ? FontWeight.bold : FontWeight.normal,
-              ),
-              textAlign: TextAlign.center,
-            ),
+      child: Align(
+        alignment: Alignment.center,
+        child: Text(
+          content,
+          style: TextStyle(
+            fontSize: 16,
+            color: textColor,
+            height: 1.6,
+            fontWeight: isSanskrit ? FontWeight.w600 : FontWeight.normal,
           ),
-        ],
+          textAlign: TextAlign.center,
+        ),
       ),
     );
   }

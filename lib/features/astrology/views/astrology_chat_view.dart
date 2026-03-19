@@ -7,6 +7,7 @@ import '../../../common/models/astrologist_model.dart';
 import '../controllers/astrology_chat_controller.dart';
 import '../models/chat_models.dart';
 import 'widgets/astrology_chat_feedback_sheet.dart';
+import '../../../common/widgets/custom_profile_avatar.dart';
 
 class AstrologyChatView extends GetView<AstrologyChatController> {
   final Astrologist expert;
@@ -18,23 +19,30 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
 
     return Scaffold(
       key: controller.scaffoldKey,
-      backgroundColor: const Color(0xFFFFF3E0), // Peach/Beige background
+      backgroundColor: Colors.black,
       appBar: _buildAppBar(context),
       body: SafeArea(
         child: Obx(() {
+          if (controller.isChatRejected.value) {
+            return _buildRejectionReport(context);
+          }
           if (controller.isChatEnded.value) {
             return _buildSummaryReport(context);
           }
           return Column(
             children: [
+              // Chat Header Timer/Status
+              _buildChatHeaderInfo(),
+
               // Main content: messages + suggestions/topics/questions
               Expanded(
                 child: Stack(
                   children: [
                     // Chat messages
                     Obx(() {
-                      if (controller.messages.isEmpty)
+                      if (controller.messages.isEmpty) {
                         return const SizedBox.shrink();
+                      }
                       return ListView.builder(
                         controller: controller.scrollController,
                         padding: const EdgeInsets.symmetric(
@@ -44,9 +52,26 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                         itemCount: controller.messages.length,
                         itemBuilder: (context, index) {
                           final msg = controller.messages[index];
-                          return _buildChatBubble(
-                            msg,
-                            controller.isMessageFromMe(msg),
+                          // Group messages by date
+                          bool showDate = false;
+                          if (index == 0) {
+                            showDate = true;
+                          } else {
+                            final prevDate = controller.messages[index - 1].createdAt;
+                            if (msg.createdAt.day != prevDate.day || 
+                                msg.createdAt.month != prevDate.month) {
+                              showDate = true;
+                            }
+                          }
+
+                          return Column(
+                            children: [
+                              if (showDate) _buildDateDivider(msg.createdAt),
+                              _buildChatBubble(
+                                msg,
+                                controller.isMessageFromMe(msg),
+                              ),
+                            ],
                           );
                         },
                       );
@@ -59,11 +84,10 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                         return const SizedBox.shrink();
                       }
 
-                      // Display questions directly on the chat screen if a topic is selected
                       if (controller.selectedTopic.value != null) {
                         return _buildQuestionList(
                           controller.selectedTopic.value!,
-                        ); // Show questions
+                        );
                       }
                       return SingleChildScrollView(
                         child: _buildTopicCards(context),
@@ -74,10 +98,61 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
               ),
 
               // Input area
-              _buildInputBar(),
+              _buildInputBar(context),
             ],
           );
         }),
+      ),
+    );
+  }
+
+  Widget _buildDateDivider(DateTime date) {
+    final now = DateTime.now();
+    String dateStr = "TODAY, ${date.day} ${controller.getMonthName(date.month)}";
+    if (date.day != now.day) {
+      dateStr = "${date.day} ${controller.getMonthName(date.month)}, ${date.year}";
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Center(
+        child: Text(
+          dateStr.toUpperCase(),
+          style: GoogleFonts.inter(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: Colors.white54,
+            letterSpacing: 1,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChatHeaderInfo() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      width: double.infinity,
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.access_time, color: Color(0xFFD4AF37), size: 16),
+              const SizedBox(width: 8),
+              Obx(() => Text(
+                controller.isRequestAccepted.value
+                    ? controller.formatTime(controller.chatDuration.value)
+                    : "00:00",
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFFD4AF37),
+                ),
+              )),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -90,48 +165,47 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
       elevation: 0,
-      backgroundColor: const Color(0xFFFFF3E0), // Match Scaffold background
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: Color(0xFF5D4037)),
-        onPressed: () => Get.back(),
+      backgroundColor: const Color(0xFF141414),
+      leading: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: InkWell(
+          onTap: () => Get.back(),
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white12),
+            ),
+            child: const Icon(Icons.chevron_left, color: Colors.white),
+          ),
+        ),
       ),
       titleSpacing: 0,
       title: Row(
         children: [
-          Stack(
-            children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundImage: NetworkImage(expert.image),
-                backgroundColor: AppTheme.cardBackground,
-              ),
-              Positioned(
-                right: 0,
-                top: 0,
-                child: Container(
-                  width: 10,
-                  height: 10,
-                  decoration: BoxDecoration(
-                    color: Colors.green,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 1.5),
-                  ),
-                ),
-              ),
-            ],
+          Container(
+            padding: const EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: const Color(0xFFD4AF37), width: 1),
+            ),
+            child: CustomProfileAvatar(
+              imageUrl: expert.image,
+              radius: 18,
+              borderWidth: 0,
+            ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  expert.name.toUpperCase(),
+                  expert.name,
                   style: GoogleFonts.inter(
-                    fontSize: 14,
+                    fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF3E2723),
+                    color: Colors.white,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -140,73 +214,18 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                 Row(
                   children: [
                     Obx(() {
-                      final isTyping = _getController().isTyping.value;
-                      final status = _getController().onlineStatus.value;
-
-                      if (isTyping) {
-                        return Text(
-                          "TYPING...",
-                          style: GoogleFonts.inter(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(
-                              0xFF8D6E63,
-                            ), // Brownish for typing
-                          ),
-                        );
-                      }
-
+                      final status = controller.onlineStatus.value;
                       return Text(
                         status,
                         style: GoogleFonts.inter(
                           fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          color: status == "ONLINE"
-                              ? Colors.green
-                              : Colors.grey,
+                          fontWeight: FontWeight.bold,
+                          color: status == "ONLINE" ? Colors.green : Colors.grey,
                         ),
                       );
                     }),
-                    const SizedBox(width: 4),
-                    Text(
-                      "• Vedic Astrology", // Hardcoded or from expert.expertise
-                      style: GoogleFonts.inter(
-                        fontSize: 10,
-                        color: const Color(0xFF5D4037),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 2),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.access_time,
-                      size: 10,
-                      color: const Color(0xFF5D4037),
-                    ),
-                    const SizedBox(width: 2),
-                    Text(
-                      "15/Min", // Hardcoded or use expert.charge
-                      style: GoogleFonts.inter(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF5D4037),
-                      ),
-                    ),
                     const SizedBox(width: 8),
-                    Obx(
-                      () => Text(
-                        controller.isRequestAccepted.value
-                            ? "•  ${_getController().formatTime(_getController().chatDuration.value)}"
-                            : "•  Waiting...",
-                        style: GoogleFonts.inter(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF8B4513),
-                        ),
-                      ),
-                    ),
+                    const Icon(Icons.access_time, size: 10, color: Color(0xFFD4AF37)),
                   ],
                 ),
               ],
@@ -218,39 +237,44 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
         Padding(
           padding: const EdgeInsets.only(right: 16),
           child: Center(
-            child: SizedBox(
-              height: 28,
-              child: Obx(() {
-                final isEnded = controller.isChatEnded.value;
-                return OutlinedButton(
-                  onPressed: isEnded
-                      ? null
-                      : () => _getController().showEndChatDialog(
-                          "End Chat?",
-                          "Are you sure you want to end this session?",
-                        ),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    side: BorderSide(
-                      color: isEnded ? Colors.grey : Colors.red,
-                      width: 1,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    backgroundColor: Colors.white,
+            child: Obx(() {
+              final isEnded = controller.isChatEnded.value;
+              final isRejected = controller.isChatRejected.value;
+              if (isEnded || isRejected) return const SizedBox.shrink();
+
+              return InkWell(
+                onTap: () {
+                  if (controller.isRequestAccepted.value) {
+                    controller.showEndChatDialog(
+                      "End Chat?",
+                      "Are you sure you want to end this session?",
+                    );
+                  } else {
+                    controller.cancelChatRequest();
+                  }
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: controller.isRequestAccepted.value
+                        ? Colors.red[900]
+                        : const Color(0xFFD4AF37),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    "END",
+                    controller.isRequestAccepted.value ? "END" : "CANCEL",
                     style: GoogleFonts.inter(
-                      fontSize: 12,
+                      fontSize: 11,
                       fontWeight: FontWeight.bold,
-                      color: isEnded ? Colors.grey : Colors.red,
+                      color: controller.isRequestAccepted.value
+                          ? Colors.white
+                          : Colors.black,
                     ),
                   ),
-                );
-              }),
-            ),
+                ),
+              );
+            }),
           ),
         ),
       ],
@@ -260,36 +284,35 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
   Widget _buildSummaryReport(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: const Color(0xFFFFF3E0), // Match background
+      color: Colors.black,
       padding: const EdgeInsets.all(24),
       child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(height: 20),
-            // Expert Image
             Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: const Color(0xFFFFD54F),
+                  color: const Color(0xFFD4AF37),
                   width: 2,
-                ), // Gold border
+                ),
               ),
-              child: CircleAvatar(
+              child: CustomProfileAvatar(
+                imageUrl: expert.image,
                 radius: 50,
-                backgroundImage: NetworkImage(expert.image),
-                backgroundColor: AppTheme.cardBackground,
+                borderWidth: 0,
               ),
             ),
             const SizedBox(height: 24),
             Text(
               "Consultation Ended",
-              style: GoogleFonts.cinzel(
+              style: GoogleFonts.lora(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF3E2723),
+                color: Colors.white,
               ),
             ),
             const SizedBox(height: 8),
@@ -298,32 +321,24 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 16,
-                color: const Color(0xFF5D4037),
+                color: Colors.white70,
                 height: 1.5,
               ),
             ),
             const SizedBox(height: 32),
-            // Session Summary (Dynamic)
             Obx(() {
               if (controller.sessionDetails.isNotEmpty) {
                 return _buildSessionSummary(controller.sessionDetails);
               }
-              // Fallback to simple duration if no summary yet
               return Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 32,
                   vertical: 20,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: const Color(0xFF141414),
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  border: Border.all(color: Colors.white12),
                 ),
                 child: Column(
                   children: [
@@ -331,7 +346,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                       "DURATION",
                       style: GoogleFonts.inter(
                         fontSize: 12,
-                        color: const Color(0xFF8D6E63),
+                        color: const Color(0xFFD4AF37),
                         letterSpacing: 1.5,
                         fontWeight: FontWeight.w600,
                       ),
@@ -342,35 +357,31 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                       style: GoogleFonts.inter(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF3E2723),
+                        color: Colors.white,
                       ),
                     ),
                   ],
                 ),
               );
             }),
-            // Buttons
+            const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  // Navigate back to expert listing
-                  Get.back();
-                },
+                onPressed: () => Get.back(),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4E342E),
+                  backgroundColor: const Color(0xFFD4AF37),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(30),
                   ),
-                  elevation: 2,
                 ),
                 child: Text(
                   "New Chat",
                   style: GoogleFonts.inter(
                     fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
                 ),
               ),
@@ -380,34 +391,124 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
               width: double.infinity,
               child: OutlinedButton(
                 onPressed: () {
-                  Get.bottomSheet(
-                    AstrologyChatFeedbackSheet(controller: controller),
+                  showModalBottomSheet(
+                    context: context,
                     isScrollControlled: true,
-                    backgroundColor:
-                        Colors.transparent, // Handled by sheet decoration
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => AstrologyChatFeedbackSheet(controller: controller),
                   );
                 },
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  side: const BorderSide(color: Color(0xFF5D4037), width: 1.5),
+                  side: const BorderSide(color: Color(0xFFD4AF37)),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(30),
                   ),
-                  backgroundColor: Colors.transparent,
                 ),
                 child: Text(
-                  "Feedback",
+                  "Give Feedback",
                   style: GoogleFonts.inter(
                     fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF5D4037),
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFFD4AF37),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 20),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildRejectionReport(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      color: Colors.black,
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.red[900]!, width: 2),
+            ),
+            child: CustomProfileAvatar(
+              imageUrl: expert.image,
+              radius: 50,
+              borderWidth: 0,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            "Request Declined",
+            style: GoogleFonts.lora(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            "The expert is currently unavailable and has declined your request.\nPlease try again later or consult another expert.",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              color: Colors.white70,
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 48),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                Get.back(); // Navigate back
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFD4AF37),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              child: Text(
+                "Find Another Expert",
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: () {
+                Get.back(); // Navigate back
+              },
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                side: const BorderSide(color: Colors.white24),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              child: Text(
+                "Go Back",
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -419,37 +520,30 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.primaryGold.withOpacity(0.3)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: const Color(0xFF141414),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.summarize, color: AppTheme.primaryGold, size: 20),
+              const Icon(Icons.summarize, color: Color(0xFFD4AF37), size: 20),
               const SizedBox(width: 8),
               Text(
                 'Session Summary',
                 style: GoogleFonts.lora(
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
+                  color: Colors.white,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -459,22 +553,25 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
             ],
           ),
           if (summary.toString().isNotEmpty) ...[
-            const Divider(height: 24),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Divider(color: Colors.white12),
+            ),
             Text(
               'Highlights',
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.textSecondary,
+                color: const Color(0xFFD4AF37),
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             Text(
               summary,
               style: GoogleFonts.inter(
-                fontSize: 13,
+                fontSize: 14,
                 height: 1.5,
-                color: AppTheme.textPrimary,
+                color: Colors.white70,
               ),
             ),
           ],
@@ -489,24 +586,21 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
         Text(
           value,
           style: GoogleFonts.inter(
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: AppTheme.primaryGold,
+            color: const Color(0xFFD4AF37),
           ),
         ),
         const SizedBox(height: 4),
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: 11, color: AppTheme.textSecondary),
+          style: GoogleFonts.inter(fontSize: 11, color: Colors.white54),
         ),
       ],
     );
   }
 
-  // ─── Vertical Topic Cards ──────────────────────────────────────────────────
   Widget _buildTopicCards(BuildContext context) {
-    // Mapping specific colors from design for icons backgrounds
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: Column(
@@ -514,20 +608,18 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
           Text(
             "WHAT YOU WOULD LIKE TO DISCUS?",
             style: GoogleFonts.inter(
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF9E9E9E), // Grey text
+              color: Colors.white38,
               letterSpacing: 0.5,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
-
           _buildVerticalTopicCard(
             context,
             icon: Icons.trending_up,
             iconColor: Colors.orange,
-            bgIconColor: const Color(0xFFFFE0B2),
             label: "Career Growth",
             topic: Topic.career,
           ),
@@ -536,7 +628,6 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
             context,
             icon: Icons.favorite,
             iconColor: Colors.pink,
-            bgIconColor: const Color(0xFFF8BBD0),
             label: "Relationship Advice",
             topic: Topic.relationship,
           ),
@@ -545,7 +636,6 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
             context,
             icon: Icons.spa,
             iconColor: Colors.green,
-            bgIconColor: const Color(0xFFC8E6C9),
             label: "Health & Wellness",
             topic: Topic.health,
           ),
@@ -554,8 +644,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
             context,
             icon: Icons.account_balance_wallet,
             iconColor: Colors.blue,
-            bgIconColor: const Color(0xFFBBDEFB),
-            label: "Financial Stability", // Swapped position to match design
+            label: "Financial Stability",
             topic: Topic.finance,
           ),
         ],
@@ -567,7 +656,6 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
     BuildContext context, {
     required IconData icon,
     required Color iconColor,
-    required Color bgIconColor,
     required String label,
     required Topic topic,
   }) {
@@ -577,22 +665,16 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: const Color(0xFF141414),
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          border: Border.all(color: Colors.white12),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: bgIconColor.withOpacity(0.5),
+                color: iconColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: iconColor, size: 20),
@@ -603,7 +685,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: const Color(0xFF212121),
+                color: Colors.white,
               ),
             ),
           ],
@@ -612,7 +694,6 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
     );
   }
 
-  // ─── Questions List after selecting topic ─────────────────────────────────
   Widget _buildQuestionList(Topic topic) {
     final questions = controller.getCurrentQuestions();
     final topicName = topic.toString().split('.').last.capitalizeFirstLetter();
@@ -623,13 +704,12 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header + Back button
           Row(
             children: [
               IconButton(
                 icon: const Icon(
                   Icons.arrow_back_ios_new_rounded,
-                  color: AppTheme.textSecondary,
+                  color: Colors.white54,
                   size: 20,
                 ),
                 onPressed: controller.goBackToTopics,
@@ -637,66 +717,55 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
               const SizedBox(width: 8),
               Text(
                 "$topicName Questions",
-                style: GoogleFonts.cinzel(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.textPrimary,
+                style: GoogleFonts.lora(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 24),
-
-          // Questions
-          Center(
-            child: SingleChildScrollView(
-              child: Column(
-                children: questions.map((qMap) {
-                  final question = qMap["q"]!;
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: InkWell(
-                      onTap: () => controller.selectQuestion(question),
-                      borderRadius: BorderRadius.circular(16),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: AppTheme.lightGold,
-                            width: 1,
+          ...questions.map((qMap) {
+            final question = qMap["q"]!;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: InkWell(
+                onTap: () => controller.selectQuestion(question),
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF141414),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.3)),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          question,
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            color: Colors.white,
+                            height: 1.4,
                           ),
                         ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                question,
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  color: AppTheme.textPrimary,
-                                  height: 1.4,
-                                ),
-                              ),
-                            ),
-                            const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              size: 16,
-                              color: AppTheme.textSecondary,
-                            ),
-                          ],
-                        ),
                       ),
-                    ),
-                  );
-                }).toList(),
+                      const Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 14,
+                        color: Color(0xFFD4AF37),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ),
+            );
+          }).toList(),
         ],
       ),
     );
@@ -710,21 +779,14 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
           color: isUser
-              ? const Color(0xFF8D6E63)
-              : Colors.white, // Brown for user, White for expert
+              ? const Color(0xFFD4AF37)
+              : const Color(0xFF1A1A1A),
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(16),
             topRight: const Radius.circular(16),
             bottomLeft: Radius.circular(isUser ? 16 : 4),
             bottomRight: Radius.circular(isUser ? 4 : 16),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
         ),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Column(
@@ -735,11 +797,11 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
               msg.content,
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: isUser ? Colors.white : const Color(0xFF3E2723),
+                color: isUser ? Colors.black : Colors.white,
                 height: 1.4,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -747,7 +809,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                   "${msg.createdAt.hour}:${msg.createdAt.minute.toString().padLeft(2, '0')}",
                   style: GoogleFonts.inter(
                     fontSize: 10,
-                    color: isUser ? Colors.white70 : Colors.grey,
+                    color: isUser ? Colors.black54 : Colors.white54,
                   ),
                 ),
                 if (isUser) ...[
@@ -759,7 +821,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                         ? Icons.done_all
                         : Icons.check,
                     size: 14,
-                    color: msg.isRead ? Colors.blue : Colors.white70,
+                    color: msg.isRead ? Colors.blue : Colors.black54,
                   ),
                 ],
               ],
@@ -770,424 +832,99 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
     );
   }
 
-  Widget _buildInputBar() {
+  Widget _buildInputBar(BuildContext context) {
     return Obx(() {
-      final hasSentMessage = controller.messages.any(
-        (m) => controller.isMessageFromMe(m),
-      );
-
-      if (!controller.isRequestAccepted.value && hasSentMessage) {
+      // After first message is sent, hide input until partner accepts
+      if (controller.messages.isNotEmpty && !controller.isRequestAccepted.value) {
         return Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-          color: Colors.white,
-          child: SafeArea(
-            top: false,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    "Holds On Expert will respond to your message soon",
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
+          padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(context).padding.bottom + 16),
+          decoration: const BoxDecoration(
+            color: Color(0xFF141414),
+            border: Border(top: BorderSide(color: Colors.white12)),
           ),
-        );
-      }
-
-      return Container(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
-        color: Colors.transparent,
-        child: SafeArea(
-          top: false,
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Suggestions Button
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFF3E0),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: const Color(0xFF8D6E63).withOpacity(0.3),
-                    width: 1,
-                  ),
-                ),
-                child: IconButton(
-                  onPressed: () => _showSuggestionsSheet(Get.context!),
-                  icon: const Icon(
-                    Icons.lightbulb_outline,
-                    color: Color(0xFF8D6E63),
-                    size: 22,
-                  ),
-                  tooltip: 'Suggested Questions',
-                ),
-              ),
-              const SizedBox(width: 8),
-
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: Colors.transparent),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: TextField(
-                    controller: controller.messageController,
-                    style: GoogleFonts.inter(
-                      fontSize: 15,
-                      color: Colors.black87,
-                    ),
-                    cursorColor: const Color(0xFF8D6E63),
-                    decoration: InputDecoration(
-                      hintText: "Ask about your........",
-                      hintStyle: GoogleFonts.inter(
-                        color: Colors.grey[400],
-                        fontSize: 14,
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
-                      ),
-                    ),
-                    onChanged: (value) {
-                      controller.showSuggestions.value = value.trim().isEmpty;
-                    },
-                    onSubmitted: (_) => controller.sendMessage(),
-                  ),
+              SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: const Color(0xFFD4AF37),
                 ),
               ),
               const SizedBox(width: 12),
-              GestureDetector(
-                onTap: controller.sendMessage,
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF8D6E63), // Brown send button
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.play_arrow,
-                    color: Colors.white,
-                    size: 20,
-                  ),
+              Text(
+                "Waiting for expert to accept...",
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: Colors.white54,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
           ),
-        ),
-      );
-    });
-  }
+        );
+      }
 
-  // ─── Suggestions Bottom Sheet ───────────────────────────────────────────────
-  void _showSuggestionsSheet(BuildContext context) {
-    // Reset topic selection when opening sheet
-    controller.selectedTopic.value = null;
-
-    Get.bottomSheet(
-      _SuggestionsSheetContent(controller: controller),
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-    );
-  }
-}
-
-/// Stateless widget for the suggestions bottom sheet content
-class _SuggestionsSheetContent extends StatelessWidget {
-  final AstrologyChatController controller;
-  const _SuggestionsSheetContent({required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.55,
-      ),
-      decoration: const BoxDecoration(
-        color: Color(0xFFFFF3E0),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Drag handle
-          Container(
-            margin: const EdgeInsets.only(top: 12, bottom: 8),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: const Color(0xFF8D6E63).withOpacity(0.3),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          // Header
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.lightbulb_outline,
-                  color: Color(0xFF8D6E63),
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  "Quick Suggestions",
-                  style: GoogleFonts.cinzel(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF3E2723),
-                  ),
-                ),
-                const Spacer(),
-                IconButton(
-                  onPressed: () => Get.back(),
-                  icon: const Icon(
-                    Icons.close,
-                    color: Color(0xFF5D4037),
-                    size: 20,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Divider(height: 1, color: Color(0xFFD7CCC8)),
-          // Content
-          Flexible(
-            child: Obx(() {
-              if (controller.selectedTopic.value != null) {
-                return _buildSheetQuestions(controller.selectedTopic.value!);
-              }
-              return SingleChildScrollView(child: _buildSheetTopics(context));
-            }),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSheetTopics(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Choose a topic to get question suggestions",
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              color: const Color(0xFF8D6E63),
-            ),
-          ),
-          const SizedBox(height: 16),
-          _buildSheetTopicTile(
-            icon: Icons.trending_up,
-            iconColor: Colors.orange,
-            bgColor: const Color(0xFFFFE0B2),
-            label: "Career Growth",
-            topic: Topic.career,
-          ),
-          const SizedBox(height: 10),
-          _buildSheetTopicTile(
-            icon: Icons.favorite,
-            iconColor: Colors.pink,
-            bgColor: const Color(0xFFF8BBD0),
-            label: "Relationship Advice",
-            topic: Topic.relationship,
-          ),
-          const SizedBox(height: 10),
-          _buildSheetTopicTile(
-            icon: Icons.spa,
-            iconColor: Colors.green,
-            bgColor: const Color(0xFFC8E6C9),
-            label: "Health & Wellness",
-            topic: Topic.health,
-          ),
-          const SizedBox(height: 10),
-          _buildSheetTopicTile(
-            icon: Icons.account_balance_wallet,
-            iconColor: Colors.blue,
-            bgColor: const Color(0xFFBBDEFB),
-            label: "Financial Stability",
-            topic: Topic.finance,
-          ),
-          const SizedBox(height: 8),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSheetTopicTile({
-    required IconData icon,
-    required Color iconColor,
-    required Color bgColor,
-    required String label,
-    required Topic topic,
-  }) {
-    return InkWell(
-      onTap: () => controller.selectTopic(topic),
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
+      return Padding(
+        padding: EdgeInsets.fromLTRB(16, 12, 16, MediaQuery.of(context).padding.bottom + 12),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: bgColor.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(10),
+                color: const Color(0xFF141414),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white12),
               ),
-              child: Icon(icon, color: iconColor, size: 18),
+              child: IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.add, color: Colors.white, size: 24),
+              ),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                label,
-                style: GoogleFonts.inter(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFF212121),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 0),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF141414),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white12),
+                ),
+                child: TextField(
+                  maxLines: 3,
+                  minLines: 1,
+                  controller: controller.messageController,
+                  cursorColor: Colors.white,
+                  style: GoogleFonts.inter(color: Colors.white, fontSize: 14),
+                  decoration: InputDecoration(
+                    hintText: "Ask about your......",
+                    hintStyle: GoogleFonts.inter(color: Colors.white30, fontSize: 14),
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    filled: true,
+                    fillColor: Colors.transparent,
+                  ),
+                  onChanged: (val) => controller.showSuggestions.value = val.isEmpty,
                 ),
               ),
             ),
-            const Icon(Icons.chevron_right, color: Color(0xFF8D6E63), size: 20),
+            const SizedBox(width: 12),
+            InkWell(
+              onTap: controller.sendMessage,
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFD4AF37),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.send_rounded, color: Colors.black, size: 20),
+              ),
+            ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildSheetQuestions(Topic topic) {
-    final questions = controller.getCurrentQuestions();
-    final topicName = topic.toString().split('.').last.capitalizeFirstLetter();
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Back to topics
-          InkWell(
-            onTap: () => controller.goBackToTopics(),
-            borderRadius: BorderRadius.circular(8),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: Color(0xFF8D6E63),
-                  size: 16,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  "$topicName Questions",
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF3E2723),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          ...questions.map((qMap) {
-            final question = qMap["q"]!;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: InkWell(
-                onTap: () {
-                  Get.back(); // Close bottom sheet first
-                  controller.selectQuestion(question); // Send the question
-                },
-                borderRadius: BorderRadius.circular(14),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: const Color(0xFFD7CCC8),
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          question,
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            color: const Color(0xFF3E2723),
-                            height: 1.4,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF8D6E63).withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.send_rounded,
-                          size: 14,
-                          color: Color(0xFF8D6E63),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ],
-      ),
-    );
+      );
+    });
   }
 }

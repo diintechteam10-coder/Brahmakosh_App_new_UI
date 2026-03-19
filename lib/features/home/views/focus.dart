@@ -60,7 +60,7 @@ class FocusInfoCard extends StatelessWidget {
                     children: [
                       Text(
                         'Focus Area',
-                        style: GoogleFonts.playfairDisplay(
+                        style: GoogleFonts.lora(
                           fontSize: 22,
                           fontWeight: FontWeight.w800,
                           color: AppTheme.textPrimary,
@@ -251,7 +251,7 @@ class _PremiumFocusTileState extends State<_PremiumFocusTile>
                           children: [
                             Text(
                               isBack ? "Insights Unlocked" : widget.label,
-                              style: GoogleFonts.playfairDisplay(
+                              style: GoogleFonts.lora(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: AppTheme.textPrimary,
@@ -262,7 +262,7 @@ class _PremiumFocusTileState extends State<_PremiumFocusTile>
                               isBack
                                   ? "Tap to hide details"
                                   : "Tap to view insights",
-                              style: GoogleFonts.inter(
+                              style: GoogleFonts.poppins(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
                                 color: isBack

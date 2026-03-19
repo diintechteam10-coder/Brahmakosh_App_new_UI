@@ -21,6 +21,14 @@ class _AshtakvargaTabState extends State<AshtakvargaTab> {
   String _selectedPlanet = 'Sun';
   int _viewMode = 0; // 0 = Chart, 1 = Table
 
+  static const Color _bgDark = Colors.black;
+  static const Color _cardDark = Color(0xFF0F0F2D);
+  static const Color _cardBorder = Color(0xFF1E1E4D);
+  static const Color _textPrimary = Colors.white;
+  static const Color _textSecondary = Color(0xFFB0B0CC);
+  static const Color _accentGold = Color(0xFFD4AF37);
+  static const Color _sectionLine = Color(0xFF1E1E4D);
+
   final List<String> _planets = [
     'Sun',
     'Moon',
@@ -34,57 +42,51 @@ class _AshtakvargaTabState extends State<AshtakvargaTab> {
   @override
   Widget build(BuildContext context) {
     if (widget.planetAshtak == null) {
-      return const Center(child: Text("No Ashtakvarga data available"));
+      return Container(
+        color: _bgDark,
+        child: Center(
+          child: Text(
+            "No Ashtakvarga data available",
+            style: GoogleFonts.poppins(color: _textSecondary),
+          ),
+        ),
+      );
     }
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Ashtakvarga",
-            style: GoogleFonts.lora(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF5D4037),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            "Ashtakvarga is used to determine and fine tune the prediction accuracies based on Dasha and Transit forecasts. 4 or lesser points are considered not good whereas more than 4 points are favorable.",
-            style: GoogleFonts.lora(
-              fontSize: 14,
-              color: const Color(0xFF5D4037),
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: 20),
-          _buildControls(),
-          const SizedBox(height: 20),
-          AnimatedCrossFade(
-            firstChild: _buildChart(),
-            secondChild: _buildTable(),
-            crossFadeState: _viewMode == 0
-                ? CrossFadeState.showFirst
-                : CrossFadeState.showSecond,
-            duration: const Duration(milliseconds: 300),
-          ),
-          const SizedBox(height: 16),
-          Center(
-            child: Text(
-              "Planet Notations",
-              style: GoogleFonts.lora(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF5D4037),
+    return Container(
+      color: _bgDark,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionHeader("ASHTAKVARGA"),
+            const SizedBox(height: 16),
+            Text(
+              "Ashtakvarga determines and fine-tunes prediction accuracies based on Dasha and Transit forecasts. 4 or fewer points are considered unfavorable, while more than 4 points are auspicious.",
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: _textSecondary,
+                height: 1.5,
               ),
+              textAlign: TextAlign.justify,
             ),
-          ),
-          const SizedBox(height: 12),
-          Center(
-            child: Wrap(
-              spacing: 16,
+            const SizedBox(height: 24),
+            _buildControls(),
+            const SizedBox(height: 24),
+            AnimatedCrossFade(
+              firstChild: _buildChart(),
+              secondChild: _buildTable(),
+              crossFadeState: _viewMode == 0
+                  ? CrossFadeState.showFirst
+                  : CrossFadeState.showSecond,
+              duration: const Duration(milliseconds: 300),
+            ),
+            const SizedBox(height: 24),
+            _buildSectionHeader("PLANET NOTATIONS"),
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 12,
               runSpacing: 8,
               alignment: WrapAlignment.center,
               children: const [
@@ -99,88 +101,152 @@ class _AshtakvargaTabState extends State<AshtakvargaTab> {
                 _LegendItem(code: "Ke", name: "Ketu"),
               ],
             ),
-          ),
-          const SizedBox(height: 20),
-        ],
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildControls() {
-    return Row(
+  Widget _buildSectionHeader(String title) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Radio Buttons for View Mode
-        Row(
-          children: [
-            Radio<int>(
-              value: 0,
-              groupValue: _viewMode,
-              onChanged: (val) {
-                setState(() {
-                  _viewMode = val!;
-                });
-              },
-              activeColor: const Color(0xFF00796B),
-            ),
-            Text("Chart", style: GoogleFonts.lora(fontSize: 16)),
-            Radio<int>(
-              value: 1,
-              groupValue: _viewMode,
-              onChanged: (val) {
-                setState(() {
-                  _viewMode = val!;
-                });
-              },
-              activeColor: const Color(0xFF00796B),
-            ),
-            Text("Table", style: GoogleFonts.lora(fontSize: 16)),
-          ],
+        Text(
+          title,
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: _textPrimary,
+            letterSpacing: 1.2,
+          ),
         ),
-        const Spacer(),
-        // Dropdown for Planet
+        const SizedBox(height: 4),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF5F5F5),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: _selectedPlanet,
-              items: _planets.map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(
-                    value,
-                    style: GoogleFonts.lora(color: const Color(0xFF5D4037)),
-                  ),
-                );
-              }).toList(),
-              onChanged: (newValue) {
-                setState(() {
-                  _selectedPlanet = newValue!;
-                });
-              },
-              icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF5D4037)),
-            ),
-          ),
+          height: 1,
+          color: _sectionLine,
         ),
       ],
+    );
+  }
+
+  Widget _buildControls() {
+    return Column(
+      children: [
+        Row(
+          children: [
+            // View Mode Toggle
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: _cardDark,
+                border: Border.all(color: _cardBorder),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildToggleBtn(Icons.grid_on, 0, "Chart"),
+                  _buildToggleBtn(Icons.table_chart, 1, "Table"),
+                ],
+              ),
+            ),
+            const Spacer(),
+            // Planet Selection
+            _buildPlanetDropdown(),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildToggleBtn(IconData icon, int index, String label) {
+    bool isSelected = _viewMode == index;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _viewMode = index;
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? _accentGold : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: isSelected ? Colors.white : _textSecondary,
+            ),
+            if (isSelected) ...[
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPlanetDropdown() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+      decoration: BoxDecoration(
+        color: _cardDark,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: _cardBorder),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: _selectedPlanet,
+          dropdownColor: _cardDark,
+          items: _planets.map((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(
+                value,
+                style: GoogleFonts.poppins(
+                  color: value == _selectedPlanet ? _accentGold : _textPrimary,
+                  fontWeight: value == _selectedPlanet ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+            );
+          }).toList(),
+          onChanged: (newValue) {
+            setState(() {
+              _selectedPlanet = newValue!;
+            });
+          },
+          icon: const Icon(Icons.arrow_drop_down, color: _accentGold),
+        ),
+      ),
     );
   }
 
   Widget _buildChart() {
     final planetData = widget.planetAshtak![_selectedPlanet.toLowerCase()];
     if (planetData == null || planetData.ashtakPoints == null) {
-      return const SizedBox(height: 200, child: Center(child: Text("No Data")));
+      return Container(
+        height: 300,
+        alignment: Alignment.center,
+        child: Text("No Data", style: GoogleFonts.poppins(color: _textSecondary)),
+      );
     }
 
-    // Map Sign -> Total Points for the selected planet
-    // Then Map House -> Points
     final Map<int, int> housePointsMap = {};
     int ascNum = _getSignNumber(widget.ascendantSign);
 
-    // Create a map of SignName -> Total Points
     final Map<int, int> signTotalPoints = {};
     for (var entry in planetData.ashtakPoints!.entries) {
       int signNum = _getSignNumber(entry.key);
@@ -192,20 +258,31 @@ class _AshtakvargaTabState extends State<AshtakvargaTab> {
       housePointsMap[house] = signTotalPoints[signForHouse] ?? 0;
     }
 
-    return NorthIndianPointsChart(
-      housePoints: housePointsMap,
-      ascendantSign: widget.ascendantSign,
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: _cardDark,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _cardBorder),
+      ),
+      child: NorthIndianPointsChart(
+        housePoints: housePointsMap,
+        ascendantSign: widget.ascendantSign,
+        isDark: true,
+      ),
     );
   }
 
   Widget _buildTable() {
     final planetData = widget.planetAshtak![_selectedPlanet.toLowerCase()];
     if (planetData == null || planetData.ashtakPoints == null) {
-      return const SizedBox(height: 200, child: Center(child: Text("No Data")));
+      return Container(
+        height: 200,
+        alignment: Alignment.center,
+        child: Text("No Data", style: GoogleFonts.poppins(color: _textSecondary)),
+      );
     }
 
-    // Columns: Sign (Abbr), Sun -> Asc, Total
-    // 8 factors: Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn, Ascendant
     final List<String> factors = [
       'sun',
       'moon',
@@ -217,7 +294,6 @@ class _AshtakvargaTabState extends State<AshtakvargaTab> {
       'ascendant',
     ];
 
-    // Build Rows for 12 signs in order Aries -> Pisces
     final List<String> signOrder = [
       'aries',
       'taurus',
@@ -237,31 +313,40 @@ class _AshtakvargaTabState extends State<AshtakvargaTab> {
       scrollDirection: Axis.horizontal,
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xFFE0E0E0)),
-          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: _cardBorder),
+          borderRadius: BorderRadius.circular(12),
+          color: _cardDark,
         ),
         child: Column(
           children: [
             // Header
-            Row(
-              children: [
-                _buildCell("Sign", width: 80, isHeader: true),
-                ...factors.map(
-                  (f) => _buildCell(
-                    _formatFactorName(f),
-                    width: 40,
-                    isHeader: true,
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+              decoration: BoxDecoration(
+                color: _cardBorder.withOpacity(0.3),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
+              ),
+              child: Row(
+                children: [
+                  _buildCell("SIGN", width: 80, isHeader: true, align: TextAlign.start, padding: const EdgeInsets.only(left: 12)),
+                  ...factors.map(
+                    (f) => _buildCell(
+                      _formatFactorName(f),
+                      width: 42,
+                      isHeader: true,
+                    ),
                   ),
-                ),
-                _buildCell(
-                  "Total",
-                  width: 50,
-                  isHeader: true,
-                  bgColor: const Color(0xFFB2DFDB),
-                ),
-              ],
+                  _buildCell(
+                    "TOTAL",
+                    width: 55,
+                    isHeader: true,
+                    isBold: true,
+                    textColor: _accentGold,
+                  ),
+                ],
+              ),
             ),
-            const Divider(height: 1, color: Color(0xFFE0E0E0)),
+            const Divider(height: 1, color: _cardBorder),
             // Body rows
             ...signOrder.map((signKey) {
               final points = planetData.ashtakPoints![signKey];
@@ -275,28 +360,26 @@ class _AshtakvargaTabState extends State<AshtakvargaTab> {
                         width: 80,
                         isHeader: true,
                         align: TextAlign.start,
-                        padding: const EdgeInsets.only(left: 8),
+                        padding: const EdgeInsets.only(left: 12),
                       ),
-                      _buildCell(points.sun?.toString() ?? "0", width: 40),
-                      _buildCell(points.moon?.toString() ?? "0", width: 40),
-                      _buildCell(points.mars?.toString() ?? "0", width: 40),
-                      _buildCell(points.mercury?.toString() ?? "0", width: 40),
-                      _buildCell(points.jupiter?.toString() ?? "0", width: 40),
-                      _buildCell(points.venus?.toString() ?? "0", width: 40),
-                      _buildCell(points.saturn?.toString() ?? "0", width: 40),
-                      _buildCell(
-                        points.ascendant?.toString() ?? "0",
-                        width: 40,
-                      ),
+                      _buildCell(points.sun?.toString() ?? "0", width: 42),
+                      _buildCell(points.moon?.toString() ?? "0", width: 42),
+                      _buildCell(points.mars?.toString() ?? "0", width: 42),
+                      _buildCell(points.mercury?.toString() ?? "0", width: 42),
+                      _buildCell(points.jupiter?.toString() ?? "0", width: 42),
+                      _buildCell(points.venus?.toString() ?? "0", width: 42),
+                      _buildCell(points.saturn?.toString() ?? "0", width: 42),
+                      _buildCell(points.ascendant?.toString() ?? "0", width: 42),
                       _buildCell(
                         points.total?.toString() ?? "0",
-                        width: 50,
+                        width: 55,
                         isBold: true,
-                        bgColor: const Color(0xFFB2DFDB).withOpacity(0.5),
+                        textColor: (points.total ?? 0) >= 28 ? const Color(0xFF81C784) : _textPrimary,
+                        bgColor: _cardBorder.withOpacity(0.1),
                       ),
                     ],
                   ),
-                  const Divider(height: 1, color: Color(0xffeeeeee)),
+                  const Divider(height: 1, color: _cardBorder),
                 ],
               );
             }),
@@ -314,23 +397,21 @@ class _AshtakvargaTabState extends State<AshtakvargaTab> {
     TextAlign align = TextAlign.center,
     EdgeInsets? padding,
     Color? bgColor,
+    Color? textColor,
   }) {
     return Container(
       width: width,
-      height: 40,
-      alignment: align == TextAlign.start
-          ? Alignment.centerLeft
-          : Alignment.center,
+      height: 48,
+      alignment: align == TextAlign.start ? Alignment.centerLeft : Alignment.center,
       padding: padding,
       color: bgColor ?? Colors.transparent,
       child: Text(
         text,
-        style: GoogleFonts.lora(
-          fontSize: 13,
-          fontWeight: (isHeader || isBold)
-              ? FontWeight.bold
-              : FontWeight.normal,
-          color: const Color(0xFF424242),
+        style: GoogleFonts.poppins(
+          fontSize: isHeader ? 11 : 13,
+          fontWeight: (isHeader || isBold) ? FontWeight.bold : FontWeight.normal,
+          color: textColor ?? (isHeader ? _textSecondary : _textPrimary),
+          letterSpacing: isHeader ? 0.5 : 0,
         ),
         textAlign: align,
       ),
@@ -338,32 +419,32 @@ class _AshtakvargaTabState extends State<AshtakvargaTab> {
   }
 
   String _formatFactorName(String key) {
-    if (key == 'ascendant') return 'Asc';
-    if (key.length <= 2) return key;
-    return key.substring(0, 1).toUpperCase() + key.substring(1, 2);
+    if (key == 'ascendant') return 'ASC';
+    if (key.length <= 2) return key.toUpperCase();
+    return key.substring(0, 1).toUpperCase() + key.substring(1, 2).toUpperCase();
   }
 
   String _formatSignName(String key) {
     if (key.length <= 2) return key.toUpperCase();
-    if (key == "ascendant") return "Asc";
-    return key[0].toUpperCase() + key.substring(1);
+    if (key == "ascendant") return "ASC";
+    return key[0].toUpperCase() + key.substring(1).toUpperCase();
   }
 
   int _getSignNumber(String? signName) {
     if (signName == null) return 1;
     final lower = signName.toLowerCase();
-    if (lower.contains('aries')) return 1;
-    if (lower.contains('taurus')) return 2;
-    if (lower.contains('gemini')) return 3;
-    if (lower.contains('cancer')) return 4;
-    if (lower.contains('leo')) return 5;
-    if (lower.contains('virgo')) return 6;
-    if (lower.contains('libra')) return 7;
-    if (lower.contains('scorpio')) return 8;
-    if (lower.contains('sagittarius')) return 9;
-    if (lower.contains('capricorn')) return 10;
-    if (lower.contains('aquarius')) return 11;
-    if (lower.contains('pisces')) return 12;
+    if (lower.contains('aries') || lower.contains('mesh')) return 1;
+    if (lower.contains('taurus') || lower.contains('vrish')) return 2;
+    if (lower.contains('gemini') || lower.contains('mithun')) return 3;
+    if (lower.contains('cancer') || lower.contains('kark')) return 4;
+    if (lower.contains('leo') || lower.contains('simha')) return 5;
+    if (lower.contains('virgo') || lower.contains('kanya')) return 6;
+    if (lower.contains('libra') || lower.contains('tula')) return 7;
+    if (lower.contains('scorpio') || lower.contains('vrishchik')) return 8;
+    if (lower.contains('sagittarius') || lower.contains('dhanu')) return 9;
+    if (lower.contains('capricorn') || lower.contains('makar')) return 10;
+    if (lower.contains('aquarius') || lower.contains('kumbh')) return 11;
+    if (lower.contains('pisces') || lower.contains('meen')) return 12;
     return 1;
   }
 }
@@ -376,23 +457,33 @@ class _LegendItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          "$code: ",
-          style: GoogleFonts.lora(
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFFF5722), // Orange for code
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F0F2D),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFF1E1E4D)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            "$code: ",
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFFD4AF37),
+              fontSize: 12,
+            ),
           ),
-        ),
-        Text(
-          name,
-          style: GoogleFonts.lora(
-            color: const Color(0xFF5D4037), // Brown for name
+          Text(
+            name,
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 12,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -81,7 +81,10 @@ class MobileOtpController extends GetxController {
           "Accept": "application/json",
         },
         body: jsonEncode(payload), // 🔥 MUST BE JSON
-      );
+      ).timeout(const Duration(seconds: 15), onTimeout: () {
+        print("⏳ REQUEST TIMEOUT - sendOtp");
+        throw http.ClientException("Request timed out");
+      });
 
       print("⬅️ STATUS: ${res.statusCode}");
       print("⬅️ RAW RESPONSE: ${res.body}");
@@ -114,7 +117,7 @@ class MobileOtpController extends GetxController {
     } catch (e, stack) {
       print("🔥 EXCEPTION: $e");
       print("🔥 STACK TRACE: $stack");
-      Get.snackbar("Error", "Server error");
+      Get.snackbar("Error", e is http.ClientException ? "Connection timeout" : "Server error");
     } finally {
       isLoading.value = false;
       print("✅ Loading = FALSE");
@@ -152,9 +155,15 @@ class MobileOtpController extends GetxController {
 
       final res = await http.post(
         Uri.parse(ApiUrls.mobileVerify),
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
         body: jsonEncode(payload),
-      );
+      ).timeout(const Duration(seconds: 15), onTimeout: () {
+        print("⏳ REQUEST TIMEOUT - verifyOtp");
+        throw http.ClientException("Verification timed out");
+      });
 
       print("⬅️ STATUS: ${res.statusCode}");
       print("⬅️ RESPONSE: ${res.body}");
@@ -175,7 +184,7 @@ class MobileOtpController extends GetxController {
     } catch (e, stack) {
       print("🔥 VERIFY ERROR: $e");
       print("🔥 STACK: $stack");
-      Get.snackbar("Error", "Server error");
+      Get.snackbar("Error", e is http.ClientException ? "Connection timeout" : "Server error");
     } finally {
       isLoading.value = false;
     }

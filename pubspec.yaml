@@ -92,6 +92,7 @@ dev_dependencies:
     sdk: flutter
 
   flutter_launcher_icons: ^0.14.4
+  flutter_lints: ^2.0.0
 
 
 flutter_launcher_icons:
@@ -115,4 +116,5 @@ flutter:
     - assets/images/bi_bg.mp4
     - assets/images/landing_welcome.mp4
     - assets/lotties/
+    - assets/icons/
 

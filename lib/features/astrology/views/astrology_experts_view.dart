@@ -10,6 +10,8 @@ import 'package:brahmakosh/features/profile/viewmodels/profile_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'voice_call_view.dart'; // Added VoiceCallView import
 import 'package:brahmakosh/core/services/storage_service.dart';
+import 'package:brahmakosh/features/dashboard/viewmodels/dashboard_viewmodel.dart';
+import '../../../../common/widgets/custom_profile_avatar.dart';
 
 class AstrologyExpertsView extends StatelessWidget {
   final String? screenTitle;
@@ -29,24 +31,42 @@ class AstrologyExpertsView extends StatelessWidget {
         : Get.put(AstrologyController(), permanent: true);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFBE6D0), // Gold background
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFBE6D0),
+        backgroundColor: Colors.black,
         elevation: 0,
-        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 30),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              try {
+                // If we can't pop, we might be a tab in the Dashboard.
+                // Navigate back to the Home tab (index 0).
+                final dashboardVM =
+                    Provider.of<DashboardViewModel>(context, listen: false);
+                dashboardVM.changeTab(0);
+              } catch (e) {
+                // Fallback to standard GetX back behavior if DashboardViewModel is not available
+                Navigator.of(context).maybePop();
+              }
+            }
+          },
+        ),
         title: Text(
           "Connect",
           style: GoogleFonts.lora(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: AppTheme.textPrimary,
+            color: Colors.white,
           ),
         ),
         centerTitle: false,
-        titleSpacing: 20,
+        titleSpacing: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.history, color: AppTheme.textPrimary),
+            icon: const Icon(Icons.history, color: Colors.white),
             onPressed: () => controller.openHistory(),
           ),
           const SizedBox(width: 8),
@@ -63,31 +83,30 @@ class AstrologyExpertsView extends StatelessWidget {
 
           // Categories / Filters
           Padding(
-            padding: const EdgeInsets.only(bottom: 4),
-
-            child: SizedBox(
-              height: 35,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Container(
+              height: 44,
+              decoration: BoxDecoration(
+                color: const Color(0xFF1A1A1A),
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: Colors.white.withOpacity(0.05)),
+              ),
               child: Obx(() {
-                // Ensure "All" is always first
                 final allCategories = [
                   {'name': 'All', '_id': 'all'},
                   ...controller.categories,
                 ];
-
-                // Access selectedCategoryId here to register dependency with Obx
                 final selectedId = controller.selectedCategoryId;
-
                 return ListView.builder(
                   controller: controller.categoryScrollController,
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
                   itemCount: allCategories.length,
                   itemBuilder: (context, index) {
                     final cat = allCategories[index];
                     final id = cat['_id'];
                     final name = cat['name'];
                     final isSelected = selectedId == id;
-
                     return _buildFilterChip(
                       context,
                       name,
@@ -161,27 +180,20 @@ class AstrologyExpertsView extends StatelessWidget {
 
   Widget _buildSearchBar(BuildContext context, AstrologyController controller) {
     return Container(
-      height: 45,
+      height: 48,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.transparent),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
       ),
       child: TextField(
         controller: controller.searchController,
-        style: GoogleFonts.inter(color: AppTheme.textPrimary),
+        style: GoogleFonts.inter(color: Colors.white),
         decoration: InputDecoration(
           hintText: "Search",
-          hintStyle: GoogleFonts.inter(color: AppTheme.textSecondary),
-          prefixIcon: const Icon(Icons.search, color: AppTheme.textPrimary),
-          filled: false, // Prevent double background
+          hintStyle: GoogleFonts.inter(color: Colors.white.withOpacity(0.4)),
+          prefixIcon: Icon(Icons.search, color: Colors.white.withOpacity(0.4)),
+          filled: false,
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 12),
           enabledBorder: InputBorder.none,
@@ -199,44 +211,44 @@ class AstrologyExpertsView extends StatelessWidget {
     AstrologyController controller,
     int index,
   ) {
-    return Container(
-      margin: const EdgeInsets.only(right: 10),
-      child: InkWell(
-        onTap: () {
-          controller.selectCategory(id);
-          // Scroll to position (simple implementation: scroll to index * approx width)
-          // For exact "first position", we'd need keys or a specific package.
-          // Here we try to center it or move it to start.
-          double offset = index * 100.0; // Approx width + margin
-          if (index > 0) offset -= 10; // Adjust for padding
+    return InkWell(
+      onTap: () {
+        controller.selectCategory(id);
+        
+        // Centering logic: (index * approx_width) - (screen_width / 2) + (approx_width / 2)
+        // Adjusting for the capsule container padding and horizontal scroll physics
+        final screenWidth = MediaQuery.of(context).size.width;
+        const itemWidth = 110.0; // Approx width of a chip
+        double offset = (index * itemWidth) - (screenWidth / 2) + (itemWidth / 2);
+        
+        // Clamp offset to scroll bounds
+        if (offset < 0) offset = 0;
+        final maxScroll = controller.categoryScrollController.position.maxScrollExtent;
+        if (offset > maxScroll) offset = maxScroll;
 
-          controller.categoryScrollController.animateTo(
-            offset,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
-        },
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? AppTheme.primaryGold
-                : Colors.transparent, // Dark gold for selected
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: isSelected
-                  ? Colors.transparent
-                  : const Color(0xFFA67C00).withOpacity(0.5),
-            ),
-          ),
-          child: Text(
-            label,
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: isSelected ? Colors.white : const Color(0xFF5D4037),
-            ),
+        controller.categoryScrollController.animateTo(
+          offset,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      },
+      borderRadius: BorderRadius.circular(18),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFD4AF37) : Colors.transparent,
+          borderRadius: BorderRadius.circular(18),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          label.toUpperCase(),
+          style: GoogleFonts.inter(
+            fontSize: 11,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+            color: isSelected ? Colors.black : Colors.white.withOpacity(0.5),
+            letterSpacing: 0.5,
           ),
         ),
       ),
@@ -248,68 +260,25 @@ class AstrologyExpertsView extends StatelessWidget {
     AstrologistItem expert,
     AstrologyController controller,
   ) {
-    // ── Partner detail logs ──
     developer.log(
-      '🔍 [Partner Details] '
-      'id: ${expert.id}, '
-      'name: ${expert.name}, '
-      'status: ${expert.status}, '
-      'experience: ${expert.experience}, '
-      'expertise: ${expert.expertise}, '
-      'profilePhoto: ${expert.profilePhoto}, '
-      'profileSummary: ${expert.profileSummary}, '
-      'chatCharge: ${expert.chatCharge}, '
-      'voiceCharge: ${expert.voiceCharge}, '
-      'videoCharge: ${expert.videoCharge}, '
-      'rating: ${expert.rating}, '
-      'reviews: ${expert.reviews}, '
-      'languages: ${expert.languages}, '
-      'categoryId: ${expert.categoryId}, '
-      'isActive: ${expert.isActive}',
+      '🔍 [Partner Details] id: ${expert.id}, name: ${expert.name}',
       name: 'AstrologyExpertsView',
     );
 
-    final hasProfilePhoto =
-        expert.profilePhoto != null && expert.profilePhoto!.isNotEmpty;
-    // Use lowercase for comparison to be safe
     final status = expert.status?.toLowerCase() ?? 'offline';
     final isOnline = status == 'online';
     final isBusy = status == 'busy';
 
-    // Status Color & Text
     Color statusColor = Colors.grey;
-    String statusText = "Offline";
-
-    if (isOnline) {
-      statusColor = Colors.green;
-      statusText = "Available";
-    } else if (isBusy) {
-      statusColor = Colors.orange;
-      statusText = "Busy";
-    }
-
-    // Skills processing
-    final skills = expert.expertise != null && expert.expertise!.isNotEmpty
-        ? expert.expertise!
-              .split(',')
-              .map((e) => "• ${e.trim()}")
-              .take(2)
-              .join("   ")
-        : "";
+    if (isOnline) statusColor = Colors.green;
+    else if (isBusy) statusColor = Colors.orange;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF8F0), // Light cream card background
+        color: const Color(0xFF141414),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppTheme.lightGold.withOpacity(0.3)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
       child: Material(
         color: Colors.transparent,
@@ -319,190 +288,153 @@ class AstrologyExpertsView extends StatelessWidget {
           borderRadius: BorderRadius.circular(24),
           child: Padding(
             padding: const EdgeInsets.all(16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Column(
               children: [
-                // Left Column: Avatar + Status
-                Column(
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Avatar with status
                     Stack(
                       children: [
-                        hasProfilePhoto
-                            ? Container(
-                                width: 64,
-                                height: 64,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                    image: NetworkImage(expert.profilePhoto!),
-                                    fit: BoxFit.cover,
-                                  ),
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 2,
-                                  ),
-                                ),
-                              )
-                            : Container(
-                                width: 64,
-                                height: 64,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  gradient: const LinearGradient(
-                                    colors: [
-                                      Color(0xFFD4AF37),
-                                      Color(0xFFA67C00),
-                                    ], // Gold Gradient
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 2,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(
-                                        0xFFA67C00,
-                                      ).withOpacity(0.3),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: const Icon(
-                                  Icons.person_rounded,
-                                  size: 36,
-                                  color: Colors.white,
-                                ),
-                              ),
+                        Container(
+                          width: 64,
+                          height: 64,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: const Color(0xFFD4AF37),
+                              width: 2,
+                            ),
+                          ),
+                          child: CustomProfileAvatar(
+                            imageUrl: expert.profilePhoto,
+                            radius: 30,
+                            borderWidth: 0,
+                          ),
+                        ),
                         Positioned(
-                          right: 0,
-                          top: 0,
+                          right: 2,
+                          bottom: 2,
                           child: Container(
-                            width: 14,
-                            height: 14,
+                            width: 12,
+                            height: 12,
                             decoration: BoxDecoration(
                               color: statusColor,
                               shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
+                              border: Border.all(color: Colors.black, width: 2),
                             ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      statusText,
-                      style: GoogleFonts.inter(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFF5D4037),
+                    const SizedBox(width: 16),
+                    // Details
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  expert.name ?? 'Astrologer',
+                                  style: GoogleFonts.lora(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  const Icon(Icons.star, color: Color(0xFFD4AF37), size: 16),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    "${expert.rating ?? 4.9}",
+                                    style: GoogleFonts.inter(
+                                      color: Colors.white,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            expert.expertise?.split(',').take(2).join(", ") ?? "Vedic Astrology",
+                            style: GoogleFonts.inter(
+                              fontSize: 13,
+                              color: Colors.white.withOpacity(0.5),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              const Icon(Icons.work_outline, color: Color(0xFFD4AF37), size: 14),
+                              const SizedBox(width: 6),
+                              Text(
+                                "${expert.experience ?? '0'}+ Years Exp.",
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  color: const Color(0xFFD4AF37),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(width: 16),
-
-                // Right Column: Details + Buttons
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        expert.name ?? 'Astrologer',
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.textPrimary,
-                        ),
+                const SizedBox(height: 20),
+                // Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildActionButton(
+                        icon: Icons.chat_outlined,
+                        price: "₹${expert.chatCharge?.toInt() ?? ""}/min",
+                        onTap: () {
+                          if (status != 'online') {
+                            _showExpertOfflineDialog(context);
+                            return;
+                          }
+                          _showChatConfirmationBottomSheet(context, expert, controller);
+                        },
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        "${expert.experience ?? '0'} Years Exp.",
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          color: AppTheme.textSecondary,
-                        ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _buildActionButton(
+                        icon: Icons.phone_outlined,
+                        price: "₹${expert.voiceCharge?.toInt() ?? 20}/min",
+                        onTap: () {
+                          if (status != 'online') {
+                            _showExpertOfflineDialog(context);
+                            return;
+                          }
+                          final hasInit = StorageService.getBool('chat_initiated_${expert.id}') ?? false;
+                          if (!hasInit) {
+                            _showInitiateChatFirstDialog(context);
+                          } else {
+                            _showVoiceCallConfirmationBottomSheet(context, expert, controller);
+                          }
+                        },
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        skills,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: AppTheme.textPrimary,
-                        ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _buildActionButton(
+                        icon: Icons.videocam_outlined,
+                        price: "₹${expert.videoCharge?.toInt() ?? 50}/min",
+                        onTap: () => _showComingSoonSheet(context),
                       ),
-
-                      const SizedBox(height: 12),
-
-                      // Action Buttons Row
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildActionButton(
-                              icon: Icons.chat_bubble_outline,
-                              price: expert.chatCharge?.toString() ?? "20",
-                              onTap: () {
-                                final status =
-                                    expert.status?.toLowerCase() ?? 'offline';
-                                if (status != 'online') {
-                                  _showExpertOfflineDialog(context);
-                                  return;
-                                }
-                                _showChatConfirmationBottomSheet(
-                                  context,
-                                  expert,
-                                  controller,
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: _buildActionButton(
-                              icon: Icons.phone_outlined,
-                              price: expert.voiceCharge?.toString() ?? "20",
-                              onTap: () {
-                                final status =
-                                    expert.status?.toLowerCase() ?? 'offline';
-                                if (status != 'online') {
-                                  _showExpertOfflineDialog(context);
-                                  return;
-                                }
-
-                                final hasInit =
-                                    StorageService.getBool(
-                                      'chat_initiated_${expert.id}',
-                                    ) ??
-                                    false;
-                                if (!hasInit) {
-                                  _showInitiateChatFirstDialog(context);
-                                } else {
-                                  _showVoiceCallConfirmationBottomSheet(
-                                    context,
-                                    expert,
-                                    controller,
-                                  );
-                                }
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: _buildActionButton(
-                              icon: Icons.videocam_outlined,
-                              price: expert.videoCharge?.toString() ?? "20",
-                              onTap: () => _showComingSoonSheet(context),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -521,31 +453,30 @@ class AstrologyExpertsView extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
         decoration: BoxDecoration(
           border: Border.all(
-            color: const Color(0xFFA67C00),
+            color: const Color(0xFFD4AF37),
             width: 1,
-          ), // Gold/Brown border
-          borderRadius: BorderRadius.circular(20),
-          color: const Color.fromARGB(
-            0,
-            255,
-            255,
-            255,
-          ), // Transparant or very light fill
+          ),
+          borderRadius: BorderRadius.circular(24),
+          color: Colors.transparent,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 14, color: const Color(0xFFA67C00)),
-            const SizedBox(width: 4),
-            Text(
-              "₹$price/min",
-              style: GoogleFonts.inter(
-                fontSize: 9,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFFA67C00),
+            Icon(icon, size: 14, color: const Color(0xFFD4AF37)),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                price,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.inter(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFFD4AF37),
+                ),
               ),
             ),
           ],
@@ -566,83 +497,83 @@ class AstrologyExpertsView extends StatelessWidget {
       builder: (context) => Container(
         padding: const EdgeInsets.all(24),
         decoration: const BoxDecoration(
-          color: Color(0xFFFFE0B2),
+          color: Color(0xFF141414), // Dark background
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.chat_bubble,
-                color: Colors.black87,
-                size: 24,
-              ),
+            Row(
+              children: [
+                // Chat Icon Box
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF262626),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.2)),
+                  ),
+                  child: const Icon(
+                    Icons.message,
+                    color: Color(0xFFD4AF37),
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                // Title
+                Expanded(
+                  child: Text(
+                    "START CHAT CONSULTATION",
+                    style: GoogleFonts.inter(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
+
             Text(
-              "START CHAT CONSULTATION",
-              style: GoogleFonts.inter(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "You're about to start a live chat session with ${expert.name ?? 'your chosen Expert'}.",
+              "You're about to start a live chat session with your chosen Expert.",
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: Colors.black87,
+                color: Colors.white.withOpacity(0.7),
                 height: 1.4,
               ),
             ),
             const SizedBox(height: 16),
-            const Divider(color: Colors.black12, thickness: 1),
+            Divider(color: Colors.white.withOpacity(0.1), thickness: 1),
             const SizedBox(height: 16),
+
+            // Description
             Text(
               "Connect with an astrologer or guru through live chat and end the session at any time - credits are deducted only for the minutes used, so please ensure a stable internet connection for a smooth experience.",
               style: GoogleFonts.inter(
                 fontSize: 13,
-                color: Colors.black87,
+                color: Colors.white.withOpacity(0.6),
                 height: 1.5,
               ),
             ),
-            const SizedBox(height: 16),
-            Text(
-              "This session will deduct ₹${expert.chatCharge ?? 15} per minute",
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF8B4513),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "Would you like to continue?",
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
             const SizedBox(height: 24),
+
+            Divider(color: Colors.white.withOpacity(0.1), thickness: 1),
+            const SizedBox(height: 24),
+
+            // Buttons
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      side: const BorderSide(color: Color(0xFF8B6914)),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      side: const BorderSide(color: Color(0xFFB8860B)),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: BorderRadius.circular(30),
                       ),
                     ),
                     child: Text(
@@ -650,7 +581,7 @@ class AstrologyExpertsView extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF8B6914),
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -660,46 +591,26 @@ class AstrologyExpertsView extends StatelessWidget {
                   child: Consumer<ProfileViewModel>(
                     builder: (context, profileVM, child) {
                       if (profileVM.isLoading) {
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Color(0xFFA67C00),
-                            ),
-                          ),
-                        );
+                        return const Center(child: CircularProgressIndicator(color: Color(0xFFD4AF37)));
                       }
+
                       return ElevatedButton(
                         onPressed: () {
-                          // Read credits BEFORE dismissing the sheet
                           final credits = profileVM.profile?.credits ?? 0;
-                          final minRequired =
-                              (expert.chatCharge ?? 15) *
-                              5; // Enforce 5 mins minimum
-
                           Navigator.pop(context);
 
-                          if (credits >= minRequired) {
-                            StorageService.setBool(
-                              'chat_initiated_${expert.id}',
-                              true,
-                            );
+                          if (credits >= 100) {
+                            StorageService.setBool('chat_initiated_${expert.id}', true);
                             controller.startChat(expert);
                           } else {
-                            // Optional: Show snackbar explaining why
-                            Get.snackbar(
-                              "Insufficient Credits",
-                              "You need at least ₹$minRequired for a 5-minute session with this expert.",
-                              backgroundColor: Colors.redAccent,
-                              colorText: Colors.white,
-                            );
                             controller.showRechargeBottomSheet(context);
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          backgroundColor: const Color(0xFFA67C00),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          backgroundColor: const Color(0xFFD4AF37),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
+                            borderRadius: BorderRadius.circular(30),
                           ),
                           elevation: 0,
                         ),
@@ -708,7 +619,7 @@ class AstrologyExpertsView extends StatelessWidget {
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Colors.black,
                           ),
                         ),
                       );
@@ -717,7 +628,7 @@ class AstrologyExpertsView extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
           ],
         ),
       ),
@@ -736,83 +647,97 @@ class AstrologyExpertsView extends StatelessWidget {
       builder: (context) => Container(
         padding: const EdgeInsets.all(24),
         decoration: const BoxDecoration(
-          color: Color(0xFFFFE0B2),
+          color: Color(0xFF141414), // Dark background
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.phone_in_talk,
-                color: Colors.black87,
-                size: 24,
-              ),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF262626),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.2)),
+                  ),
+                  child: const Icon(
+                    Icons.phone_in_talk,
+                    color: Color(0xFFD4AF37),
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    "VOICE CONSULTATION",
+                    style: GoogleFonts.inter(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
+
             Text(
-              "VOICE CONSULTATION",
-              style: GoogleFonts.inter(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "You're about to start a voice call session with ${expert.name ?? 'your chosen Expert'}.",
+              "You're about to start a voice call session with your chosen Expert.",
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: Colors.black87,
+                color: Colors.white.withOpacity(0.7),
                 height: 1.4,
               ),
             ),
             const SizedBox(height: 16),
-            const Divider(color: Colors.black12, thickness: 1),
+            Divider(color: Colors.white.withOpacity(0.1), thickness: 1),
             const SizedBox(height: 16),
+
             Text(
               "Connect with an astrologer or guru through a live audio call and end the session at any time - credits are deducted only for the minutes used, so please ensure a stable internet connection for a smooth experience.",
               style: GoogleFonts.inter(
                 fontSize: 13,
-                color: Colors.black87,
+                color: Colors.white.withOpacity(0.6),
                 height: 1.5,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
+
             Text(
-              "This session will deduct ₹${expert.voiceCharge ?? 20} per minute",
+              "This session will deduct ₹${expert.voiceCharge?.toInt() ?? 20} per minute",
               style: GoogleFonts.inter(
-                fontSize: 14,
+                fontSize: 15,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF8B4513),
+                color: const Color(0xFFD4AF37),
               ),
             ),
             const SizedBox(height: 8),
+
             Text(
               "Would you like to continue?",
               style: GoogleFonts.inter(
                 fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
+                color: Colors.white.withOpacity(0.5),
               ),
             ),
             const SizedBox(height: 24),
+            Divider(color: Colors.white.withOpacity(0.1), thickness: 1),
+            const SizedBox(height: 24),
+
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      side: const BorderSide(color: Color(0xFF8B6914)),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      side: const BorderSide(color: Color(0xFFB8860B)),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: BorderRadius.circular(30),
                       ),
                     ),
                     child: Text(
@@ -820,7 +745,7 @@ class AstrologyExpertsView extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF8B6914),
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -830,33 +755,21 @@ class AstrologyExpertsView extends StatelessWidget {
                   child: Consumer<ProfileViewModel>(
                     builder: (context, profileVM, child) {
                       if (profileVM.isLoading) {
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Color(0xFFA67C00),
-                            ),
-                          ),
-                        );
+                        return const Center(child: CircularProgressIndicator(color: Color(0xFFD4AF37)));
                       }
                       return ElevatedButton(
                         onPressed: () {
-                          // Read credits BEFORE dismissing the sheet
                           final credits = profileVM.profile?.credits ?? 0;
-                          final minRequired =
-                              (expert.voiceCharge ?? 20) *
-                              5; // Enforce 5 mins minimum
+                          final minRequired = (expert.voiceCharge ?? 20) * 5;
 
                           Navigator.pop(context);
 
                           if (credits >= minRequired) {
-                            Get.to(
-                              () =>
-                                  VoiceCallView(expert: expert.toAstrologist()),
-                            );
+                            Get.to(() => VoiceCallView(expert: expert.toAstrologist()));
                           } else {
                             Get.snackbar(
                               "Insufficient Credits",
-                              "You need at least ₹$minRequired for a 5-minute session with this expert.",
+                              "You need at least ₹$minRequired for a 5-minute session.",
                               backgroundColor: Colors.redAccent,
                               colorText: Colors.white,
                             );
@@ -864,10 +777,10 @@ class AstrologyExpertsView extends StatelessWidget {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          backgroundColor: const Color(0xFFA67C00),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          backgroundColor: const Color(0xFFD4AF37),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
+                            borderRadius: BorderRadius.circular(30),
                           ),
                           elevation: 0,
                         ),
@@ -876,7 +789,7 @@ class AstrologyExpertsView extends StatelessWidget {
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Colors.black,
                           ),
                         ),
                       );
@@ -885,7 +798,7 @@ class AstrologyExpertsView extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
           ],
         ),
       ),
@@ -895,14 +808,15 @@ class AstrologyExpertsView extends StatelessWidget {
   void _showExpertOfflineDialog(BuildContext context) {
     Get.dialog(
       AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: const Color(0xFF141414),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.white.withOpacity(0.05))),
         title: Text(
           "Expert Offline",
-          style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+          style: GoogleFonts.lora(fontWeight: FontWeight.bold, color: const Color(0xFFD4AF37)),
         ),
         content: Text(
           "This expert is currently offline. Please try again later.",
-          style: GoogleFonts.inter(),
+          style: GoogleFonts.inter(color: Colors.white.withOpacity(0.7)),
         ),
         actions: [
           TextButton(
@@ -910,7 +824,7 @@ class AstrologyExpertsView extends StatelessWidget {
             child: Text(
               "OK",
               style: GoogleFonts.inter(
-                color: const Color(0xFFA67C00),
+                color: const Color(0xFFD4AF37),
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -923,14 +837,15 @@ class AstrologyExpertsView extends StatelessWidget {
   void _showInitiateChatFirstDialog(BuildContext context) {
     Get.dialog(
       AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: const Color(0xFF141414),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.white.withOpacity(0.05))),
         title: Text(
           "Chat Required",
-          style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+          style: GoogleFonts.lora(fontWeight: FontWeight.bold, color: const Color(0xFFD4AF37)),
         ),
         content: Text(
           "Please initiate a chat with the expert first before making a call.",
-          style: GoogleFonts.inter(),
+          style: GoogleFonts.inter(color: Colors.white.withOpacity(0.7)),
         ),
         actions: [
           TextButton(
@@ -938,7 +853,7 @@ class AstrologyExpertsView extends StatelessWidget {
             child: Text(
               "OK",
               style: GoogleFonts.inter(
-                color: const Color(0xFFA67C00),
+                color: const Color(0xFFD4AF37),
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -955,67 +870,63 @@ class AstrologyExpertsView extends StatelessWidget {
       builder: (context) => Container(
         padding: const EdgeInsets.all(24),
         decoration: const BoxDecoration(
-          color: Color(0xFFFFE0B2),
+          color: Color(0xFF141414),
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(14),
+              width: 40,
+              height: 4,
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.rocket_launch_rounded,
-                color: Color(0xFFA67C00),
-                size: 28,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              "Coming Soon!",
-              style: GoogleFonts.inter(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "This feature will be available soon. Stay tuned!",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                color: Colors.black87,
-                height: 1.4,
+                color: Colors.white12,
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
             const SizedBox(height: 24),
+            const Icon(Icons.video_call_outlined,
+                color: Color(0xFFD4AF37), size: 48),
+            const SizedBox(height: 16),
+            Text(
+              "Video Call Coming Soon!",
+              style: GoogleFonts.lora(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              "We're working hard to bring video consultations to you. Stay tuned!",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                color: Colors.white.withOpacity(0.6),
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Get.back(),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  backgroundColor: const Color(0xFFA67C00),
+                  backgroundColor: const Color(0xFFD4AF37),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(30),
                   ),
-                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 child: Text(
-                  "OK",
+                  "GOT IT",
                   style: GoogleFonts.inter(
-                    fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: Colors.black,
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
           ],
         ),
       ),
@@ -1024,13 +935,13 @@ class AstrologyExpertsView extends StatelessWidget {
 
   Widget _buildExpertCardShimmer() {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: const Color(0xFF262626),
+      highlightColor: const Color(0xFF333333),
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         height: 160,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: const Color(0xFF141414),
           borderRadius: BorderRadius.circular(24),
         ),
       ),

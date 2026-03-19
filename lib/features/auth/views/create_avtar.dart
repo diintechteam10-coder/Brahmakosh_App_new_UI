@@ -17,40 +17,41 @@ class GenerateAvatarView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.landingBackground, // Light beige
+      backgroundColor: AppTheme.authBackground,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xff5D4037)),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: Get.back,
         ),
       ),
       body: Stack(
         children: [
-          // Background Bubbles
-          Positioned(top: 100, left: -20, child: _buildBubble(size: 60)),
-          Positioned(top: 150, right: 40, child: _buildBubble(size: 40)),
-          Positioned(top: 250, left: 30, child: _buildBubble(size: 80)),
-          Positioned(bottom: 200, right: -10, child: _buildBubble(size: 100)),
-          Positioned(bottom: 100, left: 50, child: _buildBubble(size: 50)),
-          Positioned(top: 300, right: 80, child: _buildBubble(size: 30)),
-          Positioned(bottom: 300, left: -30, child: _buildBubble(size: 90)),
+          // Wavy Background Pattern
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/auth_wavy_bg.png',
+              fit: BoxFit.cover,
+              opacity: const AlwaysStoppedAnimation(0.4),
+            ),
+          ),
 
           // Main Content
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
               children: [
-                const SizedBox(height: 10),
+                const SizedBox(height: 100),
 
                 Center(
                   child: Text(
                     "One Last Thing",
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 28,
+                    style: GoogleFonts.lora(
+                      fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xff5D4037),
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -60,16 +61,16 @@ class GenerateAvatarView extends StatelessWidget {
                 Text(
                   "Add a photo to personalize your journey",
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    color: const Color(0xff5D4037),
+                  style: GoogleFonts.poppins(
+                    fontSize: 15,
+                    color: AppTheme.authTextSecondary,
                     height: 1.5,
                   ),
                 ),
 
                 const Spacer(flex: 2),
 
-                /// IMAGE PICKER (Dashed Circle with Outer Line)
+                /// IMAGE PICKER
                 Obx(
                   () => GestureDetector(
                     onTap: () => _showImageSourceSheet(context),
@@ -77,28 +78,27 @@ class GenerateAvatarView extends StatelessWidget {
                       children: [
                         // Outer Solid Circle
                         Container(
-                          padding: const EdgeInsets.all(24),
+                          padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: const Color(0xff5D4037).withOpacity(0.3),
+                              color: AppTheme.authPrimaryGold.withOpacity(0.1),
                               width: 1,
                             ),
                           ),
                           child: CustomPaint(
                             painter: DashedCirclePainter(
-                              color: const Color(0xff8D6E63),
-                              dashWidth: 8,
-                              dashSpace: 6,
+                              color: AppTheme.authPrimaryGold.withOpacity(0.5),
+                              dashWidth: 10,
+                              dashSpace: 8,
                               strokeWidth: 2,
                             ),
                             child: Container(
-                              width: 200,
-                              height: 200,
+                              width: 220,
+                              height: 220,
                               padding: const EdgeInsets.all(12),
                               decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.transparent, // Transparent inside
                               ),
                               child: controller.selectedImage.value != null
                                   ? ClipOval(
@@ -107,24 +107,30 @@ class GenerateAvatarView extends StatelessWidget {
                                         fit: BoxFit.cover,
                                       ),
                                     )
-                                  : Center(
-                                      child: Icon(
-                                        Icons.camera_alt_outlined,
-                                        size: 40,
-                                        color: const Color(0xff5D4037),
+                                  : Container(
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: AppTheme.authInputFill,
+                                      ),
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.camera_alt_outlined,
+                                          size: 48,
+                                          color: AppTheme.authPrimaryGold,
+                                        ),
                                       ),
                                     ),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 32),
                         Text(
                           "UPLOAD PHOTO",
-                          style: GoogleFonts.inter(
-                            fontSize: 13,
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xff5D4037),
-                            letterSpacing: 1.0,
+                            color: AppTheme.authPrimaryGold,
+                            letterSpacing: 2.0,
                           ),
                         ),
                       ],
@@ -141,17 +147,18 @@ class GenerateAvatarView extends StatelessWidget {
                         ? null
                         : controller.generateAvatar,
                     child: Container(
-                      height: 54,
+                      height: 56,
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: AppTheme.landingButton, // Flat brown
-                        borderRadius: BorderRadius.circular(30),
+                        color: AppTheme.authPrimaryGold,
+                        borderRadius: BorderRadius.circular(16),
                         boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
+                          if (!controller.isLoading.value)
+                            BoxShadow(
+                              color: AppTheme.authPrimaryGold.withOpacity(0.3),
+                              blurRadius: 15,
+                              offset: const Offset(0, 5),
+                            ),
                         ],
                       ),
                       child: Center(
@@ -161,15 +168,15 @@ class GenerateAvatarView extends StatelessWidget {
                                 width: 24,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Colors.white,
+                                  color: Colors.black,
                                 ),
                               )
                             : Text(
-                                "Submit",
-                                style: GoogleFonts.inter(
+                                "Continue to Journey",
+                                style: GoogleFonts.poppins(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: Colors.black,
                                 ),
                               ),
                       ),
@@ -177,7 +184,7 @@ class GenerateAvatarView extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
 
                 // SKIP
                 GestureDetector(
@@ -188,18 +195,18 @@ class GenerateAvatarView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Skip",
-                        style: GoogleFonts.inter(
+                        "Skip for now",
+                        style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: const Color(0xff5D4037),
+                          color: AppTheme.authTextSecondary,
                         ),
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: 8),
                       const Icon(
-                        Icons.arrow_forward_ios,
-                        size: 14,
-                        color: Color(0xff5D4037),
+                        Icons.arrow_forward,
+                        size: 16,
+                        color: AppTheme.authTextSecondary,
                       ),
                     ],
                   ),
@@ -214,46 +221,45 @@ class GenerateAvatarView extends StatelessWidget {
     );
   }
 
-  Widget _buildBubble({required double size}) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: AppTheme.primaryGold.withOpacity(0.15),
-        shape: BoxShape.circle,
-      ),
-    );
-  }
-
   void _showImageSourceSheet(BuildContext context) {
     Get.bottomSheet(
       Container(
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
+        padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+        decoration: BoxDecoration(
+          color: AppTheme.authSurface,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(32),
+            topRight: Radius.circular(32),
           ),
+          border: Border.all(color: Colors.white.withOpacity(0.05)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              "Profile Photo",
-              style: GoogleFonts.playfairDisplay(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppTheme.textPrimary,
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white12,
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
             const SizedBox(height: 24),
+            Text(
+              "Select Photo Source",
+              style: GoogleFonts.lora(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 32),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _sourceOption(
                   icon: Icons.camera_alt_outlined,
-                  label: "Selfie",
+                  label: "Camera",
                   onTap: () {
                     Get.back();
                     controller.pickImage(ImageSource.camera);
@@ -269,7 +275,7 @@ class GenerateAvatarView extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -285,25 +291,25 @@ class GenerateAvatarView extends StatelessWidget {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(20),
       child: Container(
-        width: 100,
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        width: 120,
+        padding: const EdgeInsets.symmetric(vertical: 24),
         decoration: BoxDecoration(
-          color: AppTheme.cardBackground,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppTheme.primaryGold.withOpacity(0.1)),
+          color: AppTheme.authInputFill,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withOpacity(0.05)),
         ),
         child: Column(
           children: [
-            Icon(icon, color: AppTheme.primaryGold, size: 28),
-            const SizedBox(height: 8),
+            Icon(icon, color: AppTheme.authPrimaryGold, size: 32),
+            const SizedBox(height: 12),
             Text(
               label,
-              style: GoogleFonts.inter(
-                fontSize: 13,
+              style: GoogleFonts.poppins(
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.textPrimary,
+                color: Colors.white,
               ),
             ),
           ],
@@ -338,11 +344,11 @@ class DashedCirclePainter extends CustomPainter {
     final Offset center = Offset(size.width / 2, size.height / 2);
     final double circumference = 2 * math.pi * radius;
 
-    double currentAngle = 0;
+    double currentAngle = -math.pi / 2;
     final double dashAngle = (dashWidth / circumference) * 2 * math.pi;
     final double spaceAngle = (dashSpace / circumference) * 2 * math.pi;
 
-    while (currentAngle < 2 * math.pi) {
+    while (currentAngle < 1.5 * math.pi) {
       canvas.drawArc(
         Rect.fromCircle(center: center, radius: radius),
         currentAngle,

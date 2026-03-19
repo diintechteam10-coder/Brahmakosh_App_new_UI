@@ -16,6 +16,14 @@ class _AllDashasScreenState extends State<AllDashasScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
+  static const Color _bgDark = Colors.black;
+  static const Color _cardDark = Color(0xFF0F0F2D);
+  static const Color _cardBorder = Color(0xFF1E1E4D);
+  static const Color _textPrimary = Colors.white;
+  static const Color _textSecondary = Color(0xFFB0B0CC);
+  static const Color _accentGold = Color(0xFFD4AF37);
+  static const Color _sectionLine = Color(0xFF1E1E4D);
+
   @override
   void initState() {
     super.initState();
@@ -31,28 +39,28 @@ class _AllDashasScreenState extends State<AllDashasScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFBF5),
+      backgroundColor: _bgDark,
       appBar: AppBar(
         title: Text(
           "All Dashas",
-          style: GoogleFonts.lora(
+          style: GoogleFonts.poppins(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: const Color(0xff4E342E),
+            color: _textPrimary,
           ),
         ),
-        backgroundColor: const Color(0xFFFFFBF5),
+        backgroundColor: _bgDark,
         elevation: 0,
         leading: Container(
           margin: const EdgeInsets.all(8),
           decoration: const BoxDecoration(
-            color: Colors.white,
+            color: _cardDark,
             shape: BoxShape.circle,
           ),
           child: IconButton(
             icon: const Icon(
               Icons.arrow_back,
-              color: Color(0xff5D4037),
+              color: Colors.white,
               size: 20,
             ),
             onPressed: () => Navigator.pop(context),
@@ -61,21 +69,22 @@ class _AllDashasScreenState extends State<AllDashasScreen>
         centerTitle: true,
         bottom: TabBar(
           controller: _tabController,
-          labelColor: const Color(0xff4E342E),
-          unselectedLabelColor: const Color(0xff8D6E63),
-          indicatorColor: const Color(0xffff7438),
-          labelStyle: GoogleFonts.inter(
+          labelColor: _accentGold,
+          unselectedLabelColor: _textSecondary,
+          indicatorColor: _accentGold,
+          dividerColor: _sectionLine,
+          labelStyle: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
             fontSize: 13,
           ),
-          unselectedLabelStyle: GoogleFonts.inter(
+          unselectedLabelStyle: GoogleFonts.poppins(
             fontWeight: FontWeight.w600,
             fontSize: 13,
           ),
           tabs: const [
-            Tab(text: "Vimshottari"),
-            Tab(text: "Yogini"),
-            Tab(text: "Chardasha"),
+            Tab(text: "VIMSHOTTARI"),
+            Tab(text: "YOGINI"),
+            Tab(text: "CHARDASHA"),
           ],
         ),
       ),
@@ -97,14 +106,14 @@ class _AllDashasScreenState extends State<AllDashasScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (widget.dashas.currentVdashaAll != null) ...[
-            _buildSectionHeader("Current Vimshottari Hierarchy"),
+            _buildSectionHeader("CURRENT VIMSHOTTARI HIERARCHY"),
             const SizedBox(height: 12),
             _buildCurrentVdashaAllCard(widget.dashas.currentVdashaAll!),
             const SizedBox(height: 24),
           ],
           if (widget.dashas.vimshottariDasha != null &&
               widget.dashas.vimshottariDasha!.isNotEmpty) ...[
-            _buildSectionHeader("Major Vimshottari Dasha"),
+            _buildSectionHeader("MAJOR VIMSHOTTARI DASHA"),
             const SizedBox(height: 12),
             _buildDashaTimelineList(
               items: widget.dashas.vimshottariDasha!.map((e) {
@@ -127,7 +136,7 @@ class _AllDashasScreenState extends State<AllDashasScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (widget.dashas.currentYogini != null) ...[
-            _buildSectionHeader("Current Yogini Hierarchy"),
+            _buildSectionHeader("CURRENT YOGINI HIERARCHY"),
             const SizedBox(height: 12),
             _buildCurrentHierarchyCard(
               majorTitle: "Major",
@@ -156,13 +165,13 @@ class _AllDashasScreenState extends State<AllDashasScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (widget.dashas.currentChardasha != null) ...[
-            _buildSectionHeader("Current Chardasha Hierarchy"),
+            _buildSectionHeader("CURRENT CHARDASHA HIERARCHY"),
             if (widget.dashas.currentChardasha!.dashaDate != null)
               Padding(
                 padding: const EdgeInsets.only(left: 4, bottom: 8),
                 child: Text(
                   "${widget.dashas.currentChardasha!.dashaDate}",
-                  style: GoogleFonts.inter(fontSize: 12, color: Colors.grey),
+                  style: GoogleFonts.poppins(fontSize: 12, color: _textSecondary),
                 ),
               ),
             const SizedBox(height: 12),
@@ -184,7 +193,7 @@ class _AllDashasScreenState extends State<AllDashasScreen>
           ],
           if (widget.dashas.majorChardasha != null &&
               widget.dashas.majorChardasha!.isNotEmpty) ...[
-            _buildSectionHeader("Major Chardasha"),
+            _buildSectionHeader("MAJOR CHARDASHA"),
             const SizedBox(height: 12),
             _buildDashaTimelineList(
               items: widget.dashas.majorChardasha!.map((e) {
@@ -204,16 +213,9 @@ class _AllDashasScreenState extends State<AllDashasScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _cardDark,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(color: const Color(0xFFEFEBE9)),
+        border: Border.all(color: _cardBorder),
       ),
       child: Column(
         children: [
@@ -269,17 +271,17 @@ class _AllDashasScreenState extends State<AllDashasScreen>
                 width: 8,
                 height: 8,
                 decoration: const BoxDecoration(
-                  color: Color(0xFFD4A373),
+                  color: _accentGold,
                   shape: BoxShape.circle,
                 ),
               ),
               const SizedBox(width: 8),
               Text(
                 label.toUpperCase(),
-                style: GoogleFonts.inter(
+                style: GoogleFonts.poppins(
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
-                  color: const Color(0xff4E342E),
+                  color: _accentGold,
                   letterSpacing: 1.1,
                 ),
               ),
@@ -304,11 +306,11 @@ class _AllDashasScreenState extends State<AllDashasScreen>
                 vertical: 8.0,
               ),
               decoration: BoxDecoration(
-                color: isCurrent ? const Color(0xFFFFF3E0) : Colors.transparent,
+                color: isCurrent ? _accentGold.withOpacity(0.1) : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
                 border: isCurrent
                     ? Border.all(
-                        color: const Color(0xFFFFB74D).withOpacity(0.5),
+                        color: _accentGold.withOpacity(0.5),
                       )
                     : null,
               ),
@@ -323,19 +325,17 @@ class _AllDashasScreenState extends State<AllDashasScreen>
                           child: Icon(
                             Icons.stars,
                             size: 16,
-                            color: Colors.orange,
+                            color: _accentGold,
                           ),
                         ),
                       Text(
                         "${item.planet}",
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontSize: 14,
                           fontWeight: isCurrent
                               ? FontWeight.bold
                               : FontWeight.w500,
-                          color: isCurrent
-                              ? const Color(0xff4E342E)
-                              : const Color(0xff4E342E),
+                          color: _textPrimary,
                         ),
                       ),
                     ],
@@ -343,6 +343,7 @@ class _AllDashasScreenState extends State<AllDashasScreen>
                   _formatDateRange(
                         "${item.start} - ${item.end}",
                         compact: true,
+                        isCurrent: isCurrent,
                       ) ??
                       const SizedBox(),
                 ],
@@ -352,26 +353,35 @@ class _AllDashasScreenState extends State<AllDashasScreen>
         ),
         if (!isLast)
           const Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0),
-            child: Divider(color: Color(0xFFEFEBE9), thickness: 1),
+             padding: EdgeInsets.symmetric(vertical: 8.0),
+             child: Divider(color: _sectionLine, thickness: 1),
           ),
       ],
     );
   }
 
-  // --- Reused/Copied Widgets from AstrologyTabs (to avoid breaking changes there for now) ---
-
   Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8.0),
-      child: Text(
-        title,
-        style: GoogleFonts.lora(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: const Color(0xff4E342E),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: Text(
+            title,
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: _textPrimary,
+              letterSpacing: 1.2,
+            ),
+          ),
         ),
-      ),
+        const SizedBox(height: 4),
+        Container(
+          height: 1,
+          color: _sectionLine,
+        ),
+      ],
     );
   }
 
@@ -389,16 +399,9 @@ class _AllDashasScreenState extends State<AllDashasScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _cardDark,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(color: const Color(0xFFEFEBE9)),
+        border: Border.all(color: _cardBorder),
       ),
       child: Column(
         children: [
@@ -440,8 +443,8 @@ class _AllDashasScreenState extends State<AllDashasScreen>
   }) {
     final double indent = level * 24.0;
     final Color dotColor = level == 0
-        ? const Color(0xFF6D3A0C)
-        : (level == 1 ? const Color(0xFF8D6E63) : const Color(0xFFA1887F));
+        ? _accentGold
+        : (level == 1 ? _accentGold.withOpacity(0.8) : _accentGold.withOpacity(0.6));
 
     final formattedDate = _formatDateRange(date);
 
@@ -459,7 +462,7 @@ class _AllDashasScreenState extends State<AllDashasScreen>
                   decoration: BoxDecoration(
                     color: dotColor,
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
+                    border: Border.all(color: _cardDark, width: 2),
                     boxShadow: [
                       BoxShadow(
                         color: dotColor.withOpacity(0.3),
@@ -473,7 +476,7 @@ class _AllDashasScreenState extends State<AllDashasScreen>
                   Expanded(
                     child: Container(
                       width: 2,
-                      color: const Color(0xFFD7CCC8).withOpacity(0.5),
+                      color: _sectionLine,
                     ),
                   ),
               ],
@@ -493,20 +496,20 @@ class _AllDashasScreenState extends State<AllDashasScreen>
                         children: [
                           Text(
                             label.toUpperCase(),
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.poppins(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
-                              color: Colors.grey[600],
+                              color: _textSecondary,
                               letterSpacing: 1.0,
                             ),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             value,
-                            style: GoogleFonts.lora(
+                            style: GoogleFonts.poppins(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: const Color(0xff4E342E),
+                              color: _textPrimary,
                             ),
                           ),
                         ],
@@ -550,7 +553,7 @@ class _AllDashasScreenState extends State<AllDashasScreen>
                         width: 2,
                         color: isFirst
                             ? Colors.transparent
-                            : const Color(0xFFD7CCC8),
+                            : _sectionLine,
                       ),
                     ),
                     Container(
@@ -558,12 +561,12 @@ class _AllDashasScreenState extends State<AllDashasScreen>
                       width: 10,
                       height: 10,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF8D6E63),
+                        color: _accentGold,
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
+                        border: Border.all(color: _bgDark, width: 2),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: _accentGold.withOpacity(0.3),
                             blurRadius: 2,
                           ),
                         ],
@@ -574,7 +577,7 @@ class _AllDashasScreenState extends State<AllDashasScreen>
                         width: 2,
                         color: isLast
                             ? Colors.transparent
-                            : const Color(0xFFD7CCC8),
+                            : _sectionLine,
                       ),
                     ),
                   ],
@@ -585,26 +588,19 @@ class _AllDashasScreenState extends State<AllDashasScreen>
                   margin: const EdgeInsets.only(bottom: 12),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: _cardDark,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFEFEBE9)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.02),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                    border: Border.all(color: _cardBorder),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         item.title,
-                        style: GoogleFonts.lora(
+                        style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xff4E342E),
+                          color: _textPrimary,
                         ),
                       ),
                       if (formattedDate != null)
@@ -612,9 +608,9 @@ class _AllDashasScreenState extends State<AllDashasScreen>
                       else
                         Text(
                           item.dateRange,
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             fontSize: 12,
-                            color: const Color(0xff8D6E63),
+                            color: _textSecondary,
                           ),
                         ),
                     ],
@@ -628,17 +624,19 @@ class _AllDashasScreenState extends State<AllDashasScreen>
     );
   }
 
-  Widget? _formatDateRange(String? dateStr, {bool compact = false}) {
+  Widget? _formatDateRange(String? dateStr, {bool compact = false, bool isCurrent = false}) {
     if (dateStr == null || dateStr.isEmpty) return null;
+
+    final Color textColor = isCurrent ? _accentGold : _textSecondary;
 
     try {
       final parts = dateStr.split(" - ");
       if (parts.length != 2) {
         return Text(
           dateStr,
-          style: GoogleFonts.inter(
+          style: GoogleFonts.poppins(
             fontSize: 12,
-            color: const Color(0xff8D6E63),
+            color: textColor,
           ),
         );
       }
@@ -668,17 +666,17 @@ class _AllDashasScreenState extends State<AllDashasScreen>
           children: [
             Text(
               "${outFormat.format(start)} -",
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 10,
-                color: const Color(0xff8D6E63),
+                color: textColor,
               ),
             ),
             Text(
               outFormat.format(end),
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xff4E342E),
+                color: isCurrent ? _accentGold : _textPrimary,
               ),
             ),
           ],
@@ -696,7 +694,7 @@ class _AllDashasScreenState extends State<AllDashasScreen>
     } catch (e) {
       return Text(
         dateStr,
-        style: GoogleFonts.inter(fontSize: 12, color: const Color(0xff8D6E63)),
+        style: GoogleFonts.poppins(fontSize: 12, color: textColor),
       );
     }
   }
@@ -705,26 +703,26 @@ class _AllDashasScreenState extends State<AllDashasScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFFBF5),
+        color: _bgDark,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: const Color(0xFFD7CCC8)),
+        border: Border.all(color: _cardBorder),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             "$label: ",
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 10,
-              color: const Color(0xff8D6E63),
+              color: _textSecondary,
             ),
           ),
           Text(
             date,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: const Color(0xff4E342E),
+              color: _textPrimary,
             ),
           ),
         ],

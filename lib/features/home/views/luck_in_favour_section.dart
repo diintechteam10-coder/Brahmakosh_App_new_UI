@@ -48,7 +48,7 @@ class LuckInFavourSection extends StatelessWidget {
                     backImagePath: 'assets/images/YourLuckyNumber_inside.png',
                     backContent: Text(
                       luckyNumber,
-                      style: GoogleFonts.playfairDisplay(
+                      style: GoogleFonts.lora(
                         fontSize: 48, // Reduced from 64
                         fontWeight: FontWeight.bold,
                         color: const Color(0xFF6D3A0C),
@@ -67,7 +67,7 @@ class LuckInFavourSection extends StatelessWidget {
                       child: Text(
                         textAlign: TextAlign.center,
                         luckyColor,
-                        style: GoogleFonts.playfairDisplay(
+                        style: GoogleFonts.lora(
                           fontSize: 16, // Reduced from 64
                           fontWeight: FontWeight.bold,
                           color: const Color(0xFF6D3A0C),
@@ -97,7 +97,7 @@ class LuckInFavourSection extends StatelessWidget {
                                 textAlign: TextAlign.center,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.playfairDisplay(
+                                style: GoogleFonts.lora(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
                                   color: const Color(0xFF6D3A0C),
@@ -209,7 +209,7 @@ class LuckInFavourSection extends StatelessWidget {
                               const SizedBox(height: 8),
                               Text(
                                 'Today’s Energy',
-                                style: GoogleFonts.playfairDisplay(
+                                style: GoogleFonts.lora(
                                   fontSize: 19,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFF6D3A0C),

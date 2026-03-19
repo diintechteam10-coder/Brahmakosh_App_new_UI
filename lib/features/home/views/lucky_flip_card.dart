@@ -94,7 +94,7 @@ class LuckyFlipCard extends StatelessWidget {
         children: [
           Text(
             luckyNumber,
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.lora(
               fontSize: 36,
               fontWeight: FontWeight.bold,
               color: luckyColor,
@@ -126,7 +126,7 @@ class LuckyFlipCard extends StatelessWidget {
             ),
             child: Text(
               "Revealed",
-              style: GoogleFonts.cinzel(
+              style: GoogleFonts.lora(
                 fontSize: 8,
                 fontWeight: FontWeight.bold,
                 color: AppTheme.primaryGold,
@@ -163,7 +163,7 @@ class LuckyFlipCard extends StatelessWidget {
           Flexible(
             child: Text(
                title,
-              style: GoogleFonts.cinzel(
+              style: GoogleFonts.lora(
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.textPrimary,

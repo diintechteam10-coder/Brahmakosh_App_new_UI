@@ -21,6 +21,14 @@ class _PlanetPositionsScreenState extends State<PlanetPositionsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
+  static const Color _bgDark = Colors.black;
+  static const Color _cardDark = Color(0xFF0F0F2D);
+  static const Color _cardBorder = Color(0xFF1E1E4D);
+  static const Color _textPrimary = Colors.white;
+  static const Color _textSecondary = Color(0xFFB0B0CC);
+  static const Color _accentGold = Color(0xFFD4AF37);
+  static const Color _sectionLine = Color(0xFF1E1E4D);
+
   @override
   void initState() {
     super.initState();
@@ -36,24 +44,41 @@ class _PlanetPositionsScreenState extends State<PlanetPositionsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFBF5),
+      backgroundColor: _bgDark,
       appBar: AppBar(
         title: Text(
           "Planet Positions",
-          style: GoogleFonts.lora(
-            color: const Color(0xFF6D3A0C),
+          style: GoogleFonts.poppins(
+            color: _textPrimary,
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: const Color(0xFFFFFBF5),
+        backgroundColor: _bgDark,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Color(0xFF6D3A0C)),
+        iconTheme: const IconThemeData(color: Colors.white),
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: const BoxDecoration(
+            color: _cardDark,
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+              size: 20,
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
+        centerTitle: true,
         bottom: TabBar(
           controller: _tabController,
-          labelColor: const Color(0xFF6D3A0C),
-          unselectedLabelColor: const Color(0xFFAFAFAF),
-          indicatorColor: const Color(0xFF6D3A0C),
-          labelStyle: GoogleFonts.lora(fontWeight: FontWeight.bold),
+          labelColor: _accentGold,
+          unselectedLabelColor: _textSecondary,
+          indicatorColor: _accentGold,
+          dividerColor: _sectionLine,
+          labelStyle: GoogleFonts.poppins(fontWeight: FontWeight.bold),
           tabs: const [
             Tab(text: "Planets"),
             Tab(text: "Planets Extended"),
@@ -75,7 +100,7 @@ class _PlanetPositionsScreenState extends State<PlanetPositionsScreen>
       return Center(
         child: Text(
           "No Data Available",
-          style: GoogleFonts.lora(fontSize: 16, color: Colors.grey),
+          style: GoogleFonts.poppins(fontSize: 16, color: _textSecondary),
         ),
       );
     }
@@ -97,25 +122,19 @@ class _PlanetPositionsScreenState extends State<PlanetPositionsScreen>
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: _cardDark,
               borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              border: Border.all(color: _cardBorder),
             ),
             child: Row(
               children: [
                 Container(
                   width: 48,
                   height: 48,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
-                      colors: [Color(0xFFFFCC80), Color(0xFFFFB74D)],
+                      colors: [_accentGold, _accentGold.withOpacity(0.7)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -123,10 +142,10 @@ class _PlanetPositionsScreenState extends State<PlanetPositionsScreen>
                   child: Center(
                     child: Text(
                       planet.name?.substring(0, 1) ?? "P",
-                      style: GoogleFonts.lora(
+                      style: GoogleFonts.poppins(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: _bgDark,
                       ),
                     ),
                   ),
@@ -138,17 +157,17 @@ class _PlanetPositionsScreenState extends State<PlanetPositionsScreen>
                     children: [
                       Text(
                         planet.name ?? "-",
-                        style: GoogleFonts.lora(
+                        style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF6D3A0C),
+                          color: _textPrimary,
                         ),
                       ),
                       Text(
                         planet.sign ?? "-",
-                        style: GoogleFonts.lora(
+                        style: GoogleFonts.poppins(
                           fontSize: 14,
-                          color: const Color(0xFF5A6BB2),
+                          color: _textSecondary,
                         ),
                       ),
                     ],
@@ -156,13 +175,13 @@ class _PlanetPositionsScreenState extends State<PlanetPositionsScreen>
                 ),
                 Text(
                   "House ${planet.house}",
-                  style: GoogleFonts.lora(fontSize: 14, color: Colors.grey),
+                  style: GoogleFonts.poppins(fontSize: 14, color: _textSecondary),
                 ),
                 const SizedBox(width: 8),
                 const Icon(
                   Icons.arrow_forward_ios,
                   size: 16,
-                  color: Colors.grey,
+                  color: _textSecondary,
                 ),
               ],
             ),

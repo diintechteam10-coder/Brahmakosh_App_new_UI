@@ -14,12 +14,12 @@ class CallHistoryView extends StatelessWidget {
     final controller = Get.put(CallHistoryController());
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFBE6D0),
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFBE6D0),
+        backgroundColor: Colors.black,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppTheme.textPrimary),
+          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 30),
           onPressed: () => Get.back(),
         ),
         title: Text(
@@ -27,7 +27,7 @@ class CallHistoryView extends StatelessWidget {
           style: GoogleFonts.lora(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: AppTheme.textPrimary,
+            color: Colors.white,
           ),
         ),
         centerTitle: false,
@@ -52,7 +52,7 @@ class CallHistoryView extends StatelessWidget {
                   Icon(
                     Icons.error_outline,
                     size: 72,
-                    color: AppTheme.textSecondary.withOpacity(0.4),
+                    color: Colors.white.withOpacity(0.2),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -60,7 +60,7 @@ class CallHistoryView extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textSecondary,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -84,7 +84,7 @@ class CallHistoryView extends StatelessWidget {
                   Icon(
                     Icons.phone_in_talk_outlined,
                     size: 72,
-                    color: AppTheme.textSecondary.withOpacity(0.4),
+                    color: Colors.white.withOpacity(0.2),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -92,7 +92,7 @@ class CallHistoryView extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textSecondary,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -100,7 +100,7 @@ class CallHistoryView extends StatelessWidget {
                     'Start a voice call with an expert to see it here',
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      color: AppTheme.textSecondary.withOpacity(0.7),
+                      color: Colors.white.withOpacity(0.5),
                     ),
                   ),
                 ],
@@ -152,12 +152,12 @@ class CallHistoryView extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFFDF0), // Light theme as requested
+        color: const Color(0xFF141414),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.primaryGold.withOpacity(0.2)),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(0.2),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -175,15 +175,9 @@ class CallHistoryView extends StatelessWidget {
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: const Color(0xFF1A1A1A),
                     borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                    border: Border.all(color: Colors.white.withOpacity(0.05)),
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: log.to?.image != null && log.to!.image!.isNotEmpty
@@ -215,7 +209,7 @@ class CallHistoryView extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: AppTheme.textPrimary,
+                          color: Colors.white,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -225,7 +219,7 @@ class CallHistoryView extends StatelessWidget {
                         date,
                         style: GoogleFonts.inter(
                           fontSize: 12,
-                          color: AppTheme.textSecondary,
+                          color: Colors.white.withOpacity(0.5),
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -250,7 +244,7 @@ class CallHistoryView extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: AppTheme.textPrimary,
+                        color: Colors.white,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -258,7 +252,7 @@ class CallHistoryView extends StatelessWidget {
                       duration,
                       style: GoogleFonts.inter(
                         fontSize: 12,
-                        color: AppTheme.textSecondary,
+                        color: Colors.white.withOpacity(0.5),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -374,14 +368,14 @@ class CallHistoryView extends StatelessWidget {
                                       Text(
                                         _formatTime(position),
                                         style: TextStyle(
-                                          color: AppTheme.textSecondary,
+                                          color: Colors.white.withOpacity(0.5),
                                           fontSize: 10,
                                         ),
                                       ),
                                       Text(
                                         _formatTime(totalDuration),
                                         style: TextStyle(
-                                          color: AppTheme.textSecondary,
+                                          color: Colors.white.withOpacity(0.5),
                                           fontSize: 10,
                                         ),
                                       ),
@@ -412,8 +406,8 @@ class CallHistoryView extends StatelessWidget {
 
   Widget _buildShimmerCard() {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: const Color(0xFF1A1A1A),
+      highlightColor: const Color(0xFF262626),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         height: 80,

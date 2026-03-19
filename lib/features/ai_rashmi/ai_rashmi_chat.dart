@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-
 import '../agent/lemon_agent_page.dart';
 import 'ai_rashmi_service.dart';
 import 'ai_rashmi_view_model.dart';
@@ -26,14 +25,15 @@ class RashmiChat extends StatelessWidget {
   final String? backgroundImage;
   final bool hideLearnGita;
   final bool autoStartVoice;
-  final String? firstMessage;
-
+  final String? initialMessage;
+  final bool autoAsk;
   const RashmiChat({
     super.key,
     this.backgroundImage,
     this.hideLearnGita = false,
     this.autoStartVoice = false,
-    this.firstMessage,
+    this.initialMessage,
+    this.autoAsk = false,
   });
 
   @override
@@ -46,7 +46,8 @@ class RashmiChat extends StatelessWidget {
       backgroundImage: backgroundImage,
       hideLearnGita: hideLearnGita,
       autoStartVoice: autoStartVoice,
-      firstMessage: firstMessage,
+      initialMessage: initialMessage,
+      autoAsk: autoAsk,
     );
   }
 }
@@ -55,13 +56,14 @@ class _RashmiChatView extends StatefulWidget {
   final String? backgroundImage;
   final bool hideLearnGita;
   final bool autoStartVoice;
-  final String? firstMessage;
-
+  final String? initialMessage;
+  final bool autoAsk;
   const _RashmiChatView({
     this.backgroundImage,
     this.hideLearnGita = false,
     this.autoStartVoice = false,
-    this.firstMessage,
+    this.initialMessage,
+    this.autoAsk = false,
   });
 
   @override
@@ -116,23 +118,24 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
     };
 
     // Always start with a fresh chat when this page is opened
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Get.isRegistered<AiRashmiController>()) {
         final vm = Get.find<AiRashmiController>();
-        await vm.newChat();
+        vm.newChat();
         vm.addListener(_scrollToBottom);
-
-        // If we are opening this view and there's a first message provided by the guide screen,
-        // and we have no messages yet, display it.
-        if (widget.firstMessage != null && widget.firstMessage!.isNotEmpty) {
-          if (vm.messages.isEmpty) {
-            vm.showFirstMessage(widget.firstMessage!);
-          }
-        }
       }
 
       if (widget.autoStartVoice) {
         _toggleVoiceChat();
+      }
+
+      if (widget.autoAsk && widget.initialMessage != null) {
+        if (Get.isRegistered<AiRashmiController>()) {
+          final vm = Get.find<AiRashmiController>();
+          vm.sendMessage(widget.initialMessage!);
+        }
+      } else if (widget.initialMessage != null) {
+        _controller.text = widget.initialMessage!;
       }
     });
   }
@@ -163,9 +166,6 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
   void _toggleVoiceChat() async {
     if (_voiceService.state == VoiceAgentState.IDLE ||
         _voiceService.state == VoiceAgentState.ERROR) {
-      // Show overlay instantly
-      _showVoiceOverlay();
-
       final userId =
           StorageService.getString(AppConstants.keyUserId) ?? 'default_user';
       final vm = Get.find<AiRashmiController>();
@@ -180,6 +180,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
       }
 
       _voiceService.startSession(userId, chatId: vm.chatId);
+      _showVoiceOverlay();
     } else {
       _voiceService.stopSession();
     }
@@ -242,8 +243,12 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
       onTap: _toggleVoiceChat,
       child: Container(
         padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(color: bgColor, shape: BoxShape.circle),
-        child: Icon(icon, color: iconColor),
+        decoration: BoxDecoration(
+          color: bgColor,
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white.withOpacity(0.15)),
+        ),
+        child: Icon(icon, color: iconColor, size: 20),
       ),
     );
   }
@@ -313,30 +318,12 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
             children: [
               Builder(
                 builder: (context) {
-                  // Get saved agent name to determine correct background
-                  final savedAgentName =
-                      StorageService.getString(
-                        'ai_selected_agent_name',
-                      )?.toLowerCase() ??
-                      '';
-                  final isKrishnaCurrent = savedAgentName.contains('krishna');
-                  final isRashmiCurrent = savedAgentName.contains('rashmi');
-
                   String? currentBg = widget.backgroundImage;
-
-                  // If chat has started (first message is present)
-                  if (vm.messages.isNotEmpty) {
-                    if (isKrishnaCurrent || isKrishnaChat) {
-                      currentBg = 'assets/images/Krishna_chat.png';
-                    } else if (isRashmiCurrent ||
-                        (widget.backgroundImage?.contains('Rashmi') ?? false)) {
-                      currentBg = 'assets/images/Rashmi_chat.png';
-                    } else {
-                      // Fallback for other agents
-                      currentBg = 'assets/images/Chat_background.png';
-                    }
+                  if (isKrishnaChat) {
+                    currentBg = 'assets/icons/chat_bg_new.png';
+                  } else if (vm.messages.isNotEmpty && !isKrishnaChat) {
+                    currentBg = 'assets/images/Chat_background.png';
                   }
-
                   if (currentBg != null) {
                     return Positioned.fill(
                       child: Image.asset(currentBg, fit: BoxFit.cover),
@@ -346,10 +333,31 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                 },
               ),
 
-              // Dark overlay
-              Positioned.fill(
-                child: Container(color: Colors.black.withOpacity(0.25)),
-              ),
+              // Dark overlay for Rashmi chat (removed for Krishna to keep vibrancy)
+              if (!isKrishnaChat)
+                Positioned.fill(
+                  child: Container(color: Colors.black.withOpacity(0.25)),
+                ),
+
+              // Krishna character overlay
+              if (isKrishnaChat)
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).size.height * 0.08,
+                        ),
+                        child: Image.asset(
+                          'assets/icons/krishna_neww.png',
+                          fit: BoxFit.contain,
+                          width: double.infinity,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
 
               // Main UI Content
               Column(
@@ -429,14 +437,10 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
     ThemeData theme, {
     String? explicitDeityName,
   }) {
+    // Determine the current deity name for hint text
     String deityName = explicitDeityName ?? 'Krishna';
 
     if (explicitDeityName == null) {
-      // Check widget config for default
-      if (widget.backgroundImage?.contains('Rashmi') == true) {
-        deityName = 'Rashmi';
-      }
-      // Check selected deity or fallback
       if (_deityService.selectedDeity != null) {
         final name = _deityService.selectedDeity!.name ?? '';
         if (name.toLowerCase().contains('rashmi')) {
@@ -444,6 +448,12 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
         } else if (name.toLowerCase().contains('krishna')) {
           deityName = 'Krishna';
         }
+      }
+      // Check widget config for default OVERRIDING the service if it explicitly passed Rashmi/Krishna
+      if (widget.backgroundImage?.toLowerCase().contains('rashmi') == true) {
+        deityName = 'Rashmi';
+      } else if (widget.backgroundImage?.toLowerCase().contains('krishna') == true) {
+        deityName = 'Krishna';
       }
     }
 
@@ -457,11 +467,12 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: const Color(0xFF18151B).withOpacity(0.9),
           borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: Colors.white.withOpacity(0.1)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withOpacity(0.2),
               blurRadius: 12,
               offset: const Offset(0, -2),
             ),
@@ -482,17 +493,17 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                 style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w400,
-                  color: Colors.black87,
+                  color: Colors.white,
                   height: 1.4,
                 ),
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: Colors.white,
-                  focusColor: Colors.white,
+                  fillColor: Colors.transparent,
+                  focusColor: Colors.transparent,
 
                   hintText: 'Send message...',
                   hintStyle: TextStyle(
-                    color: Colors.grey.shade400,
+                    color: Colors.grey.shade500,
                     fontSize: 15,
                     fontWeight: FontWeight.w400,
                   ),
@@ -532,15 +543,15 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: vm.isSending
-                        ? Colors.grey.shade300
-                        : const Color(0xFFFF8C00),
+                        ? Colors.grey.shade800
+                        : const Color(0xFFF1C453),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     vm.isSending
                         ? Icons.hourglass_top_rounded
-                        : Icons.arrow_upward_rounded,
-                    color: Colors.white,
+                        : Icons.play_arrow_rounded,
+                    color: vm.isSending ? Colors.grey.shade400 : Colors.black,
                     size: 20,
                   ),
                 ),
@@ -554,96 +565,70 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
     // Expanded input for empty state (first message)
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 12,
-            offset: const Offset(0, -2),
-          ),
-        ],
+        color: const Color(0xFF18151B).withOpacity(0.9), // Dark color
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          TextField(
-            controller: _controller,
-            minLines: 1,
-            maxLines: 4,
-            textCapitalization: TextCapitalization.sentences,
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-              color: Colors.black87,
-              height: 1.4,
+          Container(
+            decoration: BoxDecoration(
+              color: const Color(
+                0xFF100E13,
+              ).withOpacity(0.6), // Darker text field
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withOpacity(0.1)),
             ),
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.white,
-              hintText: 'Ask $deityName anything...',
-              hintStyle: TextStyle(
-                color: Colors.grey.shade400,
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+            child: TextField(
+              controller: _controller,
+              minLines: 1,
+              maxLines: 4,
+              textCapitalization: TextCapitalization.sentences,
+              style: const TextStyle(
                 fontSize: 15,
-                fontWeight: FontWeight.w400,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+                height: 1.4,
               ),
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              disabledBorder: InputBorder.none,
-              errorBorder: InputBorder.none,
-              focusedErrorBorder: InputBorder.none,
-              contentPadding: EdgeInsets.zero,
-            ),
-            onTap: () async {
-              // When the input is tapped, show the first message and send it automatically
-              try {
-                final selectedAgentId = StorageService.getString(
-                  'ai_selected_agent_id',
-                );
-
-                if (selectedAgentId != null && selectedAgentId.isNotEmpty) {
-                  // The saved agent ID is available.
-                  // Since the agentController.avatars (model Data) might not have firstMessage,
-                  // we'll fetch the agent directly from AiRashmiService to get AgentResponseModel data.
-                  final agentsList = await vm.service.fetchAgents();
-                  final savedAgentData = agentsList.firstWhereOrNull(
-                    (a) => a.id == selectedAgentId,
-                  );
-
-                  if (savedAgentData != null &&
-                      savedAgentData.firstMessage != null &&
-                      savedAgentData.firstMessage!.isNotEmpty) {
-                    print(
-                      "Sending first message: \${savedAgentData.firstMessage}",
-                    );
-                    vm.showFirstMessage(savedAgentData.firstMessage!);
-                  }
+              decoration: InputDecoration(
+                fillColor: Colors.transparent,
+                filled: true,
+                hintText: 'Ask $deityName anything',
+                hintStyle: TextStyle(
+                  color: Colors.grey.shade500,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                ),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                disabledBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                focusedErrorBorder: InputBorder.none,
+              ),
+              onSubmitted: (value) async {
+                if (value.trim().isNotEmpty) {
+                  _controller.clear();
+                  await vm.sendMessage(value);
                 }
-              } catch (e) {
-                print("Error loading first message: \$e");
-              }
-            },
-            onSubmitted: (value) async {
-              if (value.trim().isNotEmpty) {
-                _controller.clear();
-                await vm.sendMessage(value);
-              }
-            },
+              },
+            ),
           ),
           const SizedBox(height: 16),
           Row(
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
+                  horizontal: 16,
+                  vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
+                  border: Border.all(color: Colors.white.withOpacity(0.15)),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
@@ -651,28 +636,28 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                   children: [
                     Icon(
                       Icons.description_outlined,
-                      size: 14,
-                      color: Colors.grey.shade500,
+                      size: 16,
+                      color: Colors.grey.shade400,
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 8),
                     Text(
                       "FAQ's",
                       style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade600,
+                        fontSize: 13,
+                        color: Colors.grey.shade400,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(width: 2),
+                    const SizedBox(width: 4),
                     Icon(
                       Icons.keyboard_arrow_down,
-                      size: 16,
-                      color: Colors.grey.shade500,
+                      size: 18,
+                      color: Colors.grey.shade400,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 12),
               _buildMicButton(),
               const Spacer(),
               GestureDetector(
@@ -686,15 +671,15 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                         }
                       },
                 child: Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(12),
                   decoration: const BoxDecoration(
-                    color: Color(0xFFFF8C00),
+                    color: Color(0xFFF1C453), // Yellow color from screenshot
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
-                    Icons.arrow_upward_rounded,
-                    color: Colors.white,
-                    size: 20,
+                    Icons.play_arrow_rounded, // Play icon
+                    color: Colors.black,
+                    size: 24,
                   ),
                 ),
               ),
@@ -706,26 +691,28 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
   }
 
   Widget _buildHeader(BuildContext context) {
-    // Read the saved agent name directly from local storage
-    String deityName =
-        StorageService.getString('ai_selected_agent_name') ?? 'Krishna';
+    // Determine the current deity name and image logic
+    String deityName = 'Krishna';
     String imageAsset = 'assets/images/Small_krishna.png';
 
-    // Check widget config for default if storage is empty, though storage should have it now
-    if (deityName == 'Krishna' &&
-        widget.backgroundImage?.contains('Rashmi') == true) {
-      deityName = 'Rashmi';
+    // Check selected deity or fallback
+    if (_deityService.selectedDeity != null) {
+      final name = _deityService.selectedDeity!.name ?? '';
+      if (name.toLowerCase().contains('rashmi')) {
+        deityName = 'Rashmi';
+        imageAsset = 'assets/images/Small_rashmi.png';
+      } else if (name.toLowerCase().contains('krishna')) {
+        deityName = 'Krishna';
+        imageAsset = 'assets/images/Small_krishna.png';
+      }
     }
 
-    // Set correct image according to the saved name
-    if (deityName.toLowerCase().contains('rashmi')) {
+    // Check widget config for explicit override
+    if (widget.backgroundImage?.toLowerCase().contains('rashmi') == true) {
+      deityName = 'Rashmi';
       imageAsset = 'assets/images/Small_rashmi.png';
-    } else if (deityName.toLowerCase().contains('krishna')) {
-      imageAsset = 'assets/images/Small_krishna.png';
-    } else {
-      // If there's another agent, default to a fallback or handle according to logic.
-      // For now, defaulting to Krishna's small image as a general fallback if nothing matches.
-      // But it can also be Rashmi's, depending on preference.
+    } else if (widget.backgroundImage?.toLowerCase().contains('krishna') == true) {
+      deityName = 'Krishna';
       imageAsset = 'assets/images/Small_krishna.png';
     }
 
@@ -738,53 +725,68 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
           },
           child: Container(
             padding: const EdgeInsets.all(6), // Reduced from 8
-            decoration: const BoxDecoration(
-              color: Color(0xFFFFF8E7), // Off-white
+            decoration:  BoxDecoration(
+              color: Color(0xffFFFFFF).withOpacity(0.1), // Off-white
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.menu,
-              color: Colors.black,
+              color: Color(0xFFFFF8E7),
               size: 18,
             ), // Reduced from 20
           ),
         ),
 
-        // Center Button showing the Agent Name and Image (onTap removed as requested)
+        // Center "Krishna" Button/Dropdown with Toggle
         Container(
           height: 36, // Reduced from 40
           padding: const EdgeInsets.symmetric(
             horizontal: 10,
           ), // Reduced from 12
           decoration: BoxDecoration(
-            color: const Color(0xFFFFF8E7), // Off-white
+            color: const Color(0xFF18151B), // Off-white
             borderRadius: BorderRadius.circular(24),
           ),
           child: Center(
-            child: Row(
-              children: [
-                // Small Avatar Image
-                Container(
-                  width: 24, // Reduced from 28
-                  height: 24, // Reduced from 28
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: AssetImage(imageAsset),
-                      fit: BoxFit.cover,
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _isDeitySelectionOpen = !_isDeitySelectionOpen;
+                });
+              },
+              child: Row(
+                children: [
+                  // Small Avatar Image
+                  Container(
+                    width: 24, // Reduced from 28
+                    height: 24, // Reduced from 28
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: AssetImage(imageAsset),
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  deityName,
-                  style: TextStyle(
-                    color: Colors.orange.shade800,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12, // Reduced from 14
+                  const SizedBox(width: 6),
+                  Text(
+                    deityName,
+                    style: TextStyle(
+                      color: Colors.orange.shade800,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12, // Reduced from 14
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 2),
+                  Icon(
+                    _isDeitySelectionOpen
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
+                    color: Colors.orange.shade800,
+                    size: 18, // Reduced from 20
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -795,13 +797,13 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
           },
           child: Container(
             padding: const EdgeInsets.all(6), // Reduced from 8
-            decoration: const BoxDecoration(
-              color: Color(0xFFFFF8E7), // Off-white
+            decoration: BoxDecoration(
+              color: Color(0xffFFFFFF).withOpacity(0.1), // Off-white
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.close,
-              color: Colors.black,
+              color: Colors.white,
               size: 16, // Reduced from 18
             ),
           ),
@@ -822,7 +824,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
           children: [
             // The main image is already in background, so we just add the card overlays
             SizedBox(
-              height: MediaQuery.of(context).size.height * 0.40,
+              height: MediaQuery.of(context).size.height * 0.39,
             ), // Push cards down
 
             if (!widget.hideLearnGita)
@@ -949,13 +951,14 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFFFBE6D0),
+          color: const Color(0xFF18151B).withOpacity(0.9),
           borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withOpacity(0.08)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withOpacity(0.2),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -965,7 +968,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [Icon(icon, color: iconColor, size: 22)],
+              children: [Icon(icon, color: const Color(0xFFF1C453), size: 24)],
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -975,21 +978,19 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                   Text(
                     title,
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
+                    style: TextStyle(fontSize: 13, color: Colors.grey.shade400),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
-            Icon(Icons.arrow_forward_ios, color: Colors.black, size: 12),
           ],
         ),
       ),
@@ -1015,8 +1016,8 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
     final isUser = msg.role == 'user';
     final bubbleColor = isUser
         ? const Color.fromARGB(255, 255, 199, 193)
-        : Colors.white;
-    final textColor = Colors.black87;
+        : Color(0xff705500);
+    final textColor = Colors.white;
     final radius = BorderRadius.only(
       topLeft: const Radius.circular(18),
       topRight: const Radius.circular(18),
@@ -1096,17 +1097,24 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
     String deityName = 'Krishna';
     String imageAsset = 'assets/images/Small_krishna.png';
 
-    // Check widget config for default
-    if (widget.backgroundImage?.contains('Rashmi') == true) {
-      deityName = 'Rashmi';
-      imageAsset = 'assets/images/Small_rashmi.png';
-    }
     if (_deityService.selectedDeity != null) {
       final name = _deityService.selectedDeity!.name ?? '';
       if (name.toLowerCase().contains('rashmi')) {
         deityName = 'Rashmi';
         imageAsset = 'assets/images/Small_rashmi.png';
+      } else if (name.toLowerCase().contains('krishna')) {
+        deityName = 'Krishna';
+        imageAsset = 'assets/images/Small_krishna.png';
       }
+    }
+
+    // Check widget config for explicit override
+    if (widget.backgroundImage?.toLowerCase().contains('rashmi') == true) {
+      deityName = 'Rashmi';
+      imageAsset = 'assets/images/Small_rashmi.png';
+    } else if (widget.backgroundImage?.toLowerCase().contains('krishna') == true) {
+      deityName = 'Krishna';
+      imageAsset = 'assets/images/Small_krishna.png';
     }
 
     return Drawer(
@@ -1117,7 +1125,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
             decoration: const BoxDecoration(
-              color: Color(0xFFFBE6D0), // Krishna Theme Background for Header
+              color: Color(0xFF18151B), // Dark theme header
             ),
             child: Stack(
               children: [
@@ -1133,15 +1141,17 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                     Text(
                       deityName,
                       style: const TextStyle(
-                        fontSize:
-                            24, // Reverted to original suggested size or kept as is
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: Colors.white, // Updated for dark theme
                       ),
                     ),
                     const Text(
                       'Powered By BI',
-                      style: TextStyle(fontSize: 14, color: Colors.black54),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.white70,
+                      ), // Updated
                     ),
                   ],
                 ),
@@ -1159,9 +1169,11 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.6),
+                        color: Colors.white.withOpacity(0.1), // Updated
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.black12),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.08),
+                        ), // Updated
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -1169,7 +1181,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                           Icon(
                             Icons.swap_horiz,
                             size: 16,
-                            color: Colors.black87,
+                            color: Colors.white, // Updated
                           ),
                           const SizedBox(width: 4),
                           Text(
@@ -1177,7 +1189,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black87,
+                              color: Colors.white, // Updated
                             ),
                           ),
                         ],
@@ -1191,7 +1203,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
 
           Expanded(
             child: Container(
-              color: Colors.white, // Light color for body as requested
+              color: const Color(0xFF100E13), // Darker background for body
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1199,7 +1211,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Material(
-                      color: const Color(0xFFFBE6D0),
+                      color: const Color(0xFF18151B), // Dark theme
                       borderRadius: BorderRadius.circular(12),
                       child: InkWell(
                         onTap: () async {
@@ -1207,21 +1219,30 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                           await vm.newChat();
                         },
                         borderRadius: BorderRadius.circular(12),
-                        child: Padding(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.1),
+                            ),
+                          ),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 12,
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.add_circle, color: Colors.black87),
+                              Icon(
+                                Icons.add_circle,
+                                color: const Color(0xFFF1C453),
+                              ), // Yellow icon
                               const SizedBox(width: 12),
                               Text(
                                 'New Chat',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
+                                  color: Colors.white, // White text
                                 ),
                               ),
                             ],
@@ -1285,7 +1306,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
 
                           return Material(
                             color: isSelected
-                                ? Colors.white
+                                ? const Color(0xFF18151B) // Dark selected bg
                                 : Colors.transparent,
                             elevation: isSelected ? 2 : 0,
                             borderRadius: BorderRadius.circular(12),
@@ -1305,8 +1326,10 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                                 ), // Reduced from 8
                                 decoration: BoxDecoration(
                                   color: isSelected
-                                      ? const Color(0xFFFBE6D0)
-                                      : Colors.grey[200],
+                                      ? const Color(0xFFF1C453).withOpacity(
+                                          0.2,
+                                        ) // Yellow tinted bg
+                                      : const Color(0xFF18151B), // Dark box bg
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
@@ -1315,8 +1338,10 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                                       : Icons.chat_bubble_outline,
                                   size: 16, // Reduced from 18
                                   color: isSelected
-                                      ? Colors.black87
-                                      : Colors.grey[600],
+                                      ? const Color(
+                                          0xFFF1C453,
+                                        ) // Yellow icon when selected
+                                      : Colors.grey[500],
                                 ),
                               ),
                               title: Text(
@@ -1327,8 +1352,8 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                                       ? FontWeight.bold
                                       : FontWeight.w500,
                                   color: isSelected
-                                      ? Colors.black87
-                                      : Colors.black54,
+                                      ? Colors.white
+                                      : Colors.grey[400],
                                 ),
                               ),
                               subtitle: Text(
@@ -1337,11 +1362,16 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 11, // Reduced from 12
-                                  color: Colors.grey[500],
+                                  color: Colors.grey[600],
                                 ),
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
+                                side: isSelected
+                                    ? BorderSide(
+                                        color: Colors.white.withOpacity(0.08),
+                                      )
+                                    : BorderSide.none,
                               ),
                               onTap: () async {
                                 Get.back();
@@ -1555,10 +1585,6 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
 
                 switch (widget.voiceService.state) {
                   case VoiceAgentState.IDLE:
-                    title = "Connecting...";
-                    actionColor = Colors.orange;
-                    currentActionIcon = Icons.hourglass_empty;
-                    break;
                   case VoiceAgentState.ERROR:
                     title = "Disconnected";
                     break;
@@ -1622,7 +1648,7 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
                               ),
                               GestureDetector(
                                 behavior: HitTestBehavior.opaque,
-                                //onTap: () => _showVoiceSettingsSheet(context),
+                                onTap: () => _showVoiceSettingsSheet(context),
                                 child: Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
@@ -1736,6 +1762,8 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
                         //   ),
                         // ),
                         const Spacer(),
+
+                        // Bottom Action Button
                         Padding(
                           padding: const EdgeInsets.only(bottom: 50.0),
                           child: GestureDetector(

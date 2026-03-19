@@ -55,16 +55,6 @@ class _CheckInViewState extends State<CheckInView>
     super.dispose();
   }
 
-  String _formatDateTimeFull(String? iso) {
-    if (iso == null) return "";
-    try {
-      final dt = DateTime.parse(iso).toLocal();
-      return DateFormat('h:mm a d.MM.yyyy').format(dt);
-    } catch (e) {
-      return "";
-    }
-  }
-
   String _formatDate(String? iso) {
     if (iso == null) return "";
     try {
@@ -151,20 +141,14 @@ class _CheckInViewState extends State<CheckInView>
             return const SafeArea(child: Center(child: Text("Loading...")));
           }
 
-          return SafeArea(
-            bottom: false,
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xffFFFDF8),
-                    Color(0xffFFF2D9),
-                    Color(0xffFFE4B5),
-                  ],
+          return Scaffold(
+            backgroundColor: Colors.black, // Dark Theme Background
+            body: SafeArea(
+              bottom: false,
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.black, // Dark Theme Background
                 ),
-              ),
               child: RefreshIndicator(
                 color: const Color(0xff7B4A12),
                 onRefresh: () async {
@@ -182,78 +166,89 @@ class _CheckInViewState extends State<CheckInView>
                       // Header row
                       Padding(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 0,
+                          horizontal: 16,
+                          vertical: 8,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            IconButton(
-                              icon: const Icon(
-                                Icons.history,
-                                color: Color(0xff7B4A12),
+                            Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white.withOpacity(0.05),
+                                border: Border.all(color: Colors.white24),
                               ),
-                              onPressed: () {
-                                Get.to(() => const SpiritualStatsScreen());
-                              },
+                              child: IconButton(
+                                padding: EdgeInsets.zero,
+                                icon: const Icon(
+                                  Icons.history,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                                onPressed: () {
+                                  Get.to(() => const SpiritualStatsScreen());
+                                },
+                              ),
                             ),
                             Text(
-                              'BRAHMAKOSH',
+                              '#AreYouSpiritual',
                               style: GoogleFonts.lora(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                letterSpacing: 2,
-                                color: const Color(0xff7B4A12),
+                                color: const Color(0xFFD4AF37), // Primary Gold
                               ),
                             ),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.share,
-                                color: Color(0xff7B4A12),
+                            Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white.withOpacity(0.05),
+                                border: Border.all(color: Colors.white24),
                               ),
-                              onPressed: () {
-                                if (data != null) {
-                                  _shareCheckInDetails(context, data);
-                                }
-                              },
+                              child: IconButton(
+                                padding: EdgeInsets.zero,
+                                icon: const Icon(
+                                  Icons.share,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                                onPressed: () {
+                                  if (data != null) {
+                                    _shareCheckInDetails(context, data);
+                                  }
+                                },
+                              ),
                             ),
                           ],
                         ),
                       ),
+                      const SizedBox(height: 16),
 
                       // Main title & Subtitle
                       Text(
-                        '#AreYouSpiritual',
+                        'DAILY SPIRITUAL CHECK - IN',
                         style: GoogleFonts.lora(
-                          fontSize: 20,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xff7B4A12),
+                          color: const Color(0xFFD4AF37),
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 6),
                       Text(
                         'Take a moment for yourself',
-                        style: GoogleFonts.lora(
-                          fontSize: 16,
-                          color: Colors.black87,
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: Colors.white70,
                         ),
                       ),
 
                       // Check-In Options
                       if (data.activities != null &&
                           data.activities!.isNotEmpty) ...[
-                        const SizedBox(height: 16),
-                        Center(
-                          child: Text(
-                            'CHECK-IN OPTIONS',
-                            style: GoogleFonts.lora(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xff7B4A12),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 24),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 40),
                           child: Wrap(
@@ -307,38 +302,9 @@ class _CheckInViewState extends State<CheckInView>
 
                       // Overview Stats
                       if (data.stats != null) ...[
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Column(
-                            children: [
-                              Text(
-                                (data.recentActivities != null &&
-                                        data.recentActivities!.isNotEmpty)
-                                    ? 'Last Check-In ${_formatDateTimeFull(data.recentActivities!.first.createdAt)}'
-                                    : 'No Recent Check-Ins',
-                                style: GoogleFonts.lora(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xff7B4A12),
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'With Each Check-In Earn Karma Points',
-                                style: GoogleFonts.lora(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: const Color(0xff7B4A12),
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        ),
                         const SizedBox(height: 10),
                         RepaintBoundary(
-                          child: _buildOverviewStats(data.stats!),
+                          child: _buildOverviewStats(data.stats!, data.recentActivities),
                         ),
                         const SizedBox(height: 16),
                       ],
@@ -370,10 +336,10 @@ class _CheckInViewState extends State<CheckInView>
                           const SizedBox(height: 12),
                           Text(
                             'Earn Karma points',
-                            style: GoogleFonts.lora(
+                            style: GoogleFonts.poppins(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: const Color(0xff7B4A12),
+                              color: const Color(0xFFD4AF37),
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -385,9 +351,9 @@ class _CheckInViewState extends State<CheckInView>
                               child: Text(
                                 data.motivation!.text!,
                                 textAlign: TextAlign.center,
-                                style: GoogleFonts.lora(
+                                style: GoogleFonts.poppins(
                                   fontSize: 14,
-                                  color: Colors.black54,
+                                  color: Colors.white70,
                                   fontStyle: FontStyle.italic,
                                 ),
                               ),
@@ -400,123 +366,112 @@ class _CheckInViewState extends State<CheckInView>
                   ),
                 ),
               ),
-            ),
+              ))
           );
         }, // Builder
       ), // Consumer
     ); // Provider
   }
 
-  Widget _buildOverviewStats(Stats stats) {
+  Widget _buildOverviewStats(Stats stats, List<RecentActivities>? recentActivities) {
+    String lastCheckInText = 'No Recent Check-Ins';
+    if (recentActivities != null && recentActivities.isNotEmpty) {
+       // Format as "Today - 7:32 PM" if it's today, else standard format
+       final dt = DateTime.parse(recentActivities.first.createdAt!).toLocal();
+       final now = DateTime.now();
+       if (dt.year == now.year && dt.month == now.month && dt.day == now.day) {
+         lastCheckInText = 'Today - ${DateFormat('h:mm a').format(dt)}';
+       } else {
+         lastCheckInText = DateFormat('MMM d - h:mm a').format(dt);
+       }
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.8),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xff7B4A12).withOpacity(0.1)),
+          color: const Color(0xFF1C1C1E), // Dark grey background
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 2000),
-                transitionBuilder: (Widget child, Animation<double> animation) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0.0, 0.5),
-                        end: Offset.zero,
-                      ).animate(animation),
-                      child: child,
-                    ),
-                  );
-                },
-                child: KeyedSubtree(
-                  key: ValueKey<int>(_currentStatIndex),
-                  child: _currentStatIndex == 0
-                      ? Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            //_statItem('Days', '${stats.days}'),
-                            _statItem('Your Check-In', '${stats.sessions}'),
-                          ],
-                        )
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            //_statItem('Minutes', '${stats.minutes}'),
-                            _statItem('Your Karma Points', '${stats.points}'),
-                          ],
-                        ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'LAST CHECK - IN',
+                  style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    letterSpacing: 1.2,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white54,
+                  ),
                 ),
-              ),
+                const SizedBox(height: 4),
+                Text(
+                  lastCheckInText,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Text(
+                      '${stats.points ?? 0}',
+                      style: GoogleFonts.poppins(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    const Icon(Icons.stars, color: Color(0xFFD4AF37), size: 16),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Karma Points',
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        color: Colors.white54,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
             ElevatedButton(
               onPressed: () {
                 Get.toNamed(AppConstants.routeRedeem);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 233, 130, 11),
+                backgroundColor: const Color(0xFFE8C265), // Soft Gold
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
+                  horizontal: 20,
+                  vertical: 10,
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(24),
                 ),
               ),
               child: Text(
-                'Redeem',
-                style: GoogleFonts.lora(
-                  color: Colors.white,
+                'REDEEM',
+                style: GoogleFonts.poppins(
+                  color: Colors.black87,
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
                 ),
               ),
             ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _statItem(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset(
-              'assets/images/brahmkosh_logo.jpeg',
-              height: 28,
-              width: 28,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) =>
-                  const SizedBox.shrink(),
-            ),
-            const SizedBox(width: 2),
-            Text(
-              value,
-              style: GoogleFonts.lora(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xff7B4A12),
-              ),
-            ),
-          ],
-        ),
-        Text(
-          label,
-          style: GoogleFonts.lora(fontSize: 14, color: const Color(0xff7B4A12)),
-        ),
-      ],
     );
   }
 
@@ -566,71 +521,116 @@ class _CheckInViewState extends State<CheckInView>
   Widget _buildCategoryStats(CategoryStats stats) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'YOUR PROGRESS',
-            style: GoogleFonts.lora(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1,
-              color: const Color(0xff7B4A12),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: const Color(0xff7B4A12).withOpacity(0.1),
-              ),
-            ),
-            child: Column(
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: const Color(0xFF141414), // Dark grey background like recent activities/last check-in
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          children: [
+            // Table Header
+            Row(
               children: [
-                if (stats.meditation != null)
-                  _categoryRow('Meditation', stats.meditation!),
-                if (stats.chanting != null)
-                  _categoryRow('Chanting', stats.chanting!),
-                if (stats.prayer != null) _categoryRow('Prayer', stats.prayer!),
-                if (stats.silence != null)
-                  _categoryRow('Silence', stats.silence!),
-                if (stats.bonus != null)
-                  _bonusRedemptionRow(
-                    'Bonus',
-                    '${stats.bonus!.count} bonuses • ${stats.bonus!.totalBonusPoints} points',
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    'YOUR PROGRESS',
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1,
+                      color: Colors.white,
+                    ),
                   ),
-                if (stats.redemption != null)
-                  _bonusRedemptionRow(
-                    'Redemption',
-                    '${stats.redemption!.count} redemptions • ${stats.redemption!.totalRedeemPoints} points',
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Text(
+                    'SESSIONS',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1,
+                      color: Colors.white,
+                    ),
                   ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Text(
+                    'TIME',
+                    textAlign: TextAlign.right,
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ],
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            
+            if (stats.meditation != null)
+              _categoryRow('Mediation', stats.meditation!),
+            if (stats.chanting != null) ...[
+              const Divider(color: Colors.white12, height: 1),
+              _categoryRow('Chanting', stats.chanting!),
+            ],
+            if (stats.prayer != null) ...[
+              const Divider(color: Colors.white12, height: 1),
+              _categoryRow('Prayer', stats.prayer!),
+            ],
+            if (stats.silence != null) ...[
+              const Divider(color: Colors.white12, height: 1),
+              _categoryRow('Silence', stats.silence!),
+            ],
+            if (stats.bonus != null) ...[
+              const Divider(color: Colors.white12, height: 1),
+              _bonusRedemptionRow(
+                'Bonus',
+                '${stats.bonus!.count} bonuses • ${stats.bonus!.totalBonusPoints} points',
+              ),
+            ],
+            if (stats.redemption != null) ...[
+              const Divider(color: Colors.white12, height: 1),
+              _bonusRedemptionRow(
+                'Redemption',
+                '${stats.redemption!.count} redemptions • ${stats.redemption!.totalRedeemPoints} points',
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _bonusRedemptionRow(String title, String subtitle) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: GoogleFonts.lora(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
+          Expanded(
+            flex: 2,
+            child: Text(
+              title,
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: Colors.white70,
+              ),
             ),
           ),
-          Text(
-            subtitle,
-            style: GoogleFonts.lora(fontSize: 13, color: Colors.black54),
+          Expanded(
+            flex: 2,
+            child: Text(
+              subtitle,
+              textAlign: TextAlign.right,
+              style: GoogleFonts.poppins(fontSize: 13, color: Colors.white54),
+            ),
           ),
         ],
       ),
@@ -639,21 +639,35 @@ class _CheckInViewState extends State<CheckInView>
 
   Widget _categoryRow(String title, CategoryDetail detail) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: GoogleFonts.lora(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
+          Expanded(
+            flex: 2,
+            child: Text(
+              title,
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: Colors.white70,
+              ),
             ),
           ),
-          Text(
-            '${detail.sessions} sessions • ${detail.minutes} mins',
-            style: GoogleFonts.lora(fontSize: 13, color: Colors.black54),
+          Expanded(
+            flex: 1,
+            child: Text(
+              '${detail.sessions}',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(fontSize: 13, color: Colors.white54),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Text(
+              '${detail.minutes} m',
+              textAlign: TextAlign.right,
+              style: GoogleFonts.poppins(fontSize: 13, color: Colors.white54),
+            ),
           ),
         ],
       ),
@@ -669,101 +683,100 @@ class _CheckInViewState extends State<CheckInView>
           Text(
             'RECENT ACTIVITIES',
             style: GoogleFonts.lora(
-              fontSize: 14,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
               letterSpacing: 1,
-              color: const Color(0xff7B4A12),
+              color: const Color(0xFFD4AF37),
             ),
           ),
           const SizedBox(height: 12),
           ListView.separated(
-            // 1. Ensures the list only occupies the height of its children
             shrinkWrap: true,
-            // 2. Removes default internal padding (Crucial for fixing your image issue)
             padding: EdgeInsets.zero,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: activities.length > 5 ? 5 : activities.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 10),
+            separatorBuilder: (context, index) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
               final activity = activities[index];
+              final bool isComplete = activity.status == 'completed';
+              
               return Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: const Color(0xff7B4A12).withOpacity(0.1),
-                  ),
+                  color: const Color(0xFF141414), // Dark grey background
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: const Color(0xff7B4A12).withOpacity(0.1),
+                        color: Colors.black.withOpacity(0.5),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         _getActivityIcon(activity.type),
-                        size: 16,
-                        color: const Color(0xff7B4A12),
+                        size: 20,
+                        color:isComplete ? const Color(0xFF2ECC71): Colors.redAccent,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             activity.title ?? '',
-                            style: GoogleFonts.lora(
+                            style: GoogleFonts.poppins(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black87,
+                              color: Colors.white,
                             ),
                           ),
+                          const SizedBox(height: 4),
                           Text(
-                            "${_formatDate(activity.createdAt)}   ${_formatTime(activity.createdAt)}",
-                            style: GoogleFonts.lora(
+                            "${_formatDate(activity.createdAt)} ${_formatTime(activity.createdAt)}",
+                            style: GoogleFonts.poppins(
                               fontSize: 12,
-                              color: Colors.black54,
+                              color: Colors.white38,
                             ),
                           ),
                         ],
                       ),
                     ),
                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         if (activity.karmaPoints != null)
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
+                              horizontal: 10,
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xffC9A24D).withOpacity(0.2),
+                              color: isComplete 
+                                  ? const Color(0xFFD4AF37).withOpacity(0.2)
+                                  : Colors.white.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
                               '+${activity.karmaPoints} Karma',
-                              style: GoogleFonts.lora(
+                              style: GoogleFonts.poppins(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: const Color(0xff7B4A12),
+                                color: isComplete 
+                                    ? const Color(0xFFD4AF37)
+                                    : Colors.white,
                               ),
                             ),
                           ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 6),
                         Text(
-                          activity.status == 'completed'
-                              ? 'Completed'
-                              : 'Incomplete',
-                          style: GoogleFonts.lora(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: activity.status == 'completed'
-                                ? Colors.green
-                                : Colors.red,
+                          isComplete ? 'Completed' : 'Incomplete',
+                          style: GoogleFonts.poppins(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: isComplete ? const Color(0xFF2ECC71) : const Color(0xFFE74C3C),
                           ),
                         ),
                       ],
@@ -798,19 +811,31 @@ class _CheckInViewState extends State<CheckInView>
     required String title,
     required VoidCallback onTap,
   }) {
+    // Determine proper casing for the title (current title might be ALL CAPS)
+    // The design shows standard camel case like "Meditation" -> we'll just format it properly.
+    String formattedTitle = title.toLowerCase().split(' ').map((word) => 
+        word.isNotEmpty ? '${word[0].toUpperCase()}${word.substring(1)}' : '').join(' ');
+
     return GestureDetector(
       onTap: onTap,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            height: 120,
+            height: 110,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(16),
+              // border: Border.all(color: const Color(0xFFD4AF37), width: 1.5),
               boxShadow: [
                 BoxShadow(
+                  blurRadius: 15,
+                  spreadRadius: 1,
+                  color: const Color(0xFFD4AF37).withOpacity(0.2), // Glow
+                  offset: const Offset(0, 0),
+                ),
+                BoxShadow(
                   blurRadius: 10,
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withOpacity(0.5),
                   offset: const Offset(0, 4),
                 ),
               ],
@@ -819,44 +844,65 @@ class _CheckInViewState extends State<CheckInView>
             child: Stack(
               fit: StackFit.expand,
               children: [
-                // Background Image
-                image != null
-                    ? CachedNetworkImage(
+                Builder(
+                  builder: (context) {
+                    final titleLower = title.toLowerCase();
+                    String? localAsset;
+                    if (titleLower.contains('chanting')) {
+                      localAsset = 'assets/icons/chanting.png';
+                    } else if (titleLower.contains('meditation')) {
+                      localAsset = 'assets/icons/meditation.png';
+                    } else if (titleLower.contains('prayer')) {
+                      localAsset = 'assets/icons/prayer.png';
+                    } else if (titleLower.contains('silence')) {
+                      localAsset = 'assets/icons/silence.png';
+                    }
+
+                    if (localAsset != null) {
+                      return Image.asset(
+                        localAsset,
+                        fit: BoxFit.cover,
+                      );
+                    } else if (image != null && image.isNotEmpty) {
+                      return CachedNetworkImage(
                         imageUrl: image,
                         fit: BoxFit.cover,
                         placeholder: (context, url) => Container(
-                          color: Colors.transparent,
+                          color: const Color(0xFF141414),
                           child: const Center(
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Color(0xFFD4AF37)),
                           ),
                         ),
                         errorWidget: (context, url, error) => Container(
-                          color: Colors.transparent,
-                          child: const Icon(Icons.error, color: Colors.red),
+                          color: const Color(0xFF141414),
+                          child: const Icon(Icons.error, color: Colors.white24),
                         ),
-                      )
-                    : Container(
-                        color: const Color(0xff7B4A12).withOpacity(0.1),
+                      );
+                    } else {
+                      return Container(
+                        color: const Color(0xFF141414),
                         child: const Icon(
                           Icons.spa,
-                          color: Color(0xff7B4A12),
+                          color: Color(0xFFD4AF37),
                           size: 40,
                         ),
-                      ),
+                      );
+                    }
+                  },
+                ),
               ],
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 10),
           // Title Text
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: Text(
-              title,
-              style: GoogleFonts.lora(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.5,
-                color: const Color(0xff7B4A12),
+              formattedTitle,
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: Colors.white,
               ),
               textAlign: TextAlign.center,
               maxLines: 2,

@@ -5,25 +5,39 @@ import 'package:brahmakosh/common/models/user_complete_details_model.dart';
 class PlanetDetailScreen extends StatelessWidget {
   final Planets planet;
 
+  static const Color _bgDark = Colors.black;
+  static const Color _cardDark = Color(0xFF0F0F2D);
+  static const Color _cardBorder = Color(0xFF1E1E4D);
+  static const Color _textPrimary = Colors.white;
+  static const Color _textSecondary = Color(0xFFB0B0CC);
+  static const Color _accentGold = Color(0xFFD4AF37);
+
   const PlanetDetailScreen({super.key, required this.planet});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFBF5),
+      backgroundColor: _bgDark,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFFFBF5),
+        backgroundColor: _bgDark,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF6D3A0C)),
-          onPressed: () => Navigator.pop(context),
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: const BoxDecoration(
+            color: _cardDark,
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
         title: Text(
           planet.name ?? "Planet Details",
-          style: GoogleFonts.lora(
+          style: GoogleFonts.poppins(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF6D3A0C),
+            color: _textPrimary,
           ),
         ),
       ),
@@ -90,10 +104,10 @@ class PlanetDetailScreen extends StatelessWidget {
             height: 200,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFFFFCC80).withOpacity(0.2),
+              color: const Color(0xFFFFCC80).withOpacity(0.1),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFFFCC80).withOpacity(0.4),
+                  color: const Color(0xFFFFCC80).withOpacity(0.2),
                   blurRadius: 40,
                   spreadRadius: 10,
                 ),
@@ -104,28 +118,28 @@ class PlanetDetailScreen extends StatelessWidget {
           Container(
             width: 120,
             height: 120,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(
-                colors: [Color(0xFFF9A825), Color(0xFFFBC02D)],
+                colors: [_accentGold, _accentGold.withOpacity(0.7)], // Adjusted Gold Gradient
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black26,
+                  color: Colors.black45, // Darker shadow
                   blurRadius: 10,
-                  offset: Offset(0, 5),
+                  offset: const Offset(0, 5),
                 ),
               ],
             ),
             child: Center(
               child: Text(
                 planet.name?.substring(0, 1) ?? "P",
-                style: GoogleFonts.lora(
+                style: GoogleFonts.poppins(
                   fontSize: 48,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: _bgDark, // Dark text on gold
                 ),
               ),
             ),
@@ -136,17 +150,17 @@ class PlanetDetailScreen extends StatelessWidget {
               children: [
                 Text(
                   planet.name ?? "",
-                  style: GoogleFonts.lora(
+                  style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF6D3A0C),
+                    color: _accentGold,
                   ),
                 ),
                 Text(
                   planet.sign ?? "",
-                  style: GoogleFonts.lora(
+                  style: GoogleFonts.poppins(
                     fontSize: 14,
-                    color: const Color(0xFF6D3A0C),
+                    color: _textSecondary,
                   ),
                 ),
               ],
@@ -158,17 +172,17 @@ class PlanetDetailScreen extends StatelessWidget {
               children: [
                 Text(
                   planet.sign ?? "",
-                  style: GoogleFonts.lora(
+                  style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF6D3A0C),
+                    color: _accentGold,
                   ),
                 ),
                 Text(
-                  "${planet.house}",
-                  style: GoogleFonts.lora(
+                  "House ${planet.house}",
+                  style: GoogleFonts.poppins(
                     fontSize: 14,
-                    color: const Color(0xFF6D3A0C),
+                    color: _textSecondary,
                   ),
                 ),
               ],
@@ -184,11 +198,12 @@ class PlanetDetailScreen extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _cardDark,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _cardBorder),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withOpacity(0.2),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -199,10 +214,10 @@ class PlanetDetailScreen extends StatelessWidget {
         children: [
           Text(
             title,
-            style: GoogleFonts.lora(
+            style: GoogleFonts.poppins(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF6D3A0C),
+              color: _accentGold,
             ),
           ),
           const SizedBox(height: 12),
@@ -228,14 +243,14 @@ class PlanetDetailScreen extends StatelessWidget {
               children: [
                 Text(
                   "$label1: ",
-                  style: GoogleFonts.lora(color: Colors.grey[600]),
+                  style: GoogleFonts.poppins(color: _textSecondary),
                 ),
                 Expanded(
                   child: Text(
                     value1,
-                    style: GoogleFonts.lora(
+                    style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF333333),
+                      color: _textPrimary,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -250,13 +265,13 @@ class PlanetDetailScreen extends StatelessWidget {
                 children: [
                   Text(
                     "$label2: ",
-                    style: GoogleFonts.lora(color: Colors.grey[600]),
+                    style: GoogleFonts.poppins(color: _textSecondary),
                   ),
                   Text(
                     value2,
-                    style: GoogleFonts.lora(
+                    style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF333333),
+                      color: _textPrimary,
                     ),
                   ),
                   if (label2 == "House" ||
@@ -265,7 +280,7 @@ class PlanetDetailScreen extends StatelessWidget {
                     const Icon(
                       Icons.keyboard_arrow_right,
                       size: 16,
-                      color: Colors.grey,
+                      color: Color(0xFFB0B0CC), // _textSecondary
                     ),
                 ],
               ),

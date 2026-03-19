@@ -41,6 +41,15 @@ class AppTheme {
   static const Color landingButton = Color(0xFFB8905A);
   static const Color redeemOrange = Color(0xFFF23900);
 
+  // New Dark Auth Theme Colors
+  static const Color authBackground = Color(0xFF000000); // Pure Black
+  static const Color authSurface = Color(0xFF141414); // Dark Grey Surface
+  static const Color authInputFill = Color(0xFF1A1A1A); // Input Background
+  static const Color authPrimaryGold = Color(0xFFD4AF37); // Premium Gold
+  static const Color authTextPrimary = Colors.white;
+  static const Color authTextSecondary = Color(0xFFBDBDBD); // Soft Grey
+  static const Color authTextHighlight = Color(0xFFF2C94B); // Bright Gold
+
   // Gradient Colors
   static const LinearGradient goldGradient = LinearGradient(
     begin: Alignment.topLeft,

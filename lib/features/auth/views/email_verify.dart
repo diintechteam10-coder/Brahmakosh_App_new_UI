@@ -1,6 +1,6 @@
-import 'package:brahmakosh/core/custom_widgets/auth_logo.dart';
 import 'package:brahmakosh/core/theme/app_theme.dart';
 import 'package:brahmakosh/features/auth/controllers/email_verify_controller.dart';
+import 'package:brahmakosh/features/auth/views/login.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,109 +10,137 @@ class EmailOtpView extends StatelessWidget {
 
   EmailOtpView({super.key, required this.email});
 
-  // Use Get.put to create controller for this page
   final EmailOtpController controller = Get.put(EmailOtpController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffFDFDFD),
-      resizeToAvoidBottomInset: false, // Prevent bottom text from moving with keyboard
+      backgroundColor: AppTheme.authBackground,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 20),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Get.back(),
         ),
       ),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            /// CONTENT
-            SingleChildScrollView(
+      body: Stack(
+        children: [
+          // Wavy Background Pattern
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/auth_wavy_bg.png',
+              fit: BoxFit.cover,
+              opacity: const AlwaysStoppedAnimation(0.4),
+            ),
+          ),
+
+          SafeArea(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 children: [
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 60),
 
-                  const AuthLogoAvatar(),
-                  const SizedBox(height: 20),
-
-                  Text(
-                    "Brahmakosh",
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w600,
+                  // Circular Gold Logo
+                  Center(
+                    child: Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        // border: Border.all(color: AppTheme.authPrimaryGold, width: 2),
+                        image: const DecorationImage(
+                          image: AssetImage('assets/images/brahmkosh_logo.jpeg'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
                   ),
 
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 32),
 
                   Text(
-                    "Verify OTP sent to your email",
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: Colors.black45,
+                    "Email Verification",
+                    style: GoogleFonts.lora(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
 
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 12),
+
+                  Text(
+                    "We've sent a 6-digit verification code to",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: AppTheme.authTextSecondary,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 4),
+                  
+                  Text(
+                    email,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.authPrimaryGold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 48),
 
                   /// OTP FIELD
-                  TextField(
+                  AuthInputField(
                     controller: controller.otpController,
+                    hint: "Enter 6-digit OTP",
+                    icon: Icons.lock_outline,
                     keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      hintText: "Enter OTP",
-                      hintStyle: GoogleFonts.inter(fontSize: 13),
-                      prefixIcon: const Icon(Icons.lock_outline),
-                      filled: true,
-                      fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 16),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        borderSide: const BorderSide(color: Colors.black12),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        borderSide: const BorderSide(color: Colors.black12),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        borderSide: BorderSide(color: AppTheme.primaryGold),
-                      ),
-                    ),
                   ),
 
-                  const SizedBox(height: 26),
+                  const SizedBox(height: 48),
 
                   /// VERIFY BUTTON
                   Obx(
-                    () => InkWell(
-                      borderRadius: BorderRadius.circular(30),
+                    () => GestureDetector(
                       onTap: controller.isLoading.value
                           ? null
                           : () => controller.verifyOtp(email: email),
                       child: Container(
-                        height: 54,
+                        height: 45,
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: AppTheme.primaryGold,
-                          borderRadius: BorderRadius.circular(30),
+                          color: AppTheme.authPrimaryGold,
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            if (!controller.isLoading.value)
+                              BoxShadow(
+                                color: AppTheme.authPrimaryGold.withOpacity(0.3),
+                                blurRadius: 15,
+                                offset: const Offset(0, 5),
+                              ),
+                          ],
                         ),
                         child: Center(
                           child: controller.isLoading.value
-                              ? const CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
+                              ? const SizedBox(
+                                  height: 24,
+                                  width: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.black,
+                                  ),
                                 )
                               : Text(
-                                  "Verify OTP",
-                                  style: GoogleFonts.inter(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
+                                  "Verify & Continue",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
                                   ),
                                 ),
                         ),
@@ -120,26 +148,37 @@ class EmailOtpView extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
 
-                  const SizedBox(height: 90),
+                  Text(
+                    "Didn't receive the code?",
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: AppTheme.authTextSecondary,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 8),
+                  
+                  GestureDetector(
+                    onTap: () {
+                      // Add resend logic if available in controller
+                    },
+                    child: Text(
+                      "Resend Code",
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.authPrimaryGold,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
-
-            /// PRIVACY - Fixed at bottom, doesn't move with keyboard
-            Positioned(
-              bottom: 20,
-              left: 24,
-              right: 24,
-              child: Text(
-                "By continuing, you agree to our Terms & Privacy Policy",
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(fontSize: 11, color: Colors.black45),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

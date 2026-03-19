@@ -87,6 +87,8 @@ class ApiUrls {
       '$chatApiUrl/conversations'; // /{conversationId}/messages
   static const String endConversation =
       '$chatApiUrl/conversations'; // /{conversationId}/end
+  static const String cancelChatRequest =
+      '$chatApiUrl/user/requests'; // /{conversationId}/cancel
   static const String userCreditBalance = '$chatApiUrl/credits/balance/user';
   static const String markConversationRead =
       '$chatApiUrl/conversations'; // /{conversationId}/read
@@ -104,4 +106,17 @@ class ApiUrls {
   /// 🔹 Swapna Decoder APIs
   static const String swapnaDecoder = '$baseUrl/api/swapna-decoder';
   static const String dreamRequests = '$baseUrl/api/dream-requests';
+  static String? getFormattedImageUrl(String? url) {
+    if (url == null || url.isEmpty) return null;
+    
+    // Trim whitespace as some APIs return URLs with leading spaces
+    String trimmedUrl = url.trim();
+    
+    if (trimmedUrl.startsWith('http')) {
+      return trimmedUrl;
+    }
+    
+    // Prepend baseUrl if it's a relative path
+    return '$baseUrl${trimmedUrl.startsWith('/') ? '' : '/'}$trimmedUrl';
+  }
 }

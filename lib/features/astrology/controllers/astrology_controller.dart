@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:brahmakosh/common_imports.dart';
-import 'package:brahmakosh/core/theme/app_theme.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../common/models/astrologist_model.dart';
@@ -202,6 +201,10 @@ class AstrologyController extends GetxController {
               }
 
               print("✅ Parsed ${parsedExperts.length} experts");
+              // Print raw expert data for debugging
+              for (var expert in parsedExperts) {
+                print("👤 Expert Data: ${json.encode(expert.toJson())}");
+              }
               _experts.value = parsedExperts;
 
               // Fallback to mock data if API returns empty
@@ -257,12 +260,12 @@ class AstrologyController extends GetxController {
   void showRechargeBottomSheet(BuildContext context) {
     Get.bottomSheet(
       Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(24),
         decoration: const BoxDecoration(
-          color: Colors.white,
+          color: Color(0xFF141414),
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(25),
-            topRight: Radius.circular(25),
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
           ),
         ),
         child: Column(
@@ -273,77 +276,92 @@ class AstrologyController extends GetxController {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Recharge your wallet",
-                  style: GoogleFonts.playfairDisplay(
-                    fontSize: 20,
+                  "RECHARGE WALLET",
+                  style: GoogleFonts.inter(
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 0.5,
                   ),
                 ),
                 IconButton(
                   onPressed: () => Get.back(),
-                  icon: const Icon(Icons.close),
+                  icon: const Icon(Icons.close, color: Colors.white54),
                 ),
               ],
             ),
-            const Divider(),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             Text(
-              "Insufficient balance to chat. Minimum \u20B9 100 required.",
-              style: GoogleFonts.lora(fontSize: 14, color: Colors.grey[600]),
+              "Insufficient balance to start consultation. Minimum ₹100 is required.",
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: Colors.white.withOpacity(0.7),
+              ),
             ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [50, 100, 200, 500].map((amount) {
+            const SizedBox(height: 24),
+            
+            GridView.count(
+              shrinkWrap: true,
+              crossAxisCount: 2,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: 2.5,
+              children: [100, 200, 500, 1000].map((amount) {
                 return InkWell(
                   onTap: () {
                     Get.back();
                     Get.snackbar(
-                      "Success",
-                      "Wallet recharged with \u20B9$amount",
-                      backgroundColor: Colors.green,
-                      colorText: Colors.white,
+                      "Processing",
+                      "Starting payment for ₹$amount...",
+                      backgroundColor: const Color(0xFFD4AF37),
+                      colorText: Colors.black,
+                      snackPosition: SnackPosition.TOP,
                     );
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 10,
-                    ),
+                    alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      border: Border.all(color: AppTheme.primaryGold),
-                      borderRadius: BorderRadius.circular(10),
+                      color: const Color(0xFF262626),
+                      border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.3)),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      "\u20B9$amount",
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      "₹$amount",
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFFD4AF37),
+                      ),
                     ),
                   ),
                 );
               }).toList(),
             ),
-            const SizedBox(height: 30),
+            
+            const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryGold,
+                  backgroundColor: const Color(0xFFD4AF37),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  elevation: 0,
                 ),
-                child: const Text(
-                  "Proceed to Pay",
-                  style: TextStyle(
-                    color: Colors.white,
+                child: Text(
+                  "PROCEED TO PAY",
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 30),
+            SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
           ],
         ),
       ),

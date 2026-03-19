@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../common/colors.dart';
 import '../blocs/dream_request_bloc.dart';
 import '../blocs/dream_request_event.dart';
 import '../blocs/dream_request_state.dart';
@@ -60,28 +59,28 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
         },
         builder: (context, state) {
           return Scaffold(
-            backgroundColor: CustomColors.lightPinkColor,
+            backgroundColor: Colors.black,
             appBar: AppBar(
               title: Text(
                 "Submit Dream Request",
                 style: GoogleFonts.lora(
                   fontSize: 20,
-                  color: const Color(0xff4E342E),
+                  color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               backgroundColor: Colors.transparent,
               elevation: 0,
-              leading: Container(
-                margin: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.8),
-                  shape: BoxShape.circle,
+              leading: IconButton(
+                icon: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
                 ),
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Color(0xff5D4037)),
-                  onPressed: () => Get.back(),
-                ),
+                onPressed: () => Get.back(),
               ),
             ),
             body: SingleChildScrollView(
@@ -97,20 +96,13 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
                         width: 72,
                         height: 72,
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              const Color(0xffFEDA87).withOpacity(0.4),
-                              const Color(0xffFF7438).withOpacity(0.15),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
+                          color: const Color(0xFFD4AF37).withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
                           Icons.nights_stay_outlined,
                           size: 36,
-                          color: Color(0xffFF7438),
+                          color: Color(0xFFD4AF37),
                         ),
                       ),
                     ),
@@ -120,7 +112,7 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
                         "Tell us about your dream",
                         style: GoogleFonts.inter(
                           fontSize: 14,
-                          color: const Color(0xff8D6E63),
+                          color: Colors.grey,
                         ),
                       ),
                     ),
@@ -143,21 +135,21 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
                         controller: _symbolController,
                         style: GoogleFonts.inter(
                           fontSize: 15,
-                          color: const Color(0xff4E342E),
+                          color: Colors.white,
                         ),
                         decoration: InputDecoration(
                           hintText: "e.g., Snake, Ocean, Flying",
                           hintStyle: GoogleFonts.inter(
                             fontSize: 14,
-                            color: const Color(0xffBDAA94),
+                            color: Colors.grey,
                           ),
                           prefixIcon: const Icon(
                             Icons.search,
-                            color: Color(0xffBDAA94),
+                            color: Colors.grey,
                             size: 20,
                           ),
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: const Color(0xFF1C1C1E),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
@@ -165,13 +157,13 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide(
-                              color: const Color(0xffFEDA87).withOpacity(0.3),
+                              color: Colors.white.withOpacity(0.1),
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: const BorderSide(
-                              color: Color(0xffFF7438),
+                              color: Color(0xFFD4AF37),
                               width: 1.5,
                             ),
                           ),
@@ -205,17 +197,17 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
                         maxLines: 5,
                         style: GoogleFonts.inter(
                           fontSize: 15,
-                          color: const Color(0xff4E342E),
+                          color: Colors.white,
                         ),
                         decoration: InputDecoration(
                           hintText:
                               "Describe the context, your feelings, surroundings...",
                           hintStyle: GoogleFonts.inter(
                             fontSize: 14,
-                            color: const Color(0xffBDAA94),
+                            color: Colors.grey,
                           ),
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: const Color(0xFF1C1C1E),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
@@ -223,13 +215,13 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide(
-                              color: const Color(0xffFEDA87).withOpacity(0.3),
+                              color: Colors.white.withOpacity(0.1),
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: const BorderSide(
-                              color: Color(0xffFF7438),
+                              color: Color(0xFFD4AF37),
                               width: 1.5,
                             ),
                           ),
@@ -247,7 +239,7 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(30),
                         gradient: const LinearGradient(
-                          colors: [Color(0xffFF7438), Color(0xffFF9A5C)],
+                          colors: [Color(0xFFD4AF37), Color(0xFFC5A028)],
                         ),
                         boxShadow: [
                           BoxShadow(
@@ -297,7 +289,7 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
                                     style: GoogleFonts.inter(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                                      color: Colors.black,
                                     ),
                                   ),
                                   const SizedBox(width: 8),
@@ -330,7 +322,7 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
           style: GoogleFonts.inter(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: const Color(0xff4E342E),
+            color: Colors.white,
           ),
         ),
       ],

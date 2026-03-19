@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
-import '../../../../common/colors.dart';
 import 'swapna_list_tab.dart';
 import 'dream_requests_tab.dart';
 import '../../notifications/views/notification_screen.dart';
@@ -32,116 +31,88 @@ class _SwapnaDecoderScreenState extends State<SwapnaDecoderScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.lightPinkColor,
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Swapna Decoder",
-              style: GoogleFonts.lora(
-                fontSize: 22,
-                color: const Color(0xff4E342E),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              "Decode your dreams ✨",
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                color: const Color(0xff8D6E63),
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-          ],
+        title: Text(
+          "Swapna Decoder",
+          style: GoogleFonts.lora(
+            fontSize: 22,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
-        leading: Container(
-          margin: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-          ),
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Color(0xff5D4037)),
-            onPressed: () => Get.back(),
-          ),
-        ),
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 8),
+        leading: IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Colors.white.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: IconButton(
-              icon: const Icon(
-                Icons.notifications_outlined,
-                color: Color(0xff5D4037),
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const NotificationScreen(),
-                  ),
-                );
-              },
-            ),
+            child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
           ),
+          onPressed: () => Get.back(),
+        ),
+        actions: [
+          IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.notifications_none_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NotificationScreen(),
+                ),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
         ],
       ),
       body: Column(
         children: [
           const SizedBox(height: 16),
           Container(
-            height: 44,
+            height: 48,
             margin: const EdgeInsets.symmetric(horizontal: 24),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  const Color(0xffFEDA87).withOpacity(0.3),
-                  const Color(0xffF4E9E0).withOpacity(0.6),
-                ],
-              ),
+              color: const Color(0xFF1C1C1E),
               borderRadius: BorderRadius.circular(25),
-              border: Border.all(
-                color: const Color(0xffFEDA87).withOpacity(0.5),
-              ),
             ),
             child: TabBar(
               controller: _tabController,
               indicator: BoxDecoration(
                 borderRadius: BorderRadius.circular(25),
-                gradient: const LinearGradient(
-                  colors: [Color(0xffFEDA87), Color(0xffF4C430)],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xffFEDA87).withOpacity(0.4),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                color: const Color(0xFFD4AF37),
               ),
               indicatorSize: TabBarIndicatorSize.tab,
               dividerColor: Colors.transparent,
-              labelColor: const Color(0xff4E342E),
-              unselectedLabelColor: const Color(0xff8D6E63),
+              labelColor: Colors.black,
+              unselectedLabelColor: Colors.grey,
               labelStyle: GoogleFonts.inter(
                 fontWeight: FontWeight.bold,
-                fontSize: 12,
+                fontSize: 13,
                 letterSpacing: 0.5,
               ),
               unselectedLabelStyle: GoogleFonts.inter(
-                fontWeight: FontWeight.w500,
-                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
               ),
               tabs: const [
-                Tab(text: "SEARCH DREAMS"),
-                Tab(text: "MY REQUESTS"),
+                Tab(text: "SEARCH DREAM"),
+                Tab(text: "MY REQUEST"),
               ],
             ),
           ),

@@ -13,24 +13,13 @@ class PanchangDetailsView extends StatelessWidget {
     final homeController = Get.find<HomeController>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF5E6), // Light orange background
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF6D3A0C)),
-          onPressed: () => Get.back(),
-        ),
-        title: Text(
-          "Panchang",
-          style: GoogleFonts.lora(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFF6D3A0C),
-          ),
-        ),
-      ),
-      body: Obx(() {
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildCustomHeader(),
+            Expanded(
+              child: Obx(() {
         if (homeController.isPanchangLoading) {
           return const Center(child: CircularProgressIndicator());
         }
@@ -45,63 +34,76 @@ class PanchangDetailsView extends StatelessWidget {
         final chaughadiya = panchang.chaughadiyaMuhurta;
         final dailyNakshatra = panchang.dailyNakshatraPrediction;
 
-        return DefaultTabController(
-          length: 4,
-          child: Column(
-            children: [
-              _buildHeaderCard(basic, advanced),
-              _buildSunMoonRow(advanced),
-              TabBar(
-                labelColor: const Color(0xFFE65100),
-                unselectedLabelColor: const Color(0xFF6D3A0C).withOpacity(0.6),
-                indicatorColor: const Color(0xFFE65100),
-                labelStyle: GoogleFonts.lora(fontWeight: FontWeight.bold),
-                isScrollable: false,
-                padding: EdgeInsets.zero,
-                labelPadding: const EdgeInsets.symmetric(horizontal: 4),
-                tabs: const [
-                  Tab(text: "Over View"),
-                  Tab(text: "Panchang"),
-                  Tab(text: "Muhurta"),
-                  Tab(text: "Chaughadiya"),
-                ],
-              ),
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    _buildOverviewTab(basic, advanced, dailyNakshatra),
-                    _buildPanchangTab(basic, advanced),
-                    _buildMuhuratTab(advanced),
-                    _buildChaughadiyaTab(chaughadiya),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      }),
+                return DefaultTabController(
+                  length: 4,
+                  child: Column(
+                    children: [
+                      _buildDateCard(basic, advanced),
+                      _buildSunMoonRow(advanced),
+                      _buildTabBar(),
+                      Expanded(
+                        child: TabBarView(
+                          children: [
+                            _buildOverviewTab(basic, advanced, dailyNakshatra),
+                            _buildPanchangTab(basic, advanced),
+                            _buildMuhuratTab(advanced),
+                            _buildChaughadiyaTab(chaughadiya),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _buildHeaderCard(BasicPanchang? basic, AdvancedPanchang? advanced) {
-    // Format Date: Thursday, 05 Feb 2026
+  Widget _buildCustomHeader() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+            onPressed: () => Get.back(),
+          ),
+          Text(
+            "Panchang",
+            style: GoogleFonts.lora(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDateCard(BasicPanchang? basic, AdvancedPanchang? advanced) {
     final now = DateTime.now();
     final formattedDate = DateFormat('EEEE, dd MMM yyyy').format(now);
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      padding: const EdgeInsets.all(16),
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF8E1), // Light yellow/cream
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.orange.withOpacity(0.2)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.orange.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        gradient: const LinearGradient(
+          colors: [Color(0xFFF3C052), Color(0xFFD48F37)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        image: const DecorationImage(
+          image: AssetImage('assets/images/shubh_muhurat_bg.png'), // Using existing asset if available, or just gradient
+          fit: BoxFit.cover,
+          opacity: 0.2,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,7 +113,7 @@ class PanchangDetailsView extends StatelessWidget {
             style: GoogleFonts.lora(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF6D3A0C),
+              color: const Color(0xFF333333),
             ),
           ),
           const SizedBox(height: 4),
@@ -119,40 +121,32 @@ class PanchangDetailsView extends StatelessWidget {
             basic?.tithi ?? "Tithi Unavailable",
             style: GoogleFonts.lora(
               fontSize: 16,
-              color: const Color(0xFF8D6E63),
+              color: const Color(0xFF333333),
               fontWeight: FontWeight.w500,
             ),
           ),
           const SizedBox(height: 16),
           Row(
             children: [
-              const Icon(
-                Icons.wb_sunny_outlined,
-                color: Colors.orange,
-                size: 20,
-              ),
+              const Icon(Icons.wb_sunny, color: Colors.orange, size: 22),
               const SizedBox(width: 8),
               Text(
-                advanced?.sunrise ?? "--:--",
-                style: GoogleFonts.inter(
+                _formatTimeString(advanced?.sunrise),
+                style: GoogleFonts.poppins(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: const Color(0xFF333333),
                 ),
               ),
               const SizedBox(width: 24),
-              const Icon(
-                Icons.nights_stay_outlined,
-                color: Colors.indigo,
-                size: 20,
-              ),
+              const Icon(Icons.nights_stay, color: Colors.indigo, size: 22),
               const SizedBox(width: 8),
               Text(
-                advanced?.moonrise ?? "--:--",
-                style: GoogleFonts.inter(
+                _formatTimeString(advanced?.moonrise),
+                style: GoogleFonts.poppins(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: const Color(0xFF333333),
                 ),
               ),
             ],
@@ -165,255 +159,329 @@ class PanchangDetailsView extends StatelessWidget {
   Widget _buildSunMoonRow(AdvancedPanchang? advanced) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildSunMoonItem(
-            Icons.wb_sunny_outlined,
-            "Sunrise",
-            advanced?.sunrise ?? "-",
-            Colors.orange,
-          ),
-          _buildSunMoonItem(
-            Icons.wb_twilight,
-            "Sunset",
-            advanced?.sunset ?? "-",
-            Colors.deepOrange,
-          ),
-          _buildSunMoonItem(
-            Icons.nights_stay_outlined,
-            "Moon rise",
-            advanced?.moonrise ?? "-",
-            Colors.indigo,
-          ),
-          _buildSunMoonItem(
-            Icons.bedtime_outlined,
-            "Moon set",
-            advanced?.moonset ?? "-",
-            Colors.blueGrey,
-          ),
+          _buildSunMoonItem(Icons.wb_sunny_outlined, "Sunrise", _formatTimeString(advanced?.sunrise), Colors.orange),
+          _buildSunMoonItem(Icons.wb_twilight, "Sunset", _formatTimeString(advanced?.sunset), Colors.deepOrange),
+          _buildSunMoonItem(Icons.nights_stay_outlined, "Moon rise", _formatTimeString(advanced?.moonrise), Colors.blueAccent),
+          _buildSunMoonItem(Icons.bedtime_outlined, "Moon set", _formatTimeString(advanced?.moonset), Colors.indigoAccent),
         ],
       ),
     );
   }
 
-  Widget _buildSunMoonItem(
-    IconData icon,
-    String label,
-    String time,
-    Color color,
-  ) {
+  Widget _buildSunMoonItem(IconData icon, String label, String time, Color color) {
     return Column(
       children: [
-        Icon(icon, color: color, size: 28),
+        Icon(icon, color: color, size: 22),
         const SizedBox(height: 4),
         Text(
           label,
-          style: GoogleFonts.lora(fontSize: 12, color: const Color(0xFF6D3A0C)),
+          style: GoogleFonts.lora(fontSize: 9, color: Colors.grey),
         ),
+        const SizedBox(height: 2),
         Text(
           time,
-          style: GoogleFonts.lora(
-            fontSize: 16,
+          style: GoogleFonts.poppins(
+            fontSize: 13,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF1F1F1F),
+            color: Colors.white,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildOverviewTab(
-    BasicPanchang? basic,
-    AdvancedPanchang? advanced,
-    DailyNakshatraPrediction? dailyNakshatra,
-  ) {
+  Widget _buildTabBar() {
+    return Container(
+      height: 35,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: Color(0xFFF3C052), width: 1)),
+      ),
+      child: TabBar(
+        isScrollable: true,
+        dividerColor: Colors.transparent,
+        indicatorSize: TabBarIndicatorSize.tab,
+        tabAlignment: TabAlignment.start,
+        indicator: const BoxDecoration(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(15),
+            topRight: Radius.circular(15),
+          ),
+          color: Color(0xFFF3C052),
+        ),
+        labelColor: Colors.black,
+        unselectedLabelColor: const Color(0xFFF3C052),
+        labelStyle: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 13),
+        unselectedLabelStyle: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 13),
+        tabs: [
+          _buildTabItem("Over View"),
+          _buildTabItem("Panchang"),
+          _buildTabItem("Muhurta"),
+          _buildTabItem("Chaughadiya"),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabItem(String text) {
+    return Tab(
+      child: Container(
+        height: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(15),
+            topRight: Radius.circular(15),
+          ),
+          border: const Border(
+            top: BorderSide(color: Color(0xFFF3C052), width: 1),
+            left: BorderSide(color: Color(0xFFF3C052), width: 1),
+            right: BorderSide(color: Color(0xFFF3C052), width: 1),
+          ),
+        ),
+        child: Center(child: Text(text)),
+      ),
+    );
+  }
+
+  Widget _buildOverviewTab(BasicPanchang? basic, AdvancedPanchang? advanced, DailyNakshatraPrediction? dailyNakshatra) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle("Hindu Calendar"),
-          _buildInfoCard([
-            _buildInfoRow(
-              "Vikram Samvat",
-              "${advanced?.vikramSamvat ?? '-'} (${advanced?.vkramSamvatName ?? '-'})",
-            ),
-            _buildInfoRow(
-              "Shaka Samvat",
-              "${advanced?.shakaSamvat ?? '-'} (${advanced?.shakaSamvatName ?? '-'})",
-            ),
-            _buildInfoRow(
-              "Purnimanta Month",
-              advanced?.hinduMaah?.purnimanta ?? "-",
-            ),
-            _buildInfoRow("Amanta Month", advanced?.hinduMaah?.amanta ?? "-"),
-            _buildInfoRow("Paksha", advanced?.paksha ?? "-"),
-            _buildInfoRow("Ritu", advanced?.ritu ?? "-"),
-            _buildInfoRow("Ayana", advanced?.ayana ?? "-"),
-          ]),
-          const SizedBox(height: 20),
-          _buildSectionTitle("Daily Panchang"),
-          Row(
+          _buildSectionHeader("Daily Panchang", const Color(0xFFF3C052)),
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: 1.6,
             children: [
-              Expanded(
-                child: _buildSmallCard(
-                  "TITHI",
-                  basic?.tithi ?? "-",
-                  "Until ${advanced?.panchang?.tithi?.endTime?.hour}:${advanced?.panchang?.tithi?.endTime?.minute} ",
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildSmallCard(
-                  "NAKSHATRA",
-                  basic?.nakshatra ?? "-",
-                  "Until ${advanced?.panchang?.nakshatra?.endTime?.hour}:${advanced?.panchang?.nakshatra?.endTime?.minute}",
-                ),
-              ),
+              _buildSmallCard("TITHI", basic?.tithi ?? "-", "Until ${_formatEndTime(advanced?.panchang?.tithi?.endTime)}"),
+              _buildSmallCard("NAKSHATRA", basic?.nakshatra ?? "-", "Until ${_formatEndTime(advanced?.panchang?.nakshatra?.endTime)}"),
+              _buildSmallCard("YOG", basic?.yog ?? "-", "Until ${_formatEndTime(advanced?.panchang?.yog?.endTime)}"),
+              _buildSmallCard("KARAN", basic?.karan ?? "-", "Until ${_formatEndTime(advanced?.panchang?.karan?.endTime)}"),
             ],
           ),
+          _buildSectionHeader("Inauspicious Timings", Colors.redAccent),
+          _buildInauspiciousCard("Rahu Kaal", "${_formatTimeString(advanced?.rahukaal?.start)} - ${_formatTimeString(advanced?.rahukaal?.end)}", icon: Icons.error_outline, color: Colors.redAccent),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildSmallCard(
-                  "YOG",
-                  basic?.yog ?? "-",
-                  "Until ${advanced?.panchang?.yog?.endTime?.hour}:${advanced?.panchang?.yog?.endTime?.minute}",
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildSmallCard(
-                  "KARAN",
-                  basic?.karan ?? "-",
-                  "Until ${advanced?.panchang?.karan?.endTime?.hour}:${advanced?.panchang?.karan?.endTime?.minute}",
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          _buildSectionTitle("Inauspicious Timings"),
-          _buildInauspiciousCard(
-            "Rahu Kaal",
-            "${advanced?.rahukaal?.start} - ${advanced?.rahukaal?.end}",
-          ),
+          _buildInauspiciousCard("Guli Kaal", "${_formatTimeString(advanced?.guliKaal?.start)} - ${_formatTimeString(advanced?.guliKaal?.end)}", icon: Icons.access_time, color: Colors.orangeAccent),
           const SizedBox(height: 12),
-          _buildInauspiciousCard(
-            "Guli Kaal",
-            "${advanced?.guliKaal?.start} - ${advanced?.guliKaal?.end}",
-            icon: Icons.access_time,
-          ),
-          const SizedBox(height: 12),
-          _buildInauspiciousCard(
-            "Yamghant Kaal",
-            "${advanced?.yamghantKaal?.start} - ${advanced?.yamghantKaal?.end}",
-            icon: Icons.access_time,
-          ),
-          const SizedBox(height: 20),
-          _buildSectionTitle("Abhijit Muhurta"),
+          _buildInauspiciousCard("Yamghant Kaal", "${_formatTimeString(advanced?.yamghantKaal?.start)} - ${_formatTimeString(advanced?.yamghantKaal?.end)}", icon: Icons.access_time, color: Colors.orangeAccent),
+          _buildSectionHeader("Inauspicious Timings", Colors.greenAccent),
+          _buildBestTimeTile(advanced),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title, Color color) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Row(
+        children: [
           Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFF2E6B56),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.verified, color: Colors.white, size: 30),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "BEST TIME TODAY",
-                        style: GoogleFonts.lora(
-                          color: Colors.white70,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        "Abhijit Muhurta",
-                        style: GoogleFonts.lora(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        "Highly auspicious for all activities",
-                        style: GoogleFonts.lora(
-                          color: Colors.white70,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  "${advanced?.abhijitMuhurta?.start} - ${advanced?.abhijitMuhurta?.end}",
-                  style: GoogleFonts.lora(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
+            width: 2,
+            height: 18,
+            decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2)),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            title,
+            style: GoogleFonts.lora(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildSmallCard(String title, String value, String time) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: GoogleFonts.lora(fontSize: 12, fontWeight: FontWeight.bold, color: const Color(0xFFF3C052)),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: GoogleFonts.lora(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const Spacer(),
+          Text(
+            time,
+            style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInauspiciousCard(String title, String time, {required IconData icon, required Color color}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.05),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.lora(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                Text(
+                  "Avoid new beginnings",
+                  style: GoogleFonts.lora(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            time,
+            style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBestTimeTile(AdvancedPanchang? advanced) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E4D3B).withOpacity(0.3),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF1E4D3B)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: const BoxDecoration(color: Color(0xFF1E4D3B), shape: BoxShape.circle),
+            child: const Icon(Icons.shield_outlined, color: Colors.greenAccent, size: 24),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "BEST TIME TODAY",
+                  style: GoogleFonts.lora(color: const Color(0xFFF3C052), fontSize: 10, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  "Abhijit Muhurta",
+                  style: GoogleFonts.lora(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  "Highly auspicious for all activities",
+                  style: GoogleFonts.lora(color: Colors.grey, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            "${_formatTimeString(advanced?.abhijitMuhurta?.start)} - ${_formatTimeString(advanced?.abhijitMuhurta?.end)}",
+            style: GoogleFonts.poppins(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatTimeString(String? time) {
+    if (time == null || time.isEmpty || time == "-" || time == "--:--") return "--:--";
+    try {
+      String cleanTime = time.trim();
+      if (cleanTime.contains('AM') || cleanTime.contains('PM')) return cleanTime;
+      
+      final parts = cleanTime.split(':');
+      if (parts.length < 2) return cleanTime;
+      
+      final hour = int.parse(parts[0].trim());
+      final minute = int.parse(parts[1].trim());
+      
+      final dt = DateTime(2000, 1, 1, hour % 24, minute);
+      return DateFormat('hh:mm a').format(dt);
+    } catch (e) {
+      return time;
+    }
+  }
+
+  String _formatEndTime(EndTime? time) {
+    if (time == null || time.hour == null || time.minute == null) return "--:--";
+    final dt = DateTime(2000, 1, 1, time.hour!, time.minute!);
+    return DateFormat('hh:mm a').format(dt);
   }
 
   Widget _buildPanchangTab(BasicPanchang? basic, AdvancedPanchang? advanced) {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _buildExpansionCard(
+        _buildDetailCard(
           "Tithi",
           basic?.tithi ?? "-",
-          "Ends At: ${advanced?.panchang?.tithi?.endTime?.hour}:${advanced?.panchang?.tithi?.endTime?.minute}",
+          "Ends At: ${_formatEndTime(advanced?.panchang?.tithi?.endTime)}",
           "Deity: Moon",
           "Special: Poorna",
-          Colors.orange.shade100,
-        ), // Placeholder data for now
-        _buildExpansionCard(
+          Colors.orange.withOpacity(0.1),
+        ),
+        _buildDetailCard(
           "Nakshatra",
           basic?.nakshatra ?? "-",
-          "Ends At: ${advanced?.panchang?.nakshatra?.endTime?.hour}:${advanced?.panchang?.nakshatra?.endTime?.minute}",
+          "Ends At: ${_formatEndTime(advanced?.panchang?.nakshatra?.endTime)}",
           null,
           null,
           null,
         ),
-        _buildExpansionCard(
+        _buildDetailCard(
           "Yog",
           basic?.yog ?? "-",
-          "Ends At: ${advanced?.panchang?.yog?.endTime?.hour}:${advanced?.panchang?.yog?.endTime?.minute}",
+          "Ends At: ${_formatEndTime(advanced?.panchang?.yog?.endTime)}",
           null,
           null,
           null,
         ),
-        _buildExpansionCard(
+        _buildDetailCard(
           "Karan",
           basic?.karan ?? "-",
-          "Ends At: ${advanced?.panchang?.karan?.endTime?.hour}:${advanced?.panchang?.karan?.endTime?.minute}",
+          "Ends At: ${_formatEndTime(advanced?.panchang?.karan?.endTime)}",
           null,
           null,
           null,
@@ -422,7 +490,7 @@ class PanchangDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _buildExpansionCard(
+  Widget _buildDetailCard(
     String title,
     String value,
     String subValue,
@@ -430,50 +498,69 @@ class PanchangDetailsView extends StatelessWidget {
     String? extra2,
     Color? iconBg,
   ) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ExpansionTile(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        collapsedShape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        backgroundColor: Colors.white,
-        collapsedBackgroundColor: Colors.white,
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: iconBg ?? Colors.grey.shade100,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            Icons.star_outline,
-            color: const Color(0xFFE65100),
-          ), // dynamic icon needed
-        ),
-        title: Text(
-          title,
-          style: GoogleFonts.lora(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            color: const Color(0xFF6D3A0C),
-          ),
-        ),
-        subtitle: Text(
-          "$value • $subValue",
-          style: GoogleFonts.lora(color: Colors.grey.shade600),
-        ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: iconBg ?? Colors.grey.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.star_outline, color: Color(0xFFF3C052), size: 24),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                    ),
+                    Text(
+                      "$value • $subValue",
+                      style: GoogleFonts.lora(color: Colors.grey, fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (extra1 != null || extra2 != null) ...[
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Divider(color: Colors.white10),
+            ),
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (extra1 != null) Text(extra1, style: GoogleFonts.lora()),
-                if (extra2 != null) Text(extra2, style: GoogleFonts.lora()),
+                if (extra1 != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4.0),
+                    child: Text(extra1, style: GoogleFonts.lora(color: Colors.white70, fontSize: 13)),
+                  ),
+                if (extra2 != null)
+                  Text(
+                    extra2,
+                    style: GoogleFonts.lora(
+                      color: const Color(0xFFF3C052),
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
               ],
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -512,7 +599,6 @@ class PanchangDetailsView extends StatelessWidget {
       ],
     );
   }
-
   Widget _buildMuhuratCard(
     String title,
     String time,
@@ -521,98 +607,36 @@ class PanchangDetailsView extends StatelessWidget {
     bool isAmber = false,
     bool isReview = false,
   }) {
-    Color cardColor = Colors.white;
     Color statusColor;
-    IconData statusIcon;
-    String statusText;
-
     if (isAuspicious) {
       statusColor = Colors.green;
-      statusIcon = Icons.check_circle;
-      statusText = "AUSPICIOUS";
     } else if (isAmber) {
       statusColor = Colors.amber;
-      statusIcon = Icons.hourglass_full;
-      statusText = "INAUSPICIOUS";
     } else if (isReview) {
       statusColor = Colors.blueGrey;
-      statusIcon = Icons.warning;
-      statusText = "INAUSPICIOUS";
     } else {
       statusColor = Colors.red;
-      statusIcon = Icons.block;
-      statusText = "INAUSPICIOUS";
     }
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border(left: BorderSide(color: statusColor, width: 4)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                statusText,
-                style: GoogleFonts.lora(
-                  color: statusColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
-              ),
-              Icon(statusIcon, color: statusColor),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: GoogleFonts.lora(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF1F1F1F),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Icon(Icons.schedule, size: 16, color: Colors.grey[600]),
-              const SizedBox(width: 4),
-              Text(
-                time,
-                style: GoogleFonts.lora(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF1F1F1F),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            description,
-            style: GoogleFonts.lora(
-              fontSize: 14,
-              color: Colors.grey[600],
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-        ],
-      ),
+    // Convert time range if needed
+    String formattedTime = time;
+    if (time.contains(" - ")) {
+      final parts = time.split(" - ");
+      if (parts.length == 2) {
+        formattedTime = "${_formatTimeString(parts[0])} - ${_formatTimeString(parts[1])}";
+      }
+    }
+
+    return _buildDetailCard(
+      title,
+      "", // Value is included in title or description
+      "Time: $formattedTime",
+      description,
+      isAuspicious ? "Status: Auspicious" : "Status: Inauspicious",
+      statusColor.withOpacity(0.1),
     );
   }
+
 
   Widget _buildChaughadiyaTab(ChaughadiyaMuhurta? chaughadiya) {
     return DefaultTabController(
@@ -620,41 +644,44 @@ class PanchangDetailsView extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            margin: const EdgeInsets.all(16),
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            height: 48,
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(25),
+              color: const Color(0xFF1A1A1A).withOpacity(0.8),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Colors.white10, width: 0.5),
             ),
             child: TabBar(
               indicator: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(25),
-                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+                color: const Color(0xFFF3C052),
+                borderRadius: BorderRadius.circular(20),
               ),
-              labelColor: const Color(0xFFE65100),
-              unselectedLabelColor: Colors.grey,
-              isScrollable: false,
-              padding: EdgeInsets.zero,
-              labelPadding: EdgeInsets.zero,
+              indicatorPadding: const EdgeInsets.all(4),
+              labelColor: Colors.black,
+              unselectedLabelColor: Colors.grey[400],
               dividerColor: Colors.transparent,
-              tabs: [
+              indicatorSize: TabBarIndicatorSize.tab,
+              labelPadding: EdgeInsets.zero,
+              labelStyle: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 0.5),
+              unselectedLabelStyle: GoogleFonts.lora(fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 0.5),
+              tabs: const [
                 Tab(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.wb_sunny_outlined),
-                      SizedBox(width: 8),
-                      Text("Day Timings"),
+                    children: [
+                      Icon(Icons.wb_sunny_rounded, size: 18),
+                      SizedBox(width: 6),
+                      Text("DAY TIMINGS"),
                     ],
                   ),
                 ),
                 Tab(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.nights_stay_outlined),
-                      SizedBox(width: 8),
-                      Text("Night Timings"),
+                    children: [
+                      Icon(Icons.nights_stay_rounded, size: 18),
+                      SizedBox(width: 6),
+                      Text("NIGHT TIMINGS"),
                     ],
                   ),
                 ),
@@ -673,272 +700,40 @@ class PanchangDetailsView extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildChaughadiyaList(List<MuhurtaItem>? list) {
-    if (list == null || list.isEmpty)
-      return const Center(child: Text("No Data"));
+    if (list == null || list.isEmpty) return const Center(child: Text("No Data", style: TextStyle(color: Colors.white)));
 
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: list.length,
       itemBuilder: (context, index) {
         final item = list[index];
-        final isGood = [
-          'shubh',
-          'labh',
-          'amrit',
-        ].contains(item.muhurta?.toLowerCase());
-        final isBad = [
-          'udveg',
-          'rog',
-          'kaal',
-        ].contains(item.muhurta?.toLowerCase());
-        final isAvg = ['char'].contains(item.muhurta?.toLowerCase());
+        final isGood = ['shubh', 'labh', 'amrit'].contains(item.muhurta?.toLowerCase());
+        final isBad = ['udveg', 'rog', 'kaal'].contains(item.muhurta?.toLowerCase());
 
-        Color statusColor = isGood
-            ? Colors.green
-            : (isBad ? Colors.red : Colors.amber);
-        String statusText = isGood ? "GOOD" : (isBad ? "BAD" : "AVG");
+        Color statusColor = isGood ? Colors.green : (isBad ? Colors.red : Colors.amber);
+        String statusText = isGood ? "Highly Auspicious" : (isBad ? "Avoid all works" : "Neutral results");
 
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border(left: BorderSide(color: statusColor, width: 4)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "FROM",
-                      style: GoogleFonts.lora(
-                        fontSize: 10,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      item.time ?? "-", // Provide safe default
-                      style: GoogleFonts.lora(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF1F1F1F),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          item.muhurta ?? "-",
-                          style: GoogleFonts.lora(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF1F1F1F),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: statusColor,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      isGood
-                          ? "Highly Auspicious"
-                          : (isBad
-                                ? "Avoid all works"
-                                : "Neutral results"), // Placeholder text based on status
-                      style: GoogleFonts.lora(fontSize: 12, color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ),
-              Text(
-                statusText,
-                style: GoogleFonts.lora(
-                  color: statusColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ),
+        // Format time range
+        String formattedTime = item.time ?? "-";
+        if (formattedTime.contains(" - ")) {
+          final parts = formattedTime.split(" - ");
+          if (parts.length == 2) {
+            formattedTime = "${_formatTimeString(parts[0])} - ${_formatTimeString(parts[1])}";
+          }
+        }
+
+        return _buildDetailCard(
+          item.muhurta ?? "-",
+          "",
+          "Time: $formattedTime",
+          statusText,
+          isGood ? "Status: GOOD" : (isBad ? "Status: BAD" : "Status: AVG"),
+          statusColor.withOpacity(0.1),
         );
       },
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0, left: 4),
-      child: Text(
-        title,
-        style: GoogleFonts.playfairDisplay(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: const Color(0xFF6D3A0C),
-        ),
-      ),
-    );
-  }
 
-  Widget _buildInfoCard(List<Widget> children) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFDF8F0), // Slight beige/paper bg
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(children: children),
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: GoogleFonts.lora(
-                fontSize: 14,
-                color: const Color(0xFF8D6E63),
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              value,
-              textAlign: TextAlign.end,
-              style: GoogleFonts.lora(
-                fontSize: 14,
-                color: const Color(0xFF4E342E),
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSmallCard(String title, String value, String subValue) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: GoogleFonts.lora(
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFE65100),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: GoogleFonts.lora(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF1F1F1F),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            subValue,
-            style: GoogleFonts.lora(fontSize: 10, color: Colors.grey),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInauspiciousCard(
-    String title,
-    String time, {
-    IconData icon = Icons.warning_amber_rounded,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.red.shade50,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: Colors.red.shade900),
-          ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: GoogleFonts.lora(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                  color: Colors.black87,
-                ),
-              ),
-              Text(
-                "Avoid new beginnings",
-                style: GoogleFonts.lora(fontSize: 12, color: Colors.grey),
-              ),
-            ],
-          ),
-          const Spacer(),
-          Text(
-            time,
-            style: GoogleFonts.lora(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-              color: Colors.black87,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

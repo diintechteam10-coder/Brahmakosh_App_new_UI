@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../common/api_urls.dart';
 
 class Astrologist {
   final String id;
@@ -135,8 +136,8 @@ class AstrologistItem {
     experience = json['experience'];
     expertise = json['expertise'];
     profileSummary = json['profileSummary'];
-    profilePhoto = json['profilePhoto'];
-    profilePhotoKey = json['profilePhotoKey'];
+    profilePhoto = json['profileImageUrl'] ?? json['profilePhoto'] ?? json['profilePicture'] ?? json['profile_photo'] ?? json['profile_picture'] ?? json['image'];
+    profilePhotoKey = json['profilePhotoKey'] ?? json['profile_photo_key'];
     backgroundBanner = json['backgroundBanner'];
     backgroundBannerKey = json['backgroundBannerKey'];
     chatCharge = json['chatCharge'];
@@ -219,7 +220,7 @@ class AstrologistItem {
     return Astrologist(
       id: id ?? '',
       name: name ?? 'Astrologer',
-      image: profilePhoto ?? '',
+      image: ApiUrls.getFormattedImageUrl(profilePhoto) ?? '',
       skills: skillsList,
       languages: languages ?? ['Hindi', 'English'],
       experience: expYears,

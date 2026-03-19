@@ -1,6 +1,7 @@
 import 'package:brahmakosh/core/common_imports.dart';
 import 'package:brahmakosh/features/profile/viewmodels/profile_viewmodel.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class UpdateProfileView extends StatefulWidget {
   const UpdateProfileView({super.key});
@@ -62,11 +63,13 @@ class _UpdateProfileViewState extends State<UpdateProfileView> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xff5D4037),
-              onPrimary: Colors.white,
-              onSurface: Color(0xff5D4037),
+            colorScheme: const ColorScheme.dark(
+              primary: Color(0xFFD4AF37), // Gold
+              onPrimary: Colors.black,
+              surface: Color(0xFF1E1E1E),
+              onSurface: Colors.white,
             ),
+            dialogBackgroundColor: const Color(0xFF1E1E1E),
           ),
           child: child!,
         );
@@ -86,11 +89,13 @@ class _UpdateProfileViewState extends State<UpdateProfileView> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xff5D4037),
-              onPrimary: Colors.white,
-              onSurface: Color(0xff5D4037),
+            colorScheme: const ColorScheme.dark(
+              primary: Color(0xFFD4AF37), // Gold
+              onPrimary: Colors.black,
+              surface: Color(0xFF1E1E1E),
+              onSurface: Colors.white,
             ),
+            dialogBackgroundColor: const Color(0xFF1E1E1E),
           ),
           child: child!,
         );
@@ -106,21 +111,21 @@ class _UpdateProfileViewState extends State<UpdateProfileView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF3E0), // Light background
+      backgroundColor: Colors.black, // Dark background
       appBar: AppBar(
         title: Text(
           'Update Profile',
-          style: GoogleFonts.cinzel(
+          style: GoogleFonts.lora(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: const Color(0xff5D4037),
+            color: Colors.white,
           ),
         ),
         centerTitle: true,
-        backgroundColor: const Color(0xFFFAF3E0),
+        backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xff5D4037)),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -134,7 +139,7 @@ class _UpdateProfileViewState extends State<UpdateProfileView> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      _buildTextField("Name", _nameController, Icons.person_outline),
+                      _buildTextField("Full Name", _nameController, Icons.person_outline),
                       const SizedBox(height: 16),
                       _buildTextField(
                         "Date of Birth", 
@@ -156,11 +161,11 @@ class _UpdateProfileViewState extends State<UpdateProfileView> {
                       const SizedBox(height: 16),
                       _buildTextField("Profession", _gowthraController, Icons.auto_awesome_outlined),
                       
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 48),
                       
                       SizedBox(
                         width: double.infinity,
-                        height: 50,
+                        height: 55,
                         child: ElevatedButton(
                           onPressed: vm.isLoading ? null : () {
                             if (_formKey.currentState!.validate()) {
@@ -170,32 +175,39 @@ class _UpdateProfileViewState extends State<UpdateProfileView> {
                                 "timeOfBirth": _timeController.text.trim(),
                                 "placeOfBirth": _placeController.text.trim(),
                                 "gowthra": _gowthraController.text.trim(),
-                                // Passing empty/dummy image data as per existing structure requirements
-                                // or if image picker is implemented later
-                                "imageFileName": "", // or handle differently
+                                "imageFileName": "", 
                                 "imageContentType": "" 
                               };
                               vm.updateProfile(body).then((_) {
                                 if (vm.errorMessage == null) {
                                    Navigator.pop(context);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(vm.errorMessage!)),
+                                  );
                                 }
                               });
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xff5D4037),
+                            backgroundColor: const Color(0xFFD4AF37), // Gold background
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
+                            elevation: 0,
                           ),
                           child: vm.isLoading 
-                              ? const CircularProgressIndicator(color: Colors.white)
+                              ? const SizedBox(
+                                  height: 24,
+                                  width: 24,
+                                  child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2)
+                                )
                               : Text(
                                   "Save Changes", 
-                                  style: GoogleFonts.inter(
+                                  style: GoogleFonts.poppins(
                                     fontSize: 16, 
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.white
+                                    color: Colors.black
                                   )
                                 ),
                         ),
@@ -217,31 +229,50 @@ class _UpdateProfileViewState extends State<UpdateProfileView> {
     IconData icon, 
     {bool isReadOnly = false, VoidCallback? onTap}
   ) {
-    return TextFormField(
-      controller: controller,
-      readOnly: isReadOnly,
-      onTap: onTap,
-      validator: (value) => value == null || value.isEmpty ? "$label is required" : null,
-      style: GoogleFonts.inter(color: const Color(0xff5D4037)),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: GoogleFonts.inter(color: const Color(0xff8D6E63)),
-        prefixIcon: Icon(icon, color: const Color(0xff8D6E63)),
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Colors.white,
+          ),
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          readOnly: isReadOnly,
+          onTap: onTap,
+          validator: (value) => value == null || value.isEmpty ? "$label is required" : null,
+          style: GoogleFonts.poppins(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: label,
+            hintStyle: GoogleFonts.poppins(color: Colors.white38),
+            prefixIcon: Icon(icon, color: Colors.white70, size: 20),
+            filled: true,
+            fillColor: const Color(0xFF141414), // Dark input background
+            contentPadding: const EdgeInsets.symmetric(vertical: 16),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.white10, width: 1),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.white10, width: 1),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFD4AF37), width: 1.5),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.redAccent, width: 1),
+            ),
+          ),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xff5D4037), width: 1.5),
-        ),
-      ),
+      ],
     );
   }
 }

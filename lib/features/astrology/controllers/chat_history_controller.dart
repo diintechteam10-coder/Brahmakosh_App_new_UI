@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:get/get.dart';
 import '../../../common/api_services.dart';
@@ -20,6 +21,7 @@ class ChatHistoryController extends GetxController {
       <String, dynamic>{}.obs; // Stores summary, duration etc.
   final selectedStatus =
       'all'.obs; // Filter: all, pending, accepted, active, ended
+  final filterScrollController = ScrollController();
 
   // Store partner info for the currently viewed conversation
   String currentPartnerName = '';
@@ -43,6 +45,7 @@ class ChatHistoryController extends GetxController {
   @override
   void onClose() {
     _socketService.off('message:new', _onNewMessage);
+    filterScrollController.dispose();
     super.onClose();
   }
 
@@ -415,17 +418,30 @@ class ChatHistoryController extends GetxController {
     return 'Astrologer';
   }
 
-  /// Extract partner profile photo from a conversation object.
   String getPartnerPhoto(Map<String, dynamic> conv) {
     final otherUser = conv['otherUser'];
+    String? photoUrl;
     if (otherUser is Map) {
-      return otherUser['profilePicture'] ?? otherUser['profilePhoto'] ?? '';
+      photoUrl = otherUser['profilePicture'] ??
+          otherUser['profilePhoto'] ??
+          otherUser['profile_picture'] ??
+          otherUser['profile_photo'] ??
+          otherUser['profileImage'] ??
+          otherUser['image'] ??
+          '';
+    } else {
+      final partner = conv['partnerId'];
+      if (partner is Map) {
+        photoUrl = partner['profilePicture'] ??
+            partner['profilePhoto'] ??
+            partner['profile_picture'] ??
+            partner['profile_photo'] ??
+            partner['profileImage'] ??
+            partner['image'] ??
+            '';
+      }
     }
-    final partner = conv['partnerId'];
-    if (partner is Map) {
-      return partner['profilePicture'] ?? partner['profilePhoto'] ?? '';
-    }
-    return '';
+    return ApiUrls.getFormattedImageUrl(photoUrl) ?? '';
   }
 
   /// Extract partner expertise from a conversation object.

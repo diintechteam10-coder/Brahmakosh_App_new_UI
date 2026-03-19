@@ -74,7 +74,14 @@ class ProfileViewModel extends ChangeNotifier {
                 print("✅ Name saved in SharedPrefs: $name");
               }
 
-              final String? imageUrl = userData['profile']?['profile_image'];
+              // Extract image URL from multiple possible locations
+              final String? imageUrl = userData['profileImageUrl'] ??
+                                      userData['profileImage'] ?? 
+                                      userData['profile_image'] ?? 
+                                      userData['profile']?['profile_image'] ??
+                                      userData['profile']?['profileImage'] ??
+                                      userData['image'];
+
               if (imageUrl != null && imageUrl.isNotEmpty) {
                 await StorageService.setString(AppConstants.keyUserImage, imageUrl);
                 print("✅ Image saved in SharedPrefs: $imageUrl");

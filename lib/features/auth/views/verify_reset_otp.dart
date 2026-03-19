@@ -1,6 +1,6 @@
-import 'package:brahmakosh/core/custom_widgets/auth_logo.dart';
 import 'package:brahmakosh/core/theme/app_theme.dart';
 import 'package:brahmakosh/features/auth/controllers/forgot_password_controller.dart';
+import 'package:brahmakosh/features/auth/views/login.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -15,153 +15,171 @@ class VerifyResetOtpView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffFDFDFD),
+      backgroundColor: AppTheme.authBackground,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Get.back(),
         ),
-        title: Text(
-          "Verify OTP",
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
-        ),
-        centerTitle: true,
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            children: [
-              const SizedBox(height: 40),
-
-              const AuthLogoAvatar(),
-              const SizedBox(height: 20),
-
-              Text(
-                "Brahmakosh",
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-
-              const SizedBox(height: 6),
-
-              Text(
-                "Enter the OTP sent to your email",
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  color: Colors.black45,
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              Text(
-                email,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  color: AppTheme.primaryGold,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-
-              const SizedBox(height: 40),
-
-              /// OTP FIELD
-              TextField(
-                controller: controller.otpController,
-                keyboardType: TextInputType.number,
-                maxLength: 6,
-                decoration: InputDecoration(
-                  hintText: "Enter OTP",
-                  hintStyle: GoogleFonts.inter(fontSize: 13),
-                  prefixIcon: const Icon(Icons.lock_outline),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 16),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: const BorderSide(color: Colors.black12),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: const BorderSide(color: Colors.black12),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide(color: AppTheme.primaryGold),
-                  ),
-                  counterText: '',
-                ),
-              ),
-
-              const SizedBox(height: 30),
-
-              /// VERIFY BUTTON
-              Obx(
-                () => GestureDetector(
-                  onTap: controller.isOtpLoading.value
-                      ? null
-                      : () => controller.verifyResetOtp(email: email),
-                  child: Container(
-                    height: 54,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryGold,
-                      borderRadius: BorderRadius.circular(30),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppTheme.primaryGold.withOpacity(0.35),
-                          blurRadius: 18,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: controller.isOtpLoading.value
-                          ? const CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            )
-                          : Text(
-                              "Verify OTP",
-                              style: GoogleFonts.inter(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              Text(
-                "Didn't receive OTP? Check your email or try again",
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  color: Colors.black54,
-                ),
-              ),
-
-              const SizedBox(height: 40),
-            ],
+      body: Stack(
+        children: [
+          // Wavy Background Pattern
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/auth_wavy_bg.png',
+              fit: BoxFit.cover,
+              opacity: const AlwaysStoppedAnimation(0.4),
+            ),
           ),
-        ),
+
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                children: [
+                  const SizedBox(height: 60),
+
+                  // Circular Gold Logo
+                  Center(
+                    child: Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppTheme.authPrimaryGold, width: 2),
+                        image: const DecorationImage(
+                          image: AssetImage('assets/images/brahmkosh_logo.jpeg'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  Text(
+                    "Verify Reset OTP",
+                    style: GoogleFonts.lora(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  Text(
+                    "Enter the 6-digit code sent to",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: AppTheme.authTextSecondary,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 4),
+                  
+                  Text(
+                    email,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.authPrimaryGold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 48),
+
+                  /// OTP FIELD
+                  AuthInputField(
+                    controller: controller.otpController,
+                    hint: "Enter 6-digit OTP",
+                    icon: Icons.lock_outline,
+                    keyboardType: TextInputType.number,
+                  ),
+
+                  const SizedBox(height: 48),
+
+                  /// VERIFY BUTTON
+                  Obx(
+                    () => GestureDetector(
+                      onTap: controller.isOtpLoading.value
+                          ? null
+                          : () => controller.verifyResetOtp(email: email),
+                      child: Container(
+                        height: 56,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: AppTheme.authPrimaryGold,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            if (!controller.isOtpLoading.value)
+                              BoxShadow(
+                                color: AppTheme.authPrimaryGold.withOpacity(0.3),
+                                blurRadius: 15,
+                                offset: const Offset(0, 5),
+                              ),
+                          ],
+                        ),
+                        child: Center(
+                          child: controller.isOtpLoading.value
+                              ? const SizedBox(
+                                  height: 24,
+                                  width: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.black,
+                                  ),
+                                )
+                              : Text(
+                                  "Verify OTP",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 32),
+                  
+                  Text(
+                    "Didn't receive code?",
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: AppTheme.authTextSecondary,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 8),
+                  
+                  GestureDetector(
+                    onTap: () {
+                      controller.requestForgotPassword();
+                    },
+                    child: Text(
+                      "Resend OTP",
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.authPrimaryGold,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
-

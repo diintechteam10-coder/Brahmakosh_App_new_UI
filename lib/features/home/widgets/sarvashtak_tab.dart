@@ -21,80 +21,85 @@ class _SarvashtakTabState extends State<SarvashtakTab> {
   // 0 = Table, 1 = Kundali (Chart)
   int _viewMode = 0;
 
+  static const Color _bgDark = Colors.black;
+  static const Color _cardDark = Color(0xFF0F0F2D);
+  static const Color _cardBorder = Color(0xFF1E1E4D);
+  static const Color _textPrimary = Colors.white;
+  static const Color _textSecondary = Color(0xFFB0B0CC);
+  static const Color _accentGold = Color(0xFFD4AF37);
+  static const Color _sectionLine = Color(0xFF1E1E4D);
+
   @override
   Widget build(BuildContext context) {
     if (widget.sarvashtak.ashtakPoints == null) {
       return const SizedBox();
     }
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Sarvashtakvarga",
-                style: GoogleFonts.lora(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF5D4037),
+    return Container(
+      color: _bgDark,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    "SARVASHTAKVARGA",
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: _textPrimary,
+                      letterSpacing: 1.2,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: const Color.fromRGBO(255, 152, 0, 0.1),
-                  borderRadius: BorderRadius.circular(20),
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: _cardDark,
+                    border: Border.all(color: _cardBorder),
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildToggleBtn(Icons.table_chart, 0),
+                      _buildToggleBtn(Icons.grid_on, 1),
+                    ],
+                  ),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildToggleBtn(Icons.table_chart, 0),
-                    _buildToggleBtn(
-                      Icons.grid_on,
-                      1,
-                    ), // Using grid icon for Chart
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            "Sarvashtak Varga is the composite form of Ashtak Varga. The houses that get more than 28 points in Sarvashtak Varga, the auspicious factors of those houses increase. Its result is considered in the auspicious and inauspicious results of the houses.",
-            style: GoogleFonts.lora(
-              fontSize: 14,
-              color: const Color(0xFF5D4037),
-              height: 1.6,
+              ],
             ),
-            textAlign: TextAlign.justify,
-          ),
-          const SizedBox(height: 24),
-          AnimatedCrossFade(
-            firstChild: _buildSarvashtakTable(widget.sarvashtak),
-            secondChild: _buildSarvashtakChart(widget.sarvashtak),
-            crossFadeState: _viewMode == 0
-                ? CrossFadeState.showFirst
-                : CrossFadeState.showSecond,
-            duration: const Duration(milliseconds: 300),
-          ),
-          const SizedBox(height: 16),
-          Center(
-            child: Text(
-              "Planet Notations",
-              style: GoogleFonts.lora(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF5D4037),
+            const SizedBox(height: 12),
+            Container(height: 1, color: _sectionLine),
+            const SizedBox(height: 16),
+            Text(
+              "Sarvashtak Varga is the composite form of Ashtak Varga. The houses that get more than 28 points in Sarvashtak Varga, the auspicious factors of those houses increase.",
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: _textSecondary,
+                height: 1.6,
               ),
+              textAlign: TextAlign.justify,
             ),
-          ),
-          const SizedBox(height: 12),
-          Center(
-            child: Wrap(
-              spacing: 16,
+            const SizedBox(height: 24),
+            AnimatedCrossFade(
+              firstChild: _buildSarvashtakTable(widget.sarvashtak),
+              secondChild: _buildSarvashtakChart(widget.sarvashtak),
+              crossFadeState: _viewMode == 0
+                  ? CrossFadeState.showFirst
+                  : CrossFadeState.showSecond,
+              duration: const Duration(milliseconds: 300),
+            ),
+            const SizedBox(height: 24),
+            _buildSectionHeader("PLANET NOTATIONS"),
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 12,
               runSpacing: 8,
               alignment: WrapAlignment.center,
               children: const [
@@ -109,10 +114,32 @@ class _SarvashtakTabState extends State<SarvashtakTab> {
                 _LegendItem(code: "Ke", name: "Ketu"),
               ],
             ),
-          ),
-          const SizedBox(height: 20),
-        ],
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: _textPrimary,
+            letterSpacing: 1.2,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Container(
+          height: 1,
+          color: _sectionLine,
+        ),
+      ],
     );
   }
 
@@ -126,32 +153,23 @@ class _SarvashtakTabState extends State<SarvashtakTab> {
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFD4A373) : Colors.transparent,
+          color: isSelected ? _accentGold : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: const Color(0xFFD4A373).withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
         ),
         child: Row(
           children: [
             Icon(
               icon,
-              size: 18,
-              color: isSelected ? Colors.white : const Color(0xFF6D3A0C),
+              size: 16,
+              color: isSelected ? Colors.white : _textSecondary,
             ),
             if (isSelected) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               Text(
                 index == 0 ? "Table" : "Chart",
-                style: GoogleFonts.lora(
+                style: GoogleFonts.poppins(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -165,10 +183,6 @@ class _SarvashtakTabState extends State<SarvashtakTab> {
   }
 
   Widget _buildSarvashtakTable(SarvAshtak data) {
-    // Collect all planets + ascendant keys
-    // We'll standardise the order as per user request (image):
-    // Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn, Ascendant, Total
-    // Note: The API returns keys in lowercase usually.
     final List<String> planetKeys = [
       "su",
       "mo",
@@ -184,30 +198,30 @@ class _SarvashtakTabState extends State<SarvashtakTab> {
       scrollDirection: Axis.horizontal,
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xFFD7CCC8)),
+          border: Border.all(color: _cardBorder),
           borderRadius: BorderRadius.circular(12),
-          color: Colors.white,
+          color: _cardDark,
         ),
         child: Column(
           children: [
             // Header
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              decoration: const BoxDecoration(
-                color: Color(0xFFEEE8E8),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(11)),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+              decoration: BoxDecoration(
+                color: _cardBorder.withOpacity(0.3),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
               ),
               child: Row(
                 children: [
-                  _buildHeaderCell("Sign", width: 80, align: TextAlign.start),
+                  _buildHeaderCell("SIGN", width: 80, align: TextAlign.start),
                   ...planetKeys.map(
                     (p) => _buildHeaderCell(_formatPlanetName(p), width: 40),
                   ),
-                  _buildHeaderCell("Total", isBold: true, width: 40),
+                  _buildHeaderCell("TOTAL", isBold: true, width: 45),
                 ],
               ),
             ),
-            const Divider(height: 1, color: Color(0xFFD7CCC8)),
+            const Divider(height: 1, color: _cardBorder),
             // Body
             ...data.ashtakPoints!.entries.map((entry) {
               final sign = entry.key;
@@ -217,56 +231,35 @@ class _SarvashtakTabState extends State<SarvashtakTab> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                      vertical: 6,
+                      vertical: 10,
                       horizontal: 16,
                     ),
                     child: Row(
                       children: [
                         _buildCell(
-                          sign,
+                          sign.toUpperCase(),
                           width: 80,
                           isHeader: true,
                           align: TextAlign.start,
                         ),
                         _buildCell(pointsIdx.sun?.toString() ?? "-", width: 40),
-                        _buildCell(
-                          pointsIdx.moon?.toString() ?? "-",
-                          width: 40,
-                        ),
-                        _buildCell(
-                          pointsIdx.mars?.toString() ?? "-",
-                          width: 40,
-                        ),
-                        _buildCell(
-                          pointsIdx.mercury?.toString() ?? "-",
-                          width: 40,
-                        ),
-                        _buildCell(
-                          pointsIdx.jupiter?.toString() ?? "-",
-                          width: 40,
-                        ),
-                        _buildCell(
-                          pointsIdx.venus?.toString() ?? "-",
-                          width: 40,
-                        ),
-                        _buildCell(
-                          pointsIdx.saturn?.toString() ?? "-",
-                          width: 40,
-                        ),
-                        _buildCell(
-                          pointsIdx.ascendant?.toString() ?? "-",
-                          width: 40,
-                        ),
+                        _buildCell(pointsIdx.moon?.toString() ?? "-", width: 40),
+                        _buildCell(pointsIdx.mars?.toString() ?? "-", width: 40),
+                        _buildCell(pointsIdx.mercury?.toString() ?? "-", width: 40),
+                        _buildCell(pointsIdx.jupiter?.toString() ?? "-", width: 40),
+                        _buildCell(pointsIdx.venus?.toString() ?? "-", width: 40),
+                        _buildCell(pointsIdx.saturn?.toString() ?? "-", width: 40),
+                        _buildCell(pointsIdx.ascendant?.toString() ?? "-", width: 40),
                         _buildCell(
                           pointsIdx.total?.toString() ?? "-",
                           isTotal: true,
                           highlightTotal: (pointsIdx.total ?? 0) >= 28,
-                          width: 40,
+                          width: 45,
                         ),
                       ],
                     ),
                   ),
-                  const Divider(height: 1, color: Color(0xFFEEEEEE)),
+                  const Divider(height: 1, color: _cardBorder),
                 ],
               );
             }),
@@ -278,17 +271,8 @@ class _SarvashtakTabState extends State<SarvashtakTab> {
 
   String _formatPlanetName(String key) {
     if (key.length <= 2) return key.toUpperCase();
-    if (key == "ascendant") return "Asc";
-    return key[0].toUpperCase() + key.substring(1);
-    // Or return icons/hindi names if preferred, but user image showed Hindi/English names
-    // Let's stick to simple abbreviations if space is tight, or icons?
-    // User image shows text. Let's return text.
-    // Ideally user image has: Mesh, 5, 5, 2, ...
-    // Columns in image are not labeled with planet names but they correspond to planets.
-    // Wait, the image provided `sarvashtak` table in user request is:
-    // Sign | Sun | Moon | ... | Total
-    // User provided JSON snippet: "aries": { "sun": 4, ... }
-    // So columns should be planets.
+    if (key == "asc") return "ASC";
+    return key[0].toUpperCase() + key.substring(1).toUpperCase();
   }
 
   Widget _buildHeaderCell(
@@ -301,10 +285,11 @@ class _SarvashtakTabState extends State<SarvashtakTab> {
       width: width,
       child: Text(
         text,
-        style: GoogleFonts.lora(
+        style: GoogleFonts.poppins(
           fontWeight: FontWeight.bold,
-          color: isBold ? Colors.black : const Color(0xFF5D4037),
-          fontSize: 14,
+          color: isBold ? _accentGold : _textSecondary,
+          fontSize: 11,
+          letterSpacing: 0.5,
         ),
         textAlign: align,
       ),
@@ -323,12 +308,12 @@ class _SarvashtakTabState extends State<SarvashtakTab> {
       width: width,
       child: Text(
         text,
-        style: GoogleFonts.lora(
+        style: GoogleFonts.poppins(
           fontWeight: isHeader || isTotal ? FontWeight.bold : FontWeight.normal,
           color: highlightTotal
-              ? Colors.green[800]
-              : (isHeader ? Colors.black : const Color(0xFF4E342E)),
-          fontSize: 14,
+              ? const Color(0xFF81C784)
+              : (isHeader ? _textPrimary : _textSecondary),
+          fontSize: 13,
         ),
         textAlign: align,
       ),
@@ -336,23 +321,6 @@ class _SarvashtakTabState extends State<SarvashtakTab> {
   }
 
   Widget _buildSarvashtakChart(SarvAshtak data) {
-    // Convert Map<String, SignPoints> to Map<int, int> (HouseNum -> Points)
-    // We assume data keys are sign names.
-    // Logic:
-    // 1. Map Sign Name -> Sign Number (1-12)
-    // 2. Map Sign Number -> House Number (based on Ascendant)
-    // Actually, NorthIndianPointsChart takes House -> Points.
-    // Wait, NorthIndianPointsChart takes House -> Points.
-    // And it internally calculates the Sign Number for each House to display the Sign Number.
-    // So if we pass House 1 = 30 points, it will display 30 in top diamond.
-    // What points should go to House 1? The points for the Sign that is in House 1.
-    // Ascendant Sign is in House 1.
-    // So we need to map:
-    //  - Find points for Ascendant Sign -> House 1
-    //  - Find points for (Ascendant + 1) -> House 2
-    //  ...
-
-    // Step 1: Parse Data into Map<int, int> (Sign Number -> Points)
     final Map<int, int> signPointsMap = {};
     for (var entry in data.ashtakPoints!.entries) {
       int signNum = _getSignNumber(entry.key);
@@ -361,64 +329,44 @@ class _SarvashtakTabState extends State<SarvashtakTab> {
       }
     }
 
-    // Step 2: Create Map<int, int> (House Number -> Points)
     final Map<int, int> housePointsMap = {};
     int ascNum = _getSignNumber(widget.ascendantSign);
 
     for (int house = 1; house <= 12; house++) {
-      // Logic: House 1 has sign ascNum.
-      // House i has sign (ascNum + i - 2) % 12 + 1
       int signForHouse = (ascNum + house - 2) % 12 + 1;
       housePointsMap[house] = signPointsMap[signForHouse] ?? 0;
     }
 
-    return NorthIndianPointsChart(
-      housePoints: housePointsMap,
-      ascendantSign: widget.ascendantSign,
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: _cardDark,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _cardBorder),
+      ),
+      child: NorthIndianPointsChart(
+        housePoints: housePointsMap,
+        ascendantSign: widget.ascendantSign,
+        isDark: true,
+      ),
     );
   }
 
   int _getSignNumber(String? signName) {
-    if (signName == null) {
-      return 1;
-    }
+    if (signName == null) return 1;
     final lower = signName.toLowerCase();
-    if (lower.contains('aries') || lower.contains('mesh')) {
-      return 1;
-    }
-    if (lower.contains('taurus') || lower.contains('vrish')) {
-      return 2;
-    }
-    if (lower.contains('gemini') || lower.contains('mithun')) {
-      return 3;
-    }
-    if (lower.contains('cancer') || lower.contains('kark')) {
-      return 4;
-    }
-    if (lower.contains('leo') || lower.contains('simha')) {
-      return 5;
-    }
-    if (lower.contains('virgo') || lower.contains('kanya')) {
-      return 6;
-    }
-    if (lower.contains('libra') || lower.contains('tula')) {
-      return 7;
-    }
-    if (lower.contains('scorpio') || lower.contains('vrishchik')) {
-      return 8;
-    }
-    if (lower.contains('sagittarius') || lower.contains('dhanu')) {
-      return 9;
-    }
-    if (lower.contains('capricorn') || lower.contains('makar')) {
-      return 10;
-    }
-    if (lower.contains('aquarius') || lower.contains('kumbh')) {
-      return 11;
-    }
-    if (lower.contains('pisces') || lower.contains('meen')) {
-      return 12;
-    }
+    if (lower.contains('aries') || lower.contains('mesh')) return 1;
+    if (lower.contains('taurus') || lower.contains('vrish')) return 2;
+    if (lower.contains('gemini') || lower.contains('mithun')) return 3;
+    if (lower.contains('cancer') || lower.contains('kark')) return 4;
+    if (lower.contains('leo') || lower.contains('simha')) return 5;
+    if (lower.contains('virgo') || lower.contains('kanya')) return 6;
+    if (lower.contains('libra') || lower.contains('tula')) return 7;
+    if (lower.contains('scorpio') || lower.contains('vrishchik')) return 8;
+    if (lower.contains('sagittarius') || lower.contains('dhanu')) return 9;
+    if (lower.contains('capricorn') || lower.contains('makar')) return 10;
+    if (lower.contains('aquarius') || lower.contains('kumbh')) return 11;
+    if (lower.contains('pisces') || lower.contains('meen')) return 12;
     return 1;
   }
 }
@@ -431,23 +379,33 @@ class _LegendItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          "$code: ",
-          style: GoogleFonts.lora(
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFFF5722), // Orange for code
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F0F2D),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFF1E1E4D)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            "$code: ",
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFFD4AF37),
+              fontSize: 12,
+            ),
           ),
-        ),
-        Text(
-          name,
-          style: GoogleFonts.lora(
-            color: const Color(0xFF5D4037), // Brown for name
+          Text(
+            name,
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 12,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

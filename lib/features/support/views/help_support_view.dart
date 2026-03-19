@@ -23,20 +23,20 @@ class HelpSupportView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.landingBackground,
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.black,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xff5D4037)),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           "Help & Support",
-          style: GoogleFonts.playfairDisplay(
+          style: GoogleFonts.lora(
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: const Color(0xff5D4037),
+            color: Colors.white,
           ),
         ),
       ),
@@ -48,10 +48,10 @@ class HelpSupportView extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               "Need Assistance?",
-              style: GoogleFonts.playfairDisplay(
+              style: GoogleFonts.lora(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xff5D4037),
+                color: AppTheme.primaryGold,
               ),
             ),
             const SizedBox(height: 16),
@@ -59,7 +59,7 @@ class HelpSupportView extends StatelessWidget {
               "For any assistance, queries, or technical support, please feel free to reach out to our dedicated support team. We're here to help you on your spiritual journey.",
               style: GoogleFonts.inter(
                 fontSize: 16,
-                color: Colors.black87,
+                color: Colors.white.withOpacity(0.9),
                 height: 1.5,
               ),
             ),
@@ -67,11 +67,15 @@ class HelpSupportView extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: const Color(0xFF1A1A1A),
                 borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: AppTheme.primaryGold.withOpacity(0.3),
+                  width: 1,
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withOpacity(0.2),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -85,10 +89,10 @@ class HelpSupportView extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black54,
+                      color: Colors.white70,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   GestureDetector(
                     onTap: _launchEmail,
                     child: Row(
@@ -99,13 +103,16 @@ class HelpSupportView extends StatelessWidget {
                           size: 20,
                         ),
                         const SizedBox(width: 12),
-                        Text(
-                          "contact@brahmakosh.com",
-                          style: GoogleFonts.inter(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.primaryGold,
-                            decoration: TextDecoration.underline,
+                        Expanded(
+                          child: Text(
+                            "contact@brahmakosh.com",
+                            style: GoogleFonts.inter(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.primaryGold,
+                              decoration: TextDecoration.underline,
+                              decorationColor: AppTheme.primaryGold,
+                            ),
                           ),
                         ),
                       ],

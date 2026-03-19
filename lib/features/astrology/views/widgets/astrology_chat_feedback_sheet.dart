@@ -1,4 +1,3 @@
-import 'package:brahmakosh/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/astrology_chat_controller.dart';
@@ -23,12 +22,12 @@ class _AstrologyChatFeedbackSheetState
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 24),
+      padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
       decoration: const BoxDecoration(
-        color: const Color(0xFFFBE6D0),
+        color: Color(0xFF141414),
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
         ),
       ),
       child: SingleChildScrollView(
@@ -36,24 +35,22 @@ class _AstrologyChatFeedbackSheetState
           mainAxisSize: MainAxisSize.min,
           children: [
             // Drag handle
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2),
-                ),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white24,
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
 
             Text(
               "Rate your Experience",
-              style: GoogleFonts.inter(
-                fontSize: 20,
+              style: GoogleFonts.lora(
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.textPrimary,
+                color: Colors.white,
               ),
             ),
             const SizedBox(height: 8),
@@ -61,35 +58,35 @@ class _AstrologyChatFeedbackSheetState
               "How was your conversation?",
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: AppTheme.textSecondary,
+                color: Colors.white60,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
+
+            // Rating Stars
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(5, (index) {
                 return GestureDetector(
                   onTap: () {
                     setState(() {
-                      _rating = index + 1;
+                      _rating = index + 1.0;
                     });
                   },
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: Icon(
-                      Icons.star_rounded,
-                      size: 40,
-                      color: index < _rating
-                          ? const Color(0xFFFFA000) // Gold/Orange
-                          : Colors.grey[300], // Inactive
+                      index < _rating ? Icons.star_rounded : Icons.star_outline_rounded,
+                      size: 48,
+                      color: index < _rating ? const Color(0xFFD4AF37) : Colors.white10,
                     ),
                   ),
                 );
               }),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
 
-            // Sentiment Chips (Mapped to selection for visual feedback)
+            // Sentiment Chips
             Wrap(
               spacing: 12,
               runSpacing: 12,
@@ -122,32 +119,40 @@ class _AstrologyChatFeedbackSheetState
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
 
             // Comment Field
             TextField(
               controller: _commentController,
-              style: GoogleFonts.inter(color: AppTheme.textPrimary),
+              style: GoogleFonts.inter(color: Colors.white),
               maxLines: 3,
               decoration: InputDecoration(
                 hintText: "Add a comment (optional)",
-                hintStyle: GoogleFonts.inter(color: Colors.grey[400]),
+                hintStyle: GoogleFonts.inter(color: Colors.white24),
                 filled: true,
-                fillColor: const Color(0xFFF5F5F5), // Light grey
+                fillColor: const Color(0xFF1A1A1A),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Colors.white10),
                 ),
-                contentPadding: const EdgeInsets.all(16),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Colors.white10),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Color(0xFFD4AF37), width: 1),
+                ),
+                contentPadding: const EdgeInsets.all(20),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
 
             // Submit Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _rating > 0
+                onPressed: (_rating > 0 && _satisfaction != null)
                     ? () {
                         widget.controller.submitFeedback(
                           rating: _rating,
@@ -155,27 +160,26 @@ class _AstrologyChatFeedbackSheetState
                           satisfaction: _satisfaction!,
                         );
                       }
-                    : null, // Disable if no rating
+                    : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryGold, // Orange/Gold
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor: const Color(0xFFD4AF37),
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(vertical: 18),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(30),
                   ),
-                  disabledBackgroundColor: Colors.grey[200],
-                  disabledForegroundColor: Colors.grey[400],
+                  disabledBackgroundColor: Colors.white10,
+                  disabledForegroundColor: Colors.white24,
                 ),
                 child: Text(
                   "Submit Review",
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -183,39 +187,39 @@ class _AstrologyChatFeedbackSheetState
   }
 
   Widget _buildSentimentChip(String apiKey, String label, IconData icon) {
-    final isSelected = _satisfaction == apiKey; // 👈 compare API key
-    final color = isSelected ? AppTheme.primaryGold : Colors.grey[400];
-    final bgColor = isSelected
-        ? AppTheme.primaryGold.withOpacity(0.1)
-        : Colors.transparent;
-    final textColor = isSelected ? AppTheme.primaryGold : Colors.grey[600];
-    final borderColor = isSelected ? AppTheme.primaryGold : Colors.grey[300];
-
+    final isSelected = _satisfaction == apiKey;
     return GestureDetector(
       onTap: () {
         setState(() {
-          _satisfaction = apiKey; // 👈 store API key (e.g. "very_happy")
+          _satisfaction = apiKey;
         });
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: borderColor!, width: 1),
+          color: isSelected ? const Color(0xFFD4AF37).withOpacity(0.1) : const Color(0xFF1A1A1A),
+          borderRadius: BorderRadius.circular(25),
+          border: Border.all(
+            color: isSelected ? const Color(0xFFD4AF37) : Colors.white10,
+            width: 1,
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 16, color: color),
+            Icon(
+              icon,
+              size: 18,
+              color: isSelected ? const Color(0xFFD4AF37) : Colors.white54,
+            ),
             const SizedBox(width: 8),
             Text(
               label,
               style: GoogleFonts.inter(
                 fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: textColor,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: isSelected ? const Color(0xFFD4AF37) : Colors.white54,
               ),
             ),
           ],

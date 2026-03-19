@@ -84,7 +84,7 @@ class TalkToRashmiCard extends StatelessWidget {
                               "TALK TO RASHMI",
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.playfairDisplay(
+                              style: GoogleFonts.lora(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,

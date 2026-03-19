@@ -8,151 +8,114 @@ import '../blocs/sankalp_event.dart';
 import '../blocs/sankalp_state.dart';
 import '../models/sankalp_model.dart';
 import 'sankalp_progress_screen.dart';
-import 'choose_sankalp_screen.dart';
 
 class CompletedSankalpTab extends StatelessWidget {
   const CompletedSankalpTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SankalpBloc, SankalpState>(
-      builder: (context, state) {
-        if (state is SankalpLoading && state is! SankalpLoaded) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    return BlocListener<SankalpBloc, SankalpState>(
+      listener: (context, state) {
+        if (!(ModalRoute.of(context)?.isCurrent ?? false)) return;
 
-        if (state is SankalpError) {
-          return Center(child: Text(state.message));
+        if (state is SankalpOperationSuccess) {
+          _showSuccessDialog(context, state.message);
+        } else if (state is SankalpError) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
         }
+      },
+      child: BlocBuilder<SankalpBloc, SankalpState>(
+        builder: (context, state) {
+          if (state is SankalpLoading && state is! SankalpLoaded) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-        List<UserSankalpModel> completedSankalps = [];
-        if (state is SankalpLoaded) {
-          completedSankalps = state.userSankalps
-              .where((s) => s.status == 'completed')
-              .toList();
-        }
+          if (state is SankalpError) {
+            return Center(
+              child: Text(
+                state.message,
+                style: const TextStyle(color: Colors.white),
+              ),
+            );
+          }
 
-        Widget _buildEmptyState(BuildContext context) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Decorative Illustration
-                  Container(
-                    height: 200,
-                    width: 200,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.03),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        const Icon(
-                          Icons.history_outlined,
-                          size: 80,
-                          color: Color(0xff8D6E63),
-                        ),
-                        Positioned(
-                          top: 40,
-                          right: 40,
-                          child: Icon(
-                            Icons.check_circle,
-                            color: Colors.green.withOpacity(0.5),
-                            size: 24,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  Text(
-                    "Your Journey Awaits",
-                    style: GoogleFonts.lora(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xff4E342E),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    "You haven't completed any sankalps yet.\nEvery journey begins with a single step.",
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      fontSize: 15,
-                      color: const Color(0xff7D6E63),
-                      height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  GestureDetector(
-                    onTap: () {
-                      final bloc = context.read<SankalpBloc>();
-                      Get.to(
-                        () => BlocProvider.value(
-                          value: bloc,
-                          child: const ChooseSankalpScreen(),
-                        ),
-                        transition: Transition.downToUp,
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 16,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xffff7438),
-                        borderRadius: BorderRadius.circular(30),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xffff7438).withOpacity(0.3),
-                            blurRadius: 12,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        "Choose a Sankalp",
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+          List<UserSankalpModel> completedSankalps = [];
+          if (state is SankalpLoaded) {
+            completedSankalps =
+                state.userSankalps
+                    .where((s) => s.status == 'completed')
+                    .toList();
+          }
+
+          if (completedSankalps.isEmpty) {
+            return RefreshIndicator(
+              onRefresh: () async {
+                context.read<SankalpBloc>().add(FetchUserSankalps());
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.7,
+                  child: _buildEmptyState(context),
+                ),
+              ),
+            );
+          }
+
+          return Scaffold(
+            backgroundColor: Colors.transparent,
+            body: RefreshIndicator(
+              onRefresh: () async {
+                context.read<SankalpBloc>().add(FetchUserSankalps());
+              },
+              child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                itemCount: completedSankalps.length,
+                itemBuilder: (context, index) {
+                  final userSankalp = completedSankalps[index];
+                  return _buildCompletedCard(context, userSankalp);
+                },
               ),
             ),
           );
-        }
-
-        return ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          itemCount: completedSankalps.length,
-          itemBuilder: (context, index) {
-            final userSankalp = completedSankalps[index];
-            return _buildCompletedCard(context, userSankalp);
-          },
-        );
-      },
+        },
+      ),
     );
   }
 
-  Widget _buildCompletedCard(
-    BuildContext context,
-    UserSankalpModel userSankalp,
-  ) {
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.history_rounded, size: 80, color: Colors.white.withOpacity(0.1)),
+          const SizedBox(height: 24),
+          Text(
+            "No Completed Sankalps",
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "Complete your active sankalps to see them here.",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              fontSize: 13,
+              color: Colors.white.withOpacity(0.5),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompletedCard(BuildContext context, UserSankalpModel userSankalp) {
     final sankalp = userSankalp.sankalp;
     return GestureDetector(
       onTap: () {
@@ -168,128 +131,131 @@ class CompletedSankalpTab extends StatelessWidget {
         });
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 20),
+        margin: const EdgeInsets.only(bottom: 24),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 15,
-              offset: const Offset(0, 6),
-            ),
-          ],
+          color: const Color(0xFF1C1C1E).withOpacity(0.8),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withOpacity(0.05)),
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    width: 70,
-                    height: 70,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      image: DecorationImage(
-                        image: NetworkImage(
-                          sankalp.bannerImage.isNotEmpty
-                              ? sankalp.bannerImage
-                              : "https://images.unsplash.com/photo-1604881991720-f91add269bed?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80",
-                        ),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          sankalp.title,
-                          style: GoogleFonts.lora(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xff4E342E),
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.history_edu,
-                              size: 14,
-                              color: Color(0xff8D6E63),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              "${userSankalp.totalDays} Days Completed",
-                              style: GoogleFonts.inter(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: const Color(0xff8D6E63),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                    child: Text(
+                      sankalp.title,
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  const SizedBox(width: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(12),
+                      color: const Color(0xFF1A3326),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.green.withOpacity(0.2)),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.check, size: 14, color: Colors.green),
-                        const SizedBox(width: 4),
-                        Text(
-                          "SUCCESS",
-                          style: GoogleFonts.inter(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      "SUCCESS",
+                      style: GoogleFonts.poppins(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF4CAF50),
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            const Divider(height: 1, indent: 16, endIndent: 16),
+            Container(
+              height: 160,
+              width: double.infinity,
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                image: DecorationImage(
+                  image: NetworkImage(
+                    sankalp.bannerImage.isNotEmpty
+                        ? sankalp.bannerImage
+                        : "https://images.unsplash.com/photo-1604881991720-f91add269bed",
+                  ),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(16),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(
-                    Icons.monetization_on,
-                    size: 18,
-                    color: Color(0xffD4AF37),
-                  ),
-                  const SizedBox(width: 8),
                   Text(
-                    "Total Karma Earned",
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: const Color(0xff5D4037),
+                    "${userSankalp.totalDays} Days Daily ${sankalp.description.split('\n').first}",
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: Colors.white.withOpacity(0.5),
+                      height: 1.5,
                     ),
                   ),
-                  const Spacer(),
-                  Text(
-                    "+${userSankalp.totalDays * sankalp.karmaPointsPerDay}",
-                    style: GoogleFonts.inter(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xff4E342E),
-                    ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          ClipOval(
+                            child: Image.asset(
+                              'assets/images/brahmkosh_logo.jpeg',
+                              width: 18,
+                              height: 18,
+                              fit: BoxFit.cover,
+                              errorBuilder: (c, e, s) => const Icon(Icons.stars, color: Color(0xFFD4AF37), size: 18),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            "${userSankalp.totalDays * sankalp.karmaPointsPerDay} Karma Earned",
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xFFD4AF37),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFD4AF37), Color(0xFFFFD700)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          children: [
+                            Text(
+                              "View Details",
+                              style: GoogleFonts.poppins(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const Icon(Icons.chevron_right, size: 14, color: Colors.black),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -297,6 +263,54 @@ class CompletedSankalpTab extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _showSuccessDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.check_circle, color: Colors.green, size: 60),
+              const SizedBox(height: 16),
+              Text(
+                "Great Job!",
+                style: GoogleFonts.playfairDisplay(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xff5D4037),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: const Color(0xff5D4037),
+                ),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xffff7438),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                ),
+                child: const Text("Keep Going"),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

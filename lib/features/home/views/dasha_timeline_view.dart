@@ -316,7 +316,7 @@ class DashaTimelineView extends StatelessWidget {
                       ),
                       child: Text(
                         level,
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                           color: themeColor,
@@ -380,7 +380,7 @@ class DashaTimelineView extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             "$label: ",
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 12,
               color: Colors.grey[600],
               fontWeight: FontWeight.bold,
@@ -388,7 +388,7 @@ class DashaTimelineView extends StatelessWidget {
           ),
           Text(
             date,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 13,
               color: const Color(0xff4E342E),
               fontWeight: FontWeight.w600,

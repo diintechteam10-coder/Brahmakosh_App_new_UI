@@ -128,7 +128,7 @@ class NorthIndianChart extends StatelessWidget {
     // Helper to add Text
     void addPlanetText(String text, double x, double y) {
       planetsSvg.writeln(
-        '<text font-size="12" x="$x" y="$y" fill="#FF5722" font-weight="bold" text-anchor="middle" alignment-baseline="middle">$text</text>',
+        '<text font-size="12" x="$x" y="$y" fill="#FF5722" font-family="Poppins, sans-serif" font-weight="600" text-anchor="middle" alignment-baseline="middle">$text</text>',
       );
     }
 
@@ -183,7 +183,7 @@ class NorthIndianChart extends StatelessWidget {
       double x = houseNumCoords[i]['x']!;
       double y = houseNumCoords[i]['y']!;
       signsSvg.writeln(
-        '<text font-size="15" x="$x" y="$y" fill="#5D4037">$sign</text>',
+        '<text font-size="15" x="$x" y="$y" fill="#E0E0E0" font-family="Poppins, sans-serif">$sign</text>',
       );
     }
 
@@ -191,21 +191,21 @@ class NorthIndianChart extends StatelessWidget {
 <svg width="350" height="350" viewBox="0 0 350 350" xmlns="http://www.w3.org/2000/svg">
   <g class="slice">
     <!-- Paths -->
-    <path d="M10,10L175,10L92.5,92.5L10,10" stroke="#8B4513" stroke-width="1.5" fill="none"/>
-    <path d="M175,10L340,10L257.5,92.5L175,10" stroke="#8B4513" stroke-width="1.5" fill="none"/>
-    <path d="M92.5,92.5L10,175L10,10" stroke="#8B4513" stroke-width="1.5" fill="none"/>
-    <path d="M92.5,92.5L175,175L257.5,92.5L175,10" stroke="#8B4513" stroke-width="1.5" fill="none"/>
-    <path d="M257.5,92.5L340,175L340,10" stroke="#8B4513" stroke-width="1.5" fill="none"/>
+    <path d="M10,10L175,10L92.5,92.5L10,10" stroke="#D4AF37" stroke-width="1.5" fill="none"/>
+    <path d="M175,10L340,10L257.5,92.5L175,10" stroke="#D4AF37" stroke-width="1.5" fill="none"/>
+    <path d="M92.5,92.5L10,175L10,10" stroke="#D4AF37" stroke-width="1.5" fill="none"/>
+    <path d="M92.5,92.5L175,175L257.5,92.5L175,10" stroke="#D4AF37" stroke-width="1.5" fill="none"/>
+    <path d="M257.5,92.5L340,175L340,10" stroke="#D4AF37" stroke-width="1.5" fill="none"/>
 
-    <path d="M92.5,92.5L175,175L92.5,257.5L10,175" stroke="#8B4513" stroke-width="1.5" fill="none"/>
-    <path d="M257.5,92.5L340,175L257.5,257.5L175,175" stroke="#8B4513" stroke-width="1.5" fill="none"/>
+    <path d="M92.5,92.5L175,175L92.5,257.5L10,175" stroke="#D4AF37" stroke-width="1.5" fill="none"/>
+    <path d="M257.5,92.5L340,175L257.5,257.5L175,175" stroke="#D4AF37" stroke-width="1.5" fill="none"/>
 
-    <path d="M92.5,257.5L10,340L10,175" stroke="#8B4513" stroke-width="1.5" fill="none"/>
-    <path d="M175,175L257.5,257.5L175,340L92.5,257.5" stroke="#8B4513" stroke-width="1.5" fill="none"/>
-    <path d="M340,175L340,340L257.5,257.5" stroke="#8B4513" stroke-width="1.5" fill="none"/>
+    <path d="M92.5,257.5L10,340L10,175" stroke="#D4AF37" stroke-width="1.5" fill="none"/>
+    <path d="M175,175L257.5,257.5L175,340L92.5,257.5" stroke="#D4AF37" stroke-width="1.5" fill="none"/>
+    <path d="M340,175L340,340L257.5,257.5" stroke="#D4AF37" stroke-width="1.5" fill="none"/>
 
-    <path d="M92.5,257.5L175,340L10,340" stroke="#8B4513" stroke-width="1.5" fill="none"/>
-    <path d="M257.5,257.5L340,340L175,340" stroke="#8B4513" stroke-width="1.5" fill="none"/>
+    <path d="M92.5,257.5L175,340L10,340" stroke="#D4AF37" stroke-width="1.5" fill="none"/>
+    <path d="M257.5,257.5L340,340L175,340" stroke="#D4AF37" stroke-width="1.5" fill="none"/>
 
     <!-- House Numbers -->
     $signsSvg

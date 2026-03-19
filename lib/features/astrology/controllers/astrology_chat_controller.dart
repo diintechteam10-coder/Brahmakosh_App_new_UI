@@ -198,12 +198,26 @@ class AstrologyChatController extends GetxController {
               );
             }
 
-            if (!isRequestAccepted.value && !isChatEnded.value) {
-              isRequestAccepted.value = true;
-              Utils.print("✅ Polling detected acceptance! 403 -> 200");
-              _startActiveStatusPolling();
-              _startMessageSyncPolling();
-              _startTimer();
+            if (!isRequestAccepted.value && !isChatEnded.value && !isChatRejected.value) {
+              // Check if the response contains explicit rejection status
+              final convStatus = data['data']?['conversationStatus']?.toString().toLowerCase()
+                  ?? data['data']?['status']?.toString().toLowerCase();
+
+              Utils.print("🔍 Polling 403->200: convStatus=$convStatus");
+
+              if (convStatus == 'rejected' || convStatus == 'ended' || convStatus == 'closed' || convStatus == 'completed') {
+                Utils.print("❌ Polling: Status is $convStatus — treating as rejection, NOT acceptance");
+                _statusPollingTimer?.cancel();
+                isChatRejected.value = true;
+              } else {
+                // Accept — _startActiveStatusPolling will catch rejections within 5s as fallback
+                isRequestAccepted.value = true;
+                Utils.print("✅ Polling detected acceptance! 403 -> 200");
+                _updateChatDurationFromData(data['data']);
+                _startActiveStatusPolling();
+                _startMessageSyncPolling();
+                _startTimer();
+              }
             }
 
             final List<dynamic> msgList = data['data']['messages'];
@@ -260,7 +274,9 @@ class AstrologyChatController extends GetxController {
           }
         } else if (response.statusCode == 403) {
           // Silently ignore - still pending acceptance (NO toast)
-          Utils.print("⏳ Polling: 403 - Waiting for acceptance...");
+          Utils.print("⏳ Polling: 403 - Waiting for acceptance... Body: ${response.body}");
+        } else {
+          Utils.print("⚠️ Polling: Unexpected status ${response.statusCode} - Body: ${response.body}");
         }
       } else {
         // Non-polling: use standard callWebApiGet
@@ -286,6 +302,7 @@ class AstrologyChatController extends GetxController {
                 if (!isRequestAccepted.value && !isChatEnded.value) {
                   isRequestAccepted.value = true;
                   Utils.print("✅ Polling detected acceptance! 403 -> 200");
+                  _updateChatDurationFromData(data['data']);
                   _startActiveStatusPolling();
                   _startMessageSyncPolling();
                   _startTimer();
@@ -459,25 +476,11 @@ class AstrologyChatController extends GetxController {
               "✅ Conversation Created: $_conversationId, Status: $status, StartTime: $startTimeStr",
             );
 
-            // Check if already active
-            if (status == 'active') {
+            // Check if already active or accepted
+            if (status == 'active' || status == 'accepted') {
               isRequestAccepted.value = true;
 
-              // Calculate initial duration if startTime exists
-              if (startTimeStr != null) {
-                try {
-                  final startTime = DateTime.parse(startTimeStr).toLocal();
-                  final now = DateTime.now();
-                  final diff = now.difference(startTime).inSeconds;
-                  if (diff > 0) {
-                    chatDuration.value = diff;
-                    Utils.print("⏱️ Resuming timer from: $diff seconds");
-                  }
-                } catch (e) {
-                  Utils.print("❌ Error parsing startTime: $e");
-                  chatDuration.value = 0;
-                }
-              }
+              _updateChatDurationFromData(conversationData);
 
               _startActiveStatusPolling();
               _startMessageSyncPolling(); // Fail-safe for blue ticks
@@ -551,25 +554,38 @@ class AstrologyChatController extends GetxController {
   }
 
   final isChatEnded = false.obs;
+  final isChatRejected = false.obs;
 
   void _onConversationEnded(dynamic data) {
     Utils.print("📌 ENTER _onConversationEnded");
     try {
       Utils.print("🛑 Conversation Ended Event: $data");
-      // If not active yet, treated as rejection
+      
+      bool isRejection = false;
       if (!isRequestAccepted.value) {
-        Get.defaultDialog(
-          title: "Request Declined",
-          middleText:
-              "The expert has declined your request. Please try again later.",
-          textConfirm: "OK",
-          confirmTextColor: Colors.white,
-          onConfirm: () {
-            Get.back(); // Close dialog
-            Get.back(); // Go back to profile
-          },
-          barrierDismissible: false,
-        );
+        isRejection = true;
+      } else if (data is String && data.toLowerCase().contains("reject")) {
+        isRejection = true;
+      }
+
+      // If treated as rejection
+      if (isRejection) {
+        try {
+          Utils.print("❌ ❌ ❌ PARTNER REJECTED REQUEST. Full event data: ${jsonEncode(data)}");
+          if (data is Map && data.containsKey('status')) {
+            Utils.print("ℹ️ Rejection Status: ${data['status']}");
+          }
+        } catch (e) {
+          Utils.print("❌ ❌ ❌ PARTNER REJECTED REQUEST. Raw data: $data");
+        }
+
+        // Stop all timers
+        _timer?.cancel();
+        _activeStatusTimer?.cancel();
+        _msgSyncTimer?.cancel();
+        _statusPollingTimer?.cancel();
+
+        isChatRejected.value = true;
       } else {
         // Normal end logic
         isRequestAccepted.value = false; // BLOCK sending
@@ -878,64 +894,48 @@ class AstrologyChatController extends GetxController {
     Utils.print("📌 ENTER showEndChatDialog (title: $title)");
     Get.dialog(
       Dialog(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: const Color(0xFF141414),
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: const BorderSide(color: Colors.white10),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFAF3E0),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.chat_bubble,
-                      color: Color(0xFF8D6E63),
-                      size: 28,
-                    ),
-                  ),
-                  Positioned(
-                    right: 14,
-                    bottom: 14,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.close,
-                        size: 14,
-                        color: Color(0xFF8D6E63),
-                      ),
-                    ),
-                  ),
-                ],
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1A1A1A),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.2)),
+                ),
+                child: const Icon(
+                  Icons.chat_bubble_outline_rounded,
+                  color: Color(0xFFD4AF37),
+                  size: 28,
+                ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               Text(
                 "End Conversation?",
-                style: GoogleFonts.cinzel(
+                style: GoogleFonts.lora(
                   fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Text(
                 "Are you sure you want to end your session with ${expert.name}?",
                 style: GoogleFonts.inter(
                   fontSize: 14,
-                  color: const Color(0xFF8D6E63),
-                  height: 1.4,
+                  color: Colors.white70,
+                  height: 1.5,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -945,10 +945,10 @@ class AstrologyChatController extends GetxController {
                 child: ElevatedButton(
                   onPressed: () {
                     Get.back();
-                    _endChat(); // Call End Chat API
+                    _endChat();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFA1887F),
+                    backgroundColor: Colors.red[900],
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -958,7 +958,7 @@ class AstrologyChatController extends GetxController {
                     "End Chat",
                     style: GoogleFonts.inter(
                       fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
@@ -967,11 +967,11 @@ class AstrologyChatController extends GetxController {
               const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
-                child: OutlinedButton(
+                child: ElevatedButton(
                   onPressed: Get.back,
-                  style: OutlinedButton.styleFrom(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    side: const BorderSide(color: Color(0xFF8D6E63)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -980,8 +980,8 @@ class AstrologyChatController extends GetxController {
                     "Continue",
                     style: GoogleFonts.inter(
                       fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF8D6E63),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
                   ),
                 ),
@@ -1112,6 +1112,45 @@ class AstrologyChatController extends GetxController {
     );
   }
 
+  void cancelChatRequest() {
+    Utils.print("📌 ENTER cancelChatRequest");
+    if (_conversationId == null) {
+      Utils.print("📌 EXIT cancelChatRequest - no conversationId");
+      return;
+    }
+
+    // Stop all timers immediately
+    _timer?.cancel();
+    _activeStatusTimer?.cancel();
+    _msgSyncTimer?.cancel();
+    _statusPollingTimer?.cancel();
+
+    final token = StorageService.getString(AppConstants.keyAuthToken) ?? "";
+    final url = "${ApiUrls.cancelChatRequest}/$_conversationId/cancel";
+
+    // Call POST API
+    callWebApi(
+      null,
+      url,
+      {"reason": "User cancelled"},
+      token: token,
+      onResponse: (response) {
+        Utils.print("✅ Request cancelled successfully: ${response.body}");
+      },
+      onError: (error) {
+        Utils.print("❌ Error cancelling request: $error");
+      },
+    );
+
+    // Leave socket room
+    _socketService.leaveConversation(_conversationId!);
+
+    // Navigate back
+    Get.back();
+
+    Utils.print("📌 EXIT cancelChatRequest");
+  }
+
   void _requestChat() {
     Utils.print("📌 ENTER _requestChat");
     // Just reset state, wait for partner message
@@ -1198,18 +1237,33 @@ class AstrologyChatController extends GetxController {
               "🔍 Status Poll: ${response.statusCode} - Found: ${conversation != null} - Status: $status",
             );
 
-            if (status == 'active' && conversation != null) {
-              // Utils.print("📝 RAW ACTIVE CONV: ${jsonEncode(conversation)}");
+            if ((status == 'active' || status == 'accepted') && conversation != null) {
+              // Conversation is healthy
             }
 
             if (!isStillActive) {
               Utils.print(
-                "🛑 Polling: Conversation ended (Found: ${conversation != null}, Status: $status)",
+                "🛑 Polling: Conversation ended. Status: $status. Conversation Details: ${jsonEncode(conversation)}",
               );
               timer.cancel();
-              _onConversationEnded(
-                "Partner ended session (detected via list status check)",
-              );
+
+              // Treat as rejection if:
+              // 1. Status is explicitly 'rejected'
+              // 2. Conversation not found at all (null) and chat was very short (< 30s = likely never truly started)
+              final bool isRejection = status == 'rejected' ||
+                  (conversation == null && chatDuration.value < 30);
+
+              if (isRejection) {
+                Utils.print("❌ Treating as REJECTION (status=$status, convNull=${conversation == null}, duration=${chatDuration.value}s)");
+                isRequestAccepted.value = false;
+                _timer?.cancel();
+                _activeStatusTimer?.cancel();
+                _msgSyncTimer?.cancel();
+                _statusPollingTimer?.cancel();
+                isChatRejected.value = true;
+              } else {
+                _onConversationEnded("Partner ended session (detected via list status check)");
+              }
             }
           }
         } else {
@@ -1223,6 +1277,24 @@ class AstrologyChatController extends GetxController {
       }
     });
     Utils.print("📌 EXIT _startActiveStatusPolling (timer started)");
+  }
+
+  void _updateChatDurationFromData(dynamic data) {
+    if (data == null) return;
+    final startTimeStr = data['startTime'] ?? data['createdAt'];
+    if (startTimeStr != null) {
+      try {
+        final startTime = DateTime.parse(startTimeStr).toLocal();
+        final now = DateTime.now();
+        final diff = now.difference(startTime).inSeconds;
+        if (diff > 0) {
+          chatDuration.value = diff;
+          Utils.print("⏱️ Resuming/Syncing timer from Data: $diff seconds");
+        }
+      } catch (e) {
+        Utils.print("❌ Error parsing startTime from Data: $e");
+      }
+    }
   }
 
   void _startMessageSyncPolling() {
@@ -1258,6 +1330,27 @@ class AstrologyChatController extends GetxController {
     final result = "$minutes:${remainingSeconds.toString().padLeft(2, '0')}";
     Utils.print("📌 EXIT formatTime -> $result");
     return result;
+  }
+
+  String getMonthName(int month) {
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    if (month >= 1 && month <= 12) {
+      return months[month - 1];
+    }
+    return '';
   }
 
   Future<void> markMessagesAsRead() async {

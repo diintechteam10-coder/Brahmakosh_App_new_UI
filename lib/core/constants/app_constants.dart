@@ -18,6 +18,7 @@ class AppConstants {
   static const String routeAvatarReels = '/avatarReels';
   static const String routeCreateAvatar = '/createAvatar';
   static const String routePanchang = '/panchang';
+  static const String routePanchangToday = '/panchang_view';
   static const String routeFocus = '/focus';
   static const String routeFocusHealth = '/focus/health';
   static const String routeFocusRelations = '/focus/relations';
@@ -39,6 +40,14 @@ class AppConstants {
   static const int splashDuration = 1;
   static const String routeWalkthrough = '/walkthrough';
   static const String routeRedeem = '/redeem';
+  static const String routeSankalp = '/sankalp';
+  static const String routeNotifications = '/notifications';
+  static const String routeAstrologyDetails = '/astrologyDetails';
+  static const String routePoojaList = '/poojaList';
+  static const String routeSwapnaDecoder = '/swapnaDecoder';
+  static const String routeGita = '/gita';
+  static const String routeKrishnaChat = '/krishnaChat';
+  static const String routeRashmiChat = '/rashmiChat';
 
   // Cache Keys
   static const String cachePanchangData = 'cache_panchang_data';

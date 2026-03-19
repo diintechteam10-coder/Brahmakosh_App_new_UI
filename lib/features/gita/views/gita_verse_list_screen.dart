@@ -1,7 +1,10 @@
+import 'package:brahmakosh/common_imports.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
+
 import '../../ai_rashmi/ai_rashmi_chat.dart';
+
 import '../data/repositories/gita_repository.dart';
 import '../data/models/chapter_model.dart';
 import '../data/models/verse_model.dart';
@@ -42,6 +45,61 @@ class _GitaVerseListViewState extends State<_GitaVerseListView> {
   // We'll read from storage in build, but setState will trigger rebuild
   // so build checks storage again. No local state needed for variables
   // since build always re-reads.
+  Offset _tapPosition = Offset.zero;
+
+  void _showAskKrishnaPopup(
+    BuildContext context,
+    dynamic verse,
+    Offset position,
+  ) {
+    showMenu(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        position.dx,
+        position.dy,
+        position.dx,
+        position.dy,
+      ),
+      color: const Color(0xFF18151B),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      items: [
+        PopupMenuItem(
+          value: 'ask',
+          child: Row(
+  children: [
+    const Icon(
+      Icons.auto_awesome, // Represents magic/divine guidance
+      color: Color(0xFFF1C453),
+      size: 20,
+    ),
+    const SizedBox(width: 12),
+    Text(
+      'Ask Krishna',
+      style: GoogleFonts.poppins( // Matches your other updated sections
+        color: Colors.white, 
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
+    ),
+  ],
+)
+        ),
+      ],
+      elevation: 8.0,
+    ).then((value) {
+      if (value == 'ask') {
+        final prompt =
+            "Can you please explain this Gita verse to me?\n\n'${verse.sanskritShloka}'\n\n(Chapter ${widget.chapter.chapterNumber}, Verse ${verse.shlokaNumber})";
+        Get.to(
+          () => RashmiChat(
+            backgroundImage: 'assets/images/Krishna_chat.png',
+            initialMessage: prompt,
+            autoAsk: true,
+          ),
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +112,7 @@ class _GitaVerseListViewState extends State<_GitaVerseListView> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF5E6),
+      backgroundColor: Colors.black, // Dark background
       floatingActionButton: FloatingActionButton.extended(
         extendedPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
         backgroundColor: const Color(0xFFFF9800),
@@ -78,7 +136,7 @@ class _GitaVerseListViewState extends State<_GitaVerseListView> {
             ),
           ),
         ),
-        label: Text(
+        label: const Text(
           "ASK KRISHNA",
           style: TextStyle(
             color: Color(0xFF8B4513),
@@ -88,9 +146,9 @@ class _GitaVerseListViewState extends State<_GitaVerseListView> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      extendBodyBehindAppBar: true,
+      extendBodyBehindAppBar: false,
       body: SafeArea(
-        top: false,
+        top: true,
         bottom: false,
         child: Column(
           children: [
@@ -123,7 +181,7 @@ class _GitaVerseListViewState extends State<_GitaVerseListView> {
                         left: 16,
                         right: 16,
                         top: 16,
-                        bottom: 60,
+                        bottom: 24, // Reduced bottom padding since no FAB
                       ),
                       itemCount: state.verses.length,
                       itemBuilder: (context, index) {
@@ -133,6 +191,7 @@ class _GitaVerseListViewState extends State<_GitaVerseListView> {
                           verse,
                           state.verses,
                           lastVerse,
+                          index, // Passed index to apply specific gradient
                         );
                       },
                     );
@@ -152,8 +211,27 @@ class _GitaVerseListViewState extends State<_GitaVerseListView> {
     dynamic verse,
     List<dynamic> allVerses,
     String? lastVerseString,
+    int index,
   ) {
+    // Determine gradient based on index (cycling through 3 colors as shown in the design)
+    final List<List<Color>> _cardGradients = [
+      [const Color(0xFF133621), const Color(0xFF0C2415)], // Dark Green
+      [const Color(0xFF4A4A4A), const Color(0xFF2A2A2A)], // Dark Grey
+      [const Color(0xFF7A4A06), const Color(0xFF442800)], // Dark Brown/Gold
+    ];
+    final gradientColors = _cardGradients[index % _cardGradients.length];
+
+    // Determine if this is the last read verse
+    final bool isLastVisited = verse.shlokaNumber == lastVerseString &&
+        widget.chapter.chapterNumber ==
+            StorageService.getInt('gita_last_chapter_number');
+
+    // Display "Last Read XX:XX PM Date" (using static placeholders like in the previous screen or generic text since timestamps are not stored properly)
+    final String lastReadText = "Last Read • Recent";
+
     return GestureDetector(
+      onTapDown: (details) => _tapPosition = details.globalPosition,
+      onLongPress: () => _showAskKrishnaPopup(context, verse, _tapPosition),
       onTap: () async {
         List<VerseModel> siblings = [];
         if (allVerses is List<VerseModel>) {
@@ -188,37 +266,35 @@ class _GitaVerseListViewState extends State<_GitaVerseListView> {
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          gradient: LinearGradient(
+            colors: gradientColors,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // White badge for verse number
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFFFFF0D6),
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 'Verses ${widget.chapter.chapterNumber}.${verse.shlokaNumber}',
                 style: const TextStyle(
-                  fontSize: 12,
+                  fontSize: 10,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF8B4513),
+                  color: Colors.black87,
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -226,12 +302,12 @@ class _GitaVerseListViewState extends State<_GitaVerseListView> {
                   child: Text(
                     verse.sanskritShloka ?? '',
                     style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF5D4037),
-                      height: 1.6,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                      height: 1.5,
                     ),
-                    textAlign: TextAlign.left,
+                    textAlign: TextAlign.center,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -239,26 +315,26 @@ class _GitaVerseListViewState extends State<_GitaVerseListView> {
                 const SizedBox(width: 8),
                 const Icon(
                   Icons.arrow_forward_ios,
-                  color: Color(0xFF8B4513),
-                  size: 16,
+                  color: Color(0xFFF1C453), // Gold arrow
+                  size: 14,
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            const Divider(thickness: 0.5),
+            const SizedBox(height: 12),
+            Divider(
+              thickness: 1,
+              color: Colors.white.withOpacity(0.2), // Subtle divider line
+            ),
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                if (verse.shlokaNumber == lastVerseString &&
-                    widget.chapter.chapterNumber ==
-                        StorageService.getInt('gita_last_chapter_number'))
-                  const Text(
-                    'Last visited verse',
+                if (isLastVisited)
+                  Text(
+                    lastReadText,
                     style: TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF8B4513),
-                      fontStyle: FontStyle.italic,
+                      fontSize: 10,
+                      color: Colors.white.withOpacity(0.6), // Greyish text
                     ),
                   )
                 else

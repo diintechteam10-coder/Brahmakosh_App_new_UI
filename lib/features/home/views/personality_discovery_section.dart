@@ -150,7 +150,7 @@
 //                 children: [
 //                   Text(
 //                     _tabs[_selectedIndex],
-//                     style: GoogleFonts.playfairDisplay(
+//                     style: GoogleFonts.lora(
 //                       fontSize: 18,
 //                       fontWeight: FontWeight.bold,
 //                       color: const Color(0xFF6D3A0C),
@@ -348,7 +348,7 @@ print("hiihello ${homeController.panchangData?.dailyNakshatraPrediction?.predict
                 children: [
                   Text(
                     _tabs[_selectedIndex],
-                    style: GoogleFonts.playfairDisplay(
+                    style: GoogleFonts.lora(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFF6D3A0C),

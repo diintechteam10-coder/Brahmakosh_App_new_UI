@@ -76,7 +76,7 @@ class _RashmiCategorySelectionViewState
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFBE6D0), // Specific background color
+      backgroundColor: const Color(0xFF100E13), // Dark background
       body: Stack(
         children: [
           SafeArea(
@@ -96,13 +96,14 @@ class _RashmiCategorySelectionViewState
                         onTap: () => Get.back(),
                         child: Container(
                           padding: const EdgeInsets.all(6), // Reduced from 8
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.1),
                             shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white.withOpacity(0.08)),
                           ),
                           child: const Icon(
                             Icons.arrow_back,
-                            color: Colors.black,
+                            color: Colors.white,
                             size: 16, // Reduced from 18
                           ),
                         ),
@@ -115,8 +116,9 @@ class _RashmiCategorySelectionViewState
                           horizontal: 10,
                         ), // Reduced from 12
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: const Color(0xFF18151B),
                           borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: Colors.white.withOpacity(0.08)),
                         ),
                         child: Center(
                           child: GestureDetector(
@@ -142,8 +144,8 @@ class _RashmiCategorySelectionViewState
                                 const SizedBox(width: 6),
                                 Text(
                                   deityName,
-                                  style: TextStyle(
-                                    color: Colors.orange.shade800,
+                                  style: const TextStyle(
+                                    color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 12, // Reduced from 14
                                   ),
@@ -153,7 +155,7 @@ class _RashmiCategorySelectionViewState
                                   _isDeitySelectionOpen
                                       ? Icons.keyboard_arrow_up
                                       : Icons.keyboard_arrow_down,
-                                  color: Colors.orange.shade800,
+                                  color: Colors.white,
                                   size: 18, // Reduced from 20
                                 ),
                               ],
@@ -171,13 +173,14 @@ class _RashmiCategorySelectionViewState
                         },
                         child: Container(
                           padding: const EdgeInsets.all(6), // Reduced from 8
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.1),
                             shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white.withOpacity(0.08)),
                           ),
                           child: const Icon(
                             Icons.menu,
-                            color: Colors.black,
+                            color: Colors.white,
                             size: 16, // Reduced from 18 to match ai_rashmi_chat
                           ),
                         ),
@@ -194,7 +197,7 @@ class _RashmiCategorySelectionViewState
                   style: GoogleFonts.lora(
                     fontSize: 20, // Reduced from 24
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF6D3A0C),
+                    color: Colors.white,
                   ),
                 ),
 
@@ -287,25 +290,26 @@ class _RashmiCategorySelectionViewState
   ) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFFFE0B2),
+        color: const Color(0xFF18151B).withOpacity(0.9),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.08)),
       ),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          collapsedIconColor: Colors.black87,
-          iconColor: Colors.black87,
+          collapsedIconColor: Colors.white,
+          iconColor: Colors.white,
           leading: Icon(
             icon,
             size: 22,
-            color: Colors.black87,
+            color: const Color(0xFFF1C453),
           ), // Reduced from 28
           title: Text(
             title,
             style: const TextStyle(
               fontSize: 14, // Reduced from 16
               fontWeight: FontWeight.w600,
-              color: Colors.black87,
+              color: Colors.white,
             ),
           ),
           children: [
@@ -334,15 +338,16 @@ class _RashmiCategorySelectionViewState
         margin: const EdgeInsets.only(bottom: 6), // Reduced from 8
         padding: const EdgeInsets.all(10), // Reduced from 12
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: const Color(0xFF100E13),
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.white.withOpacity(0.08)),
         ),
         child: Text(
           question,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12, // Reduced from 14
             fontWeight: FontWeight.w500,
-            color: Colors.black87,
+            color: Colors.grey.shade300,
           ),
         ),
       ),

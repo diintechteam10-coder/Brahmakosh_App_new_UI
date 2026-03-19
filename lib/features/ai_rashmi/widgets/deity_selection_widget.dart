@@ -16,11 +16,12 @@ class DeitySelectionWidget extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFFFBE6D0), // Beige background
+        color: const Color(0xFF18151B), // Dark theme background
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.08)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withOpacity(0.3),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -66,12 +67,12 @@ class DeitySelectionWidget extends StatelessWidget {
           // Fixed aspect ratio or height to look like a card
           height: 180,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: const Color(0xFF100E13), // Darker card background
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.orange.shade100, width: 1),
+            border: Border.all(color: Colors.white.withOpacity(0.08), width: 1),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withOpacity(0.2),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -91,7 +92,7 @@ class DeitySelectionWidget extends StatelessWidget {
                       return const Icon(
                         Icons.person,
                         size: 60,
-                        color: Colors.orange,
+                        color: Color(0xFFF1C453),
                       );
                     },
                   ),
@@ -102,10 +103,10 @@ class DeitySelectionWidget extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(8, 0, 8, 16),
                 child: Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Colors.brown.shade800,
+                    color: Colors.white,
                   ),
                   textAlign: TextAlign.center,
                 ),

@@ -15,269 +15,253 @@ class PhoneOtpView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.landingBackground,
+      backgroundColor: AppTheme.authBackground,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xff5D4037)),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Get.back(),
         ),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Obx(
-            () => Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 10),
-
-                Center(
-                  child: Text(
-                    "Verify Mobile Number",
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 28, // Matches Login Title Size
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xff5D4037),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-
-                Center(
-                  child: Text(
-                    "We need to verify your number for security.",
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      color: const Color(0xff5D4037), // Matches subtitle color
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 40),
-
-                if (controller.isOtpSent.value) ...[
-                  // OTP SENT STATE
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xffFFFDE7),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: AppTheme.primaryGold.withOpacity(0.2),
-                      ),
-                    ),
-                    child: Text(
-                      "OTP sent to your mobile number",
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xff5D4037),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 32),
-
-                  _label("Enter OTP"),
-                  const SizedBox(height: 12),
-
-                  // Custom OTP Input
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // Visual Boxes
-                      GetBuilder<MobileOtpController>(
-                        builder: (_) {
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: List.generate(6, (index) {
-                              final text = controller.otpController.text;
-                              final char = index < text.length
-                                  ? text[index]
-                                  : "";
-                              final isFocused = index == text.length;
-
-                              return Container(
-                                width: 50,
-                                height:
-                                    56, // Slightly taller for the rounded look
-                                decoration: BoxDecoration(
-                                  color: const Color(0xffFDFDFD),
-                                  borderRadius: BorderRadius.circular(
-                                    16,
-                                  ), // Softer corners
-                                  border: Border.all(
-                                    color: isFocused
-                                        ? AppTheme.landingButton
-                                        : Colors.black.withOpacity(0.1),
-                                    width: isFocused ? 1.5 : 1,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.05),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 4),
-                                      spreadRadius: 1,
-                                    ),
-                                  ],
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    char,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.w600,
-                                      color: const Color(0xff5D4037),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }),
-                          );
-                        },
-                      ),
-
-                      // Invisible TextField
-                      TextField(
-                        controller: controller.otpController,
-                        keyboardType: TextInputType.number,
-                        maxLength: 6,
-                        textAlign: TextAlign.center,
-                        showCursor: false,
-                        style: const TextStyle(color: Colors.transparent),
-                        decoration: const InputDecoration(
-                          counterText: "",
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          fillColor: Colors.transparent,
-                          filled: true,
-                        ),
-                        onChanged: (val) {
-                          controller.otpController.text = val;
-                          controller.update();
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 60),
-
-                  // Verify Button
-                  _buildButton(
-                    text: "Verify",
-                    onTap: controller.isLoading.value
-                        ? null
-                        : controller.verifyOtp,
-                    isLoading: controller.isLoading.value,
-                  ),
-                ] else ...[
-                  // MOBILE NUMBER INPUT STATE
-                  _label("Mobile Number"),
-                  const SizedBox(height: 8),
-
-                  // Mobile Input Field
-                  Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xffFDFDFD),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.black12),
-                    ),
-                    child: IntlPhoneField(
-                      controller: controller.phoneController,
-                      initialCountryCode: 'IN',
-                      disableLengthCheck: true,
-                      dropdownIconPosition: IconPosition.trailing,
-                      flagsButtonPadding: const EdgeInsets.only(left: 10),
-                      style: GoogleFonts.inter(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: "98765 43210",
-                        hintStyle: GoogleFonts.inter(color: Colors.black38),
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                          horizontal: 16,
-                        ),
-                        counterText: "", // Hide character counter
-                      ),
-                      onChanged: (phone) {
-                        controller.countryCode.value = phone.countryCode
-                            .replaceAll("+", "");
-                      },
-                      onCountryChanged: (country) {
-                        controller.countryCode.value = country.dialCode;
-                      },
-                    ),
-                  ),
-
-                  const SizedBox(height: 32),
-
-                  _label("Send OTP Via"),
-                  const SizedBox(height: 12),
-
-                  Row(
-                    children: [
-                      // Whatsapp Card
-                      Expanded(
-                        child: _methodCard(
-                          title: "WhatsApp",
-                          icon: FontAwesomeIcons.whatsapp,
-                          isSelected:
-                              controller.selectedChannel.value == "whatsapp",
-                          onTap: () =>
-                              controller.selectedChannel.value = "whatsapp",
-                          iconColor: const Color(
-                            0xff25D366,
-                          ), // WhatsApp brand green
-                          selectedBorderColor: const Color(0xff25D366),
-                          bgColor: const Color(0xffEFFBF3), // Very light green
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      // SMS Card
-                      Expanded(
-                        child: _methodCard(
-                          title: "SMS",
-                          icon: Icons.sms_outlined,
-                          isSelected:
-                              controller.selectedChannel.value == "phone",
-                          onTap: () =>
-                              controller.selectedChannel.value = "phone",
-                          iconColor: const Color(0xff5D4037),
-                          selectedBorderColor: const Color(
-                            0xff5D4037,
-                          ), // Brown border
-                          bgColor: const Color(
-                            0xffFFF8E1,
-                          ), // Light brown/beige BG
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 60),
-
-                  // Send OTP Button
-                  _buildButton(
-                    text: "Send OTP",
-                    onTap: controller.isLoading.value
-                        ? null
-                        : controller.sendOtp,
-                    isLoading: controller.isLoading.value,
-                  ),
-                ],
-              ],
+      body: Stack(
+        children: [
+          // Wavy Background Pattern
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/auth_wavy_bg.png',
+              fit: BoxFit.cover,
+              opacity: const AlwaysStoppedAnimation(0.4),
             ),
           ),
-        ),
+
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Obx(
+                () => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+
+                    Center(
+                      child: Text(
+                        controller.isOtpSent.value ? "Verify OTP" : "Phone Verification",
+                        style: GoogleFonts.lora(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    Center(
+                      child: Text(
+                        controller.isOtpSent.value
+                            ? "Enter the 6-digit code sent to your number"
+                            : "We'll send you a one-time password to verify your account",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: AppTheme.authTextSecondary,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 48),
+
+                    if (controller.isOtpSent.value) ...[
+                      // OTP INPUT STATE
+                      _label("Enter OTP"),
+                      const SizedBox(height: 16),
+
+                      // Custom OTP Input
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          GetBuilder<MobileOtpController>(
+                            builder: (_) {
+                              return Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: List.generate(6, (index) {
+                                  final text = controller.otpController.text;
+                                  final char = index < text.length ? text[index] : "";
+                                  final isFocused = index == text.length;
+
+                                  return Container(
+                                    width: 48,
+                                    height: 56,
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.authInputFill,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: isFocused
+                                            ? AppTheme.authPrimaryGold
+                                            : Colors.white.withOpacity(0.1),
+                                        width: isFocused ? 1.5 : 1,
+                                      ),
+                                      boxShadow: [
+                                        if (isFocused)
+                                          BoxShadow(
+                                            color: AppTheme.authPrimaryGold.withOpacity(0.1),
+                                            blurRadius: 8,
+                                            spreadRadius: 1,
+                                          ),
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        char,
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }),
+                              );
+                            },
+                          ),
+
+                          TextField(
+                            controller: controller.otpController,
+                            keyboardType: TextInputType.number,
+                            maxLength: 6,
+                            textAlign: TextAlign.center,
+                            showCursor: false,
+                            style: const TextStyle(color: Colors.transparent),
+                            decoration: const InputDecoration(
+                              counterText: "",
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              fillColor: Colors.transparent,
+                              filled: true,
+                            ),
+                            onChanged: (val) {
+                              // controller.otpController.text = val; // Removed: redundant
+                              controller.update();
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 40),
+
+                      _buildButton(
+                        text: "Verify OTP",
+                        onTap: controller.isLoading.value ? null : controller.verifyOtp,
+                        isLoading: controller.isLoading.value,
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      Center(
+                        child: TextButton(
+                          onPressed: controller.isLoading.value ? null : () => controller.isOtpSent.value = false,
+                          child: Text(
+                            "Edit Phone Number",
+                            style: GoogleFonts.poppins(
+                              color: AppTheme.authPrimaryGold,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ] else ...[
+                      // MOBILE NUMBER INPUT STATE
+                      _label("Mobile Number"),
+                      const SizedBox(height: 12),
+
+                      Container(
+                        height: 45,
+                        decoration: BoxDecoration(
+                          color: AppTheme.authInputFill,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.white.withOpacity(0.1)),
+                        ),
+                        child: IntlPhoneField(
+                          controller: controller.phoneController,
+                          initialCountryCode: 'IN',
+                          disableLengthCheck: true,
+                          dropdownIconPosition: IconPosition.trailing,
+                          dropdownTextStyle: const TextStyle(color: Colors.white),
+                          dropdownIcon: const Icon(Icons.arrow_drop_down, color: Colors.white54),
+                          flagsButtonPadding: const EdgeInsets.only(left: 12),
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: "98765 43210",
+                            fillColor: Colors.transparent,
+                            hintStyle: GoogleFonts.poppins(color: Colors.white.withOpacity(0.3)),
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 18,
+                              horizontal: 16,
+                            ),
+                            counterText: "",
+                          ),
+                          onChanged: (phone) {
+                            controller.countryCode.value = phone.countryCode.replaceAll("+", "");
+                          },
+                          onCountryChanged: (country) {
+                            controller.countryCode.value = country.dialCode;
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(height: 32),
+
+                      _label("Get OTP Via"),
+                      const SizedBox(height: 16),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _methodCard(
+                              title: "WhatsApp",
+                              icon: FontAwesomeIcons.whatsapp,
+                              isSelected: controller.selectedChannel.value == "whatsapp",
+                              onTap: () => controller.selectedChannel.value = "whatsapp",
+                              accentColor: const Color(0xff25D366),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: _methodCard(
+                              title: "SMS",
+                              icon: Icons.sms_outlined,
+                              isSelected: controller.selectedChannel.value == "phone",
+                              onTap: () => controller.selectedChannel.value = "phone",
+                              accentColor: AppTheme.authPrimaryGold,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 60),
+
+                      _buildButton(
+                        text: "Send OTP",
+                        onTap: controller.isLoading.value ? null : controller.sendOtp,
+                        isLoading: controller.isLoading.value,
+                      ),
+                    ],
+
+                    const SizedBox(height: 40),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -285,11 +269,11 @@ class PhoneOtpView extends StatelessWidget {
   Widget _label(String text) {
     return Text(
       text.toUpperCase(),
-      style: GoogleFonts.inter(
-        fontSize: 13,
+      style: GoogleFonts.poppins(
+        fontSize: 12,
         fontWeight: FontWeight.bold,
-        color: const Color(0xff5D4037),
-        letterSpacing: 0.5,
+        color: AppTheme.authTextSecondary.withOpacity(0.7),
+        letterSpacing: 1.2,
       ),
     );
   }
@@ -299,56 +283,43 @@ class PhoneOtpView extends StatelessWidget {
     required IconData icon,
     required bool isSelected,
     required VoidCallback onTap,
-    Color? iconColor,
-    Color? selectedBorderColor,
-    Color? bgColor,
+    required Color accentColor,
   }) {
-    // If selected, use specific styling
-    final Color backgroundColor = isSelected
-        ? (bgColor ?? Colors.white)
-        : const Color(0xffFDFDFD);
-    final Color borderColor = isSelected
-        ? (selectedBorderColor ?? AppTheme.landingButton)
-        : Colors.transparent;
-
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 20),
+        duration: const Duration(milliseconds: 250),
+        padding: const EdgeInsets.symmetric(vertical: 24),
         decoration: BoxDecoration(
-          color: backgroundColor,
+          color: isSelected ? accentColor.withOpacity(0.08) : AppTheme.authInputFill,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? borderColor : Colors.transparent,
+            color: isSelected ? accentColor : Colors.white.withOpacity(0.1),
             width: 1.5,
           ),
           boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
+            if (isSelected)
+              BoxShadow(
+                color: accentColor.withOpacity(0.15),
+                blurRadius: 15,
+                spreadRadius: 2,
+              ),
           ],
         ),
         child: Column(
           children: [
             Icon(
               icon,
-              color: isSelected
-                  ? (selectedBorderColor ?? const Color(0xff5D4037))
-                  : Colors.black45,
+              color: isSelected ? accentColor : Colors.white54,
               size: 28,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Text(
               title,
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: isSelected
-                    ? (selectedBorderColor ?? const Color(0xff5D4037))
-                    : Colors.black45,
+              style: GoogleFonts.poppins(
+                fontSize: 15,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected ? Colors.white : Colors.white54,
               ),
             ),
           ],
@@ -365,17 +336,18 @@ class PhoneOtpView extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 54,
+        height: 56,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: AppTheme.landingButton,
-          borderRadius: BorderRadius.circular(30),
+          color: AppTheme.authPrimaryGold,
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
+            if (onTap != null)
+              BoxShadow(
+                color: AppTheme.authPrimaryGold.withOpacity(0.3),
+                blurRadius: 15,
+                offset: const Offset(0, 5),
+              ),
           ],
         ),
         child: Center(
@@ -385,15 +357,15 @@ class PhoneOtpView extends StatelessWidget {
                   width: 24,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: Colors.white,
+                    color: Colors.black,
                   ),
                 )
               : Text(
                   text,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: Colors.black,
                   ),
                 ),
         ),

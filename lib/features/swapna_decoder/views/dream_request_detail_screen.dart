@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
-import '../../../../common/colors.dart';
 import '../models/dream_request_model.dart';
 import 'swapna_detail_screen.dart';
 
@@ -13,28 +12,28 @@ class DreamRequestDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.lightPinkColor,
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: Text(
           "Request Details",
           style: GoogleFonts.lora(
             fontSize: 20,
-            color: const Color(0xff4E342E),
+            color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: Container(
-          margin: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.8),
-            shape: BoxShape.circle,
+        leading: IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
           ),
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Color(0xff5D4037)),
-            onPressed: () => Get.back(),
-          ),
+          onPressed: () => Get.back(),
         ),
       ),
       body: SingleChildScrollView(
@@ -47,25 +46,11 @@ class DreamRequestDetailScreen extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xffFFFDF5),
-                    Colors.white,
-                  ],
-                ),
+                color: const Color(0xFF1C1C1E),
                 borderRadius: BorderRadius.circular(22),
                 border: Border.all(
-                  color: const Color(0xffFEDA87).withOpacity(0.3),
+                  color: Colors.white.withOpacity(0.1),
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xff5D4037).withOpacity(0.06),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,13 +61,13 @@ class DreamRequestDetailScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: const Color(0xffFEDA87).withOpacity(0.3),
+                          color: const Color(0xFFD4AF37).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: const Icon(
                           Icons.nights_stay_outlined,
                           size: 18,
-                          color: Color(0xffFF7438),
+                          color: Color(0xFFD4AF37),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -103,7 +88,7 @@ class DreamRequestDetailScreen extends StatelessWidget {
                     style: GoogleFonts.lora(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xff4E342E),
+                      color: Colors.white,
                     ),
                   ),
 
@@ -116,9 +101,9 @@ class DreamRequestDetailScreen extends StatelessWidget {
                         width: 3,
                         height: 16,
                         decoration: BoxDecoration(
-                          color: const Color(0xffFF7438),
-                          borderRadius: BorderRadius.circular(2),
-                        ),
+                        color: const Color(0xFFD4AF37),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -136,7 +121,7 @@ class DreamRequestDetailScreen extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: const Color(0xffF4E9E0).withOpacity(0.4),
+                      color: Colors.black.withOpacity(0.3),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -144,7 +129,7 @@ class DreamRequestDetailScreen extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 15,
                         height: 1.6,
-                        color: const Color(0xff4E342E),
+                        color: Colors.grey[300],
                       ),
                     ),
                   ),
@@ -154,15 +139,7 @@ class DreamRequestDetailScreen extends StatelessWidget {
                   // Divider
                   Container(
                     height: 1,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.transparent,
-                          const Color(0xffFEDA87).withOpacity(0.5),
-                          Colors.transparent,
-                        ],
-                      ),
-                    ),
+                    color: Colors.white.withOpacity(0.1),
                   ),
 
                   const SizedBox(height: 20),
@@ -176,7 +153,7 @@ class DreamRequestDetailScreen extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xff4E342E),
+                          color: Colors.white,
                         ),
                       ),
                       _buildStatusChip(request.status ?? 'Pending'),
@@ -253,15 +230,8 @@ class DreamRequestDetailScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(30),
                         gradient: const LinearGradient(
-                          colors: [Color(0xffFF7438), Color(0xffFF9A5C)],
+                          colors: [Color(0xFFD4AF37), Color(0xFFC5A028)],
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xffFF7438).withOpacity(0.3),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
                       ),
                       child: ElevatedButton(
                         onPressed: () {
@@ -292,7 +262,7 @@ class DreamRequestDetailScreen extends StatelessWidget {
                               "View Interpretation",
                               style: GoogleFonts.inter(
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontSize: 15,
                               ),
                             ),

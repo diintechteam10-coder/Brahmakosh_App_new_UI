@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 import 'astrologist_profile_view.dart';
+import '../../../common/widgets/custom_profile_avatar.dart';
 import '../../../core/theme/app_theme.dart';
 import '../controllers/chat_history_controller.dart';
 import '../models/chat_models.dart';
@@ -22,12 +23,12 @@ class ConversationMessagesView extends StatelessWidget {
     });
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFBE6D0),
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFBE6D0),
+        backgroundColor: Colors.black,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppTheme.textPrimary),
+          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 30),
           onPressed: () => Get.back(),
         ),
         titleSpacing: 0,
@@ -43,34 +44,11 @@ class ConversationMessagesView extends StatelessWidget {
                   width: 1.5,
                 ),
               ),
-              child: controller.currentPartnerPhoto.isNotEmpty
-                  ? CircleAvatar(
-                      radius: 20,
-                      backgroundImage: NetworkImage(
-                        controller.currentPartnerPhoto,
-                      ),
-                      backgroundColor: const Color(0xFFD7CCC8),
-                    )
-                  : Container(
-                      width: 40,
-                      height: 40,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [
-                            Color(0xFFD4AF37),
-                            Color(0xFFA67C00),
-                          ], // Gold Gradient
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.person_rounded,
-                        size: 24,
-                        color: Colors.white,
-                      ),
-                    ),
+              child: CustomProfileAvatar(
+                imageUrl: controller.currentPartnerPhoto,
+                radius: 20,
+                borderColor: Colors.transparent,
+              ),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -84,7 +62,7 @@ class ConversationMessagesView extends StatelessWidget {
                     style: GoogleFonts.lora(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: AppTheme.textPrimary,
+                      color: Colors.white,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -109,7 +87,7 @@ class ConversationMessagesView extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFF5D4037),
+                          color: Colors.white.withOpacity(0.6),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -125,7 +103,7 @@ class ConversationMessagesView extends StatelessWidget {
                           style: GoogleFonts.inter(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
-                            color: const Color(0xFF5D4037),
+                            color: Colors.white.withOpacity(0.6),
                           ),
                         ),
                       ],
@@ -151,14 +129,14 @@ class ConversationMessagesView extends StatelessWidget {
                 Icon(
                   Icons.chat_outlined,
                   size: 64,
-                  color: AppTheme.textSecondary.withOpacity(0.4),
+                  color: Colors.white.withOpacity(0.2),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   'No messages in this conversation',
                   style: GoogleFonts.inter(
                     fontSize: 14,
-                    color: AppTheme.textSecondary,
+                    color: Colors.white.withOpacity(0.5),
                   ),
                 ),
               ],
@@ -179,14 +157,15 @@ class ConversationMessagesView extends StatelessWidget {
       }),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        decoration: BoxDecoration(
+          color: const Color(0xFF141414),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          border: Border(top: BorderSide(color: Colors.white.withOpacity(0.05))),
           boxShadow: [
             BoxShadow(
-              color: Colors.black12,
+              color: Colors.black.withOpacity(0.3),
               blurRadius: 10,
-              offset: Offset(0, -4),
+              offset: const Offset(0, -4),
             ),
           ],
         ),
@@ -213,7 +192,7 @@ class ConversationMessagesView extends StatelessWidget {
                   Get.to(() => AstrologistProfileView(expert: expert));
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFA67C00), // Dark Gold
+                  backgroundColor: AppTheme.primaryGold, // Bright Premium Gold
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -229,8 +208,8 @@ class ConversationMessagesView extends StatelessWidget {
                       "New Chat",
                       style: GoogleFonts.inter(
                         fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
                     ),
                   ],
@@ -251,7 +230,7 @@ class ConversationMessagesView extends StatelessWidget {
         constraints: const BoxConstraints(maxWidth: 280),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: isUser ? const Color(0xFFA67C00) : Colors.white,
+          color: isUser ? AppTheme.primaryGold : const Color(0xFF1A1A1A),
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(18),
             topRight: const Radius.circular(18),
@@ -262,9 +241,12 @@ class ConversationMessagesView extends StatelessWidget {
                 ? const Radius.circular(4)
                 : const Radius.circular(18),
           ),
+          border: isUser 
+              ? null 
+              : Border.all(color: Colors.white.withOpacity(0.05)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withOpacity(0.2),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -279,7 +261,7 @@ class ConversationMessagesView extends StatelessWidget {
               msg.content,
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: isUser ? Colors.white : AppTheme.textPrimary,
+                color: isUser ? Colors.black : Colors.white,
                 height: 1.4,
               ),
             ),
@@ -289,8 +271,8 @@ class ConversationMessagesView extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 10,
                 color: isUser
-                    ? Colors.white.withOpacity(0.7)
-                    : AppTheme.textSecondary.withOpacity(0.6),
+                    ? Colors.black.withOpacity(0.5)
+                    : Colors.white.withOpacity(0.5),
               ),
             ),
           ],
@@ -314,8 +296,8 @@ class ConversationMessagesView extends StatelessWidget {
         return Align(
           alignment: isRight ? Alignment.centerRight : Alignment.centerLeft,
           child: Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
+            baseColor: const Color(0xFF1A1A1A),
+            highlightColor: const Color(0xFF262626),
             child: Container(
               margin: const EdgeInsets.only(bottom: 12),
               width: 200,
@@ -346,12 +328,12 @@ class ConversationMessagesView extends StatelessWidget {
       decoration: isEmbedded
           ? null
           : BoxDecoration(
-              color: Colors.white,
+              color: const Color(0xFF141414),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppTheme.primaryGold.withOpacity(0.3)),
+              border: Border.all(color: Colors.white.withOpacity(0.05)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withOpacity(0.2),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -369,7 +351,7 @@ class ConversationMessagesView extends StatelessWidget {
                 style: GoogleFonts.lora(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
+                  color: Colors.white,
                 ),
               ),
             ],
@@ -384,13 +366,13 @@ class ConversationMessagesView extends StatelessWidget {
             ],
           ),
           if (summary.toString().isNotEmpty) ...[
-            const Divider(height: 24),
+            Divider(height: 24, color: Colors.white.withOpacity(0.1)),
             Text(
               'Highlights',
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.textSecondary,
+                color: Colors.white.withOpacity(0.5),
               ),
             ),
             const SizedBox(height: 6),
@@ -399,7 +381,7 @@ class ConversationMessagesView extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 13,
                 height: 1.5,
-                color: AppTheme.textPrimary,
+                color: Colors.white.withOpacity(0.8),
               ),
             ),
           ],
@@ -422,7 +404,7 @@ class ConversationMessagesView extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: 11, color: AppTheme.textSecondary),
+          style: GoogleFonts.inter(fontSize: 11, color: Colors.white.withOpacity(0.5)),
         ),
       ],
     );

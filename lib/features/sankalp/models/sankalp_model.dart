@@ -45,7 +45,7 @@ class SankalpModel {
 
   factory SankalpModel.fromJson(Map<String, dynamic> json) {
     return SankalpModel(
-      id: json['_id'] ?? '',
+      id: json['_id'] ?? json['id'] ?? '',
       title: json['title'] ?? '',
       description: json['description'] ?? '',
       category: json['category'] ?? '',
@@ -95,6 +95,7 @@ class UserSankalpModel {
   final List<DailyReport> dailyReports;
   final int karmaEarned;
   final int completionBonusEarned;
+  final String? reminderTime;
 
   UserSankalpModel({
     required this.id,
@@ -108,6 +109,7 @@ class UserSankalpModel {
     required this.dailyReports,
     required this.karmaEarned,
     required this.completionBonusEarned,
+    this.reminderTime,
   });
 
   factory UserSankalpModel.fromJson(Map<String, dynamic> json) {
@@ -131,6 +133,7 @@ class UserSankalpModel {
           [],
       karmaEarned: json['karmaEarned'] ?? 0,
       completionBonusEarned: json['completionBonusEarned'] ?? 0,
+      reminderTime: json['reminderTime'],
     );
   }
 }

@@ -63,11 +63,11 @@ class _GemstoneDetailViewState extends State<GemstoneDetailView>
           labelColor: const Color(0xff4E342E),
           unselectedLabelColor: const Color(0xff8D6E63),
           indicatorColor: const Color(0xffff7438),
-          labelStyle: GoogleFonts.inter(
+          labelStyle: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
             fontSize: 13,
           ),
-          unselectedLabelStyle: GoogleFonts.inter(
+          unselectedLabelStyle: GoogleFonts.poppins(
             fontWeight: FontWeight.w600,
             fontSize: 13,
           ),
@@ -153,7 +153,7 @@ class _GemstoneDetailViewState extends State<GemstoneDetailView>
             width: 120,
             child: Text(
               label,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: const Color(0xff8D6E63),
@@ -163,7 +163,7 @@ class _GemstoneDetailViewState extends State<GemstoneDetailView>
           Expanded(
             child: Text(
               value,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: const Color(0xff4E342E),
@@ -268,7 +268,7 @@ class RudrakshaDetailView extends StatelessWidget {
                   const SizedBox(height: 16),
                   Text(
                     "Recommendation",
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xff8D6E63),
@@ -278,7 +278,7 @@ class RudrakshaDetailView extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     rudraksha.recommend ?? "Recommended for you.",
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 15,
                       color: const Color(0xff5D4037),
                       height: 1.5,
@@ -288,7 +288,7 @@ class RudrakshaDetailView extends StatelessWidget {
                   const Divider(height: 32),
                   Text(
                     "Details & Benefits",
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xff8D6E63),
@@ -298,7 +298,7 @@ class RudrakshaDetailView extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     rudraksha.detail ?? "No additional details.",
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 15,
                       color: const Color(0xff5D4037),
                       height: 1.6,
@@ -415,7 +415,7 @@ class _PujaDetailViewState extends State<PujaDetailView> {
                   Text(
                     widget.puja.summary ??
                         "Puja recommendations based on your horoscope and planetary combinations.",
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 13.5,
                       color: const Color(0xff5D4037),
                       height: 1.55,
@@ -461,7 +461,7 @@ class _PujaDetailViewState extends State<PujaDetailView> {
                       ),
                       child: Text(
                         "${widget.puja.suggestions!.length}",
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           color: const Color(0xffff7438),
@@ -563,7 +563,7 @@ class _PujaDetailViewState extends State<PujaDetailView> {
                   child: Center(
                     child: Text(
                       "${index + 1}",
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.poppins(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                         color: accentColor,
@@ -643,7 +643,7 @@ class _PujaDetailViewState extends State<PujaDetailView> {
                     overflow: isExpanded
                         ? TextOverflow.visible
                         : TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 13,
                       color: const Color(0xff6D4C41),
                       height: 1.55,
@@ -664,7 +664,7 @@ class _PujaDetailViewState extends State<PujaDetailView> {
                         padding: const EdgeInsets.only(top: 6),
                         child: Text(
                           isExpanded ? "Show Less" : "Read More",
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             fontSize: 12.5,
                             fontWeight: FontWeight.w600,
                             color: const Color(0xffff7438),
@@ -714,7 +714,7 @@ class _PujaDetailViewState extends State<PujaDetailView> {
                       const SizedBox(width: 6),
                       Text(
                         "Learn More",
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.poppins(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
@@ -751,7 +751,7 @@ class _PujaDetailViewState extends State<PujaDetailView> {
           const SizedBox(width: 4),
           Text(
             label,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 11,
               fontWeight: FontWeight.w600,
               color: color,

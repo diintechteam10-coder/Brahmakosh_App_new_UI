@@ -113,7 +113,7 @@ class DestinyGuidanceSection extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFF6D3A0C),
@@ -122,7 +122,7 @@ class DestinyGuidanceSection extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                       fontSize: 11,
                       color: const Color(0xFF874101),
                       height: 1.3,

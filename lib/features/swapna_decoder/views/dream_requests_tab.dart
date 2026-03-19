@@ -28,12 +28,12 @@ class DreamRequestsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.black,
       floatingActionButton: Container(
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           gradient: const LinearGradient(
-            colors: [Color(0xffFEDA87), Color(0xffF4C430)],
+            colors: [Color(0xFFD4AF37), Color(0xFFC5A028)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -54,24 +54,26 @@ class DreamRequestsView extends StatelessWidget {
               ),
             ).then((value) {
               if (value == true) {
-                context.read<DreamRequestBloc>().add(FetchDreamRequests());
+                if (context.mounted) {
+                  context.read<DreamRequestBloc>().add(FetchDreamRequests());
+                }
               }
             });
           },
           backgroundColor: Colors.transparent,
           elevation: 0,
-          child: const Icon(Icons.add, color: Color(0xff5D4037), size: 28),
+          child: const Icon(Icons.add, color: Colors.black, size: 28),
         ),
       ),
       body: BlocBuilder<DreamRequestBloc, DreamRequestState>(
         builder: (context, state) {
           if (state is DreamRequestLoading) {
             return const Center(
-              child: CircularProgressIndicator(color: Color(0xffFF7438)),
+              child: CircularProgressIndicator(color: Color(0xFFD4AF37)),
             );
           } else if (state is DreamRequestError) {
             return RefreshIndicator(
-              color: const Color(0xffFF7438),
+              color: const Color(0xFFD4AF37),
               onRefresh: () async {
                 context.read<DreamRequestBloc>().add(FetchDreamRequests());
               },
@@ -84,14 +86,14 @@ class DreamRequestsView extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.cloud_off_rounded,
-                            size: 48, color: Colors.grey[400]),
+                            size: 48, color: Colors.grey[600]),
                         const SizedBox(height: 12),
                         Text(
                           "Something went wrong",
                           style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: const Color(0xff5D4037),
+                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -111,7 +113,7 @@ class DreamRequestsView extends StatelessWidget {
           } else if (state is DreamRequestLoaded) {
             if (state.requests.isEmpty) {
               return RefreshIndicator(
-                color: const Color(0xffFF7438),
+                color: const Color(0xFFD4AF37),
                 onRefresh: () async {
                   context.read<DreamRequestBloc>().add(FetchDreamRequests());
                 },
@@ -122,26 +124,41 @@ class DreamRequestsView extends StatelessWidget {
                         height: MediaQuery.of(context).size.height * 0.25),
                     Column(
                       children: [
-                        Icon(
-                          Icons.edit_note_rounded,
-                          size: 56,
-                          color: const Color(0xffFEDA87).withOpacity(0.8),
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1C1C1E),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: const Color(0xFFD4AF37).withOpacity(0.1),
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.edit_note_rounded,
+                            size: 40,
+                            color: const Color(0xFFD4AF37).withOpacity(0.8),
+                          ),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 20),
                         Text(
                           "No dream requests yet",
                           style: GoogleFonts.lora(
-                            fontSize: 18,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xff5D4037),
+                            color: Colors.white,
                           ),
                         ),
-                        const SizedBox(height: 6),
-                        Text(
-                          "Tap + to submit your first dream",
-                          style: GoogleFonts.inter(
-                            fontSize: 13,
-                            color: const Color(0xff8D6E63),
+                        const SizedBox(height: 8),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 40),
+                          child: Text(
+                            "Submit your dream symbol and our experts will decode its spiritual meaning for you.",
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              height: 1.5,
+                              color: Colors.grey[500],
+                            ),
                           ),
                         ),
                       ],
@@ -175,21 +192,11 @@ class DreamRequestsView extends StatelessWidget {
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 14),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border(
-                          left: BorderSide(
-                            color: statusColor,
-                            width: 4,
-                          ),
+                        color: const Color(0xFF1C1C1E),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.05),
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xff5D4037).withOpacity(0.06),
-                            blurRadius: 14,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
                       ),
                       padding: const EdgeInsets.all(16),
                       child: Column(
@@ -198,11 +205,21 @@ class DreamRequestsView extends StatelessWidget {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                               // Status Indicator Bar
+                              Container(
+                                width: 3,
+                                height: 34,
+                                decoration: BoxDecoration(
+                                  color: statusColor,
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
                               // Dream icon
                               Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: statusColor.withOpacity(0.1),
+                                  color: statusColor.withOpacity(0.08),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Icon(
@@ -221,7 +238,7 @@ class DreamRequestsView extends StatelessWidget {
                                       style: GoogleFonts.lora(
                                         fontSize: 17,
                                         fontWeight: FontWeight.bold,
-                                        color: const Color(0xff4E342E),
+                                        color: Colors.white,
                                       ),
                                     ),
                                     const SizedBox(height: 6),
@@ -232,7 +249,7 @@ class DreamRequestsView extends StatelessWidget {
                                       style: GoogleFonts.inter(
                                         fontSize: 13,
                                         height: 1.4,
-                                        color: const Color(0xff8D6E63),
+                                        color: Colors.grey,
                                       ),
                                     ),
                                   ],
@@ -244,40 +261,41 @@ class DreamRequestsView extends StatelessWidget {
                             ],
                           ),
                           if (request.completedDreamId != null) ...[
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 16),
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 6,
+                                horizontal: 12,
+                                vertical: 10,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0xffE8F5E9),
-                                borderRadius: BorderRadius.circular(8),
+                                color: const Color(0xFFD4AF37).withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: const Color(0xFFD4AF37).withOpacity(0.1),
+                                ),
                               ),
                               child: Row(
-                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   const Icon(
-                                    Icons.check_circle,
-                                    size: 14,
-                                    color: Color(0xff2E7D32),
+                                    Icons.auto_awesome,
+                                    size: 16,
+                                    color: Color(0xFFD4AF37),
                                   ),
-                                  const SizedBox(width: 6),
-                                  Flexible(
+                                  const SizedBox(width: 10),
+                                  Expanded(
                                     child: Text(
-                                      "Decoded as: ${request.completedDreamId?.symbolName}",
+                                      "Decoded: ${request.completedDreamId?.symbolName}",
                                       style: GoogleFonts.inter(
-                                        fontSize: 12,
+                                        fontSize: 13,
                                         fontWeight: FontWeight.w600,
-                                        color: const Color(0xff2E7D32),
+                                        color: const Color(0xFFD4AF37),
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(width: 4),
                                   const Icon(
                                     Icons.arrow_forward_ios,
-                                    size: 10,
-                                    color: Color(0xff2E7D32),
+                                    size: 12,
+                                    color: Color(0xFFD4AF37),
                                   ),
                                 ],
                               ),
@@ -300,53 +318,32 @@ class DreamRequestsView extends StatelessWidget {
   Color _getStatusColor(String? status) {
     switch (status?.toLowerCase()) {
       case 'completed':
-        return const Color(0xff2E7D32);
+        return const Color(0xFFD4AF37);
       case 'in progress':
-        return const Color(0xffFF7438);
+        return const Color(0xFFC5A028);
       case 'pending':
-        return const Color(0xffE53935);
+        return Colors.grey[600]!;
       default:
         return Colors.grey;
     }
   }
 
   Widget _buildStatusChip(String status, Color color) {
-    IconData icon;
-    switch (status.toLowerCase()) {
-      case 'completed':
-        icon = Icons.check_circle_outline;
-        break;
-      case 'in progress':
-        icon = Icons.hourglass_bottom_rounded;
-        break;
-      case 'pending':
-        icon = Icons.schedule;
-        break;
-      default:
-        icon = Icons.help_outline;
-    }
-
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.3)),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withOpacity(0.2)),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 12, color: color),
-          const SizedBox(width: 4),
-          Text(
-            status,
-            style: GoogleFonts.inter(
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              color: color,
-            ),
-          ),
-        ],
+      child: Text(
+        status.toUpperCase(),
+        style: GoogleFonts.inter(
+          fontSize: 9,
+          letterSpacing: 0.5,
+          fontWeight: FontWeight.w800,
+          color: color,
+        ),
       ),
     );
   }

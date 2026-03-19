@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:brahmakosh/core/theme/app_theme.dart';
+import 'package:brahmakosh/common/api_urls.dart';
 
 class CustomProfileAvatar extends StatelessWidget {
   final String? imageUrl;
@@ -20,6 +20,8 @@ class CustomProfileAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final formattedUrl = ApiUrls.getFormattedImageUrl(imageUrl);
+    
     return Container(
       width: radius * 2,
       height: radius * 2,
@@ -32,13 +34,18 @@ class CustomProfileAvatar extends StatelessWidget {
         ),
       ),
       child: ClipOval(
-        child: (imageUrl == null || imageUrl!.isEmpty)
+        child: (formattedUrl == null || formattedUrl.isEmpty)
             ? _buildFallbackIcon()
             : CachedNetworkImage(
-                imageUrl: imageUrl!,
+                imageUrl: formattedUrl,
                 fit: BoxFit.cover,
                 placeholder: (context, url) => _buildFallbackIcon(),
-                errorWidget: (context, url, error) => _buildFallbackIcon(),
+                errorWidget: (context, url, error) {
+                  debugPrint(
+                    "❌ CustomProfileAvatar Error loading: $url - Error: $error",
+                  );
+                  return _buildFallbackIcon();
+                },
               ),
       ),
     );
@@ -48,13 +55,20 @@ class CustomProfileAvatar extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      decoration: BoxDecoration(
-        color: backgroundColor,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFFD4AF37),
+            Color(0xFFA67C00),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
       ),
-      child: Icon(
-        Icons.person,
-        size: radius * 1.2,
-        color: AppTheme.primaryGold,
+      child: const Icon(
+        Icons.person_rounded,
+        size: 24,
+        color: Colors.white,
       ),
     );
   }

@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../core/theme/app_theme.dart';
 import '../controllers/chat_history_controller.dart';
+import '../../../common/widgets/custom_profile_avatar.dart';
 import 'conversation_messages_view.dart';
 import '../../../common/models/astrologist_model.dart';
 import 'astrology_chat_view.dart';
@@ -18,12 +19,12 @@ class ConversationHistoryView extends StatelessWidget {
     final controller = Get.put(ChatHistoryController());
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFBE6D0),
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFBE6D0),
+        backgroundColor: Colors.black,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppTheme.textPrimary),
+          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 30),
           onPressed: () => Get.back(),
         ),
         title: Text(
@@ -31,7 +32,7 @@ class ConversationHistoryView extends StatelessWidget {
           style: GoogleFonts.lora(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: AppTheme.textPrimary,
+            color: Colors.white,
           ),
         ),
         centerTitle: false,
@@ -39,7 +40,7 @@ class ConversationHistoryView extends StatelessWidget {
           IconButton(
             icon: const Icon(
               Icons.phone_in_talk_outlined,
-              color: AppTheme.textPrimary,
+              color: Colors.white,
             ),
             onPressed: () => Get.to(() => const CallHistoryView()),
             tooltip: 'Call Logs',
@@ -73,7 +74,7 @@ class ConversationHistoryView extends StatelessWidget {
                         Icon(
                           Icons.chat_bubble_outline,
                           size: 72,
-                          color: AppTheme.textSecondary.withOpacity(0.4),
+                          color: Colors.white.withOpacity(0.2),
                         ),
                         const SizedBox(height: 16),
                         Text(
@@ -81,7 +82,7 @@ class ConversationHistoryView extends StatelessWidget {
                           style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: AppTheme.textSecondary,
+                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -89,7 +90,7 @@ class ConversationHistoryView extends StatelessWidget {
                           'Start a chat with an expert to see it here',
                           style: GoogleFonts.inter(
                             fontSize: 13,
-                            color: AppTheme.textSecondary.withOpacity(0.7),
+                            color: Colors.white.withOpacity(0.5),
                           ),
                         ),
                       ],
@@ -139,14 +140,14 @@ class ConversationHistoryView extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF8F0),
+        color: const Color(0xFF141414),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.lightGold.withOpacity(0.3)),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -160,40 +161,12 @@ class ConversationHistoryView extends StatelessWidget {
             child: Row(
               children: [
                 // Avatar
-                photo.isNotEmpty
-                    ? Container(
-                        width: 52,
-                        height: 52,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
-                          image: DecorationImage(
-                            image: NetworkImage(photo),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      )
-                    : Container(
-                        width: 52,
-                        height: 52,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: const LinearGradient(
-                            colors: [
-                              Color(0xFFD4AF37),
-                              Color(0xFFA67C00),
-                            ], // Gold Gradient
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          border: Border.all(color: Colors.white, width: 2),
-                        ),
-                        child: const Icon(
-                          Icons.person_rounded,
-                          size: 30,
-                          color: Colors.white,
-                        ),
-                      ),
+                CustomProfileAvatar(
+                  imageUrl: photo,
+                  radius: 26,
+                  borderWidth: 2,
+                  borderColor: Colors.white,
+                ),
                 const SizedBox(width: 14),
 
                 // Name + Status
@@ -206,7 +179,7 @@ class ConversationHistoryView extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: AppTheme.textPrimary,
+                          color: Colors.white,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -246,7 +219,7 @@ class ConversationHistoryView extends StatelessWidget {
                       date,
                       style: GoogleFonts.inter(
                         fontSize: 11,
-                        color: AppTheme.textSecondary,
+                        color: Colors.white.withOpacity(0.5),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -343,61 +316,76 @@ class ConversationHistoryView extends StatelessWidget {
 
   Widget _buildFilterChips(ChatHistoryController controller) {
     final filters = ['All', 'Active', 'Pending', 'Accepted', 'Ended'];
-    return Container(
-      height: 50,
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(vertical: 12),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: filters.length,
-        itemBuilder: (context, index) {
-          final filter = filters[index];
-          final value = filter.toLowerCase();
-          return Obx(() {
-            final isSelected = controller.selectedStatus.value == value;
-            return Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: GestureDetector(
-                onTap: () => controller.changeStatus(value),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Container(
+        height: 44,
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A1A1A),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: Colors.white.withOpacity(0.05)),
+        ),
+        child: ListView.builder(
+          controller: controller.filterScrollController,
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          itemCount: filters.length,
+          itemBuilder: (context, index) {
+            final filter = filters[index];
+            final value = filter.toLowerCase();
+            return Obx(() {
+              final isSelected = controller.selectedStatus.value == value;
+              return InkWell(
+                onTap: () {
+                  controller.changeStatus(value);
+                  
+                  // Centering logic
+                  final screenWidth = MediaQuery.of(context).size.width;
+                  const itemWidth = 100.0; // Approx width for history chips
+                  double offset = (index * itemWidth) - (screenWidth / 2) + (itemWidth / 2);
+                  
+                  if (offset < 0) offset = 0;
+                  final maxScroll = controller.filterScrollController.position.maxScrollExtent;
+                  if (offset > maxScroll) offset = maxScroll;
+
+                  controller.filterScrollController.animateTo(
+                    offset,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                },
+                borderRadius: BorderRadius.circular(18),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                   decoration: BoxDecoration(
-                    color: isSelected ? AppTheme.primaryGold : Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isSelected
-                          ? Colors.transparent
-                          : AppTheme.primaryGold.withOpacity(0.3),
-                    ),
+                    color: isSelected ? AppTheme.primaryGold : Colors.transparent,
+                    borderRadius: BorderRadius.circular(18),
                   ),
                   alignment: Alignment.center,
                   child: Text(
-                    filter,
+                    filter.toUpperCase(),
                     style: GoogleFonts.inter(
-                      fontSize: 13,
-                      fontWeight: isSelected
-                          ? FontWeight.w600
-                          : FontWeight.w500,
-                      color: isSelected ? Colors.white : AppTheme.textPrimary,
+                      fontSize: 11,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                      color: isSelected ? Colors.black : Colors.white.withOpacity(0.5),
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ),
-              ),
-            );
-          });
-        },
+              );
+            });
+          },
+        ),
       ),
     );
   }
 
   Widget _buildShimmerCard() {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: const Color(0xFF1A1A1A),
+      highlightColor: const Color(0xFF262626),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         height: 80,

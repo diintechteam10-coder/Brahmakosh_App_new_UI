@@ -239,7 +239,7 @@ class _HomeTopBarState extends State<HomeTopBar> with TickerProviderStateMixin {
                                   children: [
                                     Text(
                                       "BRAHMAKOSH",
-                                      style: GoogleFonts.playfairDisplay(
+                                      style: GoogleFonts.lora(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         color: _currentPhase == DayPhase.night

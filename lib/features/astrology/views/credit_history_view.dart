@@ -13,20 +13,20 @@ class CreditHistoryView extends StatelessWidget {
     final controller = Get.put(CreditHistoryController());
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F0),
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFFF8F0),
+        backgroundColor: Colors.black,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF3E2723)),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Get.back(),
         ),
         title: Text(
           'Credit History',
-          style: GoogleFonts.playfairDisplay(
+          style: GoogleFonts.lora(
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF3E2723),
+            color: Colors.white,
           ),
         ),
         centerTitle: false,
@@ -95,13 +95,13 @@ class CreditHistoryView extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Colors.grey[500],
+              color: Colors.white54,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Your credit usage will appear here',
-            style: GoogleFonts.inter(fontSize: 13, color: Colors.grey[400]),
+            style: GoogleFonts.inter(fontSize: 13, color: Colors.white38),
           ),
         ],
       ),
@@ -138,12 +138,12 @@ class CreditHistoryView extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFF1A1A1A),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE0D5CC).withOpacity(0.5)),
+        border: Border.all(color: AppTheme.primaryGold.withOpacity(0.2)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withOpacity(0.2),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -167,7 +167,7 @@ class CreditHistoryView extends StatelessWidget {
                 ),
                 child: CircleAvatar(
                   radius: 20,
-                  backgroundColor: const Color(0xFFFFF3E0),
+                  backgroundColor: AppTheme.primaryGold.withOpacity(0.1),
                   backgroundImage: partnerPhoto.isNotEmpty
                       ? NetworkImage(partnerPhoto)
                       : null,
@@ -175,7 +175,7 @@ class CreditHistoryView extends StatelessWidget {
                       ? const Icon(
                           Icons.person,
                           size: 20,
-                          color: Color(0xFF8D6E63),
+                          color: AppTheme.primaryGold,
                         )
                       : null,
                 ),
@@ -191,7 +191,7 @@ class CreditHistoryView extends StatelessWidget {
                       style: GoogleFonts.lora(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF3E2723),
+                        color: Colors.white,
                       ),
                     ),
                     if (expertise.isNotEmpty)
@@ -199,7 +199,7 @@ class CreditHistoryView extends StatelessWidget {
                         expertise,
                         style: GoogleFonts.inter(
                           fontSize: 12,
-                          color: const Color(0xFF8D6E63),
+                          color: Colors.white70,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -214,7 +214,7 @@ class CreditHistoryView extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFF3E0),
+                  color: AppTheme.primaryGold.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: AppTheme.primaryGold.withOpacity(0.3),
@@ -230,7 +230,7 @@ class CreditHistoryView extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF3E2723),
+                        color: AppTheme.primaryGold,
                       ),
                     ),
                   ],
@@ -241,7 +241,7 @@ class CreditHistoryView extends StatelessWidget {
 
           const SizedBox(height: 12),
           // Divider
-          Container(height: 1, color: const Color(0xFFF5EDE6)),
+          Container(height: 1, color: Colors.white.withOpacity(0.1)),
           const SizedBox(height: 10),
 
           // Bottom row: Duration & Date
@@ -279,7 +279,7 @@ class CreditHistoryView extends StatelessWidget {
           style: GoogleFonts.inter(
             fontSize: 12,
             fontWeight: FontWeight.w500,
-            color: const Color(0xFF5D4037),
+            color: Colors.white70,
           ),
         ),
       ],

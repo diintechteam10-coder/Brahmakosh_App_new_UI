@@ -84,7 +84,7 @@ class DoshaDetailView extends StatelessWidget {
                       children: [
                         Text(
                           "Status",
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             fontSize: 13,
                             color: const Color(0xff8D6E63),
                           ),
@@ -94,7 +94,7 @@ class DoshaDetailView extends StatelessWidget {
                           doshaDetail.present == true
                               ? "Present"
                               : "Not Present",
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.poppins(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: const Color(0xff4E342E),
@@ -132,7 +132,7 @@ class DoshaDetailView extends StatelessWidget {
                 child: Text(
                   // Prefer manglikReport, then description
                   doshaDetail.manglikReport ?? doshaDetail.description!,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 15,
                     color: const Color(0xff5D4037),
                     height: 1.5,
@@ -170,7 +170,7 @@ class DoshaDetailView extends StatelessWidget {
                 ),
                 child: Text(
                   doshaDetail.conclusion ?? doshaDetail.oneLine!,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.poppins(
                     fontSize: 15,
                     fontStyle: FontStyle.italic,
                     color: const Color(0xffff7438),
@@ -298,7 +298,7 @@ class DoshaDetailView extends StatelessWidget {
         children: [
           Text(
             title,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 13,
               fontWeight: FontWeight.bold,
               color: const Color(0xff8D6E63),
@@ -319,7 +319,7 @@ class DoshaDetailView extends StatelessWidget {
                   Expanded(
                     child: Text(
                       item,
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.poppins(
                         fontSize: 13,
                         color: const Color(0xff5D4037),
                         height: 1.4,
@@ -345,7 +345,7 @@ class DoshaDetailView extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: GoogleFonts.inter(
+        style: GoogleFonts.poppins(
           fontSize: 14,
           color: const Color(0xff5D4037),
           height: 1.5,
@@ -362,7 +362,7 @@ class DoshaDetailView extends StatelessWidget {
         children: [
           Text(
             label,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 14,
               fontWeight: FontWeight.bold,
               color: const Color(0xff8D6E63),
@@ -370,7 +370,7 @@ class DoshaDetailView extends StatelessWidget {
           ),
           Text(
             value,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 14,
               color: const Color(0xff5D4037),
             ),

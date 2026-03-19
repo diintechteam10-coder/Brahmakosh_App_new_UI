@@ -10,11 +10,13 @@ class NorthIndianPointsChart extends StatelessWidget {
   /// House Number (1-12).
   final Map<int, int> housePoints;
   final String? ascendantSign;
+  final bool isDark;
 
   const NorthIndianPointsChart({
     super.key,
     required this.housePoints,
     this.ascendantSign,
+    this.isDark = false,
   });
 
   @override
@@ -117,12 +119,15 @@ class NorthIndianPointsChart extends StatelessWidget {
 
     // Build Sign Number Texts
     StringBuffer signsSvg = StringBuffer();
+    final Color signColor = isDark ? Colors.white70 : const Color(0xFF5D4037);
+    final String signHex = '#${signColor.value.toRadixString(16).substring(2)}';
+
     for (int i = 0; i < 12; i++) {
       int sign = getSignForHouse(i + 1);
       double x = houseNumCoords[i]['x']!;
       double y = houseNumCoords[i]['y']!;
       signsSvg.writeln(
-        '<text font-size="14" x="$x" y="$y" fill="#5D4037" text-anchor="middle" alignment-baseline="middle">$sign</text>',
+        '<text font-size="14" x="$x" y="$y" fill="$signHex" font-family="Poppins, sans-serif" text-anchor="middle" alignment-baseline="middle">$sign</text>',
       );
     }
 
@@ -134,60 +139,59 @@ class NorthIndianPointsChart extends StatelessWidget {
       double x = centerPoints[i]['x']!;
       double y = centerPoints[i]['y']!;
 
-      // Color logic: High points (>28) green, Low (<25) red, Avg orange?
-      // Standard Sarvashtak: 28 is average.
-      String color = "#4E342E"; // Default brown
-      if (points >= 30) {
-        color = "#2E7D32"; // Green
-      } else if (points < 25) {
-        color = "#C62828"; // Red
+      String color;
+      if (isDark) {
+        if (points >= 30) {
+          color = "#81C784"; // Light green for dark theme
+        } else if (points < 25) {
+          color = "#E57373"; // Light red for dark theme
+        } else {
+          color = "#FFFFFF"; // White for dark theme
+        }
+      } else {
+        color = "#4E342E"; // Default brown
+        if (points >= 30) {
+          color = "#2E7D32"; // Green
+        } else if (points < 25) {
+          color = "#C62828"; // Red
+        }
       }
 
       pointsSvg.writeln(
-        '<text font-size="24" font-weight="bold" x="$x" y="$y" fill="$color" text-anchor="middle" alignment-baseline="middle">$points</text>',
+        '<text font-size="24" font-family="Poppins, sans-serif" font-weight="bold" x="$x" y="$y" fill="$color" text-anchor="middle" alignment-baseline="middle">$points</text>',
       );
     }
 
+    final String strokeColor = isDark ? "#D4AF37" : "#D4AF37"; // Using Gold accent 
+    final String bgColor = isDark ? "none" : "none"; // Background is handled by parent container
+
     return '''
 <svg width="350" height="350" viewBox="0 0 350 350" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
-      <feOffset dx="0" dy="1" />
-      <feComponentTransfer>
-        <feFuncA type="linear" slope="0.2" />
-      </feComponentTransfer>
-      <feMerge>
-        <feMergeNode />
-        <feMergeNode in="SourceGraphic" />
-      </feMerge>
-    </filter>
-  </defs>
   <g class="slice">
     <!-- Paths -->
-    <path d="M10,10L175,10L92.5,92.5L10,10" stroke="#D4A373" stroke-width="2" fill="none"/>
-    <path d="M175,10L340,10L257.5,92.5L175,10" stroke="#D4A373" stroke-width="2" fill="none"/>
-    <path d="M92.5,92.5L10,175L10,10" stroke="#D4A373" stroke-width="2" fill="none"/>
-    <path d="M92.5,92.5L175,175L257.5,92.5L175,10" stroke="#D4A373" stroke-width="2" fill="none"/>
-    <path d="M257.5,92.5L340,175L340,10" stroke="#D4A373" stroke-width="2" fill="none"/>
+    <path d="M10,10L175,10L92.5,92.5L10,10" stroke="$strokeColor" stroke-width="2" fill="$bgColor"/>
+    <path d="M175,10L340,10L257.5,92.5L175,10" stroke="$strokeColor" stroke-width="2" fill="$bgColor"/>
+    <path d="M92.5,92.5L10,175L10,10" stroke="$strokeColor" stroke-width="2" fill="$bgColor"/>
+    <path d="M92.5,92.5L175,175L257.5,92.5L175,10" stroke="$strokeColor" stroke-width="2" fill="$bgColor"/>
+    <path d="M257.5,92.5L340,175L340,10" stroke="$strokeColor" stroke-width="2" fill="$bgColor"/>
 
-    <path d="M92.5,92.5L175,175L92.5,257.5L10,175" stroke="#D4A373" stroke-width="2" fill="none"/>
-    <path d="M257.5,92.5L340,175L257.5,257.5L175,175" stroke="#D4A373" stroke-width="2" fill="none"/>
+    <path d="M92.5,92.5L175,175L92.5,257.5L10,175" stroke="$strokeColor" stroke-width="2" fill="$bgColor"/>
+    <path d="M257.5,92.5L340,175L257.5,257.5L175,175" stroke="$strokeColor" stroke-width="2" fill="$bgColor"/>
 
-    <path d="M92.5,257.5L10,340L10,175" stroke="#D4A373" stroke-width="2" fill="none"/>
-    <path d="M175,175L257.5,257.5L175,340L92.5,257.5" stroke="#D4A373" stroke-width="2" fill="none"/>
-    <path d="M340,175L340,340L257.5,257.5" stroke="#D4A373" stroke-width="2" fill="none"/>
+    <path d="M92.5,257.5L10,340L10,175" stroke="$strokeColor" stroke-width="2" fill="$bgColor"/>
+    <path d="M175,175L257.5,257.5L175,340L92.5,257.5" stroke="$strokeColor" stroke-width="2" fill="$bgColor"/>
+    <path d="M340,175L340,340L257.5,257.5" stroke="$strokeColor" stroke-width="2" fill="$bgColor"/>
 
-    <path d="M92.5,257.5L175,340L10,340" stroke="#D4A373" stroke-width="2" fill="none"/>
-    <path d="M257.5,257.5L340,340L175,340" stroke="#D4A373" stroke-width="2" fill="none"/>
+    <path d="M92.5,257.5L175,340L10,340" stroke="$strokeColor" stroke-width="2" fill="$bgColor"/>
+    <path d="M257.5,257.5L340,340L175,340" stroke="$strokeColor" stroke-width="2" fill="$bgColor"/>
 
     <!-- House/Sign Numbers -->
-    <g font-family="Georgia, serif">
+    <g>
       $signsSvg
     </g>
 
     <!-- Points -->
-    <g font-family="Georgia, serif">
+    <g>
       $pointsSvg
     </g>
 

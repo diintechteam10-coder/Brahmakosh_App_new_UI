@@ -9,6 +9,7 @@ import 'package:brahmakosh/features/check_in/views/meditation_start.dart';
 import 'package:brahmakosh/features/check_in/views/spiritual_configuration_view.dart';
 import 'package:brahmakosh/features/home/mantra/mantra_chanting.dart';
 import 'package:brahmakosh/features/avatar/views/create_avatar_view.dart';
+import 'package:brahmakosh/features/home/views/panchang_details_view.dart';
 import 'package:brahmakosh/features/panchang/views/panchang_view.dart';
 import 'package:brahmakosh/features/focus/views/focus_view.dart';
 import 'package:brahmakosh/features/focus/views/health_focus_view.dart';
@@ -31,6 +32,12 @@ import '../constants/app_constants.dart';
 import '../services/storage_service.dart';
 import '../../features/walkthrough/views/walkthrough_view.dart';
 import 'package:brahmakosh/features/redeem/views/redeem_list_view.dart';
+import 'package:brahmakosh/features/sankalp/views/sankalp_screen.dart';
+import 'package:brahmakosh/features/notifications/views/notification_screen.dart';
+import 'package:brahmakosh/features/home/views/astrology_details_screen.dart';
+import 'package:brahmakosh/features/pooja/views/pooja_list_screen.dart';
+import 'package:brahmakosh/features/swapna_decoder/views/swapna_decoder_screen.dart';
+import 'package:brahmakosh/features/gita/views/gita_chapter_screen.dart';
 
 import 'package:brahmakosh/features/check_in/views/chanting_configuration_view.dart';
 
@@ -93,7 +100,8 @@ class AppPages {
       name: AppConstants.routeCreateAvatar,
       page: () => const CreateAvatarView(),
     ),
-    GetPage(name: AppConstants.routePanchang, page: () => const PanchangView()),
+    GetPage(name: AppConstants.routePanchang, page: () => const PanchangDetailsView()),
+    GetPage(name: AppConstants.routePanchangToday, page: () => const PanchangView()),
     GetPage(name: AppConstants.routeFocus, page: () => const FocusView()),
     GetPage(
       name: AppConstants.routeFocusHealth,
@@ -150,5 +158,26 @@ class AppPages {
       page: () => const WalkthroughView(),
     ),
     GetPage(name: AppConstants.routeRedeem, page: () => const RedeemListView()),
+    GetPage(name: AppConstants.routeSankalp, page: () => const SankalpScreen()),
+    GetPage(
+      name: AppConstants.routeNotifications,
+      page: () => const NotificationScreen(),
+    ),
+    GetPage(
+      name: AppConstants.routeAstrologyDetails,
+      page: () => const AstrologyDetailsScreen(),
+    ),
+    GetPage(
+      name: AppConstants.routePoojaList,
+      page: () => const PoojaListScreen(),
+    ),
+    GetPage(
+      name: AppConstants.routeSwapnaDecoder,
+      page: () => const SwapnaDecoderScreen(),
+    ),
+    GetPage(
+      name: AppConstants.routeGita,
+      page: () => const GitaChapterScreen(),
+    ),
   ];
 }
