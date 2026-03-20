@@ -1,9 +1,5 @@
+import 'package:brahmakosh/core/common_imports.dart';
 import 'package:brahmakosh/common/utils.dart';
-import 'package:brahmakosh/core/constants/app_constants.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:brahmakosh/core/custom_widgets/custom_fluid_slider.dart';
 import 'package:brahmakosh/features/check_in/blocs/spiritual_config/spiritual_config_bloc.dart';

@@ -1,7 +1,6 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import '../../../core/constants/app_constants.dart';
+
+import 'package:brahmakosh/core/common_imports.dart';
 import '../../agent/controllers/agent_controller.dart';
 import '../../ai_rashmi/ai_rashmi_chat.dart';
 

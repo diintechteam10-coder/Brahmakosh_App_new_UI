@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:brahmakosh/core/common_imports.dart';
+import 'dart:io';
 import '../../../core/services/payment_service.dart';
 import '../../astrology/views/credit_history_view.dart';
 
@@ -47,6 +48,58 @@ class _RechargePlansViewState extends State<RechargePlansView> {
 
   @override
   Widget build(BuildContext context) {
+    if (Platform.isIOS) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFFDF5E6),
+        appBar: AppBar(
+          backgroundColor: const Color(0xFFFDF5E6),
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Color(0xFF6D3A0C)),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: Text(
+            "Recharge Plans",
+            style: GoogleFonts.lora(
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+              color: const Color(0xFF6D3A0C),
+            ),
+          ),
+          centerTitle: true,
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.account_balance_wallet_outlined,
+                size: 80,
+                color: Color(0xFFD4A373),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                "Coming Soon",
+                style: GoogleFonts.lora(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF6D3A0C),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "We are bringing recharge plans to iOS soon!",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  color: const Color(0xFF8D6E63),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     return Scaffold(
       backgroundColor: const Color(0xFFFDF5E6), // Premium Beige bg
       appBar: AppBar(

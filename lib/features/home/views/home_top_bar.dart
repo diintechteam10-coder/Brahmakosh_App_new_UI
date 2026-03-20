@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:brahmakosh/core/common_imports.dart';
 import 'package:brahmakosh/common/widgets/custom_profile_avatar.dart';
-import '../../../../core/common_imports.dart';
 import 'package:brahmakosh/features/home/controllers/home_controller.dart';
 import 'package:brahmakosh/common/models/user_complete_details_model.dart';
 import 'package:brahmakosh/features/profile/viewmodels/profile_viewmodel.dart';

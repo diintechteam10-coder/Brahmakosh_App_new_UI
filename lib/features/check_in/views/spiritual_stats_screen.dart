@@ -1,14 +1,11 @@
+import 'package:brahmakosh/core/common_imports.dart';
 import 'dart:async';
 import 'package:brahmakosh/features/check_in/blocs/spiritual_stats/spiritual_stats_bloc.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_stats_model.dart';
 import 'package:brahmakosh/features/check_in/repositories/spiritual_repository.dart';
 import 'package:brahmakosh/features/profile/viewmodels/profile_viewmodel.dart';
-import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:brahmakosh/common/widgets/custom_profile_avatar.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class SpiritualStatsScreen extends StatelessWidget {

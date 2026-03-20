@@ -1,6 +1,4 @@
-import 'package:brahmakosh/core/constants/app_constants.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:brahmakosh/core/common_imports.dart';
 
 class MeditateScreen extends StatefulWidget {
   const MeditateScreen({super.key});

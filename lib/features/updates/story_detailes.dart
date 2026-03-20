@@ -1,6 +1,5 @@
+import 'package:brahmakosh/core/common_imports.dart';
 import 'package:brahmakosh/features/updates/controller/status_controller.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class WhatsAppStatusPage extends StatelessWidget {
   WhatsAppStatusPage({super.key});

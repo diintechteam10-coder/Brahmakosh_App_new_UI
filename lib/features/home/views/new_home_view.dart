@@ -19,7 +19,8 @@ import 'package:brahmakosh/features/check_in/views/prayer_configuration_view.dar
 import 'package:brahmakosh/features/ai_rashmi/views/ai_guide_view.dart';
 import 'package:brahmakosh/common/api_urls.dart';
 import 'package:brahmakosh/common/widgets/custom_profile_avatar.dart';
-import 'package:brahmakosh/features/profile/views/profile_view.dart' as brahmakosh_profile;
+import 'package:brahmakosh/features/profile/views/profile_view.dart'
+    as brahmakosh_profile;
 import 'package:brahmakosh/features/pooja/blocs/pooja_bloc.dart';
 import 'package:brahmakosh/features/pooja/blocs/pooja_event.dart';
 import 'package:brahmakosh/features/pooja/blocs/pooja_state.dart';
@@ -128,151 +129,38 @@ class _NewHomeViewState extends State<NewHomeView> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-
+    final padding = MediaQuery.of(context).padding;
     return Scaffold(
       backgroundColor: Colors.black,
-      body: RefreshIndicator(
-        onRefresh: _handleRefresh,
-        color: const Color(0xFFD4AF37),
-        backgroundColor: Colors.black,
-        child: CustomScrollView(
-          controller: widget.scrollController,
-          physics: const BouncingScrollPhysics(
-            parent: AlwaysScrollableScrollPhysics(),
-          ),
-          slivers: [
-            _buildHeader(),
-            _buildSearchBar(),
-            _buildTitle(),
-            _buildMainBanner(screenWidth),
-            _buildFeatureGrid(isTablet),
-            _buildSpiritualCheckIn(),
-            _buildKarmaDashboard(),
-            _buildExpertConnect(screenWidth),
-            _buildMuhuratSection(),
-            _buildRemediesSection(screenWidth),
-            // _buildSelfDiscoverySection(),
-            _buildPujaVidhi(screenWidth),
-            _buildSankalpTracker(),
-            _buildSwapnaDecoder(),
-            _buildGitaBanner(screenWidth),
-            _buildSponsorsSection(screenWidth),
-            const SliverToBoxAdapter(child: SizedBox(height: 110)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return SliverToBoxAdapter(
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Greeting Text
-              Consumer<ProfileViewModel>(
-                builder: (context, profileVM, child) {
-                  final fullName = profileVM.profile?.profile?.name ?? " ";
-                  // Extract first name only
-                  final firstName = fullName.trim().split(' ').first;
-                  return RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Namaste ",
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        TextSpan(
-                          text: firstName,
-                          style: GoogleFonts.poppins(
-                            color: const Color(0xFFD4AF37),
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-              // Icons Row
-              Row(
-                children: [
-                  // Notification Bell with red dot badge
-                  GestureDetector(
-                    onTap: () {
-                      _unfocusAll();
-                      Get.toNamed(AppConstants.routeNotifications);
-                    },
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(2.w),
-                          width: 10.w,
-                          height: 10.w,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.05),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
-                          ),
-                          child: SvgPicture.asset(
-                            'assets/icons/notification.svg',
-                            color: Colors.white,
-                          ),
-                        ),
-                        // Red badge dot
-                        Positioned(
-                          top: 8,
-                          right: 10,
-                          child: Container(
-                            width: 8,
-                            height: 8,
-                            decoration: const BoxDecoration(
-                              color: Colors.red,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  // Profile Avatar with gold ring
-                  GestureDetector(
-                    onTap: () async {
-                      _unfocusAll();
-                      final result = await Get.to(
-                        () => const brahmakosh_profile.ProfileView(),
-                      );
-                      if (result != null && result is int && context.mounted) {
-                        Provider.of<DashboardViewModel>(
-                          context,
-                          listen: false,
-                        ).changeTab(result);
-                      }
-                    },
-                    child: Consumer<ProfileViewModel>(
-                      builder: (context, profileVM, child) {
-                        return CustomProfileAvatar(
-                          imageUrl: profileVM.profile?.profileImageUrl,
-                          radius: 5.w,
-                          borderWidth: 1.5,
-                          borderColor: AppTheme.primaryGold,
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
+      body: Padding(
+        padding: EdgeInsets.only(top: padding.top),
+        child: RefreshIndicator(
+          onRefresh: _handleRefresh,
+          color: const Color(0xFFD4AF37),
+          backgroundColor: Colors.black,
+          child: CustomScrollView(
+            controller: widget.scrollController,
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
+            slivers: [
+              _buildHeader(),
+              _buildSearchBar(),
+              _buildTitle(),
+              _buildMainBanner(screenWidth),
+              _buildFeatureGrid(isTablet),
+              _buildSpiritualCheckIn(),
+              _buildKarmaDashboard(),
+              _buildExpertConnect(screenWidth),
+              _buildMuhuratSection(),
+              _buildRemediesSection(screenWidth),
+              // _buildSelfDiscoverySection(),
+              _buildPujaVidhi(screenWidth),
+              _buildSankalpTracker(),
+              _buildSwapnaDecoder(),
+              _buildGitaBanner(screenWidth),
+              _buildSponsorsSection(screenWidth),
+              const SliverToBoxAdapter(child: SizedBox(height: 110)),
             ],
           ),
         ),
@@ -280,68 +168,181 @@ class _NewHomeViewState extends State<NewHomeView> {
     );
   }
 
- Widget _buildSearchBar() {
-  return SliverToBoxAdapter(
-    child: Padding(
-      padding: EdgeInsets.fromLTRB(4.w, 1.5.h, 4.w, 1.5.h),
-      child: Container(
-        height: 5.5.h,
-        decoration: BoxDecoration(
-          color: const Color(0xFF1C1C1E),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: TextField(
-          focusNode: _searchFocusNode,
-          textAlignVertical: TextAlignVertical.center, // Keeps icon/text aligned
-          style: TextStyle(color: Colors.white, fontSize: 11.sp),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.transparent,
-            hintText: "Search rituals, puja, astrologers",
-            hintStyle: GoogleFonts.poppins(
-              color: Colors.white.withOpacity(0.35),
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w500,
+  Widget _buildHeader() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Consumer<ProfileViewModel>(
+              builder: (context, profileVM, child) {
+                final fullName = profileVM.profile?.profile?.name ?? " ";
+                final firstName = fullName.trim().split(' ').first;
+                return RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: "Namaste ",
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      TextSpan(
+                        text: firstName,
+                        style: GoogleFonts.poppins(
+                          color: const Color(0xFFD4AF37),
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
-            prefixIcon: Padding(
-              padding: EdgeInsets.all(1.4.h),
-              child: SvgPicture.asset(
-                'assets/icons/search.svg',
-                colorFilter: ColorFilter.mode(
-                  Colors.white.withOpacity(0.35),
-                  BlendMode.srcIn,
+            // Icons Row
+            Row(
+              children: [
+                // Notification Bell with red dot badge
+                GestureDetector(
+                  onTap: () {
+                    _unfocusAll();
+                    Get.toNamed(AppConstants.routeNotifications);
+                  },
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(2.w),
+                        width: 10.w,
+                        height: 10.w,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.05),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.1),
+                            width: 1,
+                          ),
+                        ),
+                        child: SvgPicture.asset(
+                          'assets/icons/notification.svg',
+                          color: Colors.white,
+                        ),
+                      ),
+                      // Red badge dot
+                      Positioned(
+                        top: 8,
+                        right: 10,
+                        child: Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-             
+                const SizedBox(width: 10),
+                // Profile Avatar with gold ring
+                GestureDetector(
+                  onTap: () async {
+                    _unfocusAll();
+                    final result = await Get.to(
+                      () => const brahmakosh_profile.ProfileView(),
+                    );
+                    if (result != null && result is int && context.mounted) {
+                      Provider.of<DashboardViewModel>(
+                        context,
+                        listen: false,
+                      ).changeTab(result);
+                    }
+                  },
+                  child: Consumer<ProfileViewModel>(
+                    builder: (context, profileVM, child) {
+                      return CustomProfileAvatar(
+                        imageUrl: profileVM.profile?.profileImageUrl,
+                        radius: 5.w,
+                        borderWidth: 1.5,
+                        borderColor: AppTheme.primaryGold,
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    final borderRadius = BorderRadius.circular(16);
+
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(4.w, 1.5.h, 4.w, 0),
+        child: Container(
+          height: 6.h,
+          decoration: BoxDecoration(borderRadius: borderRadius),
+          child: TextField(
+            focusNode: _searchFocusNode,
+            style: TextStyle(color: Colors.white, fontSize: 11.sp),
+            textAlignVertical: TextAlignVertical.center,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: const Color(0xFF0A0A0A), // 👈 DARK COLOR
+              hintText: "Search rituals, puja, astrologers",
+              hintStyle: GoogleFonts.poppins(
+                color: Colors.white.withOpacity(0.35),
+                fontSize: 11.sp,
+                fontWeight: FontWeight.w500,
               ),
-            ),
-            // Use OutlineInputBorder to get the surrounding ring
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: BorderSide.none, // Invisible by default
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: BorderSide.none, // Invisible when not focused
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: Color(0xFFD4AF37), // Your theme purple
-                width: 1.2,
+
+              prefixIcon: Padding(
+                padding: EdgeInsets.symmetric(vertical: 1.2.h, horizontal: 1.2.h),
+                child: SvgPicture.asset(
+                  'assets/icons/search.svg',
+                  colorFilter: ColorFilter.mode(
+                    Colors.white.withOpacity(0.4),
+                    BlendMode.srcIn
+                  ),
+                ),
               ),
+                            border: OutlineInputBorder(
+                borderRadius: borderRadius,
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: borderRadius,
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: borderRadius,
+                borderSide: const BorderSide(
+                  color: Color(0xFFD4AF37),
+                  width: 1.2,
+                ),
+              ),
+
+              contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 8),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 8),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildTitle() {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.fromLTRB(4.w, 1.5.h, 4.w, 1.5.h),
+        padding: EdgeInsets.fromLTRB(4.w, 1.h, 4.w, 0.h),
         child: Center(
           child: Text(
             "BRAHMAKOSH",
@@ -360,89 +361,93 @@ class _NewHomeViewState extends State<NewHomeView> {
   Widget _buildMainBanner(double screenWidth) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 1.5.h),
+        padding: EdgeInsets.symmetric(vertical: 1.h),
         child: Obx(() {
-        final message = homeController.activeFounderMessage;
-        final krishaImageUrl =
-            message?.founderImage ?? 'assets/images/home_krishna_banner.png';
-
-        return Stack(
-          alignment: Alignment.bottomCenter,
-          children: [
-            SizedBox(
-              height: screenWidth * 0.9, // Adaptive height
-              child: PageView(
-                controller: _bannerController,
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentBannerIndex = index;
-                  });
-                },
-                children: [
-                  _buildBannerItem(
-                    krishaImageUrl,
-                    "Talk to Krishna",
-                    () {
-                      _unfocusAll();
-                      Get.to(
-                        () => const AiGuideView(
-                          deityName: "Krishna",
-                          subtitle: "Divine Cosmic Intelligence",
-                          backgroundImage: 'assets/images/rashmi_background.jpeg',
-                          characterImagePath: 'assets/images/Krishana_new.png',
-                          chatBackgroundImage: 'assets/images/Krishna_chat.png',
-                        ),
-                      );
-                    },
-                    isNetwork: message?.founderImage != null,
-                  ),
-                  _buildBannerItem(
-                    'assets/images/TalkToRashmiBack.png',
-                    "Talk to Rashmi",
-                    () {
-                      _unfocusAll();
-                      Get.to(
-                        () => const AiGuideView(
-                          deityName: "Rashmi",
-                          subtitle: "Your Spiritual Guide",
-                          backgroundImage: 'assets/images/rashmi_background.jpeg',
-                          characterImagePath: 'assets/images/Rashmi_new.png',
-                          chatBackgroundImage: 'assets/images/Rashmi_chat.png',
-                        ),
-                      );
-                    },
-                    isNetwork: false,
-                  ),
-                ],
-              ),
-            ),
-            Positioned(
-              bottom: 12,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(2, (index) {
-                  final bool isSelected = _currentBannerIndex == index;
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    width: isSelected ? 20 : 6,
-                    height: 4,
-                    margin: const EdgeInsets.symmetric(horizontal: 3),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(2),
-                      color: isSelected
-                          ? Colors.white
-                          : Colors.white.withOpacity(0.5),
+          final message = homeController.activeFounderMessage;
+          final krishaImageUrl =
+              message?.founderImage ?? 'assets/images/home_krishna_banner.png';
+          return Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              SizedBox(
+                height: screenWidth * 0.9, // Adaptive height
+                child: PageView(
+                  controller: _bannerController,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentBannerIndex = index;
+                    });
+                  },
+                  children: [
+                    _buildBannerItem(
+                      krishaImageUrl,
+                      "Talk to Krishna",
+                      () {
+                        _unfocusAll();
+                        Get.to(
+                          () => const AiGuideView(
+                            deityName: "Krishna",
+                            subtitle: "Divine Cosmic Intelligence",
+                            backgroundImage:
+                                'assets/images/rashmi_background.jpeg',
+                            characterImagePath:
+                                'assets/images/Krishana_new.png',
+                            chatBackgroundImage:
+                                'assets/images/Krishna_chat.png',
+                          ),
+                        );
+                      },
+                      isNetwork: message?.founderImage != null,
                     ),
-                  );
-                }),
+                    _buildBannerItem(
+                      'assets/images/TalkToRashmiBack.png',
+                      "Talk to Rashmi",
+                      () {
+                        _unfocusAll();
+                        Get.to(
+                          () => const AiGuideView(
+                            deityName: "Rashmi",
+                            subtitle: "Your Spiritual Guide",
+                            backgroundImage:
+                                'assets/images/rashmi_background.jpeg',
+                            characterImagePath: 'assets/images/Rashmi_new.png',
+                            chatBackgroundImage:
+                                'assets/images/Rashmi_chat.png',
+                          ),
+                        );
+                      },
+                      isNetwork: false,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        );
-      }),
-    ),
-  );
-}
+              Positioned(
+                bottom: 12,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(2, (index) {
+                    final bool isSelected = _currentBannerIndex == index;
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      width: isSelected ? 20 : 6,
+                      height: 4,
+                      margin: const EdgeInsets.symmetric(horizontal: 3),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(2),
+                        color: isSelected
+                            ? Colors.white
+                            : Colors.white.withOpacity(0.5),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ],
+          );
+        }),
+      ),
+    );
+  }
 
   Widget _buildBannerItem(
     String imageUrl,
@@ -487,7 +492,8 @@ class _NewHomeViewState extends State<NewHomeView> {
                     buttonText,
                     style: GoogleFonts.poppins(
                       fontSize: 12.sp,
-                      fontWeight: FontWeight.w500),
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
@@ -497,28 +503,25 @@ class _NewHomeViewState extends State<NewHomeView> {
       ),
     );
   }
-
 Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
   return GestureDetector(
     onTap: onTap,
     child: Stack(
       clipBehavior: Clip.none,
       children: [
-        // 1. The Border & Background Layer
         Align(
           alignment: Alignment.center,
           child: Container(
-            height: 10.h,
+            height: 10.5.h,
             width: double.infinity,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              // This creates the gradient border effect
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.white.withOpacity(0.2), // Visible border at top
-                  Colors.white.withOpacity(0.05),           // Fades out at bottom
+                  Colors.white.withOpacity(0.2),
+                  Colors.white.withOpacity(0.05),
                 ],
               ),
               boxShadow: [
@@ -529,33 +532,34 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                 ),
               ],
             ),
-            // The Inner Content (Padding creates the border thickness)
-            padding: const EdgeInsets.all(1.2), 
+            padding: const EdgeInsets.all(1.2),
             child: Container(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xff1E1E1E), // Visible border at top
-                  Color(0xff000000),           // Fades out at bottom
-                ],
-              ),
-                borderRadius: BorderRadius.circular(15), // slightly smaller
-                // color: const Color(0xFF0A0A0A), // Solid dark inner background
+                gradient: const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xff1E1E1E),
+                    Color(0xff000000),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(15),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(bottom: 1.h,),
+                    padding: EdgeInsets.only(bottom: 1.h),
                     child: Text(
                       title,
                       textAlign: TextAlign.center,
+                      maxLines: 2, // ✅ force single line
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
                       style: GoogleFonts.poppins(
                         color: Colors.white,
                         fontSize: 12.sp,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w400,
                       ),
                     ),
                   ),
@@ -564,15 +568,14 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
             ),
           ),
         ),
-        
-        // 2. The Floating Icon
+
+        /// 🔥 Floating Icon
         Positioned(
-          top: -10, 
+          top: -8, // 👈 adjusted for better alignment
           left: 0,
           right: 0,
           child: Center(
             child: Container(
-              // Shadow to make the icon "pop"
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 boxShadow: [
@@ -596,173 +599,346 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
     ),
   );
 }
-  Widget _buildFeatureGrid(bool isTablet) {
-    return SliverPadding(
-      padding: EdgeInsets.fromLTRB(4.w, 1.5.h, 4.w, 1.5.h),
-      sliver: SliverGrid(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: isTablet ? 4 : 3,
-          mainAxisSpacing: 3.5.h, // Space between rows
-          crossAxisSpacing: 3.w, // Space between columns
-          childAspectRatio: 0.82, // Adjusted to fit the icon + card height
-        ),
-        delegate: SliverChildListDelegate([
-          _buildGridItem(
-            "Check - In",
-            "assets/icons/check_in.png",
-            onTap: () {
-              _unfocusAll();
-              Get.toNamed(AppConstants.routeCheckIn);
-            },
-          ),
-          _buildGridItem(
-            "Astrology",
-            "assets/icons/astrology.png",
-            onTap: () {
-              _unfocusAll();
-              Get.toNamed(AppConstants.routeAstrologyDetails);
-            },
-          ),
-          _buildGridItem(
-            "Expert Connect",
-            "assets/icons/expert_connect.png",
-            onTap: () {
-              _unfocusAll();
-              Provider.of<DashboardViewModel>(
-                context,
-                listen: false,
-              ).changeTab(3);
-            },
-          ),
-          _buildGridItem(
-            "Remedies",
-            "assets/icons/remedies.png",
-            onTap: () {
-              _unfocusAll();
-              Provider.of<DashboardViewModel>(
-                context,
-                listen: false,
-              ).changeTab(4);
-            },
-          ),
-          _buildGridItem(
-            "Sankalp Tracker",
-            "assets/icons/sankalptracker.png",
-            onTap: () {
-              _unfocusAll();
-              Get.toNamed(AppConstants.routeSankalp);
-            },
-          ),
-          _buildGridItem(
-            "Puja Vidi",
-            "assets/icons/puja_vidhi.png",
-            onTap: () {
-              _unfocusAll();
-              Get.toNamed(AppConstants.routePoojaList);
-            },
-          ),
-        ]),
-      ),
-    );
-  }
+  // Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
+  //   return GestureDetector(
+  //     onTap: onTap,
+  //     child: Stack(
+  //       clipBehavior: Clip.none,
+  //       children: [
+  //         Align(
+  //           alignment: Alignment.center,
+  //           child: Container(
+  //             height: 10.h,
+  //             width: double.infinity,
+  //             decoration: BoxDecoration(
+  //               borderRadius: BorderRadius.circular(16),
+  //               // This creates the gradient border effect
+  //               gradient: LinearGradient(
+  //                 begin: Alignment.topCenter,
+  //                 end: Alignment.bottomCenter,
+  //                 colors: [
+  //                   Colors.white.withOpacity(0.2), // Visible border at top
+  //                   Colors.white.withOpacity(0.05), // Fades out at bottom
+  //                 ],
+  //               ),
+  //               boxShadow: [
+  //                 BoxShadow(
+  //                   color: Colors.white.withOpacity(0.1),
+  //                   blurRadius: 10,
+  //                   offset: const Offset(0, 5),
+  //                 ),
+  //               ],
+  //             ),
+  //             // The Inner Content (Padding creates the border thickness)
+  //             padding: const EdgeInsets.all(1.2),
+  //             child: Container(
+  //               decoration: BoxDecoration(
+  //                 gradient: LinearGradient(
+  //                   begin: Alignment.topCenter,
+  //                   end: Alignment.bottomCenter,
+  //                   colors: [
+  //                     Color(0xff1E1E1E), // Visible border at top
+  //                     Color(0xff000000), // Fades out at bottom
+  //                   ],
+  //                 ),
+  //                 borderRadius: BorderRadius.circular(15), // slightly smaller
+  //                 // color: const Color(0xFF0A0A0A), // Solid dark inner background
+  //               ),
+  //               child: Column(
+  //                 mainAxisAlignment: MainAxisAlignment.end,
+  //                 children: [
+  //                   Padding(
+  //                     padding: EdgeInsets.only(bottom: 1.h),
+  //                     child: Text(
+  //                       title,
+  //                       textAlign: TextAlign.center,
+  //                       style: GoogleFonts.poppins(
+  //                         color: Colors.white,
+  //                         fontSize: 12.sp,
+  //                         fontWeight: FontWeight.w500,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //           ),
+  //         ),
 
-  // Placeholder methods for other sections
- Widget _buildSpiritualCheckIn() {
-  return SliverToBoxAdapter(
-    child: Padding(
-      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
-      child: Container(
-        padding: EdgeInsets.all(5.w),
-        decoration: BoxDecoration(
-          color: const Color(0xFF111111), // Match dark background
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.white.withOpacity(0.1),width: 1),
-        ),
-        child: Column(
-          children: [
-            // Header Row
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "ARE YOU SPRITUAL ?",
-                  style: GoogleFonts.poppins( // Cleaner look
-                    color: Colors.white.withOpacity(0.6),
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                Text(
-                  "${_selectedCheckInIndex + 1}/${_checkInActivities.length}",
-                  style: GoogleFonts.poppins(
-                    color: const Color(0xFFFFD447), // Brighter gold
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
+  //         // 2. The Floating Icon
+  //         Positioned(
+  //           top: -10,
+  //           left: 0,
+  //           right: 0,
+  //           child: Center(
+  //             child: Container(
+  //               // Shadow to make the icon "pop"
+  //               decoration: BoxDecoration(
+  //                 shape: BoxShape.circle,
+  //                 boxShadow: [
+  //                   BoxShadow(
+  //                     color: Colors.black.withOpacity(0.6),
+  //                     blurRadius: 15,
+  //                     offset: const Offset(0, 8),
+  //                   ),
+  //                 ],
+  //               ),
+  //               child: Image.asset(
+  //                 iconPath,
+  //                 width: 18.w,
+  //                 height: 18.w,
+  //                 fit: BoxFit.contain,
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
-            // Horizontal Activity List
-            if (_isCheckInLoading && _checkInActivities.isEmpty)
-              const Center(child: CircularProgressIndicator(color: Color(0xFFFFD447)))
-            else
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                child: Row(
-                  children: List.generate(_checkInActivities.length, (index) {
-                    final activity = _checkInActivities[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 20.0),
-                      child: GestureDetector(
-                        onTap: () => setState(() => _selectedCheckInIndex = index),
-                        child: _buildActivityItem(
-                          activity.title ?? "",
-                          _getActivityIconPath(activity.title ?? ""),
-                          isSelected: _selectedCheckInIndex == index,
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-              ),
-            SizedBox(height: 3.h),
-            // The White Action Button
-            SizedBox(
-              width: 45.w,
-              height: 4.5.h,
-              // Specific width from image
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  elevation: 10,
-                  shadowColor: Colors.black.withOpacity(0.5),
-                  padding: const EdgeInsets.symmetric(vertical: 0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-                onPressed: _onCheckInNowPressed,
-                child: Text(
-                  "CHECK-IN NOW",
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12.sp,
-                    letterSpacing: 0.2,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+Widget _buildFeatureGrid(bool isTablet) {
+  return SliverPadding(
+    padding: EdgeInsets.fromLTRB(4.w, 1.5.h, 4.w, 1.5.h),
+    sliver: SliverGrid(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: isTablet ? 4 : 3,
+        // mainAxisSpacing: 0.h, // ✅ reduced gap (IMPORTANT)
+        crossAxisSpacing: 3.w,
+        childAspectRatio: 0.75, // 👈 adjusted for perfect look
       ),
+      delegate: SliverChildListDelegate([
+        _buildGridItem(
+          "Check - In",
+          "assets/icons/check_in.png",
+          onTap: () {
+            _unfocusAll();
+            Get.toNamed(AppConstants.routeCheckIn);
+          },
+        ),
+        _buildGridItem(
+          "Astrology",
+          "assets/icons/astrology.png",
+          onTap: () {
+            _unfocusAll();
+            Get.toNamed(AppConstants.routeAstrologyDetails);
+          },
+        ),
+        _buildGridItem(
+          "Expert Connect",
+          "assets/icons/expert_connect.png",
+          onTap: () {
+            _unfocusAll();
+            Provider.of<DashboardViewModel>(
+              context,
+              listen: false,
+            ).changeTab(3);
+          },
+        ),
+        _buildGridItem(
+          "Remedies",
+          "assets/icons/remedies.png",
+          onTap: () {
+            _unfocusAll();
+            Provider.of<DashboardViewModel>(
+              context,
+              listen: false,
+            ).changeTab(4);
+          },
+        ),
+        _buildGridItem(
+          "Sankalp Tracker",
+          "assets/icons/sankalptracker.png",
+          onTap: () {
+            _unfocusAll();
+            Get.toNamed(AppConstants.routeSankalp);
+          },
+        ),
+        _buildGridItem(
+          "Puja Vidi",
+          "assets/icons/puja_vidhi.png",
+          onTap: () {
+            _unfocusAll();
+            Get.toNamed(AppConstants.routePoojaList);
+          },
+        ),
+      ]),
     ),
   );
 }
+
+  // Widget _buildFeatureGrid(bool isTablet) {
+  //   return SliverPadding(
+  //     padding: EdgeInsets.fromLTRB(4.w, 1.5.h, 4.w, 1.5.h),
+  //     sliver: SliverGrid(
+  //       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+  //         crossAxisCount: isTablet ? 4 : 3,
+  //         mainAxisSpacing: 3.5.h, // Space between rows
+  //         crossAxisSpacing: 3.w, // Space between columns
+  //         childAspectRatio: 0.82, // Adjusted to fit the icon + card height
+  //       ),
+  //       delegate: SliverChildListDelegate([
+  //         _buildGridItem(
+  //           "Check - In",
+  //           "assets/icons/check_in.png",
+  //           onTap: () {
+  //             _unfocusAll();
+  //             Get.toNamed(AppConstants.routeCheckIn);
+  //           },
+  //         ),
+  //         _buildGridItem(
+  //           "Astrology",
+  //           "assets/icons/astrology.png",
+  //           onTap: () {
+  //             _unfocusAll();
+  //             Get.toNamed(AppConstants.routeAstrologyDetails);
+  //           },
+  //         ),
+  //         _buildGridItem(
+  //           "Expert Connect",
+  //           "assets/icons/expert_connect.png",
+  //           onTap: () {
+  //             _unfocusAll();
+  //             Provider.of<DashboardViewModel>(
+  //               context,
+  //               listen: false,
+  //             ).changeTab(3);
+  //           },
+  //         ),
+  //         _buildGridItem(
+  //           "Remedies",
+  //           "assets/icons/remedies.png",
+  //           onTap: () {
+  //             _unfocusAll();
+  //             Provider.of<DashboardViewModel>(
+  //               context,
+  //               listen: false,
+  //             ).changeTab(4);
+  //           },
+  //         ),
+  //         _buildGridItem(
+  //           "Sankalp Tracker",
+  //           "assets/icons/sankalptracker.png",
+  //           onTap: () {
+  //             _unfocusAll();
+  //             Get.toNamed(AppConstants.routeSankalp);
+  //           },
+  //         ),
+  //         _buildGridItem(
+  //           "Puja Vidi",
+  //           "assets/icons/puja_vidhi.png",
+  //           onTap: () {
+  //             _unfocusAll();
+  //             Get.toNamed(AppConstants.routePoojaList);
+  //           },
+  //         ),
+  //       ]),
+  //     ),
+  //   );
+  // }
+
+
+  // Placeholder methods for other sections
+  Widget _buildSpiritualCheckIn() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
+        child: Container(
+          padding: EdgeInsets.all(5.w),
+          decoration: BoxDecoration(
+            color: const Color(0xFF111111), // Match dark background
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+          ),
+          child: Column(
+            children: [
+              // Header Row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "ARE YOU SPRITUAL ?",
+                    style: GoogleFonts.poppins(
+                      // Cleaner look
+                      color: Colors.white.withOpacity(0.6),
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  Text(
+                    "${_selectedCheckInIndex + 1}/${_checkInActivities.length}",
+                    style: GoogleFonts.poppins(
+                      color: const Color(0xFFFFD447), // Brighter gold
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // Horizontal Activity List
+              if (_isCheckInLoading && _checkInActivities.isEmpty)
+                const Center(
+                  child: CircularProgressIndicator(color: Color(0xFFFFD447)),
+                )
+              else
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  child: Row(
+                    children: List.generate(_checkInActivities.length, (index) {
+                      final activity = _checkInActivities[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 20.0),
+                        child: GestureDetector(
+                          onTap: () =>
+                              setState(() => _selectedCheckInIndex = index),
+                          child: _buildActivityItem(
+                            activity.title ?? "",
+                            _getActivityIconPath(activity.title ?? ""),
+                            isSelected: _selectedCheckInIndex == index,
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+              SizedBox(height: 3.h),
+              // The White Action Button
+              SizedBox(
+                width: 45.w,
+                height: 4.5.h,
+                // Specific width from image
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    elevation: 10,
+                    shadowColor: Colors.black.withOpacity(0.5),
+                    padding: const EdgeInsets.symmetric(vertical: 0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  onPressed: _onCheckInNowPressed,
+                  child: Text(
+                    "CHECK-IN NOW",
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12.sp,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   String _getActivityIconPath(String title) {
     switch (title.toLowerCase()) {
@@ -789,9 +965,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
     final activity = _checkInActivities[_selectedCheckInIndex];
 
     if (activity.title == 'Chanting') {
-      Get.to(
-        () => ChantingConfigurationView(chantingCategoryId: activity.id!),
-      );
+      Get.to(() => ChantingConfigurationView(chantingCategoryId: activity.id!));
     } else if (activity.title == 'Prayer' && activity.id != null) {
       Get.to(() => PrayerConfigurationView(prayerCategoryId: activity.id!));
     } else if (activity.id != null) {
@@ -804,67 +978,71 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
     }
   }
 
-Widget _buildActivityItem(String title, String imagePath, {bool isSelected = false}) {
-  final double size = isSelected ? 26.w : 22.w;
-  return Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-        height: size,
-        width: size,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          // Clean gold border only when selected
-          border: isSelected 
-              ? Border.all(color: const Color(0xFFFFD447), width: 1.08) 
-              : Border.all(color: Colors.transparent, width: 2.0),
-          boxShadow: isSelected ? [
-            BoxShadow(
-              color: const Color(0xFFFFD447).withOpacity(0.2),
-              blurRadius: 15,
-              spreadRadius: 2,
-            )
-          ] : [],
-        ),
-        padding: EdgeInsets.all(isSelected ? 4 : 0), 
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Image.asset(
-            imagePath,
-            fit: BoxFit.cover,
+  Widget _buildActivityItem(
+    String title,
+    String imagePath, {
+    bool isSelected = false,
+  }) {
+    final double size = isSelected ? 26.w : 22.w;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          height: size,
+          width: size,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            // Clean gold border only when selected
+            border: isSelected
+                ? Border.all(color: const Color(0xFFFFD447), width: 1.08)
+                : Border.all(color: Colors.transparent, width: 2.0),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: const Color(0xFFFFD447).withOpacity(0.2),
+                      blurRadius: 15,
+                      spreadRadius: 2,
+                    ),
+                  ]
+                : [],
+          ),
+          padding: EdgeInsets.all(isSelected ? 4 : 0),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.asset(imagePath, fit: BoxFit.cover),
           ),
         ),
-      ),
-      const SizedBox(height: 12),
-      Text(
-        title,
-        style: GoogleFonts.poppins(
-          color: isSelected ? Colors.white : Colors.white.withOpacity(0.5),
-          fontSize: isSelected ? 12.sp : 10.sp,
-          fontWeight: isSelected ? FontWeight.w400 : FontWeight.w400,
+        const SizedBox(height: 12),
+        Text(
+          title,
+          style: GoogleFonts.poppins(
+            color: isSelected ? Colors.white : Colors.white.withOpacity(0.5),
+            fontSize: isSelected ? 12.sp : 10.sp,
+            fontWeight: isSelected ? FontWeight.w400 : FontWeight.w400,
+          ),
         ),
-      ),
-    ],
-  );
-}
+      ],
+    );
+  }
+
   Widget _buildKarmaDashboard() {
     return SliverToBoxAdapter(
       child: Consumer<ProfileViewModel>(
         builder: (context, profileVM, child) {
           final karmaPoints = profileVM.profile?.karmaPoints ?? 0;
           return Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 4.w,
-              vertical: 1.5.h,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 3.h),
               decoration: BoxDecoration(
                 color: const Color(0xFF111111),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.white.withOpacity(0.1),width:  1),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.1),
+                  width: 1,
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -903,7 +1081,7 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
                                 color: const Color(0xFFD4AF37).withOpacity(0.1),
                                 blurRadius: 10,
                                 spreadRadius: -2,
-                              )
+                              ),
                             ],
                           ),
                           child: Text(
@@ -933,7 +1111,8 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
                       _buildVerticalDivider(),
                       // Seva Done
                       Obx(() {
-                        final completedCount = redeemController.redemptionHistory
+                        final completedCount = redeemController
+                            .redemptionHistory
                             .where(
                               (item) =>
                                   item.status.toLowerCase() == 'completed',
@@ -1140,38 +1319,42 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
           children: [
             Row(
               children: [
-                
-                    Container(
-                     padding: const EdgeInsets.all(2), // Border width
-                     decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color:  Color(0xFFD4AF37), // Border color
-                          width: 2,
-                        ),
-                        ),
-                        child: CircleAvatar(
-                      radius: 6.w,
-                      backgroundColor: Colors.white.withOpacity(0.1),
-                      backgroundImage: () {
-                        if (expert.profilePhoto == null || expert.profilePhoto!.isEmpty) {
-                          return const AssetImage('assets/images/logo.png') as ImageProvider;
-                        }
-                        final photo = expert.profilePhoto!;
-                        if (photo.startsWith('file://')) {
-                          return FileImage(File(photo.replaceFirst('file://', '')));
-                        }
-                        if (photo.startsWith('/')) {
-                          return FileImage(File(photo));
-                        }
-                        final formattedUrl = ApiUrls.getFormattedImageUrl(photo);
-                        if (formattedUrl == null) {
-                          return const AssetImage('assets/images/logo.png') as ImageProvider;
-                        }
-                        return NetworkImage(formattedUrl);
-                      }(),
+                Container(
+                  padding: const EdgeInsets.all(2), // Border width
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Color(0xFFD4AF37), // Border color
+                      width: 2,
                     ),
-                    ),
+                  ),
+                  child: CircleAvatar(
+                    radius: 6.w,
+                    backgroundColor: Colors.white.withOpacity(0.1),
+                    backgroundImage: () {
+                      if (expert.profilePhoto == null ||
+                          expert.profilePhoto!.isEmpty) {
+                        return const AssetImage('assets/images/logo.png')
+                            as ImageProvider;
+                      }
+                      final photo = expert.profilePhoto!;
+                      if (photo.startsWith('file://')) {
+                        return FileImage(
+                          File(photo.replaceFirst('file://', '')),
+                        );
+                      }
+                      if (photo.startsWith('/')) {
+                        return FileImage(File(photo));
+                      }
+                      final formattedUrl = ApiUrls.getFormattedImageUrl(photo);
+                      if (formattedUrl == null) {
+                        return const AssetImage('assets/images/logo.png')
+                            as ImageProvider;
+                      }
+                      return NetworkImage(formattedUrl);
+                    }(),
+                  ),
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Column(
@@ -1191,9 +1374,14 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
                           ),
                           SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 4,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
-                              color: isOnline ? Colors.green.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+                              color: isOnline
+                                  ? Colors.green.withOpacity(0.1)
+                                  : Colors.grey.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
@@ -1234,32 +1422,40 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
                     fontWeight: FontWeight.w400,
                   ),
                 ),
-               Container(
-  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-  decoration: BoxDecoration(
-    color: const Color(0xFF2C2C2E), // Subtle dark grey background
-    borderRadius: BorderRadius.circular(20), // Pill shape
-  ),
-  child: Row(
-    mainAxisSize: MainAxisSize.min, // Shrinks container to content size
-    children: [
-      Text(
-        "${expert.rating ?? 0.0}",
-        style: GoogleFonts.poppins( // Switched to Poppins for that clean look
-          color: Colors.white,
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      const SizedBox(width: 4), // Gap between text and star
-      const Icon(
-        Icons.star_rounded, // Rounded version looks more like the image
-        color: Color(0xFFFFD447), // Brighter yellow/gold
-        size: 16,
-      ),
-    ],
-  ),
-)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(
+                      0xFF2C2C2E,
+                    ), // Subtle dark grey background
+                    borderRadius: BorderRadius.circular(20), // Pill shape
+                  ),
+                  child: Row(
+                    mainAxisSize:
+                        MainAxisSize.min, // Shrinks container to content size
+                    children: [
+                      Text(
+                        "${expert.rating ?? 0.0}",
+                        style: GoogleFonts.poppins(
+                          // Switched to Poppins for that clean look
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(width: 4), // Gap between text and star
+                      const Icon(
+                        Icons
+                            .star_rounded, // Rounded version looks more like the image
+                        color: Color(0xFFFFD447), // Brighter yellow/gold
+                        size: 16,
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 12),
@@ -1267,7 +1463,7 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                   flex: 0,
+                  flex: 0,
                   child: GestureDetector(
                     onTap: () {
                       _unfocusAll();
@@ -1278,7 +1474,7 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                   flex: 0,
+                  flex: 0,
                   child: GestureDetector(
                     onTap: () {
                       _unfocusAll();
@@ -1299,11 +1495,16 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
     return Container(
       // height: 40,
       width: 100,
-      padding: const EdgeInsets.symmetric(vertical: 5,horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
       decoration: BoxDecoration(
         color: isPrimary ? const Color(0xFFD4AF37) : Colors.transparent,
         borderRadius: BorderRadius.circular(100),
-        border: isPrimary ? null : Border.all(color: const Color(0xFFD4AF37).withOpacity(0.5),width: 1),
+        border: isPrimary
+            ? null
+            : Border.all(
+                color: const Color(0xFFD4AF37).withOpacity(0.5),
+                width: 1,
+              ),
       ),
       child: Center(
         child: Text(
@@ -1343,45 +1544,50 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
                     "TODAY'S MUHURAT",
                     style: GoogleFonts.poppins(
                       color: Color(0xff8E8E93),
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w500,
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                  
                 ],
               ),
               const SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(
-      child: _buildMuhuratTimeCard(
-        "SUNRISES & SUNSET",
-        formatTimeToAMPM(basic?.sunrise), // formats to e.g. "6:24 AM"
-        formatTimeToAMPM(basic?.sunset),  // formats to e.g. "6:15 PM"
-        Icons.wb_sunny_outlined,
-        const Color(0xFFFF9933),
-      ),
-    ),  
+                    child: _buildMuhuratTimeCard(
+                      "SUNRISES & SUNSET",
+                      formatTimeToAMPM(
+                        basic?.sunrise,
+                      ), // formats to e.g. "6:24 AM"
+                      formatTimeToAMPM(
+                        basic?.sunset,
+                      ), // formats to e.g. "6:15 PM"
+                      Icons.wb_sunny_outlined,
+                      const Color(0xFFFF9933),
+                    ),
+                  ),
                   const SizedBox(width: 10),
-                 Expanded(
-        child: _buildMuhuratTimeCard(
-       "MOONRISE & MOONSET",
-    // Logic for Moonrise
-      formatTimeToAMPM(
-      (basic?.moonrise?.isNotEmpty ?? false) 
-          ? basic!.moonrise 
-          : advanced?.moonrise
-      ),
-    // Logic for Moonset
-      formatTimeToAMPM(
-      (basic?.moonset?.isNotEmpty ?? false) 
-          ? basic!.moonset 
-          : advanced?.moonset
-    ),
-    Icons.nightlight_round_outlined,
-    const Color(0xFF8A9DFF), // Updated to the softer blue from your image
-  ),
-),
+                  Expanded(
+                    child: _buildMuhuratTimeCard(
+                      "MOONRISE & MOONSET",
+                      // Logic for Moonrise
+                      formatTimeToAMPM(
+                        (basic?.moonrise?.isNotEmpty ?? false)
+                            ? basic!.moonrise
+                            : advanced?.moonrise,
+                      ),
+                      // Logic for Moonset
+                      formatTimeToAMPM(
+                        (basic?.moonset?.isNotEmpty ?? false)
+                            ? basic!.moonset
+                            : advanced?.moonset,
+                      ),
+                      Icons.nightlight_round_outlined,
+                      const Color(
+                        0xFF8A9DFF,
+                      ), // Updated to the softer blue from your image
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 20),
@@ -1458,7 +1664,7 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
                   ],
                 ),
               ),
-               
+
               const SizedBox(height: 16),
               Center(
                 child: GestureDetector(
@@ -1474,7 +1680,10 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
                     decoration: BoxDecoration(
                       color: Color(0xff1C1C1E),
                       borderRadius: BorderRadius.circular(50),
-                      border: Border.all(color: Colors.white.withOpacity(0.1),width: 1.17),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.1),
+                        width: 1.17,
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -1505,94 +1714,104 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
     );
   }
 
- Widget _buildMuhuratTimeCard(String label, String time1, String time2, IconData icon, Color themeColor) {
-  return Container(
-    padding: EdgeInsets.all(4.w),
-    decoration: BoxDecoration(
-      color: const Color(0xFF121212), // Dark card background
-      borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: Colors.white.withOpacity(0.1)),
-    ),
-    child: Column(
-      children: [
-        // Icon with Glow Effect
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            // The Glow
-            Container(
-              width: 10,
-              height: 10,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: themeColor.withOpacity(0.5),
-                    blurRadius: 25,
-                    spreadRadius: 15,
-                  ),
-                ],
+  Widget _buildMuhuratTimeCard(
+    String label,
+    String time1,
+    String time2,
+    IconData icon,
+    Color themeColor,
+  ) {
+    return Container(
+      padding: EdgeInsets.all(4.w),
+      decoration: BoxDecoration(
+        color: const Color(0xFF121212), // Dark card background
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Column(
+        children: [
+          // Icon with Glow Effect
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              // The Glow
+              Container(
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: themeColor.withOpacity(0.5),
+                      blurRadius: 25,
+                      spreadRadius: 15,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            // The Icon
-            Icon(icon, color: themeColor, size: 8.w),
-          ],
-        ),
-        const SizedBox(height: 16),
-        // Title Text
-        Text(
-          label,
-          style: GoogleFonts.poppins(
-            color: Colors.white.withOpacity(0.4),
-            fontSize: 7.5.sp,
-            fontWeight: FontWeight.w500,
-            letterSpacing: 0.5,
+              // The Icon
+              Icon(icon, color: themeColor, size: 8.w),
+            ],
           ),
-        ),
-        const SizedBox(height: 8),
-        // Time Row
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              time1,
-              style: GoogleFonts.poppins(
-                color: Colors.white,
-                fontSize: 9.sp,
-                fontWeight: FontWeight.w600,
+          const SizedBox(height: 16),
+          // Title Text
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              color: Colors.white.withOpacity(0.4),
+              fontSize: 7.5.sp,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 0.5,
+            ),
+          ),
+          const SizedBox(height: 8),
+          // Time Row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                time1,
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 9.sp,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 1.w),
-              child: Icon(Icons.circle, color: Colors.white.withOpacity(0.4), size: 1.w),
-            ),
-            Text(
-              time2,
-              style: GoogleFonts.poppins(
-                color: Colors.white,
-                fontSize: 9.sp,
-                fontWeight: FontWeight.w600,
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 1.w),
+                child: Icon(
+                  Icons.circle,
+                  color: Colors.white.withOpacity(0.4),
+                  size: 1.w,
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-}
-
-String formatTimeToAMPM(String? time) {
-  if (time == null || time.isEmpty || time == "--:--") return "--:--";
-  try {
-    // If your time is already a string like "06:30:00" or "18:30"
-    // We parse it and then re-format it to 12-hour style
-    final DateTime parsedTime = DateFormat("HH:mm").parse(time);
-    return DateFormat("h:mm a").format(parsedTime);
-  } catch (e) {
-    // Fallback if the string is already partially formatted or in a different style
-    return time; 
+              Text(
+                time2,
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 9.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
-}
+
+  String formatTimeToAMPM(String? time) {
+    if (time == null || time.isEmpty || time == "--:--") return "--:--";
+    try {
+      // If your time is already a string like "06:30:00" or "18:30"
+      // We parse it and then re-format it to 12-hour style
+      final DateTime parsedTime = DateFormat("HH:mm").parse(time);
+      return DateFormat("h:mm a").format(parsedTime);
+    } catch (e) {
+      // Fallback if the string is already partially formatted or in a different style
+      return time;
+    }
+  }
 
   Widget _buildDetailedMuhuratCard(
     String title,
@@ -1606,7 +1825,10 @@ String formatTimeToAMPM(String? time) {
       decoration: BoxDecoration(
         color: const Color(0xFF141414),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color:Color(0xFFD4AF37).withOpacity(0.20),width: 0.5),
+        border: Border.all(
+          color: Color(0xFFD4AF37).withOpacity(0.20),
+          width: 0.5,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1627,7 +1849,10 @@ String formatTimeToAMPM(String? time) {
                 decoration: BoxDecoration(
                   color: statusColor.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: statusColor.withOpacity(0.1),width: 1),
+                  border: Border.all(
+                    color: statusColor.withOpacity(0.1),
+                    width: 1,
+                  ),
                 ),
                 child: Text(
                   status,
@@ -1670,7 +1895,10 @@ String formatTimeToAMPM(String? time) {
               Container(
                 width: 8,
                 height: 8,
-                decoration: BoxDecoration(shape: BoxShape.circle, color: tagColor),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: tagColor,
+                ),
               ),
               const SizedBox(width: 12),
               Text(
@@ -1722,13 +1950,15 @@ String formatTimeToAMPM(String? time) {
         "title": "7 Mukhi Rudraksha",
         "subtitle": "For spiritual protection & planet Saturn...",
         "price": "1,299",
-        "image": "https://img.freepik.com/premium-photo/rudraksha-isolated-white-background_1025754-1845.jpg?w=740",
+        "image":
+            "https://img.freepik.com/premium-photo/rudraksha-isolated-white-background_1025754-1845.jpg?w=740",
       },
       {
         "title": "Yellow Sapphire",
         "subtitle": "For wealth, prosperity & planet Jupiter...",
         "price": "15,500",
-        "image": "https://img.freepik.com/premium-photo/yellow-sapphire-gemstone-isolated-white-background_1025754-2091.jpg?w=740",
+        "image":
+            "https://img.freepik.com/premium-photo/yellow-sapphire-gemstone-isolated-white-background_1025754-2091.jpg?w=740",
       },
     ];
 
@@ -1737,17 +1967,21 @@ String formatTimeToAMPM(String? time) {
         "title": "Sphatik Mala",
         "subtitle": "For peace, concentration & planet Moon...",
         "price": "850",
-        "image": "https://img.freepik.com/free-photo/shiny-white-crystal-beads-necklace_53876-104917.jpg?t=st=1710675715~exp=1710679315~hmac=8e6b1b6c0b1b0b2b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9a0b1",
+        "image":
+            "https://img.freepik.com/free-photo/shiny-white-crystal-beads-necklace_53876-104917.jpg?t=st=1710675715~exp=1710679315~hmac=8e6b1b6c0b1b0b2b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9a0b1",
       },
       {
         "title": "Gomati Chakra",
         "subtitle": "For protection, prosperity and bringing luck...",
         "price": "150",
-        "image": "https://img.freepik.com/premium-photo/gomti-chakra-shell-isolated-white-background_1025754-2150.jpg?w=740",
+        "image":
+            "https://img.freepik.com/premium-photo/gomti-chakra-shell-isolated-white-background_1025754-2150.jpg?w=740",
       },
     ];
 
-    final displayedRemedies = _selectedRemedyTab == "MUST HAVE" ? mustHaveRemedies : goodToHaveRemedies;
+    final displayedRemedies = _selectedRemedyTab == "MUST HAVE"
+        ? mustHaveRemedies
+        : goodToHaveRemedies;
 
     return SliverToBoxAdapter(
       child: Padding(
@@ -1762,95 +1996,98 @@ String formatTimeToAMPM(String? time) {
               ),
               child: Text(
                 "PERSONALIZED REMEDIES",
-              style: GoogleFonts.poppins(
-                color: Color(0xff8E8E93),
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w500,
+                style: GoogleFonts.poppins(
+                  color: Color(0xff8E8E93),
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1C1C1E),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _buildTabButton(
-                      "MUST HAVE",
-                      isSelected: _selectedRemedyTab == "MUST HAVE",
-                      onTap: () {
-                        setState(() {
-                          _selectedRemedyTab = "MUST HAVE";
-                        });
-                      },
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1C1C1E),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _buildTabButton(
+                        "MUST HAVE",
+                        isSelected: _selectedRemedyTab == "MUST HAVE",
+                        onTap: () {
+                          setState(() {
+                            _selectedRemedyTab = "MUST HAVE";
+                          });
+                        },
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: _buildTabButton(
-                      "GOOD TO HAVE",
-                      isSelected: _selectedRemedyTab == "GOOD TO HAVE",
-                      onTap: () {
-                        setState(() {
-                          _selectedRemedyTab = "GOOD TO HAVE";
-                        });
-                      },
+                    Expanded(
+                      child: _buildTabButton(
+                        "GOOD TO HAVE",
+                        isSelected: _selectedRemedyTab == "GOOD TO HAVE",
+                        onTap: () {
+                          setState(() {
+                            _selectedRemedyTab = "GOOD TO HAVE";
+                          });
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            height: 35.h,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              itemCount: displayedRemedies.length,
-              itemBuilder: (context, index) {
-                final remedy = displayedRemedies[index];
-                return _buildProductCard(
-                  remedy["title"]!,
-                  remedy["subtitle"]!,
-                  remedy["price"]!,
-                  remedy["image"]!,
-                  screenWidth,
-                  isNetwork: true,
-                );
-              },
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 35.h,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                itemCount: displayedRemedies.length,
+                itemBuilder: (context, index) {
+                  final remedy = displayedRemedies[index];
+                  return _buildProductCard(
+                    remedy["title"]!,
+                    remedy["subtitle"]!,
+                    remedy["price"]!,
+                    remedy["image"]!,
+                    screenWidth,
+                    isNetwork: true,
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-  Widget _buildTabButton(String label, {required bool isSelected, required VoidCallback onTap}) {
+  Widget _buildTabButton(
+    String label, {
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-    
         padding: EdgeInsets.symmetric(vertical: 1.25.h),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFFD4AF37)
-              : Colors.transparent,
+          color: isSelected ? const Color(0xFFD4AF37) : Colors.transparent,
           borderRadius: BorderRadius.circular(25),
-          boxShadow: isSelected ? [
-            BoxShadow(
-              color: const Color(0xFFD4AF37).withOpacity(0.3),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            )
-          ] : null,
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: const Color(0xFFD4AF37).withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
         ),
         child: Text(
           label,
@@ -1898,10 +2135,7 @@ String formatTimeToAMPM(String? time) {
                         child: const Icon(Icons.image, color: Colors.white24),
                       ),
                     )
-                  : Image.asset(
-                      imagePath,
-                      fit: BoxFit.cover,
-                    ),
+                  : Image.asset(imagePath, fit: BoxFit.cover),
             ),
           ),
           const SizedBox(height: 12),
@@ -1964,10 +2198,10 @@ String formatTimeToAMPM(String? time) {
   }
 
   Widget _buildPujaVidhi(double screenWidth) {
-    return BlocProvider(
-      create: (context) =>
-          PoojaBloc(repository: PoojaRepository())..add(FetchPoojas()),
-      child: SliverToBoxAdapter(
+    return SliverToBoxAdapter(
+      child: BlocProvider(
+        create: (context) =>
+            PoojaBloc(repository: PoojaRepository())..add(FetchPoojas()),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12),
           child: Column(
@@ -1980,67 +2214,71 @@ String formatTimeToAMPM(String? time) {
                 ),
                 child: Text(
                   "PUJA VIDHI",
-                style: GoogleFonts.poppins(
-                  color: Color(0xff8E8E93),
+                  style: GoogleFonts.poppins(
+                    color: Color(0xff8E8E93),
                     fontSize: 13.5.sp,
                     fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 4),
-            BlocBuilder<PoojaBloc, PoojaState>(
-              builder: (context, state) {
-                if (state is PoojaLoading) {
-                  return SizedBox(
-                    height: 22.5.h,
-                    child: const Center(
-                      child: CircularProgressIndicator(color: Color(0xFFD4AF37)),
-                    ),
-                  );
-                } else if (state is PoojaLoaded) {
-                  if (state.filteredPoojas.isEmpty) {
+              const SizedBox(height: 4),
+              BlocBuilder<PoojaBloc, PoojaState>(
+                builder: (context, state) {
+                  if (state is PoojaLoading) {
+                    return SizedBox(
+                      height: 22.5.h,
+                      child: const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFFD4AF37),
+                        ),
+                      ),
+                    );
+                  } else if (state is PoojaLoaded) {
+                    if (state.filteredPoojas.isEmpty) {
+                      return SizedBox(
+                        height: 100,
+                        child: Center(
+                          child: Text(
+                            "No Puja available",
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.5),
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                    return SizedBox(
+                      height: 22.5.h,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        itemCount: state.filteredPoojas.length,
+                        itemBuilder: (context, index) {
+                          final pooja = state.filteredPoojas[index];
+                          return _buildRealPujaCard(pooja, screenWidth);
+                        },
+                      ),
+                    );
+                  } else if (state is PoojaError) {
                     return SizedBox(
                       height: 100,
                       child: Center(
                         child: Text(
-                          "No Puja available",
-                          style: TextStyle(color: Colors.white.withOpacity(0.5)),
+                          "Error loading Puja Vidhi",
+                          style: TextStyle(color: Colors.red.withOpacity(0.7)),
                         ),
                       ),
                     );
                   }
-                  return SizedBox(
-                    height: 22.5.h,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      itemCount: state.filteredPoojas.length,
-                      itemBuilder: (context, index) {
-                        final pooja = state.filteredPoojas[index];
-                        return _buildRealPujaCard(pooja, screenWidth);
-                      },
-                    ),
-                  );
-                } else if (state is PoojaError) {
-                  return SizedBox(
-                    height: 100,
-                    child: Center(
-                      child: Text(
-                        "Error loading Puja Vidhi",
-                        style: TextStyle(color: Colors.red.withOpacity(0.7)),
-                      ),
-                    ),
-                  );
-                }
-                return const SizedBox.shrink();
-              },
-            ),
-          ],
+                  return const SizedBox.shrink();
+                },
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildRealPujaCard(PoojaModel pooja, double screenWidth) {
     return GestureDetector(
@@ -2073,11 +2311,7 @@ String formatTimeToAMPM(String? time) {
           children: [
             Row(
               children: [
-                Icon(
-                  Icons.auto_awesome,
-                  color: Color(0xFFD4AF37),
-                  size: 5.w,
-                ),
+                Icon(Icons.auto_awesome, color: Color(0xFFD4AF37), size: 5.w),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Column(
@@ -2120,9 +2354,7 @@ String formatTimeToAMPM(String? time) {
         ),
       ),
     );
-
   }
-
 
   Widget _buildSankalpTracker() {
     return SliverToBoxAdapter(
@@ -2145,7 +2377,10 @@ String formatTimeToAMPM(String? time) {
               decoration: BoxDecoration(
                 color: const Color(0xFF141414),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.white.withOpacity(0.05),width: 1),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.05),
+                  width: 1,
+                ),
               ),
               child: Column(
                 children: [
@@ -2253,7 +2488,11 @@ String formatTimeToAMPM(String? time) {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.play_circle_outline, size: 22,color: Colors.black,),
+                          const Icon(
+                            Icons.play_circle_outline,
+                            size: 22,
+                            color: Colors.black,
+                          ),
                           const SizedBox(width: 8),
                           Text(
                             "TRACK YOUR SANKALP",
@@ -2374,26 +2613,44 @@ String formatTimeToAMPM(String? time) {
                     decoration: BoxDecoration(
                       color: const Color(0xFF0A0A0A),
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: Colors.white.withOpacity(0.1),width: 1),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.1),
+                        width: 1,
+                      ),
                     ),
                     child: TextField(
                       focusNode: _swapnaFocusNode,
-                      style: GoogleFonts.poppins(color: Colors.white, fontSize: 10.5.sp),
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: 10.5.sp,
+                      ),
                       decoration: InputDecoration(
                         fillColor: const Color(0xFF0A0A0A),
                         filled: true,
                         hintText: "Enter your dream....",
-                        hintStyle: GoogleFonts.poppins(color: Colors.white30, fontSize: 10.5.sp),
+                        hintStyle: GoogleFonts.poppins(
+                          color: Colors.white30,
+                          fontSize: 10.5.sp,
+                        ),
                         border: InputBorder.none,
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide(color: Colors.white.withOpacity(0.1),width: 1),
+                          borderSide: BorderSide(
+                            color: Colors.white.withOpacity(0.1),
+                            width: 1,
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide(color: Colors.white.withOpacity(0.1),width: 1),
+                          borderSide: BorderSide(
+                            color: Colors.white.withOpacity(0.1),
+                            width: 1,
+                          ),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                         suffixIcon: Padding(
                           padding: const EdgeInsets.all(4.0),
                           child: Container(
@@ -2405,7 +2662,11 @@ String formatTimeToAMPM(String? time) {
                                 _unfocusAll();
                                 Get.toNamed(AppConstants.routeSwapnaDecoder);
                               },
-                              icon: Icon(Icons.send_rounded, color: Color(0xFFD4AF37), size: 5.5.w),
+                              icon: Icon(
+                                Icons.send_rounded,
+                                color: Color(0xFFD4AF37),
+                                size: 5.5.w,
+                              ),
                             ),
                           ),
                         ),
@@ -2479,16 +2740,15 @@ String formatTimeToAMPM(String? time) {
                           borderRadius: BorderRadius.circular(16),
                         ),
                       ),
-                        onPressed: () {
-                          _unfocusAll();
-                          Get.toNamed(AppConstants.routeGita);
-                        },
-                        child: Text(
+                      onPressed: () {
+                        _unfocusAll();
+                        Get.toNamed(AppConstants.routeGita);
+                      },
+                      child: Text(
                         "START YOUR JOURNEY",
                         style: GoogleFonts.poppins(
                           fontWeight: FontWeight.w400,
                           fontSize: 10.5.sp,
-
                         ),
                       ),
                     ),
@@ -2508,10 +2768,7 @@ String formatTimeToAMPM(String? time) {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 4.w,
-              vertical: 1.5.h,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
             child: Text(
               "PERSONALITY & SELF-DISCOVERY",
               style: GoogleFonts.lora(

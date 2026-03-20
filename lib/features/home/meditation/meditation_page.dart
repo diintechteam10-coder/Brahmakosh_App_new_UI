@@ -1,3 +1,4 @@
+import 'package:brahmakosh/core/common_imports.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:brahmakosh/core/theme/app_theme.dart';
@@ -26,13 +27,14 @@ class StartDhyanaView extends StatelessWidget {
           onPressed: () => Get.back(),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header Quote
-            Text(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header Quote
+              Text(
               "Your inner engineering starts here.",
               style: GoogleFonts.lora(
                 fontSize: 16,
@@ -132,8 +134,9 @@ class StartDhyanaView extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   void _openPlayer(BuildContext context, String title, int duration) {
     Get.to(() => MeditationPlayerView(title: title, durationMinutes: duration));
