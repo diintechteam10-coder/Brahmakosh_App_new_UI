@@ -1644,22 +1644,22 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
                                   letterSpacing: 1.1,
                                 ),
                               ),
-                              GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTap: () => _showVoiceSettingsSheet(context),
-                                child: Container(
-                                  padding: EdgeInsets.all(2.w),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.1),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    Icons.settings,
-                                    color: Colors.white,
-                                    size: 6.w,
-                                  ),
-                                ),
-                              ),
+                              // GestureDetector(
+                              //   behavior: HitTestBehavior.opaque,
+                              //   onTap: () => _showVoiceSettingsSheet(context),
+                              //   child: Container(
+                              //     padding: EdgeInsets.all(2.w),
+                              //     decoration: BoxDecoration(
+                              //       color: Colors.white.withOpacity(0.1),
+                              //       shape: BoxShape.circle,
+                              //     ),
+                              //     child: Icon(
+                              //       Icons.settings,
+                              //       color: Colors.white,
+                              //       size: 6.w,
+                              //     ),
+                              //   ),
+                              // ),
                             ],
                           ),
                         ),
@@ -1810,121 +1810,122 @@ class _FullScreenVoiceOverlayState extends State<_FullScreenVoiceOverlay> {
     );
   }
 
-  void _showVoiceSettingsSheet(BuildContext context) {
-    // List of available voices - adjust IDs based on your backend expectations
-    final voices = [
-      {'id': 'voice_1', 'name': 'Rashmi (Female 1)'},
-      {'id': 'voice_2', 'name': 'Priya (Female 2)'},
-      {'id': 'voice_3', 'name': 'Krishna (Male 1)'},
-      {'id': 'voice_4', 'name': 'Arjun (Male 2)'},
-    ];
+  // void _showVoiceSettingsSheet(BuildContext context) {
+  //   // List of available voices - adjust IDs based on your backend expectations
+  //   final voices = [
+  //     {'id': 'voice_1', 'name': 'Rashmi (Female 1)'},
+  //     {'id': 'voice_2', 'name': 'Priya (Female 2)'},
+  //     {'id': 'voice_3', 'name': 'Krishna (Male 1)'},
+  //     {'id': 'voice_4', 'name': 'Arjun (Male 2)'},
+  //   ];
 
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext sheetContext) {
-        return Container(
-          padding: EdgeInsets.all(6.w),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFE0B2), // Match other modals
-            borderRadius: BorderRadius.vertical(top: Radius.circular(6.w)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Voice Settings",
-                style: GoogleFonts.lora(
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "Select your preferred AI voice:",
-                style: GoogleFonts.poppins(fontSize: 10.5.sp, color: Colors.black54),
-              ),
-              const SizedBox(height: 20),
-              ...voices.map((voice) {
-                // Get the currently saved voice (default to voice_1)
-                final currentVoice =
-                    StorageService.getString('ai_selected_voice') ?? 'voice_1';
-                final isSelected = currentVoice == voice['id'];
+  //   showModalBottomSheet(
+  //     context: context,
+  //     backgroundColor: Colors.transparent,
+  //     builder: (BuildContext sheetContext) {
+  //       return Container(
+  //         padding: EdgeInsets.all(6.w),
+  //         decoration: BoxDecoration(
+  //           color: const Color(0xFFFFE0B2), // Match other modals
+  //           borderRadius: BorderRadius.vertical(top: Radius.circular(6.w)),
+  //         ),
+  //         child: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: [
+  //             Text(
+  //               "Voice Settings",
+  //               style: GoogleFonts.lora(
+  //                 fontSize: 15.sp,
+  //                 fontWeight: FontWeight.bold,
+  //                 color: Colors.black87,
+  //               ),
+  //             ),
+  //             const SizedBox(height: 8),
+  //             Text(
+  //               "Select your preferred AI voice:",
+  //               style: GoogleFonts.poppins(fontSize: 10.5.sp, color: Colors.black54),
+  //             ),
+  //             const SizedBox(height: 20),
+  //             ...voices.map((voice) {
+  //               // Get the currently saved voice (default to voice_1)
+  //               final currentVoice =
+  //                   StorageService.getString('ai_selected_voice') ?? 'voice_1';
+  //               final isSelected = currentVoice == voice['id'];
 
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: InkWell(
-                    onTap: () {
-                      StorageService.setString(
-                        'ai_selected_voice',
-                        voice['id']!,
-                      );
-                      Navigator.pop(sheetContext);
-                      Get.snackbar(
-                        "Voice Changed",
-                        "Switched to ${voice['name']}. Reconnect to apply.",
-                        snackPosition: SnackPosition.TOP,
-                        backgroundColor: const Color(0xFFA67C00),
-                        colorText: Colors.white,
-                        duration: const Duration(seconds: 2),
-                      );
-                    },
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      padding: EdgeInsets.all(4.w),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? Colors.white
-                            : Colors.white.withOpacity(0.5),
-                        border: Border.all(
-                          color: isSelected
-                              ? const Color(0xFFA67C00)
-                              : Colors.transparent,
-                          width: isSelected ? 2 : 1,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.record_voice_over,
-                            color: isSelected
-                                ? const Color(0xFFA67C00)
-                                : Colors.black54,
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Text(
-                              voice['name']!,
-                              style: GoogleFonts.poppins(
-                                fontSize: 12.sp,
-                                fontWeight: isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                                color: isSelected
-                                    ? const Color(0xFFA67C00)
-                                    : Colors.black87,
-                              ),
-                            ),
-                          ),
-                          if (isSelected)
-                            const Icon(
-                              Icons.check_circle,
-                              color: Color(0xFFA67C00),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ],
-          ),
-        );
-      },
-    );
-  }
+  //               return Padding(
+  //                 padding: const EdgeInsets.only(bottom: 12),
+  //                 child: InkWell(
+  //                   onTap: () {
+  //                     StorageService.setString(
+  //                       'ai_selected_voice',
+  //                       voice['id']!,
+  //                     );
+  //                     Navigator.pop(sheetContext);
+  //                     Get.snackbar(
+  //                       "Voice Changed",
+  //                       "Switched to ${voice['name']}. Reconnect to apply.",
+  //                       snackPosition: SnackPosition.TOP,
+  //                       backgroundColor: const Color(0xFFA67C00),
+  //                       colorText: Colors.white,
+  //                       duration: const Duration(seconds: 2),
+  //                     );
+  //                   },
+  //                   borderRadius: BorderRadius.circular(12),
+  //                   child: Container(
+  //                     padding: EdgeInsets.all(4.w),
+  //                     decoration: BoxDecoration(
+  //                       color: isSelected
+  //                           ? Colors.white
+  //                           : Colors.white.withOpacity(0.5),
+  //                       border: Border.all(
+  //                         color: isSelected
+  //                             ? const Color(0xFFA67C00)
+  //                             : Colors.transparent,
+  //                         width: isSelected ? 2 : 1,
+  //                       ),
+  //                       borderRadius: BorderRadius.circular(12),
+  //                     ),
+  //                     child: Row(
+  //                       children: [
+  //                         Icon(
+  //                           Icons.record_voice_over,
+  //                           color: isSelected
+  //                               ? const Color(0xFFA67C00)
+  //                               : Colors.black54,
+  //                         ),
+  //                         const SizedBox(width: 16),
+  //                         Expanded(
+  //                           child: Text(
+  //                             voice['name']!,
+  //                             style: GoogleFonts.poppins(
+  //                               fontSize: 12.sp,
+  //                               fontWeight: isSelected
+  //                                   ? FontWeight.bold
+  //                                   : FontWeight.normal,
+  //                               color: isSelected
+  //                                   ? const Color(0xFFA67C00)
+  //                                   : Colors.black87,
+  //                             ),
+  //                           ),
+  //                         ),
+  //                         if (isSelected)
+  //                           const Icon(
+  //                             Icons.check_circle,
+  //                             color: Color(0xFFA67C00),
+  //                           ),
+  //                       ],
+  //                     ),
+  //                   ),
+  //                 ),
+  //               );
+  //             }).toList(),
+  //           ],
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+
 }
 
