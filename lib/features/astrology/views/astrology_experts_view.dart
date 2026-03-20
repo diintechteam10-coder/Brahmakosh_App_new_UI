@@ -430,14 +430,6 @@ class AstrologyExpertsView extends StatelessWidget {
                         },
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: _buildActionButton(
-                        icon: Icons.videocam_outlined,
-                        price: "₹${expert.videoCharge?.toInt() ?? 50}/min",
-                        onTap: () => _showComingSoonSheet(context),
-                      ),
-                    ),
                   ],
                 ),
               ],
@@ -914,81 +906,6 @@ class AstrologyExpertsView extends StatelessWidget {
     );
   }
 
-  void _showComingSoonSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        padding: EdgeInsets.all(6.w),
-        decoration: BoxDecoration(
-          color: const Color(0xFF18151B),
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 0.5),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 12.w,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.white12,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            SizedBox(height: 3.h),
-            Icon(
-              Icons.video_call_outlined,
-              color: const Color(0xFFFFD700),
-              size: 15.w,
-            ),
-            SizedBox(height: 2.h),
-            Text(
-              "Video Call Coming Soon!",
-              style: GoogleFonts.lora(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            SizedBox(height: 1.5.h),
-            Text(
-              "We're working hard to bring video consultations to you. Stay tuned!",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
-                color: Colors.white.withValues(alpha: 0.6),
-                fontSize: 11.sp,
-              ),
-            ),
-            SizedBox(height: 4.h),
-            SizedBox(
-              width: double.infinity,
-              height: 6.h,
-              child: ElevatedButton(
-                onPressed: () => Get.back(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFFD700),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  "GOT IT",
-                  style: GoogleFonts.poppins(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: MediaQuery.of(context).padding.bottom + 2.h),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildExpertCardShimmer() {
     return Shimmer.fromColors(

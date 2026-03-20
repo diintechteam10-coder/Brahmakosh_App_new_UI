@@ -172,6 +172,37 @@ class PhoneOtpView extends StatelessWidget {
                           ),
                         ),
                       ),
+
+                      const SizedBox(height: 24),
+
+                      Center(
+                        child: Column(
+                          children: [
+                            Text(
+                              "Didn't receive the code?",
+                              style: GoogleFonts.poppins(
+                                fontSize: 14,
+                                color: AppTheme.authTextSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            GestureDetector(
+                              onTap: controller.isLoading.value
+                                  ? null
+                                  : controller.resendOtp,
+                              child: Text(
+                                "Resend OTP",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppTheme.authPrimaryGold,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ] else ...[
                       // MOBILE NUMBER INPUT STATE
                       _label("Mobile Number"),

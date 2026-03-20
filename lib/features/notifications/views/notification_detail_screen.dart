@@ -12,7 +12,7 @@ class NotificationDetailScreen extends StatelessWidget {
     final info = notification.categoryInfo;
 
     return Scaffold(
-      backgroundColor: AppTheme.homeBackground,
+      backgroundColor: Colors.black,
       body: CustomScrollView(
         slivers: [
           // AppBar
@@ -53,7 +53,7 @@ class NotificationDetailScreen extends StatelessWidget {
                         style: GoogleFonts.lora(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF3E2723),
+                          color: AppTheme.primaryGold,
                         ),
                       ),
                     ),
@@ -96,17 +96,10 @@ class NotificationDetailScreen extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          info.color.withValues(alpha: 0.08),
-                          info.color.withValues(alpha: 0.03),
-                        ],
-                      ),
+                      color: const Color(0xFF121212),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: info.color.withValues(alpha: 0.15),
+                        color: Colors.white.withOpacity(0.05),
                         width: 1,
                       ),
                     ),
@@ -129,10 +122,10 @@ class NotificationDetailScreen extends StatelessWidget {
                             children: [
                               Text(
                                 notification.title,
-                                style: GoogleFonts.lora(
+                                style: GoogleFonts.poppins(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
-                                  color: const Color(0xFF3E2723),
+                                  color: Colors.white,
                                   height: 1.3,
                                 ),
                               ),
@@ -142,14 +135,14 @@ class NotificationDetailScreen extends StatelessWidget {
                                   Icon(
                                     Icons.access_time_rounded,
                                     size: 14,
-                                    color: const Color(0xFFBCAAA4),
+                                    color: Colors.white.withOpacity(0.4),
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
                                     _formatFullDate(notification.createdAt),
-                                    style: GoogleFonts.lora(
+                                    style: GoogleFonts.poppins(
                                       fontSize: 12,
-                                      color: const Color(0xFFBCAAA4),
+                                      color: Colors.white.withOpacity(0.4),
                                     ),
                                   ),
                                 ],
@@ -168,15 +161,8 @@ class NotificationDetailScreen extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: const Color(0xFF1C1C1E),
                       borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.04),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -186,15 +172,15 @@ class NotificationDetailScreen extends StatelessWidget {
                           style: GoogleFonts.lora(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF5D4037),
+                            color: AppTheme.primaryGold,
                           ),
                         ),
                         const SizedBox(height: 10),
                         Text(
                           notification.body,
-                          style: GoogleFonts.lora(
+                          style: GoogleFonts.poppins(
                             fontSize: 14,
-                            color: const Color(0xFF6D4C41),
+                            color: Colors.white.withOpacity(0.7),
                             height: 1.6,
                           ),
                         ),
@@ -211,15 +197,8 @@ class NotificationDetailScreen extends StatelessWidget {
                       width: double.infinity,
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: const Color(0xFF1C1C1E),
                         borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.04),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -237,19 +216,19 @@ class NotificationDetailScreen extends StatelessWidget {
                                 style: GoogleFonts.lora(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: const Color(0xFF5D4037),
+                                  color: AppTheme.primaryGold,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 12),
-                          const Divider(color: Color(0xFFF5E6D0), height: 1),
+                          const SizedBox(height: 14),
+                          Divider(color: Colors.white.withOpacity(0.1), height: 1),
                           const SizedBox(height: 14),
                           Text(
                             notification.description!,
-                            style: GoogleFonts.lora(
+                            style: GoogleFonts.poppins(
                               fontSize: 13.5,
-                              color: const Color(0xFF6D4C41),
+                              color: Colors.white.withOpacity(0.6),
                               height: 1.7,
                             ),
                           ),
@@ -267,10 +246,10 @@ class NotificationDetailScreen extends StatelessWidget {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: info.color.withValues(alpha: 0.08),
+                        color: info.color.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: info.color.withValues(alpha: 0.2),
+                          color: info.color.withOpacity(0.2),
                           width: 1,
                         ),
                       ),
@@ -278,13 +257,14 @@ class NotificationDetailScreen extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(info.icon, size: 16, color: info.color),
-                          const SizedBox(width: 6),
+                          const SizedBox(width: 8),
                           Text(
-                            info.label,
-                            style: GoogleFonts.lora(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
+                            info.label.toUpperCase(),
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
                               color: info.color,
+                              letterSpacing: 1.2,
                             ),
                           ),
                         ],
@@ -300,19 +280,10 @@ class NotificationDetailScreen extends StatelessWidget {
                       width: double.infinity,
                       child: Container(
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [AppTheme.primaryGold, AppTheme.darkGold],
+                          gradient: const LinearGradient(
+                            colors: [AppTheme.primaryGold, Color(0xFFB8860B)],
                           ),
                           borderRadius: BorderRadius.circular(14),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppTheme.primaryGold.withValues(
-                                alpha: 0.3,
-                              ),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
                         ),
                         child: Material(
                           color: Colors.transparent,
@@ -337,12 +308,12 @@ class NotificationDetailScreen extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               child: Center(
                                 child: Text(
-                                  'Mark as Read',
-                                  style: GoogleFonts.lora(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                    letterSpacing: 0.5,
+                                  'Mark as Read'.toUpperCase(),
+                                  style: GoogleFonts.cinzel(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                    letterSpacing: 1.5,
                                   ),
                                 ),
                               ),

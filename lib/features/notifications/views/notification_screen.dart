@@ -10,7 +10,6 @@ class NotificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final allNotifications = DummyNotifications.getAll();
-    final unreadCount = DummyNotifications.getUnreadCount();
 
     // Group notifications by time
     final now = DateTime.now();
@@ -32,69 +31,46 @@ class NotificationScreen extends StatelessWidget {
         .toList();
 
     return Scaffold(
-      backgroundColor: AppTheme.homeBackground,
+      backgroundColor: Colors.black,
       body: CustomScrollView(
         slivers: [
-          // Custom AppBar
+          // Premium AppBar
           SliverToBoxAdapter(
             child: SafeArea(
               bottom: false,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-                child: Row(
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
+                child: Stack(
+                  alignment: Alignment.center,
                   children: [
-                    GestureDetector(
-                      onTap: () => Get.back(),
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.8),
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.08),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.arrow_back_ios_new,
-                          size: 18,
-                          color: Color(0xFF5D4037),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Notifications',
-                      style: GoogleFonts.lora(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF3E2723),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    if (unreadCount > 0)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppTheme.primaryGold,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '$unreadCount',
-                          style: GoogleFonts.lora(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: GestureDetector(
+                        onTap: () => Get.back(),
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.08),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.arrow_back_ios_new,
+                            size: 16,
                             color: Colors.white,
                           ),
                         ),
                       ),
+                    ),
+                    Text(
+                      'NOTIFICATION',
+                      style: GoogleFonts.lora(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.primaryGold,
+                        letterSpacing: 2.0,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -129,14 +105,13 @@ class NotificationScreen extends StatelessWidget {
   Widget _buildSectionHeader(String title) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
         child: Text(
           title,
-          style: GoogleFonts.lora(
-            fontSize: 15,
+          style: GoogleFonts.poppins(
+            fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFF8D6E63),
-            letterSpacing: 0.5,
+            color: Colors.white.withOpacity(0.9),
           ),
         ),
       ),
@@ -147,24 +122,42 @@ class NotificationScreen extends StatelessWidget {
     List<NotificationModel> notifications,
     BuildContext context,
   ) {
-    return SliverPadding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      sliver: SliverList(
-        delegate: SliverChildBuilderDelegate((context, index) {
-          return _NotificationCard(
-            notification: notifications[index],
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => NotificationDetailScreen(
-                    notification: notifications[index],
-                  ),
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+        child: Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF151517),
+            // borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            children: [
+              for (var i = 0; i < notifications.length; i++) ...[
+                _NotificationCard(
+                  notification: notifications[i],
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => NotificationDetailScreen(
+                          notification: notifications[i],
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          );
-        }, childCount: notifications.length),
+                if (i < notifications.length - 1)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20, right: 20),
+                    child: Divider(
+                      color: Colors.white.withOpacity(0.06),
+                      height: 1,
+                    ),
+                  ),
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -178,150 +171,118 @@ class _NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final info = notification.categoryInfo;
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: notification.isRead
-              ? Colors.white.withValues(alpha: 0.85)
-              : Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: notification.isRead
-              ? null
-              : Border.all(color: info.color.withValues(alpha: 0.2), width: 1),
-          boxShadow: [
-            BoxShadow(
-              color: notification.isRead
-                  ? Colors.black.withValues(alpha: 0.04)
-                  : info.color.withValues(alpha: 0.1),
-              blurRadius: notification.isRead ? 6 : 12,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 18),
+        color: Colors.transparent,
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Category Icon
+            // Category Icon - Rounded Square with darker background
             Container(
-              width: 46,
-              height: 46,
+              width: 50,
+              height: 50,
               decoration: BoxDecoration(
-                color: info.color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(13),
+                color: const Color(0xFF0D0D0E),
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(info.icon, color: info.color, size: 24),
+              child: Icon(
+                _getDisplayIcon(notification.category), 
+                color: _getIconColor(notification.category), 
+                size: 24,
+              ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 16),
 
             // Content
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    notification.title,
-                    style: GoogleFonts.lora(
-                      fontSize: 14.5,
-                      fontWeight: notification.isRead
-                          ? FontWeight.w500
-                          : FontWeight.w700,
-                      color: const Color(0xFF3E2723),
-                      height: 1.3,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        notification.title,
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          height: 1.2,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                       if (!notification.isRead) ...[
+              const SizedBox(width: 12),
+              Container(
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryGold,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primaryGold.withOpacity(0.4),
+                      blurRadius: 4,
+                      spreadRadius: 1,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  ],
+                ),
+              ),
+              const SizedBox(width: 4),
+            ],
+                    ],
                   ),
                   const SizedBox(height: 4),
                   Text(
                     notification.body,
-                    style: GoogleFonts.lora(
-                      fontSize: 12.5,
-                      color: const Color(0xFF8D6E63),
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      color: Colors.white.withOpacity(0.4),
                       height: 1.4,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: info.color.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          info.label,
-                          style: GoogleFonts.lora(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: info.color,
-                          ),
-                        ),
-                      ),
-                      const Spacer(),
-                      Text(
-                        _formatTime(notification.createdAt),
-                        style: GoogleFonts.lora(
-                          fontSize: 11,
-                          color: const Color(0xFFBCAAA4),
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),
-
-            // Unread indicator
-            if (!notification.isRead)
-              Padding(
-                padding: const EdgeInsets.only(left: 8, top: 4),
-                child: Container(
-                  width: 9,
-                  height: 9,
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryGold,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.primaryGold.withValues(alpha: 0.4),
-                        blurRadius: 6,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+           
+          
           ],
         ),
       ),
     );
   }
 
-  String _formatTime(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date);
+  IconData _getDisplayIcon(NotificationCategory category) {
+    // Attempt to match the reference image icons if possible
+    // Reference has Star, Heart, Moon
+    switch (category) {
+      case NotificationCategory.dailyAstrology:
+        return Icons.star_rounded;
+      case NotificationCategory.emotionalCompanion:
+        return Icons.favorite_rounded;
+      case NotificationCategory.spiritualCheckIn:
+        return Icons.nightlight_round;
+      default:
+        return NotificationCategoryInfo.getInfo(category).icon;
+    }
+  }
 
-    if (difference.inDays > 7) {
-      return '${date.day}/${date.month}/${date.year}';
-    } else if (difference.inDays > 0) {
-      if (difference.inDays == 1) return 'Yesterday';
-      return '${difference.inDays}d ago';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours}h ago';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes}m ago';
-    } else {
-      return 'Just now';
+  Color _getIconColor(NotificationCategory category) {
+    switch (category) {
+      case NotificationCategory.dailyAstrology:
+        return const Color(0xFFFFD700);
+      case NotificationCategory.emotionalCompanion:
+        return Colors.red;
+      case NotificationCategory.spiritualCheckIn:
+        return const Color(0xFF7E57C2);
+      default:
+        return NotificationCategoryInfo.getInfo(category).color;
     }
   }
 }

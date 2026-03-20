@@ -12,6 +12,7 @@ class MantraChantingController extends GetxController
     with GetTickerProviderStateMixin {
   var chantCount = 0.obs;
   var isCompleted = false.obs;
+  var isStarted = false.obs; // Tracks if chanting session has begun
   final _chantingMantras = <Data>[].obs; // Observable for list of mantras
   final _selectedIndex = 0.obs; // Observable for selected mantra index
   final _isLoading = false.obs; // Observable for loading state
@@ -104,8 +105,8 @@ class MantraChantingController extends GetxController
 
     _handleArguments();
 
-    // Play Background Audio (handles fallback internally)
-    _playBackgroundAudio();
+    // Removed auto-play of Background Audio (now handled by user click)
+    // _playBackgroundAudio();
   }
 
   void _handleArguments() {
@@ -161,7 +162,7 @@ class MantraChantingController extends GetxController
     return "Mantra";
   }
 
-  Future<void> _playBackgroundAudio() async {
+  Future<void> startBackgroundAudio() async {
     try {
       if (_audioUrl != null && _audioUrl!.startsWith('http')) {
         // Network Source
@@ -180,6 +181,27 @@ class MantraChantingController extends GetxController
     } catch (e) {
       debugPrint("❌ Error playing background audio: $e");
     }
+  }
+
+  void startChanting() {
+    isStarted.value = true;
+    startTimer();
+    startBackgroundAudio();
+  }
+
+  void pauseBackgroundAudio() {
+    _backgroundAudioPlayer.pause();
+    stopTimer();
+  }
+
+  void resumeBackgroundAudio() {
+    _backgroundAudioPlayer.resume();
+    startTimer();
+  }
+
+  void stopBackgroundAudio() {
+    _backgroundAudioPlayer.stop();
+    stopTimer();
   }
 
   Future<void> fetchChantingMantras() async {

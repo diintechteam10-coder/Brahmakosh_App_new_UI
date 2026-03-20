@@ -129,7 +129,7 @@ class PrayerConfigurationView extends StatelessWidget {
                     ),
                     if (loadedState.isStarting)
                       Container(
-                        color: Colors.black.withOpacity(0.5),
+                        color: Colors.black.withValues(alpha: 0.5),
                         child: const Center(
                           child: CircularProgressIndicator(color: Color(0xFFD4AF37)),
                         ),
@@ -160,7 +160,7 @@ class PrayerConfigurationView extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white24),
             ),
@@ -178,7 +178,7 @@ class PrayerConfigurationView extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white24),
             ),
@@ -218,7 +218,7 @@ class PrayerConfigurationView extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -238,7 +238,7 @@ class PrayerConfigurationView extends StatelessWidget {
                 child: const Icon(
                   Icons.volunteer_activism_rounded,
                   size: 16,
-                  color: Color(0xffE67E22), // Orange icon
+                  color: const Color(0xFFD4AF37), // Gold icon
                 ),
               ),
               const SizedBox(width: 10),
@@ -431,7 +431,7 @@ class PrayerConfigurationView extends StatelessWidget {
       height: 48,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        color: const Color(0xffE67E22), // Orange Button
+        color: const Color(0xFFD4AF37), // Gold Button
       ),
       child: ElevatedButton(
         onPressed: () {
@@ -440,7 +440,7 @@ class PrayerConfigurationView extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
-          foregroundColor: Colors.white,
+          foregroundColor: Colors.black, // Dark text on gold
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
           ),
@@ -555,7 +555,7 @@ class _EmotionListState extends State<_EmotionList> {
                     alignment: Alignment.center,
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.transparent,
+                      color: Colors.black12,
                     ),
                     child: Text(
                       emoji,
@@ -574,7 +574,7 @@ class _EmotionListState extends State<_EmotionList> {
                         fontWeight: isSelected
                             ? FontWeight.bold
                             : FontWeight.normal,
-                        color: isSelected ? Colors.white : Colors.white54,
+                        color: isSelected ? const Color(0xFFD4AF37) : Colors.white54,
                       ),
                     ),
                   ),

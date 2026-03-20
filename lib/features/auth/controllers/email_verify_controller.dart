@@ -75,6 +75,49 @@ class EmailOtpController extends GetxController {
     }
   }
 
+  /// 🔁 RESEND EMAIL OTP
+  Future<void> resendOtp({required String email}) async {
+    print("🔁 Resend Email OTP called");
+
+    try {
+      isLoading.value = true;
+
+      final payload = {
+        "email": email,
+        "clientId": "CLI-KBHUMT",
+      };
+
+      print("➡️ API URL: ${ApiUrls.resendEmailOtp}");
+      print("➡️ Payload: $payload");
+
+      final response = await http.post(
+        Uri.parse(ApiUrls.resendEmailOtp),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(payload),
+      );
+
+      print("⬅️ Status Code: ${response.statusCode}");
+      print("⬅️ Response: ${response.body}");
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("✅ Email OTP resent successfully");
+        Get.snackbar("Success", data['message'] ?? "OTP resent to email");
+      } else {
+        print("❌ OTP resend failed");
+        Get.snackbar("Error", data['message'] ?? "Failed to resend OTP");
+      }
+    } catch (e, s) {
+      print("🔥 Exception in OTP resend");
+      print(e);
+      print(s);
+      Get.snackbar("Error", "Server error");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   @override
   void onClose() {
     otpController.dispose();

@@ -34,6 +34,8 @@ export 'package:google_fonts/google_fonts.dart';
 export 'package:lottie/lottie.dart';
 export 'package:flutter_bloc/flutter_bloc.dart' hide Transition;
 export 'package:cached_network_image/cached_network_image.dart';
+export 'package:flutter_svg/flutter_svg.dart';
+export 'package:sizer/sizer.dart';
 
 // Routing
 export 'package:go_router/go_router.dart';

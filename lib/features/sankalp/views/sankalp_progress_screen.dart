@@ -419,6 +419,7 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                         child: ElevatedButton(
                           onPressed: () {
                             if (isTodayCompleted) {
+                              context.read<SankalpBloc>().add(ClearSankalpOperationStatus());
                               Get.back();
                             } else {
                               Utils.print("Mark Day $currentDayDisplay Complete clicked for Sankalp: ${sankalp.title} (ID: ${activeUserSankalp.id})");
@@ -469,6 +470,7 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
   void _showSuccessDialog(BuildContext context, String message) {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
           backgroundColor: const Color(0xFF1C1C1E),
@@ -502,7 +504,10 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    context.read<SankalpBloc>().add(ClearSankalpOperationStatus());
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primaryGold,
                     foregroundColor: Colors.black,

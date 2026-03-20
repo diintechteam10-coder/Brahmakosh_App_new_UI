@@ -457,43 +457,57 @@ class MySankalpTab extends StatelessWidget {
   void _showSuccessDialog(BuildContext context, String message) {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
+          backgroundColor: const Color(0xFF1C1C1E),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(24),
+            side: BorderSide(color: AppTheme.primaryGold.withOpacity(0.2)),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.check_circle, color: Colors.green, size: 60),
+              const Icon(Icons.check_circle, color: Color(0xFF4CAF50), size: 60),
               const SizedBox(height: 16),
               Text(
                 "Great Job!",
                 style: GoogleFonts.lora(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xff5D4037),
+                  color: Colors.white,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Text(
                 message,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                   fontSize: 14,
-                  color: const Color(0xff5D4037),
+                  color: Colors.white.withOpacity(0.8),
                 ),
               ),
               const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xffff7438),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    context.read<SankalpBloc>().add(ClearSankalpOperationStatus());
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryGold,
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: Text(
+                    "Keep Going",
+                    style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
                   ),
                 ),
-                child: const Text("Keep Going"),
               ),
             ],
           ),

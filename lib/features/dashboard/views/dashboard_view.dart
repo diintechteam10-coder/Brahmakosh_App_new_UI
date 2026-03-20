@@ -11,6 +11,7 @@ import '../../report/views/report_view.dart';
 import '../../check_in/views/check_in_view.dart';
 import '../../astrology/views/astrology_experts_view.dart';
 import '../../remedies/views/remedies_web_view.dart';
+import '../../../common/widgets/custom_popups.dart';
 
 class DashboardView extends StatelessWidget {
   const DashboardView({super.key});
@@ -118,35 +119,13 @@ class _DashboardLayoutState extends State<DashboardLayout>
     final shouldPop = await showDialog<bool>(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Text(
-            'Exit App',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: const Text('Are you sure you want to exit the app?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text(
-                'No',
-                style: TextStyle(color: Colors.grey, fontSize: 16),
-              ),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text(
-                'Yes',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ],
+        return ActionConfirmationPopup(
+          title: 'Exit App',
+          description: 'Are you sure you want to exit the app?',
+          confirmLabel: 'Yes',
+          cancelLabel: 'No',
+          onConfirm: () {}, // Handled by showDialog return value
+          confirmColor: Colors.red,
         );
       },
     );

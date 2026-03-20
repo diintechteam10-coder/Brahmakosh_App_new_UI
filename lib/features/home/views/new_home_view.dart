@@ -1260,7 +1260,7 @@ Widget _buildFeatureGrid(bool isTablet) {
               final experts = astrologyController.experts;
               if (astrologyController.isLoading.value && experts.isEmpty) {
                 return const SizedBox(
-                  height: 184,
+                  height: 205,
                   child: Center(
                     child: CircularProgressIndicator(color: Color(0xFFD4AF37)),
                   ),
@@ -1268,7 +1268,7 @@ Widget _buildFeatureGrid(bool isTablet) {
               }
               if (experts.isEmpty) {
                 return SizedBox(
-                  height: 184,
+                  height: 205,
                   child: Center(
                     child: Text(
                       "No experts available",
@@ -1280,7 +1280,7 @@ Widget _buildFeatureGrid(bool isTablet) {
                 );
               }
               return SizedBox(
-                height: 185,
+                height: 205,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -1950,15 +1950,13 @@ Widget _buildFeatureGrid(bool isTablet) {
         "title": "7 Mukhi Rudraksha",
         "subtitle": "For spiritual protection & planet Saturn...",
         "price": "1,299",
-        "image":
-            "https://img.freepik.com/premium-photo/rudraksha-isolated-white-background_1025754-1845.jpg?w=740",
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSs1hx27RUdRVHpThGV_4DN3712p8UCKtndeA&s",
       },
       {
         "title": "Yellow Sapphire",
         "subtitle": "For wealth, prosperity & planet Jupiter...",
         "price": "15,500",
-        "image":
-            "https://img.freepik.com/premium-photo/yellow-sapphire-gemstone-isolated-white-background_1025754-2091.jpg?w=740",
+        "image": "https://www.shivaago.com/wp-content/uploads/2021/03/IMG_20210307_160026_compress32-600x486.jpg",
       },
     ];
 
@@ -1967,15 +1965,13 @@ Widget _buildFeatureGrid(bool isTablet) {
         "title": "Sphatik Mala",
         "subtitle": "For peace, concentration & planet Moon...",
         "price": "850",
-        "image":
-            "https://img.freepik.com/free-photo/shiny-white-crystal-beads-necklace_53876-104917.jpg?t=st=1710675715~exp=1710679315~hmac=8e6b1b6c0b1b0b2b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9a0b1",
+        "image": "https://ik.imagekit.io/gemsonline/wp-content/uploads/2026/01/Spetics-mala-3-scaled.jpg",
       },
       {
         "title": "Gomati Chakra",
         "subtitle": "For protection, prosperity and bringing luck...",
         "price": "150",
-        "image":
-            "https://img.freepik.com/premium-photo/gomti-chakra-shell-isolated-white-background_1025754-2150.jpg?w=740",
+        "image": "https://m.media-amazon.com/images/I/A1QIkWYHngL._AC_UY1100_.jpg",
       },
     ];
 

@@ -14,6 +14,22 @@ class SankalpBloc extends Bloc<SankalpEvent, SankalpState> {
     on<ReportDailyStatus>(_onReportDailyStatus);
     on<FetchSankalpDetail>(_onFetchSankalpDetail);
     on<FetchSankalpProgress>(_onFetchSankalpProgress);
+    on<ClearSankalpOperationStatus>(_onClearSankalpOperationStatus);
+  }
+
+  void _onClearSankalpOperationStatus(
+    ClearSankalpOperationStatus event,
+    Emitter<SankalpState> emit,
+  ) {
+    if (state is SankalpOperationSuccess || state is SankalpError) {
+      // Re-emit Loaded state with current data if possible
+      // This is a simple way to "consume" the success/error status
+      // If we don't have loaded data, it will go to initial or loading.
+      // Typically we are in a scenario where we already had some data.
+      emit(const SankalpLoaded()); // Simplified for now, or fetch fresh?
+      // Better: trigger a fresh fetch to be sure
+      add(FetchUserSankalps());
+    }
   }
 
   Future<void> _onFetchAvailableSankalps(

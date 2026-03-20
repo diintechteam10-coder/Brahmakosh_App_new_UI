@@ -77,7 +77,7 @@ class _SpiritualConfigurationViewState
                 leading: Container(
                   margin: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
+                    color: Colors.white.withValues(alpha: 0.05),
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white24),
                   ),
@@ -181,7 +181,7 @@ class _SpiritualConfigurationViewState
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white24),
             ),
@@ -199,7 +199,7 @@ class _SpiritualConfigurationViewState
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white24),
             ),
@@ -240,7 +240,7 @@ class _SpiritualConfigurationViewState
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -260,7 +260,7 @@ class _SpiritualConfigurationViewState
                 child: const Icon(
                   Icons.access_time_filled_rounded,
                   size: 16,
-                  color: Color(0xffE67E22), // Orange icon
+                  color: const Color(0xFFD4AF37), // Gold icon
                 ),
               ),
               const SizedBox(width: 10),
@@ -418,7 +418,7 @@ class _SpiritualConfigurationViewState
       height: 48,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        color: const Color(0xffE67E22), // Orange Button
+        color: const Color(0xFFD4AF37), // Gold Button
       ),
       child: ElevatedButton(
         onPressed: () {
@@ -427,7 +427,7 @@ class _SpiritualConfigurationViewState
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
-          foregroundColor: Colors.white,
+          foregroundColor: Colors.black, // Dark text on gold
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
           ),
@@ -565,7 +565,7 @@ class _EmotionListState extends State<_EmotionList> {
                         alignment: Alignment.center,
                         decoration: const BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.transparent,
+                          color: Colors.black12,
                         ),
                         child: Text(
                           emoji,
@@ -584,7 +584,7 @@ class _EmotionListState extends State<_EmotionList> {
                             fontWeight: isSelected
                                 ? FontWeight.bold
                                 : FontWeight.normal,
-                            color: isSelected ? Colors.white : Colors.white54,
+                            color: isSelected ? const Color(0xFFD4AF37) : Colors.white54,
                           ),
                         ),
                       ),

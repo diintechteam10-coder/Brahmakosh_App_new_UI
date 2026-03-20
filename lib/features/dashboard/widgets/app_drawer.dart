@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../profile/viewmodels/profile_viewmodel.dart';
 import '../../profile/views/profile_details_view.dart';
 import '../../profile/views/update_profile_view.dart';
+import '../../../../common/widgets/custom_popups.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../viewmodels/dashboard_viewmodel.dart';
@@ -307,10 +308,7 @@ class AppDrawer extends StatelessWidget {
                                         icon: Icons.shopping_cart_outlined,
                                         label: "Orders",
                                         onTap: () {
-                                          _showComingSoonPopup(
-                                            context,
-                                            "Orders",
-                                          );
+                                          Get.dialog(const ComingSoonPopup(feature: "Orders"));
                                         },
                                       ),
                                       _menuItem(
@@ -340,10 +338,7 @@ class AppDrawer extends StatelessWidget {
                                         icon: Icons.settings_outlined,
                                         label: "Settings",
                                         onTap: () {
-                                          _showComingSoonPopup(
-                                            context,
-                                            "Settings",
-                                          );
+                                          Get.dialog(const ComingSoonPopup(feature: "Settings"));
                                         },
                                       ),
                                       _menuItem(
@@ -382,31 +377,38 @@ class AppDrawer extends StatelessWidget {
                                   //_sectionHeader("Account Option"),
                                   const SizedBox(height: 8),
                                   GestureDetector(
-                                    onTap: () async {
-                                      await StorageService.setBool(
-                                        AppConstants.keyIsLoggedIn,
-                                        false,
+                                    onTap: () {
+                                      Get.dialog(
+                                        ActionConfirmationPopup(
+                                          title: "Logout",
+                                          description: "Are you sure you want to logout from Brahmakosh?",
+                                          confirmLabel: "Logout",
+                                          onConfirm: () async {
+                                            await StorageService.setBool(
+                                              AppConstants.keyIsLoggedIn,
+                                              false,
+                                            );
+                                            await StorageService.remove(
+                                              AppConstants.keyAuthToken,
+                                            );
+                                            await StorageService.remove(
+                                              AppConstants.keyUserId,
+                                            );
+                                            Get.offAllNamed(AppConstants.routeLogin);
+                                          },
+                                        ),
                                       );
-                                      await StorageService.remove(
-                                        AppConstants.keyAuthToken,
-                                      );
-                                      await StorageService.remove(
-                                        AppConstants.keyUserId,
-                                      );
-                                      Get.offAllNamed(AppConstants.routeLogin);
                                     },
                                     child: Container(
                                       height: 36,
                                       width: 110, // Reduced width
                                       alignment: Alignment.center,
                                       decoration: BoxDecoration(
-                                        color: AppTheme
-                                            .landingButton, // Updated color
+                                        color: AppTheme.landingButton, // Updated color
                                         borderRadius: BorderRadius.circular(8),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: AppTheme.landingButton
-                                                .withOpacity(0.3),
+                                            color: AppTheme.landingButton.withOpacity(0.3),
                                             blurRadius: 6,
                                             offset: const Offset(0, 3),
                                           ),
@@ -499,44 +501,6 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  void _showComingSoonPopup(BuildContext context, String featureName) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        backgroundColor: Colors.white,
-        title: Row(
-          children: [
-            const Icon(Icons.info_outline, color: AppTheme.primaryGold),
-            const SizedBox(width: 10),
-            Text(
-              "Coming Soon",
-              style: GoogleFonts.lora(
-                fontWeight: FontWeight.bold,
-                color: const Color(0xff5D4037),
-              ),
-            ),
-          ],
-        ),
-        content: Text(
-          "The $featureName feature is currently under development and will be available in a future update. Stay tuned!",
-          style: GoogleFonts.lora(fontSize: 15, color: Colors.black87),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              "Okay",
-              style: GoogleFonts.lora(
-                fontWeight: FontWeight.bold,
-                color: AppTheme.primaryGold,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Future<void> _launchDeleteAccountEmail(
       BuildContext context, String userEmail) async {
@@ -589,7 +553,7 @@ class AppDrawer extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6), // Reduced padding
       child: InkWell(
-        onTap: () => _showComingSoonPopup(context, "Change Language"),
+        onTap: () => Get.dialog(const ComingSoonPopup(feature: "Change Language")),
         child: Row(
           children: [
             const Icon(Icons.translate, color: Color(0xff5D4037), size: 18),

@@ -39,52 +39,59 @@ class _SplashViewState extends State<SplashView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SizedBox.expand(
-        child: Image.asset('assets/images/splash2.jpg', fit: BoxFit.cover),
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 60),
+              Text(
+                'BRAHMAKOSH',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.lora(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFFD4AF37), // Gold color
+                  letterSpacing: 1.5,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Your Spiritual Operating System',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.lora(
+                  fontSize: 16,
+                  color: const Color(0xFFD4AF37).withOpacity(0.9),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            SizedBox(height: 20),
+              // Center Logo Image
+              Center(
+                child: Image.asset(
+                  'assets/icons/splash_logo.png',
+                  width: MediaQuery.of(context).size.width * 0.80,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Daily insights and astrology that bring\nclarity, discipline, and balance\nto your life.',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: Colors.white,
+                  height: 1.5,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 60),
+            ],
+          ),
+        ),
       ),
-      // body: SafeArea(
-      //   child: Center(
-      //     child: SingleChildScrollView(
-      //       child: Column(
-      //         mainAxisAlignment: MainAxisAlignment.center,
-      //         children: [
-      //           Image.asset(
-      //             'assets/images/brahmkosh_logo.jpeg',
-      //             height: 200,
-      //             width: 200,
-      //           ),
-      //           //const SizedBox(height: 5),
-      //           Text(
-      //             'BRAHMAKOSH',
-      //             style: GoogleFonts.lora(
-      //               fontSize: 32,
-      //               fontWeight: FontWeight.bold,
-      //               color: const Color(0xFFD4AF37), // Gold color
-      //               letterSpacing: 1.5,
-      //             ),
-      //           ),
-      //           const SizedBox(height: 10),
-      //           Text(
-      //             'Your Spiritual Operating System',
-      //             style: GoogleFonts.lora(fontSize: 18, color: Colors.black87),
-      //             textAlign: TextAlign.center,
-      //           ),
-      //           const SizedBox(height: 12),
-      //           Text(
-      //             'Spirituality • Astrology • Companion • Intelligence',
-      //             style: GoogleFonts.lora(
-      //               fontSize: 14,
-      //               color: Colors.grey[600],
-      //               fontWeight: FontWeight.w500,
-      //             ),
-      //             textAlign: TextAlign.center,
-      //           ),
-      //         ],
-      //       ),
-      //     ),
-      //   ),
-      // ),
     );
   }
 }

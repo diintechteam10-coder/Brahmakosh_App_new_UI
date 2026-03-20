@@ -190,7 +190,7 @@ class GenerateAvatarView extends StatelessWidget {
                 GestureDetector(
                   onTap: controller.isLoading.value
                       ? null
-                      : () => Get.offAllNamed(AppConstants.routeDashboard),
+                      : () => Get.offAllNamed(AppConstants.routeRegistrationSuccess),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

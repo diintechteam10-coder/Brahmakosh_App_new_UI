@@ -138,6 +138,8 @@ class _CheckInViewState extends State<CheckInView>
             return const SafeArea(child: Center(child: Text("Loading...")));
           }
 
+          final finalData = data;
+
           return Scaffold(
             backgroundColor: Colors.black, // Dark Theme Background
             body: SafeArea(
@@ -174,7 +176,7 @@ class _CheckInViewState extends State<CheckInView>
                               height: 36,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.white.withOpacity(0.05),
+                                color: Colors.white.withValues(alpha: 0.05),
                                 border: Border.all(color: Colors.white24),
                               ),
                               child: IconButton(
@@ -202,7 +204,7 @@ class _CheckInViewState extends State<CheckInView>
                               height: 36,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.white.withOpacity(0.05),
+                                color: Colors.white.withValues(alpha: 0.05),
                                 border: Border.all(color: Colors.white24),
                               ),
                               child: IconButton(
@@ -227,107 +229,112 @@ class _CheckInViewState extends State<CheckInView>
                       // Main title & Subtitle
                       Text(
                         'DAILY SPIRITUAL CHECK - IN',
+                        textAlign: TextAlign.center,
                         style: GoogleFonts.lora(
-                          fontSize: 18,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: const Color(0xFFD4AF37),
+                          letterSpacing: 0.5,
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 8),
                       Text(
                         'Take a moment for yourself',
+                        textAlign: TextAlign.center,
                         style: GoogleFonts.poppins(
-                          fontSize: 14,
+                          fontSize: 15,
                           color: Colors.white70,
+                          letterSpacing: 0.2,
                         ),
                       ),
 
-                      // Check-In Options
-                      if (data.activities != null &&
-                          data.activities!.isNotEmpty) ...[
-                        const SizedBox(height: 24),
+                      // Check-In Options (2x2 Grid)
+                      if (finalData.activities != null &&
+                          finalData.activities!.isNotEmpty) ...[
+                        const SizedBox(height: 32),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 40),
-                          child: Wrap(
-                            spacing: 20,
-                            runSpacing: 12,
-                            alignment: WrapAlignment.center,
-                            children: data.activities!.map((activity) {
-                              return SizedBox(
-                                width:
-                                    (MediaQuery.of(context).size.width -
-                                        80 -
-                                        20) /
-                                    2,
-                                child: _card(
-                                  image: activity.image,
-                                  title: activity.title?.toUpperCase() ?? '',
-                                  onTap: () {
-                                    if (activity.route != null) {
-                                      if (activity.title == 'Chanting') {
-                                        Get.to(
-                                          () => ChantingConfigurationView(
-                                            chantingCategoryId: activity.id!,
-                                          ),
-                                        );
-                                      } else if (activity.title == 'Prayer' &&
-                                          activity.id != null) {
-                                        Get.to(
-                                          () => PrayerConfigurationView(
-                                            prayerCategoryId: activity.id!,
-                                          ),
-                                        );
-                                      } else if (activity.id != null) {
-                                        context.read<CheckInBloc>().add(
-                                          SelectActivity(
-                                            activityId: activity.id!,
-                                            route: AppConstants
-                                                .routeSpiritualConfiguration,
-                                            title: activity.title,
-                                          ),
-                                        );
-                                      }
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 20,
+                              mainAxisSpacing: 24,
+                              childAspectRatio: 0.82, // Balanced for card + text
+                            ),
+                            itemCount: finalData.activities!.length,
+                            itemBuilder: (context, index) {
+                              final activities = finalData.activities!;
+                              final activity = activities[index];
+                              return _card(
+                                image: activity.image,
+                                title: activity.title?.toUpperCase() ?? '',
+                                onTap: () {
+                                  if (activity.route != null) {
+                                    if (activity.title == 'Chanting') {
+                                      Get.to(
+                                        () => ChantingConfigurationView(
+                                          chantingCategoryId: activity.id!,
+                                        ),
+                                      );
+                                    } else if (activity.title == 'Prayer' &&
+                                        activity.id != null) {
+                                      Get.to(
+                                        () => PrayerConfigurationView(
+                                          prayerCategoryId: activity.id!,
+                                        ),
+                                      );
+                                    } else if (activity.id != null) {
+                                      context.read<CheckInBloc>().add(
+                                        SelectActivity(
+                                          activityId: activity.id!,
+                                          route: AppConstants
+                                              .routeSpiritualConfiguration,
+                                          title: activity.title,
+                                        ),
+                                      );
                                     }
-                                  },
-                                ),
+                                  }
+                                },
                               );
-                            }).toList(),
+                            },
                           ),
                         ),
                       ],
-                      SizedBox(height: 32),
+                      const SizedBox(height: 32),
 
                       // Overview Stats
-                      if (data.stats != null) ...[
+                      if (finalData.stats != null) ...[
                         const SizedBox(height: 10),
                         RepaintBoundary(
-                          child: _buildOverviewStats(data.stats!, data.recentActivities),
+                          child: _buildOverviewStats(finalData.stats!, finalData.recentActivities),
                         ),
                         const SizedBox(height: 16),
                       ],
 
                       // Category Progress
-                      if (data.categoryStats != null) ...[
+                      if (finalData.categoryStats != null) ...[
                         RepaintBoundary(
-                          child: _buildCategoryStats(data.categoryStats!),
+                          child: _buildCategoryStats(finalData.categoryStats!),
                         ),
                         const SizedBox(height: 16),
                       ],
 
                       // Recent Activities
-                      if (data.recentActivities != null &&
-                          data.recentActivities!.isNotEmpty)
+                      if (finalData.recentActivities != null &&
+                          finalData.recentActivities!.isNotEmpty)
                         RepaintBoundary(
-                          child: _buildRecentActivities(data.recentActivities!),
+                          child: _buildRecentActivities(finalData.recentActivities!),
                         ),
-                      SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
                       // Karma & Motivation
                       Column(
                         children: [
-                          if (data.motivation?.emoji != null)
+                          if (finalData.motivation?.emoji != null)
                             Text(
-                              data.motivation!.emoji!,
+                              finalData.motivation!.emoji!,
                               style: const TextStyle(fontSize: 40),
                             ),
                           const SizedBox(height: 12),
@@ -340,13 +347,13 @@ class _CheckInViewState extends State<CheckInView>
                             ),
                           ),
                           const SizedBox(height: 8),
-                          if (data.motivation?.text != null)
+                          if (finalData.motivation?.text != null)
                             Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 32,
                               ),
                               child: Text(
-                                data.motivation!.text!,
+                                finalData.motivation!.text!,
                                 textAlign: TextAlign.center,
                                 style: GoogleFonts.poppins(
                                   fontSize: 14,
@@ -417,27 +424,69 @@ class _CheckInViewState extends State<CheckInView>
                   ),
                 ),
                 const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Text(
-                      '${stats.points ?? 0}',
-                      style: GoogleFonts.poppins(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 500),
+                  transitionBuilder: (Widget child, Animation<double> animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(0.0, 0.2),
+                          end: Offset.zero,
+                        ).animate(animation),
+                        child: child,
                       ),
-                    ),
-                    const SizedBox(width: 6),
-                    const Icon(Icons.stars, color: Color(0xFFD4AF37), size: 16),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Karma Points',
-                      style: GoogleFonts.poppins(
-                        fontSize: 13,
-                        color: Colors.white54,
-                      ),
-                    ),
-                  ],
+                    );
+                  },
+                  child: _currentStatIndex == 0
+                      ? Row(
+                          key: const ValueKey<int>(0),
+                          children: [
+                            Text(
+                              '${stats.points ?? 0}',
+                              style: GoogleFonts.poppins(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            const Icon(Icons.stars,
+                                color: Color(0xFFD4AF37), size: 16),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Karma Points',
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                color: Colors.white54,
+                              ),
+                            ),
+                          ],
+                        )
+                      : Row(
+                          key: const ValueKey<int>(1),
+                          children: [
+                            Text(
+                              '${stats.sessions ?? 0}',
+                              style: GoogleFonts.poppins(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            const Icon(Icons.check_circle_outline,
+                                color: Color(0xFFD4AF37), size: 16),
+                            const SizedBox(width: 4),
+                            Text(
+                               'Total Check-ins',
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                color: Colors.white54,
+                              ),
+                            ),
+                          ],
+                        ),
                 ),
               ],
             ),
@@ -709,7 +758,7 @@ class _CheckInViewState extends State<CheckInView>
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.5),
+                        color: Colors.black.withValues(alpha: 0.5),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -753,8 +802,8 @@ class _CheckInViewState extends State<CheckInView>
                             ),
                             decoration: BoxDecoration(
                               color: isComplete 
-                                  ? const Color(0xFFD4AF37).withOpacity(0.2)
-                                  : Colors.white.withOpacity(0.1),
+                                  ? const Color(0xFFD4AF37).withValues(alpha: 0.2)
+                                  : Colors.white.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
@@ -809,8 +858,6 @@ class _CheckInViewState extends State<CheckInView>
     required String title,
     required VoidCallback onTap,
   }) {
-    // Determine proper casing for the title (current title might be ALL CAPS)
-    // The design shows standard camel case like "Meditation" -> we'll just format it properly.
     String formattedTitle = title.toLowerCase().split(' ').map((word) => 
         word.isNotEmpty ? '${word[0].toUpperCase()}${word.substring(1)}' : '').join(' ');
 
@@ -819,93 +866,98 @@ class _CheckInViewState extends State<CheckInView>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            height: 110,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              // border: Border.all(color: const Color(0xFFD4AF37), width: 1.5),
-              boxShadow: [
-                BoxShadow(
-                  blurRadius: 15,
-                  spreadRadius: 1,
-                  color: const Color(0xFFD4AF37).withOpacity(0.2), // Glow
-                  offset: const Offset(0, 0),
-                ),
-                BoxShadow(
-                  blurRadius: 10,
-                  color: Colors.black.withOpacity(0.5),
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Builder(
-                  builder: (context) {
-                    final titleLower = title.toLowerCase();
-                    String? localAsset;
-                    if (titleLower.contains('chanting')) {
-                      localAsset = 'assets/icons/chanting.png';
-                    } else if (titleLower.contains('meditation')) {
-                      localAsset = 'assets/icons/meditation.png';
-                    } else if (titleLower.contains('prayer')) {
-                      localAsset = 'assets/icons/prayer.png';
-                    } else if (titleLower.contains('silence')) {
-                      localAsset = 'assets/icons/silence.png';
-                    }
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(24), // Increased slightly for better look
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 15,
+                    spreadRadius: 1,
+                    color: const Color(0xFFD4AF37).withValues(alpha: 0.15),
+                    offset: const Offset(0, 0),
+                  ),
+                ],
+              ),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: Builder(
+                      builder: (context) {
+                        final titleLower = title.toLowerCase();
+                        String? localAsset;
+                        if (titleLower.contains('chanting')) {
+                          localAsset = 'assets/icons/chanting.png';
+                        } else if (titleLower.contains('meditation')) {
+                          localAsset = 'assets/icons/meditation.png';
+                        } else if (titleLower.contains('prayer')) {
+                          localAsset = 'assets/icons/prayer.png';
+                        } else if (titleLower.contains('silence')) {
+                          localAsset = 'assets/icons/silence.png';
+                        }
 
-                    if (localAsset != null) {
-                      return Image.asset(
-                        localAsset,
-                        fit: BoxFit.cover,
-                      );
-                    } else if (image != null && image.isNotEmpty) {
-                      return CachedNetworkImage(
-                        imageUrl: image,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
-                          color: const Color(0xFF141414),
-                          child: const Center(
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2, color: Color(0xFFD4AF37)),
-                          ),
-                        ),
-                        errorWidget: (context, url, error) => Container(
-                          color: const Color(0xFF141414),
-                          child: const Icon(Icons.error, color: Colors.white24),
-                        ),
-                      );
-                    } else {
-                      return Container(
-                        color: const Color(0xFF141414),
-                        child: const Icon(
-                          Icons.spa,
-                          color: Color(0xFFD4AF37),
-                          size: 40,
-                        ),
-                      );
-                    }
-                  },
-                ),
-              ],
+                        if (localAsset != null) {
+                          return Image.asset(
+                            localAsset,
+                            fit: BoxFit.cover,
+                          );
+                        } else if (image != null && image.isNotEmpty) {
+                          return CachedNetworkImage(
+                            imageUrl: image,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Container(
+                              color: const Color(0xFF141414),
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2, color: Color(0xFFD4AF37)),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => Container(
+                              color: const Color(0xFF141414),
+                              child: const Icon(Icons.error, color: Colors.white24),
+                            ),
+                          );
+                        } else {
+                          return Container(
+                            color: const Color(0xFF141414),
+                            child: const Icon(
+                              Icons.spa,
+                              color: Color(0xFFD4AF37),
+                              size: 40,
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                  // Border overlay to ensure it's never clipped
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: const Color(0xFFD4AF37), // Solid gold
+                        width: 1.5,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          const SizedBox(height: 10),
-          // Title Text
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: Text(
-              formattedTitle,
-              style: GoogleFonts.poppins(
-                fontSize: 13,
-                color: Colors.white,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+          const SizedBox(height: 12),
+          Text(
+            formattedTitle,
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Colors.white,
+              letterSpacing: 0.5,
             ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

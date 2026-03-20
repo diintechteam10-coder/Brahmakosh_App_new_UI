@@ -97,7 +97,7 @@ class GenerateAvatarController extends GetxController {
         onResponse: (responseJson) async {
           isLoading.value = false;
           print("✅ Avatar upload response: $responseJson");
-          Get.offAllNamed(AppConstants.routeDashboard);
+          Get.offAllNamed(AppConstants.routeRegistrationSuccess);
           Get.snackbar("Success", "Upload Image successfully 🎉");
         },
         onError: (error) {

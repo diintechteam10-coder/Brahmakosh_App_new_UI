@@ -70,6 +70,14 @@
           }
         },
         {
+          "client_id": "449350149768-n9lbvgm8jb2fcohvn4jndhar9gfp3qt5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.brahmakosh.app",
+            "certificate_hash": "8ac06c406bed52f3fd4e4a44f15978b226818c84"
+          }
+        },
+        {
           "client_id": "449350149768-p2oa3hde280llpre5m7v381pibulr9n6.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -103,10 +111,10 @@
               "client_type": 3
             },
             {
-              "client_id": "449350149768-52s0420o367lvjn7uvclfgj3ke5344q2.apps.googleusercontent.com",
+              "client_id": "449350149768-15aca1qvknhbq7hj92l513nv3fnlukq7.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.brahmakoshpartner.app"
+                "bundle_id": "com.brahmakosh.temptest"
               }
             }
           ]
@@ -154,6 +162,14 @@
           }
         },
         {
+          "client_id": "449350149768-soa82i054bu4v0cd7b4rno1h7gfotrho.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.brahmakoshpartner.app",
+            "certificate_hash": "1f65fe9d090dd1c43b5c1e562db68ae3e358a587"
+          }
+        },
+        {
           "client_id": "449350149768-tdb78kvt44lh6un9vao7nlumcti6lelr.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -179,10 +195,10 @@
               "client_type": 3
             },
             {
-              "client_id": "449350149768-52s0420o367lvjn7uvclfgj3ke5344q2.apps.googleusercontent.com",
+              "client_id": "449350149768-15aca1qvknhbq7hj92l513nv3fnlukq7.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.brahmakoshpartner.app"
+                "bundle_id": "com.brahmakosh.temptest"
               }
             }
           ]
