@@ -1081,7 +1081,7 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
               final experts = astrologyController.experts;
               if (astrologyController.isLoading.value && experts.isEmpty) {
                 return const SizedBox(
-                  height: 184,
+                  height: 205,
                   child: Center(
                     child: CircularProgressIndicator(color: Color(0xFFD4AF37)),
                   ),
@@ -1089,7 +1089,7 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
               }
               if (experts.isEmpty) {
                 return SizedBox(
-                  height: 184,
+                  height: 205,
                   child: Center(
                     child: Text(
                       "No experts available",
@@ -1101,7 +1101,7 @@ Widget _buildActivityItem(String title, String imagePath, {bool isSelected = fal
                 );
               }
               return SizedBox(
-                height: 185,
+                height: 205,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 12),
