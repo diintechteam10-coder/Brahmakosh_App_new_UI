@@ -65,6 +65,9 @@ class _NewHomeViewState extends State<NewHomeView> {
   final FocusNode _searchFocusNode = FocusNode();
   final FocusNode _swapnaFocusNode = FocusNode();
 
+  // Scroll Controller for check-in activities
+  final ScrollController _checkInScrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -108,11 +111,30 @@ class _NewHomeViewState extends State<NewHomeView> {
     }
   }
 
+  void _scrollToSelectedCheckIn(int index) {
+    if (!_checkInScrollController.hasClients) return;
+    final screenWidth = MediaQuery.of(context).size.width;
+    double itemWidth = 22.w + 20.0;
+    double offset = (index * itemWidth) - (screenWidth / 2) + (26.w / 2);
+
+    if (offset < 0) offset = 0;
+    if (offset > _checkInScrollController.position.maxScrollExtent) {
+      offset = _checkInScrollController.position.maxScrollExtent;
+    }
+
+    _checkInScrollController.animateTo(
+      offset,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
   @override
   void dispose() {
     _bannerController.dispose();
     _searchFocusNode.dispose();
     _swapnaFocusNode.dispose();
+    _checkInScrollController.dispose();
     super.dispose();
   }
 
@@ -366,6 +388,7 @@ class _NewHomeViewState extends State<NewHomeView> {
           final message = homeController.activeFounderMessage;
           final krishaImageUrl =
               message?.founderImage ?? 'assets/images/home_krishna_banner.png';
+
           return Stack(
             alignment: Alignment.bottomCenter,
             children: [
@@ -534,6 +557,8 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
             ),
             padding: const EdgeInsets.all(1.2),
             child: Container(
+              height: 10.h,
+              width: double.infinity,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   begin: Alignment.topCenter,
@@ -569,274 +594,108 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
           ),
         ),
 
-        /// 🔥 Floating Icon
-        Positioned(
-          top: -8, // 👈 adjusted for better alignment
-          left: 0,
-          right: 0,
-          child: Center(
-            child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.6),
-                    blurRadius: 15,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: Image.asset(
-                iconPath,
-                width: 18.w,
-                height: 18.w,
-                fit: BoxFit.contain,
+
+          // 2. The Floating Icon
+          Positioned(
+            top: -10,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Container(
+                // Shadow to make the icon "pop"
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.6),
+                      blurRadius: 15,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Image.asset(
+                  iconPath,
+                  width: 18.w,
+                  height: 18.w,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
-  // Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
-  //   return GestureDetector(
-  //     onTap: onTap,
-  //     child: Stack(
-  //       clipBehavior: Clip.none,
-  //       children: [
-  //         Align(
-  //           alignment: Alignment.center,
-  //           child: Container(
-  //             height: 10.h,
-  //             width: double.infinity,
-  //             decoration: BoxDecoration(
-  //               borderRadius: BorderRadius.circular(16),
-  //               // This creates the gradient border effect
-  //               gradient: LinearGradient(
-  //                 begin: Alignment.topCenter,
-  //                 end: Alignment.bottomCenter,
-  //                 colors: [
-  //                   Colors.white.withOpacity(0.2), // Visible border at top
-  //                   Colors.white.withOpacity(0.05), // Fades out at bottom
-  //                 ],
-  //               ),
-  //               boxShadow: [
-  //                 BoxShadow(
-  //                   color: Colors.white.withOpacity(0.1),
-  //                   blurRadius: 10,
-  //                   offset: const Offset(0, 5),
-  //                 ),
-  //               ],
-  //             ),
-  //             // The Inner Content (Padding creates the border thickness)
-  //             padding: const EdgeInsets.all(1.2),
-  //             child: Container(
-  //               decoration: BoxDecoration(
-  //                 gradient: LinearGradient(
-  //                   begin: Alignment.topCenter,
-  //                   end: Alignment.bottomCenter,
-  //                   colors: [
-  //                     Color(0xff1E1E1E), // Visible border at top
-  //                     Color(0xff000000), // Fades out at bottom
-  //                   ],
-  //                 ),
-  //                 borderRadius: BorderRadius.circular(15), // slightly smaller
-  //                 // color: const Color(0xFF0A0A0A), // Solid dark inner background
-  //               ),
-  //               child: Column(
-  //                 mainAxisAlignment: MainAxisAlignment.end,
-  //                 children: [
-  //                   Padding(
-  //                     padding: EdgeInsets.only(bottom: 1.h),
-  //                     child: Text(
-  //                       title,
-  //                       textAlign: TextAlign.center,
-  //                       style: GoogleFonts.poppins(
-  //                         color: Colors.white,
-  //                         fontSize: 12.sp,
-  //                         fontWeight: FontWeight.w500,
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-  //           ),
-  //         ),
-
-  //         // 2. The Floating Icon
-  //         Positioned(
-  //           top: -10,
-  //           left: 0,
-  //           right: 0,
-  //           child: Center(
-  //             child: Container(
-  //               // Shadow to make the icon "pop"
-  //               decoration: BoxDecoration(
-  //                 shape: BoxShape.circle,
-  //                 boxShadow: [
-  //                   BoxShadow(
-  //                     color: Colors.black.withOpacity(0.6),
-  //                     blurRadius: 15,
-  //                     offset: const Offset(0, 8),
-  //                   ),
-  //                 ],
-  //               ),
-  //               child: Image.asset(
-  //                 iconPath,
-  //                 width: 18.w,
-  //                 height: 18.w,
-  //                 fit: BoxFit.contain,
-  //               ),
-  //             ),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-Widget _buildFeatureGrid(bool isTablet) {
-  return SliverPadding(
-    padding: EdgeInsets.fromLTRB(4.w, 1.5.h, 4.w, 1.5.h),
-    sliver: SliverGrid(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: isTablet ? 4 : 3,
-        // mainAxisSpacing: 0.h, // ✅ reduced gap (IMPORTANT)
-        crossAxisSpacing: 3.w,
-        childAspectRatio: 0.75, // 👈 adjusted for perfect look
+        ],
       ),
-      delegate: SliverChildListDelegate([
-        _buildGridItem(
-          "Check - In",
-          "assets/icons/check_in.png",
-          onTap: () {
-            _unfocusAll();
-            Get.toNamed(AppConstants.routeCheckIn);
-          },
-        ),
-        _buildGridItem(
-          "Astrology",
-          "assets/icons/astrology.png",
-          onTap: () {
-            _unfocusAll();
-            Get.toNamed(AppConstants.routeAstrologyDetails);
-          },
-        ),
-        _buildGridItem(
-          "Expert Connect",
-          "assets/icons/expert_connect.png",
-          onTap: () {
-            _unfocusAll();
-            Provider.of<DashboardViewModel>(
-              context,
-              listen: false,
-            ).changeTab(3);
-          },
-        ),
-        _buildGridItem(
-          "Remedies",
-          "assets/icons/remedies.png",
-          onTap: () {
-            _unfocusAll();
-            Provider.of<DashboardViewModel>(
-              context,
-              listen: false,
-            ).changeTab(4);
-          },
-        ),
-        _buildGridItem(
-          "Sankalp Tracker",
-          "assets/icons/sankalptracker.png",
-          onTap: () {
-            _unfocusAll();
-            Get.toNamed(AppConstants.routeSankalp);
-          },
-        ),
-        _buildGridItem(
-          "Puja Vidi",
-          "assets/icons/puja_vidhi.png",
-          onTap: () {
-            _unfocusAll();
-            Get.toNamed(AppConstants.routePoojaList);
-          },
-        ),
-      ]),
-    ),
-  );
-}
+    );
+  }
 
-  // Widget _buildFeatureGrid(bool isTablet) {
-  //   return SliverPadding(
-  //     padding: EdgeInsets.fromLTRB(4.w, 1.5.h, 4.w, 1.5.h),
-  //     sliver: SliverGrid(
-  //       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-  //         crossAxisCount: isTablet ? 4 : 3,
-  //         mainAxisSpacing: 3.5.h, // Space between rows
-  //         crossAxisSpacing: 3.w, // Space between columns
-  //         childAspectRatio: 0.82, // Adjusted to fit the icon + card height
-  //       ),
-  //       delegate: SliverChildListDelegate([
-  //         _buildGridItem(
-  //           "Check - In",
-  //           "assets/icons/check_in.png",
-  //           onTap: () {
-  //             _unfocusAll();
-  //             Get.toNamed(AppConstants.routeCheckIn);
-  //           },
-  //         ),
-  //         _buildGridItem(
-  //           "Astrology",
-  //           "assets/icons/astrology.png",
-  //           onTap: () {
-  //             _unfocusAll();
-  //             Get.toNamed(AppConstants.routeAstrologyDetails);
-  //           },
-  //         ),
-  //         _buildGridItem(
-  //           "Expert Connect",
-  //           "assets/icons/expert_connect.png",
-  //           onTap: () {
-  //             _unfocusAll();
-  //             Provider.of<DashboardViewModel>(
-  //               context,
-  //               listen: false,
-  //             ).changeTab(3);
-  //           },
-  //         ),
-  //         _buildGridItem(
-  //           "Remedies",
-  //           "assets/icons/remedies.png",
-  //           onTap: () {
-  //             _unfocusAll();
-  //             Provider.of<DashboardViewModel>(
-  //               context,
-  //               listen: false,
-  //             ).changeTab(4);
-  //           },
-  //         ),
-  //         _buildGridItem(
-  //           "Sankalp Tracker",
-  //           "assets/icons/sankalptracker.png",
-  //           onTap: () {
-  //             _unfocusAll();
-  //             Get.toNamed(AppConstants.routeSankalp);
-  //           },
-  //         ),
-  //         _buildGridItem(
-  //           "Puja Vidi",
-  //           "assets/icons/puja_vidhi.png",
-  //           onTap: () {
-  //             _unfocusAll();
-  //             Get.toNamed(AppConstants.routePoojaList);
-  //           },
-  //         ),
-  //       ]),
-  //     ),
-  //   );
-  // }
-
+  Widget _buildFeatureGrid(bool isTablet) {
+    return SliverPadding(
+      padding: EdgeInsets.fromLTRB(4.w, 1.5.h, 4.w, 1.5.h),
+      sliver: SliverGrid(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: isTablet ? 4 : 3,
+          mainAxisSpacing: 3.5.h, // Space between rows
+          crossAxisSpacing: 3.w, // Space between columns
+          childAspectRatio: 0.82, // Adjusted to fit the icon + card height
+        ),
+        delegate: SliverChildListDelegate([
+          _buildGridItem(
+            "Check - In",
+            "assets/icons/check_in.png",
+            onTap: () {
+              _unfocusAll();
+              Get.toNamed(AppConstants.routeCheckIn);
+            },
+          ),
+          _buildGridItem(
+            "Astrology",
+            "assets/icons/astrology.png",
+            onTap: () {
+              _unfocusAll();
+              Get.toNamed(AppConstants.routeAstrologyDetails);
+            },
+          ),
+          _buildGridItem(
+            "Expert Connect",
+            "assets/icons/expert_connect.png",
+            onTap: () {
+              _unfocusAll();
+              Provider.of<DashboardViewModel>(
+                context,
+                listen: false,
+              ).changeTab(3);
+            },
+          ),
+          _buildGridItem(
+            "Remedies",
+            "assets/icons/remedies.png",
+            onTap: () {
+              _unfocusAll();
+              Provider.of<DashboardViewModel>(
+                context,
+                listen: false,
+              ).changeTab(4);
+            },
+          ),
+          _buildGridItem(
+            "Sankalp Tracker",
+            "assets/icons/sankalptracker.png",
+            onTap: () {
+              _unfocusAll();
+              Get.toNamed(AppConstants.routeSankalp);
+            },
+          ),
+          _buildGridItem(
+            "Puja Vidi",
+            "assets/icons/puja_vidhi.png",
+            onTap: () {
+              _unfocusAll();
+              Get.toNamed(AppConstants.routePoojaList);
+            },
+          ),
+        ]),
+      ),
+    );
+  }
 
   // Placeholder methods for other sections
   Widget _buildSpiritualCheckIn() {
@@ -857,7 +716,7 @@ Widget _buildFeatureGrid(bool isTablet) {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "ARE YOU SPRITUAL ?",
+                    "ARE YOU SPIRITUAL ?",
                     style: GoogleFonts.poppins(
                       // Cleaner look
                       color: Colors.white.withOpacity(0.6),
@@ -885,6 +744,7 @@ Widget _buildFeatureGrid(bool isTablet) {
                 )
               else
                 SingleChildScrollView(
+                  controller: _checkInScrollController,
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
                   child: Row(
@@ -893,8 +753,10 @@ Widget _buildFeatureGrid(bool isTablet) {
                       return Padding(
                         padding: const EdgeInsets.only(right: 20.0),
                         child: GestureDetector(
-                          onTap: () =>
-                              setState(() => _selectedCheckInIndex = index),
+                          onTap: () {
+                            setState(() => _selectedCheckInIndex = index);
+                            _scrollToSelectedCheckIn(index);
+                          },
                           child: _buildActivityItem(
                             activity.title ?? "",
                             _getActivityIconPath(activity.title ?? ""),
@@ -939,6 +801,8 @@ Widget _buildFeatureGrid(bool isTablet) {
       ),
     );
   }
+
+
 
   String _getActivityIconPath(String title) {
     switch (title.toLowerCase()) {
@@ -987,40 +851,51 @@ Widget _buildFeatureGrid(bool isTablet) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          height: size,
-          width: size,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            // Clean gold border only when selected
-            border: isSelected
-                ? Border.all(color: const Color(0xFFFFD447), width: 1.08)
-                : Border.all(color: Colors.transparent, width: 2.0),
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                      color: const Color(0xFFFFD447).withOpacity(0.2),
-                      blurRadius: 15,
-                      spreadRadius: 2,
-                    ),
-                  ]
-                : [],
-          ),
-          padding: EdgeInsets.all(isSelected ? 4 : 0),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Image.asset(imagePath, fit: BoxFit.cover),
+        SizedBox(
+          height: 26.w,
+          child: Center(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              height: size,
+              width: size,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                // Clean gold border only when selected
+                border: isSelected
+                    ? Border.all(color: const Color(0xFFFFD447), width: 1.08)
+                    : Border.all(color: Colors.transparent, width: 2.0),
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: const Color(0xFFFFD447).withOpacity(0.2),
+                          blurRadius: 15,
+                          spreadRadius: 2,
+                        ),
+                      ]
+                    : [],
+              ),
+              padding: EdgeInsets.all(isSelected ? 4 : 0),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.asset(imagePath, fit: BoxFit.cover),
+              ),
+            ),
           ),
         ),
         const SizedBox(height: 12),
-        Text(
-          title,
-          style: GoogleFonts.poppins(
-            color: isSelected ? Colors.white : Colors.white.withOpacity(0.5),
-            fontSize: isSelected ? 12.sp : 10.sp,
-            fontWeight: isSelected ? FontWeight.w400 : FontWeight.w400,
+        SizedBox(
+          height: 18.sp,
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: Text(
+              title,
+              style: GoogleFonts.poppins(
+                color: isSelected ? Colors.white : Colors.white.withOpacity(0.5),
+                fontSize: isSelected ? 12.sp : 10.sp,
+                fontWeight: isSelected ? FontWeight.w400 : FontWeight.w400,
+              ),
+            ),
           ),
         ),
       ],
@@ -1950,13 +1825,15 @@ Widget _buildFeatureGrid(bool isTablet) {
         "title": "7 Mukhi Rudraksha",
         "subtitle": "For spiritual protection & planet Saturn...",
         "price": "1,299",
-        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSs1hx27RUdRVHpThGV_4DN3712p8UCKtndeA&s",
+        "image":
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSs1hx27RUdRVHpThGV_4DN3712p8UCKtndeA&s",
       },
       {
         "title": "Yellow Sapphire",
         "subtitle": "For wealth, prosperity & planet Jupiter...",
         "price": "15,500",
-        "image": "https://www.shivaago.com/wp-content/uploads/2021/03/IMG_20210307_160026_compress32-600x486.jpg",
+        "image":
+            "https://www.shivaago.com/wp-content/uploads/2021/03/IMG_20210307_160026_compress32-600x486.jpg",
       },
     ];
 
@@ -1965,13 +1842,15 @@ Widget _buildFeatureGrid(bool isTablet) {
         "title": "Sphatik Mala",
         "subtitle": "For peace, concentration & planet Moon...",
         "price": "850",
-        "image": "https://ik.imagekit.io/gemsonline/wp-content/uploads/2026/01/Spetics-mala-3-scaled.jpg",
+        "image":
+            "https://ik.imagekit.io/gemsonline/wp-content/uploads/2026/01/Spetics-mala-3-scaled.jpg",
       },
       {
         "title": "Gomati Chakra",
         "subtitle": "For protection, prosperity and bringing luck...",
         "price": "150",
-        "image": "https://m.media-amazon.com/images/I/A1QIkWYHngL._AC_UY1100_.jpg",
+        "image":
+            "https://m.media-amazon.com/images/I/A1QIkWYHngL._AC_UY1100_.jpg",
       },
     ];
 

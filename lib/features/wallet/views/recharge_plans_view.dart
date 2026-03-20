@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:brahmakosh/core/common_imports.dart';
 import 'dart:io';
 import '../../../core/services/payment_service.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../astrology/views/credit_history_view.dart';
 
 class RechargePlansView extends StatefulWidget {
@@ -46,16 +47,94 @@ class _RechargePlansViewState extends State<RechargePlansView> {
     }
   }
 
+  void _showCreditRequestPopup() {
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: const Color(0xFF141414),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
+          decoration: BoxDecoration(
+            color: const Color(0xFF141414),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: AppTheme.primaryGold.withOpacity(0.2),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: EdgeInsets.all(4.w),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryGold.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.check_circle_rounded,
+                  color: AppTheme.primaryGold,
+                  size: 30.sp,
+                ),
+              ),
+              SizedBox(height: 3.h),
+              Text(
+                "Request Sent",
+                style: GoogleFonts.lora(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(height: 2.h),
+              Text(
+                "Your add credit request has been sent successfully. Credits will be added to your wallet shortly.",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  fontSize: 11.sp,
+                  color: Colors.white70,
+                  height: 1.5,
+                ),
+              ),
+              SizedBox(height: 4.h),
+              SizedBox(
+                width: double.infinity,
+                height: 5.5.h,
+                child: ElevatedButton(
+                  onPressed: () => Get.back(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryGold,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    "Okay",
+                    style: GoogleFonts.poppins(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      barrierDismissible: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (Platform.isIOS) {
       return Scaffold(
-        backgroundColor: const Color(0xFFFDF5E6),
+        backgroundColor: Colors.black,
         appBar: AppBar(
-          backgroundColor: const Color(0xFFFDF5E6),
+          backgroundColor: Colors.black,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Color(0xFF6D3A0C)),
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
@@ -63,19 +142,19 @@ class _RechargePlansViewState extends State<RechargePlansView> {
             style: GoogleFonts.lora(
               fontWeight: FontWeight.bold,
               fontSize: 22,
-              color: const Color(0xFF6D3A0C),
+              color: Colors.white,
             ),
           ),
-          centerTitle: true,
+          centerTitle: false,
         ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
+              Icon(
                 Icons.account_balance_wallet_outlined,
                 size: 80,
-                color: Color(0xFFD4A373),
+                color: AppTheme.primaryGold.withOpacity(0.5),
               ),
               const SizedBox(height: 24),
               Text(
@@ -83,7 +162,7 @@ class _RechargePlansViewState extends State<RechargePlansView> {
                 style: GoogleFonts.lora(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF6D3A0C),
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 8),
@@ -92,7 +171,7 @@ class _RechargePlansViewState extends State<RechargePlansView> {
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                   fontSize: 16,
-                  color: const Color(0xFF8D6E63),
+                  color: Colors.white54,
                 ),
               ),
             ],
@@ -101,12 +180,12 @@ class _RechargePlansViewState extends State<RechargePlansView> {
       );
     }
     return Scaffold(
-      backgroundColor: const Color(0xFFFDF5E6), // Premium Beige bg
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFDF5E6),
+        backgroundColor: Colors.black,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF6D3A0C)),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -114,13 +193,13 @@ class _RechargePlansViewState extends State<RechargePlansView> {
           style: GoogleFonts.lora(
             fontWeight: FontWeight.bold,
             fontSize: 22,
-            color: const Color(0xFF6D3A0C),
+            color: Colors.white,
           ),
         ),
-        centerTitle: true,
+        centerTitle: false,
         actions: [
           IconButton(
-            icon: const Icon(Icons.receipt_long, color: Color(0xFF6D3A0C)),
+            icon: Icon(Icons.receipt_long, color: AppTheme.primaryGold),
             tooltip: "Credit History",
             onPressed: () {
               Get.to(() => const CreditHistoryView());
@@ -135,7 +214,7 @@ class _RechargePlansViewState extends State<RechargePlansView> {
             child: _isLoading
                 ? const Center(
                     child: CircularProgressIndicator(
-                      color: Color(0xFF6D3A0C),
+                      color: AppTheme.primaryGold,
                     ),
                   )
                 : GridView.builder(
@@ -170,17 +249,19 @@ class _RechargePlansViewState extends State<RechargePlansView> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: const Color(0xFF1A1A1A),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isSelected ? const Color(0xFFD4A373) : Colors.transparent,
-            width: 2,
+            color: isSelected
+                ? AppTheme.primaryGold
+                : AppTheme.primaryGold.withOpacity(0.15),
+            width: isSelected ? 2 : 1,
           ),
           boxShadow: [
             BoxShadow(
               color: isSelected
-                  ? const Color(0xFFD4A373).withOpacity(0.2)
-                  : Colors.black.withOpacity(0.04),
+                  ? AppTheme.primaryGold.withOpacity(0.15)
+                  : Colors.black.withOpacity(0.3),
               blurRadius: 15,
               offset: const Offset(0, 6),
             ),
@@ -195,16 +276,16 @@ class _RechargePlansViewState extends State<RechargePlansView> {
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFDF5E6),
+                      color: AppTheme.primaryGold.withOpacity(0.1),
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: const Color(0xFFFDECB6).withOpacity(0.5),
+                        color: AppTheme.primaryGold.withOpacity(0.25),
                       ),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.monetization_on,
                       size: 28,
-                      color: Color(0xFFD4A373),
+                      color: AppTheme.primaryGold,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -213,7 +294,7 @@ class _RechargePlansViewState extends State<RechargePlansView> {
                     style: GoogleFonts.lora(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF6D3A0C),
+                      color: Colors.white,
                     ),
                   ),
                   Text(
@@ -221,7 +302,7 @@ class _RechargePlansViewState extends State<RechargePlansView> {
                     style: GoogleFonts.lora(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF8D6E63),
+                      color: Colors.white54,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -231,15 +312,18 @@ class _RechargePlansViewState extends State<RechargePlansView> {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFF3E0),
+                      color: AppTheme.primaryGold.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: AppTheme.primaryGold.withOpacity(0.3),
+                      ),
                     ),
                     child: Text(
                       "₹ ${plan['price']}",
                       style: GoogleFonts.lora(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFFE65100),
+                        color: AppTheme.primaryGold,
                       ),
                     ),
                   ),
@@ -251,8 +335,8 @@ class _RechargePlansViewState extends State<RechargePlansView> {
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? const Color(0xFFD4A373)
-                    : const Color(0xFFFDF5E6).withOpacity(0.5),
+                    ? AppTheme.primaryGold
+                    : Colors.white.withOpacity(0.05),
                 borderRadius: const BorderRadius.vertical(
                   bottom: Radius.circular(22),
                 ),
@@ -264,7 +348,7 @@ class _RechargePlansViewState extends State<RechargePlansView> {
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
-                  color: isSelected ? Colors.white : const Color(0xFF8D6E63),
+                  color: isSelected ? Colors.black : Colors.white54,
                 ),
               ),
             ),
@@ -278,11 +362,16 @@ class _RechargePlansViewState extends State<RechargePlansView> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFF1A1A1A),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        border: Border(
+          top: BorderSide(
+            color: AppTheme.primaryGold.withOpacity(0.15),
+          ),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(0.3),
             blurRadius: 20,
             offset: const Offset(0, -10),
           ),
@@ -290,63 +379,30 @@ class _RechargePlansViewState extends State<RechargePlansView> {
       ),
       child: SafeArea(
         child: InkWell(
-          onTap: () async {
+          onTap: () {
             if (_plans.isEmpty) return;
-            final selectedPlan = _plans[_selectedPlanIndex];
-
-            final success = await PaymentService.startPayment(
-    planAmount: selectedPlan["price"],
-  );
-
-  if(success){
-    Get.snackbar("Success", "Credits added successfully");
-  } else {
-    Get.snackbar("Error", "Payment failed");
-  }
-},
-          // onTap: () {
-          //   Get.dialog(
-          //     AlertDialog(
-          //       title: Text(
-          //         "Request Sent",
-          //         style: GoogleFonts.lora(
-          //           fontWeight: FontWeight.bold,
-          //           color: const Color(0xFF6D3A0C),
-          //         ),
-          //       ),
-          //       content: Text(
-          //         "Your request has been sent for adding amount in wallet.",
-          //         style: GoogleFonts.lora(fontSize: 16),
-          //       ),
-          //       backgroundColor: const Color(0xFFFDF5E6),
-          //       shape: RoundedRectangleBorder(
-          //         borderRadius: BorderRadius.circular(16),
-          //       ),
-          //       actions: [
-          //         TextButton(
-          //           onPressed: () => Get.back(),
-          //           child: Text(
-          //             "OK",
-          //             style: GoogleFonts.lora(
-          //               fontWeight: FontWeight.bold,
-          //               fontSize: 16,
-          //               color: const Color(0xFFE65100),
-          //             ),
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //   );
-          // },
+            // final selectedPlan = _plans[_selectedPlanIndex];
+            //
+            // final success = await PaymentService.startPayment(
+            //   planAmount: selectedPlan["price"],
+            // );
+            //
+            // if (success) {
+            //   _showCreditRequestPopup();
+            // } else {
+            //   Get.snackbar("Error", "Payment failed");
+            // }
+            _showCreditRequestPopup();
+          },
           borderRadius: BorderRadius.circular(16),
           child: Container(
             height: 56,
             decoration: BoxDecoration(
-              color: const Color(0xFF6D3A0C),
+              color: AppTheme.primaryGold,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF6D3A0C).withOpacity(0.3),
+                  color: AppTheme.primaryGold.withOpacity(0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 6),
                 ),
@@ -357,7 +413,7 @@ class _RechargePlansViewState extends State<RechargePlansView> {
               children: [
                 const Icon(
                   Icons.account_balance_wallet_outlined,
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
                 const SizedBox(width: 12),
                 Text(
@@ -365,7 +421,7 @@ class _RechargePlansViewState extends State<RechargePlansView> {
                   style: GoogleFonts.lora(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: Colors.black,
                   ),
                 ),
               ],
@@ -376,4 +432,3 @@ class _RechargePlansViewState extends State<RechargePlansView> {
     );
   }
 }
-
