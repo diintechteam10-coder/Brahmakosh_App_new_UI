@@ -1,7 +1,6 @@
+import 'package:brahmakosh/core/common_imports.dart';
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import '../agent/lemon_agent_page.dart';
 import 'ai_rashmi_service.dart';

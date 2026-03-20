@@ -9,6 +9,8 @@ import 'package:brahmakosh/core/services/storage_service.dart';
 import 'package:brahmakosh/features/home/views/planet_positions_screen.dart';
 import 'package:brahmakosh/features/home/widgets/astrology_tabs.dart';
 import 'package:brahmakosh/features/home/widgets/ashtakvarga_tab.dart';
+import 'package:brahmakosh/core/common_imports.dart';
+import 'package:brahmakosh/features/home/controllers/home_controller.dart';
 import 'package:brahmakosh/features/home/widgets/remedies_tab.dart';
 
 import '../widgets/sarvashtak_tab.dart';

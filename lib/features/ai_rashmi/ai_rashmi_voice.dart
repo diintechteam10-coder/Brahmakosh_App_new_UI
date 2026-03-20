@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:brahmakosh/core/common_imports.dart';
 import 'package:video_player/video_player.dart';
 import 'package:sizer/sizer.dart';
 

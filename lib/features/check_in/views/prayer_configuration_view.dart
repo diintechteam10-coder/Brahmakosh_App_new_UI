@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:brahmakosh/core/common_imports.dart';
 import 'package:brahmakosh/features/check_in/repositories/spiritual_repository.dart';
 import 'package:brahmakosh/features/check_in/blocs/prayer/prayer_bloc.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_configuration_model.dart';

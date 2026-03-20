@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/common_imports.dart';
+import '../../../common/utils.dart';
 import '../../../common/widgets/profile_image_view.dart';
 import '../../../common/widgets/custom_profile_avatar.dart';
 import '../viewmodels/profile_viewmodel.dart';
@@ -301,33 +302,38 @@ class _ProfileViewState extends State<ProfileView> {
                 _buildSectionContainer(
                   title: "Others",
                   children: [
-                    _buildListTile(
-                      icon: Icons.account_balance_wallet_outlined,
-                      title: "My Kosh",
-                      onTap: () {
-                        // ProfileView is pushed from NewHomeView via Navigator.push.
-                        // We safely pop and return the desired tab index back to NewHomeView.
-                        Get.back(result: 5);
-                      },
-                    ),
+                    if (!Platform.isIOS) ...[
+                      _buildListTile(
+                        icon: Icons.account_balance_wallet_outlined,
+                        title: "My Kosh",
+                        onTap: () {
+                          // ProfileView is pushed from NewHomeView via Navigator.push.
+                          // We safely pop and return the desired tab index back to NewHomeView.
+                          Get.back(result: 5);
+                        },
+                      ),
+                      const Divider(color: Colors.white10, height: 1),
+                    ],
+                    if (!Platform.isIOS)
+                      _buildListTile(
+                        icon: Icons.shopping_cart_outlined,
+                        title: "Orders",
+                        onTap: () => Utils.showToast('Coming soon'),
+                      ),
                     const Divider(color: Colors.white10, height: 1),
-                    _buildListTile(
-                      icon: Icons.shopping_cart_outlined,
-                      title: "Orders",
-                      onTap: () => Get.dialog(const ComingSoonPopup(feature: "Orders")),
-                    ),
+                    if (!Platform.isIOS)
+                      _buildListTile(
+                        icon: Icons.receipt_long_outlined,
+                        title: "Credit History",
+                        onTap: () => Get.to(() => const CreditHistoryView()),
+                      ),
                     const Divider(color: Colors.white10, height: 1),
-                    _buildListTile(
-                      icon: Icons.receipt_long_outlined,
-                      title: "Credit History",
-                      onTap: () => Get.to(() => const CreditHistoryView()),
-                    ),
-                    const Divider(color: Colors.white10, height: 1),
-                    _buildListTile(
-                      icon: Icons.settings_outlined,
-                      title: "Settings",
-                      onTap: () => Get.dialog(const ComingSoonPopup(feature: "Settings")),
-                    ),
+                    if (!Platform.isIOS)
+                      _buildListTile(
+                        icon: Icons.settings_outlined,
+                        title: "Settings",
+                        onTap: () => Utils.showToast('Coming soon'),
+                      ),
                     const Divider(color: Colors.white10, height: 1),
                     _buildListTile(
                       icon: Icons.help_outline,
@@ -474,8 +480,14 @@ class _ProfileViewState extends State<ProfileView> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: isKarma
-                ? [const Color(0xFFE2A03D), const Color(0xFFBF7A23)] // Golden gradient
-                : [const Color(0xFF4B5BEA), const Color(0xFF2E3EB1)], // Blue gradient
+                ? [
+                    const Color(0xFFE2A03D),
+                    const Color(0xFFBF7A23),
+                  ] // Golden gradient
+                : [
+                    const Color(0xFF4B5BEA),
+                    const Color(0xFF2E3EB1),
+                  ], // Blue gradient
           ),
         ),
         child: Stack(
@@ -514,12 +526,18 @@ class _ProfileViewState extends State<ProfileView> {
                         style: GoogleFonts.poppins(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: isKarma ? const Color(0xFF2C1E0D) : Colors.white,
+                          color: isKarma
+                              ? const Color(0xFF2C1E0D)
+                              : Colors.white,
                         ),
                       ),
                       if (isKarma) ...[
                         const SizedBox(width: 4),
-                        Icon(Icons.stars, color: const Color(0xFF2C1E0D), size: 18),
+                        Icon(
+                          Icons.stars,
+                          color: const Color(0xFF2C1E0D),
+                          size: 18,
+                        ),
                       ],
                     ],
                   ),
@@ -527,7 +545,9 @@ class _ProfileViewState extends State<ProfileView> {
                     subtitle,
                     style: GoogleFonts.poppins(
                       fontSize: 10,
-                      color: isKarma ? const Color(0xFF2C1E0D).withOpacity(0.8) : Colors.white.withOpacity(0.8),
+                      color: isKarma
+                          ? const Color(0xFF2C1E0D).withOpacity(0.8)
+                          : Colors.white.withOpacity(0.8),
                     ),
                   ),
                 ],

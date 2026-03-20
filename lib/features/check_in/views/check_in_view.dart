@@ -1,9 +1,7 @@
+import 'package:brahmakosh/core/common_imports.dart';
 import 'package:brahmakosh/core/constants/app_constants.dart';
 import 'package:brahmakosh/features/check_in/views/prayer_configuration_view.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:get/get.dart';
+import 'package:brahmakosh/features/check_in/views/chanting_configuration_view.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_checkin_model.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,7 +13,6 @@ import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
-import 'chanting_configuration_view.dart';
 import 'package:brahmakosh/features/check_in/views/spiritual_stats_screen.dart';
 
 class CheckInView extends StatefulWidget {
@@ -373,7 +370,8 @@ class _CheckInViewState extends State<CheckInView>
                   ),
                 ),
               ),
-              ))
+              ),
+            ),
           );
         }, // Builder
       ), // Consumer

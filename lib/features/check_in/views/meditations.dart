@@ -1,6 +1,4 @@
-import 'package:brahmakosh/core/constants/app_constants.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:brahmakosh/core/common_imports.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MeditateScreen extends StatefulWidget {

@@ -98,7 +98,7 @@ class ProfileDetailsView extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            const Icon(Icons.chevron_right, color: Colors.white38, size: 24),
+                            // const Icon(Icons.chevron_right, color: Colors.white38, size: 24),
                           ],
                         ),
                       ),

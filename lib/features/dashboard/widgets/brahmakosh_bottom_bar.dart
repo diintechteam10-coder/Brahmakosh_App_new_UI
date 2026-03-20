@@ -22,7 +22,7 @@ class BrahmakoshBottomBar extends StatelessWidget {
       margin: EdgeInsets.only(
         left: 15,
         right: 15,
-        // bottom: bottomPadding > 0 ? bottomPadding : 15,
+        bottom: bottomPadding > 0 ? bottomPadding : 15,
       ),
       height: barHeight + 30, // Extra height for the floating logo
       child: Stack(

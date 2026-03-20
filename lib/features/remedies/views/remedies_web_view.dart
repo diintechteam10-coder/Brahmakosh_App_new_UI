@@ -1,7 +1,6 @@
 import 'package:brahmakosh/core/common_imports.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class RemediesWebView extends StatefulWidget {
@@ -19,15 +18,19 @@ class _RemediesWebViewState extends State<RemediesWebView> {
   @override
   void initState() {
     super.initState();
+    _initializeController();
+    _loadWebView();
+  }
+
+  void _initializeController() {
     controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(
         NavigationDelegate(
-          onProgress: (int progress) {
-            // Update loading bar.
-          },
+          onProgress: (int progress) {},
           onPageStarted: (String url) {
+            debugPrint('WebView Page Started: $url');
             if (mounted) {
               setState(() {
                 isLoading = true;
@@ -35,6 +38,7 @@ class _RemediesWebViewState extends State<RemediesWebView> {
             }
           },
           onPageFinished: (String url) {
+            debugPrint('WebView Page Finished: $url');
             if (mounted) {
               setState(() {
                 isLoading = false;
@@ -43,16 +47,59 @@ class _RemediesWebViewState extends State<RemediesWebView> {
           },
           onWebResourceError: (WebResourceError error) {},
           onNavigationRequest: (NavigationRequest request) {
-            if (request.url.startsWith('https://shop.brahmakosh.com/')) {
+            if (request.url.startsWith('https://shop.brahmakosh.com')) {
               return NavigationDecision.navigate;
             }
-            // Allow all internal navigation on the site
             return NavigationDecision.navigate;
           },
         ),
-      )
-      ..loadRequest(Uri.parse('https://shop.brahmakosh.com/'));
+      );
   }
+
+
+Future<void> _loadWebView() async {
+  final token = StorageService.getString(AppConstants.keyAuthToken);
+
+  if (token != null && token.isNotEmpty) {
+    final url =
+        'https://prod.brahmakosh.com/api/store/sso-login'
+        '?token=$token&redirect=/remedies';
+
+    debugPrint('✅ Loading SSO URL: $url');
+
+    await controller.loadRequest(Uri.parse(url));
+  } else {
+    const url = 'https://shop.brahmakosh.com/';
+    debugPrint('⚠️ Loading without token: $url');
+
+    await controller.loadRequest(Uri.parse(url));
+  }
+}
+  // Future<void> _loadWebView() async {
+  //   final token = StorageService.getString(AppConstants.keyAuthToken);
+
+  //   if (token != null && token.isNotEmpty) {
+  //     // Set cookie for persistence
+  //     final cookieManager = WebViewCookieManager();
+  //     await cookieManager.setCookie(
+  //       WebViewCookie(
+  //         name: 'token',
+  //         value: token,
+  //         domain: 'shop.brahmakosh.com',
+  //         path: '/',
+  //       ),
+  //     );
+
+  //     // Pass token as URL parameter for initial login
+  //     final url = 'https://shop.brahmakosh.com/?token=$token';
+  //     debugPrint('WebView Loading with token: $url');
+  //     await controller.loadRequest(Uri.parse(url));
+  //   } else {
+  //     const url = 'https://shop.brahmakosh.com/';
+  //     debugPrint('WebView Loading without token: $url');
+  //     await controller.loadRequest(Uri.parse(url));
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -71,11 +118,9 @@ class _RemediesWebViewState extends State<RemediesWebView> {
             SafeArea(
               top: false,
               bottom: true,
-              left: false,
-              right: false,
               child: Padding(
                 padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).padding.top,
+                  top: MediaQuery.paddingOf(context).top,
                 ),
                 child: WebViewWidget(controller: controller),
               ),

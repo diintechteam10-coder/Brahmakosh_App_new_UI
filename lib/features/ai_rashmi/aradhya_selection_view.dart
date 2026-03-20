@@ -1,9 +1,7 @@
+import 'package:brahmakosh/core/common_imports.dart';
 import 'package:brahmakosh/features/agent/controllers/agent_controller.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../../../core/common_imports.dart';
 import '../../../../common/models/avtar_list.dart';
 import 'deity_selection_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';

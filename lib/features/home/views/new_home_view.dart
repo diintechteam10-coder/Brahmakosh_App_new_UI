@@ -151,154 +151,38 @@ class _NewHomeViewState extends State<NewHomeView> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
-
+    final padding = MediaQuery.of(context).padding;
     return Scaffold(
       backgroundColor: Colors.black,
-      body: RefreshIndicator(
-        onRefresh: _handleRefresh,
-        color: const Color(0xFFD4AF37),
-        backgroundColor: Colors.black,
-        child: CustomScrollView(
-          controller: widget.scrollController,
-          physics: const BouncingScrollPhysics(
-            parent: AlwaysScrollableScrollPhysics(),
-          ),
-          slivers: [
-            _buildHeader(),
-            _buildSearchBar(),
-            _buildTitle(),
-            _buildMainBanner(screenWidth),
-            _buildFeatureGrid(isTablet),
-            _buildSpiritualCheckIn(),
-            _buildKarmaDashboard(),
-            _buildExpertConnect(screenWidth),
-            _buildMuhuratSection(),
-            _buildRemediesSection(screenWidth),
-            // _buildSelfDiscoverySection(),
-            _buildPujaVidhi(screenWidth),
-            _buildSankalpTracker(),
-            _buildSwapnaDecoder(),
-            _buildGitaBanner(screenWidth),
-            _buildSponsorsSection(screenWidth),
-            const SliverToBoxAdapter(child: SizedBox(height: 110)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return SliverToBoxAdapter(
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Greeting Text
-              Consumer<ProfileViewModel>(
-                builder: (context, profileVM, child) {
-                  final fullName = profileVM.profile?.profile?.name ?? " ";
-                  // Extract first name only
-                  final firstName = fullName.trim().split(' ').first;
-                  return RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Namaste ",
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        TextSpan(
-                          text: firstName,
-                          style: GoogleFonts.poppins(
-                            color: const Color(0xFFD4AF37),
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-              // Icons Row
-              Row(
-                children: [
-                  // Notification Bell with red dot badge
-                  GestureDetector(
-                    onTap: () {
-                      _unfocusAll();
-                      Get.toNamed(AppConstants.routeNotifications);
-                    },
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(2.w),
-                          width: 10.w,
-                          height: 10.w,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.05),
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.1),
-                              width: 1,
-                            ),
-                          ),
-                          child: SvgPicture.asset(
-                            'assets/icons/notification.svg',
-                            color: Colors.white,
-                          ),
-                        ),
-                        // Red badge dot
-                        Positioned(
-                          top: 8,
-                          right: 10,
-                          child: Container(
-                            width: 8,
-                            height: 8,
-                            decoration: const BoxDecoration(
-                              color: Colors.red,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  // Profile Avatar with gold ring
-                  GestureDetector(
-                    onTap: () async {
-                      _unfocusAll();
-                      final result = await Get.to(
-                        () => const brahmakosh_profile.ProfileView(),
-                      );
-                      if (result != null && result is int && context.mounted) {
-                        Provider.of<DashboardViewModel>(
-                          context,
-                          listen: false,
-                        ).changeTab(result);
-                      }
-                    },
-                    child: Consumer<ProfileViewModel>(
-                      builder: (context, profileVM, child) {
-                        return CustomProfileAvatar(
-                          imageUrl: profileVM.profile?.profileImageUrl,
-                          radius: 5.w,
-                          borderWidth: 1.5,
-                          borderColor: AppTheme.primaryGold,
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
+      body: Padding(
+        padding: EdgeInsets.only(top: padding.top),
+        child: RefreshIndicator(
+          onRefresh: _handleRefresh,
+          color: const Color(0xFFD4AF37),
+          backgroundColor: Colors.black,
+          child: CustomScrollView(
+            controller: widget.scrollController,
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
+            slivers: [
+              _buildHeader(),
+              _buildSearchBar(),
+              _buildTitle(),
+              _buildMainBanner(screenWidth),
+              _buildFeatureGrid(isTablet),
+              _buildSpiritualCheckIn(),
+              _buildKarmaDashboard(),
+              _buildExpertConnect(screenWidth),
+              _buildMuhuratSection(),
+              _buildRemediesSection(screenWidth),
+              // _buildSelfDiscoverySection(),
+              _buildPujaVidhi(screenWidth),
+              _buildSankalpTracker(),
+              _buildSwapnaDecoder(),
+              _buildGitaBanner(screenWidth),
+              _buildSponsorsSection(screenWidth),
+              const SliverToBoxAdapter(child: SizedBox(height: 110)),
             ],
           ),
         ),
@@ -306,57 +190,170 @@ class _NewHomeViewState extends State<NewHomeView> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildHeader() {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.fromLTRB(4.w, 1.5.h, 4.w, 1.5.h),
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Consumer<ProfileViewModel>(
+              builder: (context, profileVM, child) {
+                final fullName = profileVM.profile?.profile?.name ?? " ";
+                final firstName = fullName.trim().split(' ').first;
+                return RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: "Namaste ",
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      TextSpan(
+                        text: firstName,
+                        style: GoogleFonts.poppins(
+                          color: const Color(0xFFD4AF37),
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            // Icons Row
+            Row(
+              children: [
+                // Notification Bell with red dot badge
+                GestureDetector(
+                  onTap: () {
+                    _unfocusAll();
+                    Get.toNamed(AppConstants.routeNotifications);
+                  },
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(2.w),
+                        width: 10.w,
+                        height: 10.w,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.05),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.1),
+                            width: 1,
+                          ),
+                        ),
+                        child: SvgPicture.asset(
+                          'assets/icons/notification.svg',
+                          color: Colors.white,
+                        ),
+                      ),
+                      // Red badge dot
+                      Positioned(
+                        top: 8,
+                        right: 10,
+                        child: Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 10),
+                // Profile Avatar with gold ring
+                GestureDetector(
+                  onTap: () async {
+                    _unfocusAll();
+                    final result = await Get.to(
+                      () => const brahmakosh_profile.ProfileView(),
+                    );
+                    if (result != null && result is int && context.mounted) {
+                      Provider.of<DashboardViewModel>(
+                        context,
+                        listen: false,
+                      ).changeTab(result);
+                    }
+                  },
+                  child: Consumer<ProfileViewModel>(
+                    builder: (context, profileVM, child) {
+                      return CustomProfileAvatar(
+                        imageUrl: profileVM.profile?.profileImageUrl,
+                        radius: 5.w,
+                        borderWidth: 1.5,
+                        borderColor: AppTheme.primaryGold,
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    final borderRadius = BorderRadius.circular(16);
+
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(4.w, 1.5.h, 4.w, 0),
         child: Container(
-          height: 5.5.h,
-          decoration: BoxDecoration(
-            color: const Color(0xFF1C1C1E),
-            borderRadius: BorderRadius.circular(16),
-          ),
+          height: 6.h,
+          decoration: BoxDecoration(borderRadius: borderRadius),
           child: TextField(
             focusNode: _searchFocusNode,
-            textAlignVertical:
-                TextAlignVertical.center, // Keeps icon/text aligned
             style: TextStyle(color: Colors.white, fontSize: 11.sp),
+            textAlignVertical: TextAlignVertical.center,
             decoration: InputDecoration(
               filled: true,
-              fillColor: Colors.transparent,
+              fillColor: const Color(0xFF0A0A0A), // 👈 DARK COLOR
               hintText: "Search rituals, puja, astrologers",
               hintStyle: GoogleFonts.poppins(
                 color: Colors.white.withOpacity(0.35),
-                fontSize: 12.sp,
+                fontSize: 11.sp,
                 fontWeight: FontWeight.w500,
               ),
+
               prefixIcon: Padding(
-                padding: EdgeInsets.all(1.4.h),
+                padding: EdgeInsets.symmetric(vertical: 1.2.h, horizontal: 1.2.h),
                 child: SvgPicture.asset(
                   'assets/icons/search.svg',
                   colorFilter: ColorFilter.mode(
-                    Colors.white.withOpacity(0.35),
-                    BlendMode.srcIn,
+                    Colors.white.withOpacity(0.4),
+                    BlendMode.srcIn
                   ),
                 ),
               ),
-              // Use OutlineInputBorder to get the surrounding ring
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
-                borderSide: BorderSide.none, // Invisible by default
+                            border: OutlineInputBorder(
+                borderRadius: borderRadius,
+                borderSide: BorderSide.none,
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
-                borderSide: BorderSide.none, // Invisible when not focused
+                borderRadius: borderRadius,
+                borderSide: BorderSide.none,
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: borderRadius,
                 borderSide: const BorderSide(
-                  color: Color(0xFFD4AF37), // Your theme purple
+                  color: Color(0xFFD4AF37),
                   width: 1.2,
                 ),
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+
+              contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 8),
             ),
           ),
         ),
@@ -367,7 +364,7 @@ class _NewHomeViewState extends State<NewHomeView> {
   Widget _buildTitle() {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.fromLTRB(4.w, 1.5.h, 4.w, 1.5.h),
+        padding: EdgeInsets.fromLTRB(4.w, 1.h, 4.w, 0.h),
         child: Center(
           child: Text(
             "BRAHMAKOSH",
@@ -386,7 +383,7 @@ class _NewHomeViewState extends State<NewHomeView> {
   Widget _buildMainBanner(double screenWidth) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 1.5.h),
+        padding: EdgeInsets.symmetric(vertical: 1.h),
         child: Obx(() {
           final message = homeController.activeFounderMessage;
           final krishaImageUrl =
@@ -518,7 +515,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                     buttonText,
                     style: GoogleFonts.poppins(
                       fontSize: 12.sp,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
@@ -529,73 +526,74 @@ class _NewHomeViewState extends State<NewHomeView> {
       ),
     );
   }
-
-  Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          // 1. The Border & Background Layer
-          Align(
-            alignment: Alignment.center,
+Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
+  return GestureDetector(
+    onTap: onTap,
+    child: Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Align(
+          alignment: Alignment.center,
+          child: Container(
+            height: 10.5.h,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.white.withOpacity(0.2),
+                  Colors.white.withOpacity(0.05),
+                ],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.white.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(1.2),
             child: Container(
               height: 10.h,
               width: double.infinity,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                // This creates the gradient border effect
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.white.withOpacity(0.2), // Visible border at top
-                    Colors.white.withOpacity(0.05), // Fades out at bottom
+                    Color(0xff1E1E1E),
+                    Color(0xff000000),
                   ],
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.white.withOpacity(0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 1.h),
+                    child: Text(
+                      title,
+                      textAlign: TextAlign.center,
+                      maxLines: 2, // ✅ force single line
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                   ),
                 ],
               ),
-              // The Inner Content (Padding creates the border thickness)
-              padding: const EdgeInsets.all(1.2),
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xff1E1E1E), // Visible border at top
-                      Color(0xff000000), // Fades out at bottom
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(15), // slightly smaller
-                  // color: const Color(0xFF0A0A0A), // Solid dark inner background
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 1.h),
-                      child: Text(
-                        title,
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ),
           ),
+        ),
+
 
           // 2. The Floating Icon
           Positioned(
@@ -803,6 +801,8 @@ class _NewHomeViewState extends State<NewHomeView> {
       ),
     );
   }
+
+
 
   String _getActivityIconPath(String title) {
     switch (title.toLowerCase()) {
@@ -2073,10 +2073,10 @@ class _NewHomeViewState extends State<NewHomeView> {
   }
 
   Widget _buildPujaVidhi(double screenWidth) {
-    return BlocProvider(
-      create: (context) =>
-          PoojaBloc(repository: PoojaRepository())..add(FetchPoojas()),
-      child: SliverToBoxAdapter(
+    return SliverToBoxAdapter(
+      child: BlocProvider(
+        create: (context) =>
+            PoojaBloc(repository: PoojaRepository())..add(FetchPoojas()),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12),
           child: Column(

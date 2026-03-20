@@ -1,4 +1,5 @@
 import 'package:brahmakosh/core/theme/app_theme.dart';
+import 'package:brahmakosh/core/common_imports.dart';
 import 'package:brahmakosh/features/auth/controllers/email_register_controller.dart';
 import 'package:brahmakosh/features/auth/views/login.dart';
 import 'package:flutter/gestures.dart';
