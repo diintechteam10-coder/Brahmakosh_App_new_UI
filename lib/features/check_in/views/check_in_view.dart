@@ -530,7 +530,7 @@ class _CheckInViewState extends State<CheckInView>
     const String playStoreUrl =
         "https://play.google.com/store/apps/details?id=com.brahmakosh.app&pcampaignid=web_share";
 
-    // const String appStoreUrl = "";
+    const String appStoreUrl = "https://apps.apple.com/in/app/brahmakosh/id6759043110";
 
     final stats = data.stats!;
     final recent =
@@ -554,7 +554,7 @@ class _CheckInViewState extends State<CheckInView>
         "\nJoin me on my spiritual journey! Download Brahmakosh now.\n";
     shareMessage += "Android:\n$playStoreUrl\n\n";
 
-    // shareMessage += "iOS:\n$appStoreUrl\n\n";
+    shareMessage += "iOS:\n$appStoreUrl\n\n";
 
     shareMessage += "#Brahmakosh #Spirituality";
     final box = context.findRenderObject() as RenderBox?;

@@ -7,6 +7,8 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/gestures.dart';
 import 'package:brahmakosh/core/common_imports.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'dart:io';
 
 class LoginView extends StatelessWidget {
   LoginView({super.key});
@@ -183,15 +185,38 @@ class LoginView extends StatelessWidget {
 
                   const SizedBox(height: 32),
 
-                  // Continue with Google
-                  Obx(() => _buildSocialButton(
-                    text: "Continue with Google",
-                    imagePath: "assets/images/google.png",
-                    onTap: authController.isLoading ? null : () => authController.signInWithGoogle(),
-                    isLoading: authController.isGoogleLoading.value,
-                    backgroundColor: AppTheme.authPrimaryGold.withOpacity(0.1),
-                    textColor: Colors.white,
-                  )),
+                  // Social Logins
+                  Obx(
+                    () => Column(
+                      children: [
+                        _buildSocialButton(
+                          text: "Continue with Google",
+                          imagePath: "assets/images/google.png",
+                          onTap: authController.isLoading
+                              ? null
+                              : () => authController.signInWithGoogle(),
+                          isLoading: authController.isGoogleLoading.value,
+                          backgroundColor: AppTheme.authPrimaryGold.withOpacity(
+                            0.1,
+                          ),
+                          textColor: Colors.white,
+                        ),
+                        if (Platform.isIOS) ...[
+                          const SizedBox(height: 16),
+                          _buildSocialButton(
+                            text: "Continue with Apple",
+                            iconData: FontAwesomeIcons.apple,
+                            onTap: authController.isLoading
+                                ? null
+                                : () => authController.signInWithApple(),
+                            isLoading: authController.isAppleLoading.value,
+                            backgroundColor: Colors.white,
+                            textColor: Colors.black,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
 
                   const SizedBox(height: 48),
 
@@ -276,7 +301,8 @@ class LoginView extends StatelessWidget {
 
   Widget _buildSocialButton({
     required String text,
-    required String imagePath,
+    String? imagePath,
+    IconData? iconData,
     VoidCallback? onTap,
     bool isLoading = false,
     required Color backgroundColor,
@@ -297,15 +323,20 @@ class LoginView extends StatelessWidget {
         ),
         child: Center(
           child: isLoading
-              ? const SizedBox(
+              ? SizedBox(
                   height: 24,
                   width: 24,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: textColor,
+                  ),
                 )
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset(imagePath, height: 20),
+                    if (imagePath != null) Image.asset(imagePath, height: 20),
+                    if (iconData != null)
+                      FaIcon(iconData, color: textColor, size: 20),
                     const SizedBox(width: 12),
                     Text(
                       text,
