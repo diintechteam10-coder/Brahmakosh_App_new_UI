@@ -175,7 +175,7 @@ class _NewHomeViewState extends State<NewHomeView> {
               _buildKarmaDashboard(),
               _buildExpertConnect(screenWidth),
               _buildMuhuratSection(),
-              _buildRemediesSection(screenWidth),
+              if (!Platform.isIOS) _buildRemediesSection(screenWidth),
               // _buildSelfDiscoverySection(),
               _buildPujaVidhi(screenWidth),
               _buildSankalpTracker(),
