@@ -114,8 +114,9 @@ class VoiceAgentService extends ChangeNotifier {
 
       _channel!.stream.listen(
         _handleMessage,
-        onError: (error) {
+        onError: (error, StackTrace? stack) {
           debugPrint('[VoiceAgent] WebSocket Error: $error');
+          debugPrint('[VoiceAgent] WebSocket StackTrace: $stack');
           _errorMessage = 'WebSocket Error: $error';
           _setState(VoiceAgentState.ERROR);
         },
@@ -123,13 +124,12 @@ class VoiceAgentService extends ChangeNotifier {
           final closeCode = _channel?.closeCode;
           final closeReason = _channel?.closeReason;
           debugPrint(
-            '[VoiceAgent] WebSocket stream onDone triggered. Intentional: $_isIntentionalClose. Reason: $closeReason, Code: $closeCode',
+            '[VoiceAgent] WebSocket stream onDone. Intentional: $_isIntentionalClose. Code: $closeCode, Reason: $closeReason',
           );
 
-          // Add WebSocket auto-reconnect on onDone (unless intentional close).
           if (!_isIntentionalClose) {
-            debugPrint('[VoiceAgent] Unexpected close. Reconnecting in 1s...');
-            Future.delayed(const Duration(milliseconds: 1000), () {
+            debugPrint('[VoiceAgent] Unexpected close. Reconnecting in 2s...');
+            Future.delayed(const Duration(milliseconds: 2000), () {
               if (!_isIntentionalClose) {
                 _connectWebSocket(isReconnect: true);
               }
@@ -140,25 +140,30 @@ class VoiceAgentService extends ChangeNotifier {
 
       // Send start message ONLY once per session or on reconnect
       if (_currentUserId != null) {
+        // Add a small delay for the connection to stabilize
+        await Future.delayed(const Duration(milliseconds: 200));
+
         final agentId =
             StorageService.getString('ai_selected_agent_id') ?? 'default_agent';
 
-        final selectedVoice =
-            StorageService.getString('ai_selected_voice') ?? 'voice_1';
+        // NOTE: We don't send 'voice' here to match VoiceWebSocketService
+        // and avoid potential server-side TTS generation errors for specific agents.
         final payload = {
           "type": "start",
           "userId": _currentUserId,
           "chatId": _currentChatId ?? "new",
           "agentId": agentId,
-          "voice": selectedVoice,
         };
+
+        debugPrint('[VoiceAgent] Sending start payload: ${jsonEncode(payload)}');
         _sendWSMessage(payload);
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('[VoiceAgent] Connection Exception: $e');
+      debugPrint('[VoiceAgent] StackTrace: $stackTrace');
       _errorMessage = 'Connection Exception: $e';
       _setState(VoiceAgentState.ERROR);
-      _cleanup(closeWebSocket: false); // Never close the socket automatically
+      _cleanup(closeWebSocket: false);
     }
   }
 

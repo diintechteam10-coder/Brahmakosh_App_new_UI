@@ -62,6 +62,13 @@ android {
             } else {
                 signingConfigs.getByName("debug")
             }
+            // Add Proguard support
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }
