@@ -262,11 +262,10 @@ class _RemediesWebViewState extends State<RemediesWebView> {
       /// 🔥 BEST PRACTICE: Use only SSO URL (no manual cookie dependency)
       final url =
           'https://prod.brahmakosh.com/api/store/sso-login'
-          '?token=$token&redirect=/remedies';
+          '?token=$token';
 
       debugPrint('🚀 Loading SSO URL: $url');
 
-      /// Small delay (important for Android stability)
       await Future.delayed(const Duration(milliseconds: 300));
 
       await controller.loadRequest(Uri.parse(url));
