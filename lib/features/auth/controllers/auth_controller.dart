@@ -8,6 +8,7 @@ import 'package:brahmakosh/core/services/storage_service.dart';
 import 'package:brahmakosh/core/constants/app_constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:brahmakosh/core/services/push_notification_service.dart';
 
 class AuthController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -369,6 +370,14 @@ Future<void> signInWithApple() async {
           await StorageService.setString(AppConstants.keyAuthToken, token);
 
           print('✅ Existing user → Dashboard');
+          
+          // Initialize Push Notifications
+          try {
+            await PushNotificationService.instance.initialize();
+          } catch (e) {
+            print("❌ Push Notification Init Error: $e");
+          }
+
           Get.offAllNamed(AppConstants.routeDashboard);
         } else {
           /// 🆕 NEW USER → MOBILE OTP
@@ -385,6 +394,13 @@ Future<void> signInWithApple() async {
   }
 
   Future<void> signOut() async {
+    // 1. Remove Push Token
+    try {
+      await PushNotificationService.instance.removeToken();
+    } catch (e) {
+      print("❌ Push Token Removal Error: $e");
+    }
+
     await _googleSignIn.signOut();
     await _auth.signOut();
 

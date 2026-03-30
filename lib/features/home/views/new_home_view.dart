@@ -28,6 +28,7 @@ import 'package:brahmakosh/features/pooja/models/pooja_model.dart';
 import 'package:brahmakosh/features/pooja/repositories/pooja_repository.dart';
 import 'package:brahmakosh/features/pooja/views/pooja_detail_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:brahmakosh/features/notifications/blocs/notification_bloc.dart';
 import 'package:brahmakosh/features/redeem/controllers/redeem_controller.dart';
 
 class NewHomeView extends StatefulWidget {
@@ -76,6 +77,7 @@ class _NewHomeViewState extends State<NewHomeView> {
       _handleRefresh();
       _fetchCheckInData();
       _unfocusAll(); // Initial clean state
+      context.read<NotificationBloc>().add(RefreshUnreadCount());
     });
   }
 
@@ -145,6 +147,9 @@ class _NewHomeViewState extends State<NewHomeView> {
       redeemController.fetchRedemptionHistory(),
       Provider.of<ProfileViewModel>(context, listen: false).refreshProfile(),
     ]);
+    if (mounted) {
+      context.read<NotificationBloc>().add(RefreshUnreadCount());
+    }
   }
 
   @override
@@ -228,7 +233,7 @@ class _NewHomeViewState extends State<NewHomeView> {
             // Icons Row
             Row(
               children: [
-                // Notification Bell with red dot badge
+                // Notification Bell with dynamic badge
                 GestureDetector(
                   onTap: () {
                     _unfocusAll();
@@ -254,18 +259,39 @@ class _NewHomeViewState extends State<NewHomeView> {
                           color: Colors.white,
                         ),
                       ),
-                      // Red badge dot
-                      Positioned(
-                        top: 8,
-                        right: 10,
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: const BoxDecoration(
-                            color: Colors.red,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
+                      // Dynamic Badge
+                      BlocBuilder<NotificationBloc, NotificationState>(
+                        builder: (context, state) {
+                          debugPrint("HOME BADGE COUNT: ${state.unreadCount}");
+                          if (state.unreadCount <= 0) {
+                            return const SizedBox.shrink();
+                          }
+                          return Positioned(
+                            top: -2,
+                            right: 2,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                              constraints: BoxConstraints(
+                                minWidth: 18,
+                                minHeight: 18,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  state.unreadCount > 9 ? '9+' : state.unreadCount.toString(),
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                    fontSize: 8.sp,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),

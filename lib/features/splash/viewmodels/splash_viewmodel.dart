@@ -1,4 +1,5 @@
 import '../../../../core/common_imports.dart';
+import '../../../../core/services/push_notification_service.dart';
 
 class SplashViewModel extends ChangeNotifier {
   bool _isLoading = true;
@@ -29,6 +30,12 @@ class SplashViewModel extends ChangeNotifier {
         // Navigate to Intro screens
         Get.offAllNamed(AppConstants.routeIntro);
       } else if (hasToken) {
+        // Initialize Push Notifications for existing session
+        try {
+          await PushNotificationService.instance.initialize();
+        } catch (e) {
+          debugPrint("Push Notification error: $e");
+        }
         // If token exists, navigate to Dashboard
         Get.offAllNamed(AppConstants.routeDashboard);
       } else {

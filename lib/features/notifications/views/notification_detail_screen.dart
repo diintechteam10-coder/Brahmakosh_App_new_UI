@@ -1,5 +1,6 @@
 import 'package:brahmakosh/core/common_imports.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../blocs/notification_bloc.dart';
 import '../models/notification_model.dart';
 
 class NotificationDetailScreen extends StatelessWidget {
@@ -289,6 +290,7 @@ class NotificationDetailScreen extends StatelessWidget {
                           color: Colors.transparent,
                           child: InkWell(
                             onTap: () {
+                              context.read<NotificationBloc>().add(MarkReadEvent(notification.id));
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
@@ -302,6 +304,7 @@ class NotificationDetailScreen extends StatelessWidget {
                                   ),
                                 ),
                               );
+                              Get.back();
                             },
                             borderRadius: BorderRadius.circular(14),
                             child: Padding(
