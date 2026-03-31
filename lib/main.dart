@@ -25,18 +25,17 @@ import 'package:flutter_bloc/flutter_bloc.dart' hide Transition;
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   debugPrint("Handling a background message: ${message.messageId}");
-  
+
   // Show the notification manually
   await PushNotificationService.showLocalNotification(message);
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+  // HttpOverrides.global = MyHttpOverrides();
+
   // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Set up background message handler
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -87,9 +86,9 @@ class MyApp extends StatelessWidget {
           },
         ),
         BlocProvider(
-          create: (context) => NotificationBloc(
-            repository: NotificationRepository(),
-          )..add(RefreshUnreadCount()),
+          create: (context) =>
+              NotificationBloc(repository: NotificationRepository())
+                ..add(RefreshUnreadCount()),
         ),
       ],
       child: Sizer(
