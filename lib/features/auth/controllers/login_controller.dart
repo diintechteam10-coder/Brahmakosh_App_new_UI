@@ -6,6 +6,7 @@ import '../../../../common/api_services.dart';
 import '../../../../common/api_urls.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/services/storage_service.dart';
+import '../../../../core/services/push_notification_service.dart';
 
 class LoginController extends GetxController {
   // Controllers
@@ -52,6 +53,13 @@ class LoginController extends GetxController {
             await StorageService.setBool(AppConstants.keyIsLoggedIn, true);
             print("✅ Token saved to SharedPreferences: $token");
             print("🔑 DEBUG_TOKEN: $token");
+
+            // Initialize Push Notifications
+            try {
+              await PushNotificationService.instance.initialize();
+            } catch (e) {
+              print("❌ Push Notification Init Error: $e");
+            }
           }
 
           Get.snackbar(

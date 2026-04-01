@@ -122,6 +122,8 @@ class NotificationModel {
   final String id;
   final String title;
   final String body;
+  final String? type;
+  final Map<String, dynamic>? data;
   final String? description;
   final DateTime createdAt;
   final bool isRead;
@@ -131,6 +133,8 @@ class NotificationModel {
     required this.id,
     required this.title,
     required this.body,
+    this.type,
+    this.data,
     this.description,
     required this.createdAt,
     required this.isRead,
@@ -141,16 +145,33 @@ class NotificationModel {
       NotificationCategoryInfo.getInfo(category);
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
+    // Map API 'type' to NotificationCategory enum
+    NotificationCategory category = NotificationCategory.dailyAstrology;
+    final String? typeStr = json['type'];
+    
+    if (typeStr != null) {
+      if (typeStr.contains('offer')) category = NotificationCategory.offer;
+      else if (typeStr.contains('astrology')) category = NotificationCategory.dailyAstrology;
+      else if (typeStr.contains('check')) category = NotificationCategory.spiritualCheckIn;
+      else if (typeStr.contains('remedy')) category = NotificationCategory.remedies;
+      else if (typeStr.contains('reward')) category = NotificationCategory.rewards;
+      else if (typeStr.contains('update')) category = NotificationCategory.appUpdate;
+      else if (typeStr.contains('payment')) category = NotificationCategory.paymentRequest;
+    }
+
     return NotificationModel(
       id: json['_id'] ?? '',
       title: json['title'] ?? 'No Title',
-      body: json['body'] ?? 'No Content',
+      // API uses 'message', but model used 'body'. Handling both.
+      body: json['message'] ?? json['body'] ?? 'No Content',
+      type: typeStr,
+      data: json['data'] is Map ? Map<String, dynamic>.from(json['data']) : null,
       description: json['description'],
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
-          : DateTime.now(),
+          : (json['sentAt'] != null ? DateTime.parse(json['sentAt']) : DateTime.now()),
       isRead: json['isRead'] ?? false,
-      category: NotificationCategory.dailyAstrology,
+      category: category,
     );
   }
 }

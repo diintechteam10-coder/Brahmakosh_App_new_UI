@@ -1,19 +1,68 @@
 import '../../../../core/common_imports.dart';
+import '../../../../core/services/push_notification_service.dart';
+import '../../../../core/services/connectivity_service.dart';
 
 class SplashViewModel extends ChangeNotifier {
   bool _isLoading = true;
+  bool _hasInternet = true;
+  bool _isCheckingConnection = false;
 
   bool get isLoading => _isLoading;
+  bool get hasInternet => _hasInternet;
+  bool get isCheckingConnection => _isCheckingConnection;
+
+  late final ConnectivityService _connectivityService;
 
   SplashViewModel() {
+    _connectivityService = Get.find<ConnectivityService>();
+    
+    // Listen to internet status for auto-retry/navigation
+    _connectivityService.hasInternetAccess.listen((hasAccess) {
+      if (hasAccess && !_hasInternet) {
+        // Automatically try to proceed if internet restored
+        _hasInternet = true;
+        notifyListeners();
+        _checkFirstLaunch();
+      }
+    });
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initialize();
     });
   }
 
   Future<void> _initialize() async {
-    await Future.delayed(const Duration(seconds: AppConstants.splashDuration));
-    await _checkFirstLaunch();
+    _isCheckingConnection = true;
+    notifyListeners();
+
+    // Layer 2: Real internet check
+    final hasRealAccess = await _connectivityService.checkRealInternetAccess();
+    
+    _isCheckingConnection = false;
+    _hasInternet = hasRealAccess;
+    notifyListeners();
+
+    if (_hasInternet) {
+      await Future.delayed(const Duration(seconds: AppConstants.splashDuration));
+      await _checkFirstLaunch();
+    }
+  }
+
+  Future<void> retryConnection() async {
+    if (_isCheckingConnection) return;
+    
+    _isCheckingConnection = true;
+    notifyListeners();
+
+    final hasRealAccess = await _connectivityService.checkRealInternetAccess();
+    
+    _isCheckingConnection = false;
+    _hasInternet = hasRealAccess;
+    notifyListeners();
+
+    if (_hasInternet) {
+      await _checkFirstLaunch();
+    }
   }
 
   Future<void> _checkFirstLaunch() async {
@@ -26,17 +75,18 @@ class SplashViewModel extends ChangeNotifier {
       await Future.delayed(const Duration(milliseconds: 100));
 
       if (isFirstLaunch) {
-        // Navigate to Intro screens
         Get.offAllNamed(AppConstants.routeIntro);
       } else if (hasToken) {
-        // If token exists, navigate to Dashboard
+        try {
+          await PushNotificationService.instance.initialize();
+        } catch (e) {
+          debugPrint("Push Notification error: $e");
+        }
         Get.offAllNamed(AppConstants.routeDashboard);
       } else {
-        // Navigate to Login
         Get.offAllNamed(AppConstants.routeLogin);
       }
     } catch (e) {
-      // Fallback navigation if there's an error
       Get.offAllNamed(AppConstants.routeIntro);
     }
     
@@ -44,4 +94,3 @@ class SplashViewModel extends ChangeNotifier {
     notifyListeners();
   }
 }
-

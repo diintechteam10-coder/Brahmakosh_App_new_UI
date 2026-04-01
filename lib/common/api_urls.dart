@@ -19,6 +19,7 @@ class ApiUrls {
   static const String checkUser = '$apiUrl/user/check-email';
   static const String resendEmailOtp = '$apiUrl/user/register/resend-email-otp';
   static const String resendMobileOtp = '$apiUrl/user/register/resend-mobile-otp';
+  static const String pushToken = '$apiUrl/user/push-token';
 
   ///
   static const String getProfile = '$apiUrl/user/profile';
@@ -104,6 +105,8 @@ class ApiUrls {
       '$chatApiUrl/conversations'; // /:conversationId/voice-recording
   static const String presignedUrl = '$baseUrl/api/upload/presigned-url';
   static const String notifications = '$baseUrl/api/notifications';
+  static const String markAllRead = '$baseUrl/api/notifications/read-all';
+  static const String notificationUnreadCount = '$baseUrl/api/notifications/unread-count';
 
   /// 🔹 Swapna Decoder APIs
   static const String swapnaDecoder = '$baseUrl/api/swapna-decoder';

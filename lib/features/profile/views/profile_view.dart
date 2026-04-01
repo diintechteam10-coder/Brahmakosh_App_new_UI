@@ -16,6 +16,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../support/views/help_support_view.dart';
 import '../../support/views/about_us_view.dart';
+import '../../../../core/services/push_notification_service.dart';
 import '../../astrology/views/credit_history_view.dart';
 import '../../redeem/views/redeem_list_view.dart';
 import '../../../common/widgets/custom_popups.dart';
@@ -642,7 +643,14 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   Future<void> _logout() async {
-    // Clear all authentication data including token
+    // 1. Notify backend to remove push token (Requires current token)
+    try {
+      await PushNotificationService.instance.removeToken();
+    } catch (e) {
+      debugPrint("Error removing push token: $e");
+    }
+
+    // 2. Clear all authentication data including token
     await StorageService.setBool(AppConstants.keyIsLoggedIn, false);
     await StorageService.remove(AppConstants.keyAuthToken);
     await StorageService.remove(AppConstants.keyUserId);
