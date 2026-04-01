@@ -99,16 +99,54 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
           final currentDayDisplay = rawCurrentDay > totalDays ? totalDays : rawCurrentDay;
           
           final now = DateTime.now();
-          final bool isTodayCompleted = activeUserSankalp.dailyReports.any((r) {
+          debugPrint("=== Sankalp Progress Debug ===");
+          debugPrint("Current Day: $rawCurrentDay");
+          debugPrint("Total Days: $totalDays");
+          debugPrint("Status: ${activeUserSankalp.status}");
+          debugPrint("Reports Count: ${activeUserSankalp.dailyReports.length}");
+          for (var r in activeUserSankalp.dailyReports) {
+            debugPrint(" - Day ${r.day}: ${r.status} (${r.date})");
+          }
+
+          final bool isTodayMarkedAndCompleted = activeUserSankalp.dailyReports.any((r) {
             final reportDate = r.date;
-            if (reportDate == null) {
-              return r.day == currentDayDisplay && r.status == 'yes';
-            }
+            if (reportDate == null) return r.day == currentDayDisplay && r.status == 'yes';
             return reportDate.year == now.year &&
                 reportDate.month == now.month &&
                 reportDate.day == now.day &&
                 r.status == 'yes';
           });
+          
+          final bool isTodayMarkedAsNo = activeUserSankalp.dailyReports.any((r) {
+            final reportDate = r.date;
+            if (reportDate == null) return r.day == currentDayDisplay && r.status == 'no';
+            return reportDate.year == now.year &&
+                reportDate.month == now.month &&
+                reportDate.day == now.day &&
+                r.status == 'no';
+          });
+
+          // A day is "Actually Missed" if its scheduled date is before today and it wasn't reported yes
+          final bool isDayMissedByDate = activeUserSankalp.dailyReports.any((r) {
+            final reportDate = r.date;
+            if (reportDate == null) return false;
+            
+            // Compare only dates (year, month, day)
+            final reportDateOnly = DateTime(reportDate.year, reportDate.month, reportDate.day);
+            final todayDateOnly = DateTime(now.year, now.month, now.day);
+            
+            return reportDateOnly.isBefore(todayDateOnly) && r.day == currentDayDisplay && r.status != 'yes';
+          });
+
+          final bool isActionDisabled = isTodayMarkedAndCompleted || isTodayMarkedAsNo || isDayMissedByDate;
+          
+          debugPrint("=== Sankalp UI Status ===");
+          debugPrint("Current Day Display: $currentDayDisplay");
+          debugPrint("isTodayMarkedAndCompleted: $isTodayMarkedAndCompleted");
+          debugPrint("isTodayMarkedAsNo: $isTodayMarkedAsNo");
+          debugPrint("isDayMissedByDate: $isDayMissedByDate");
+          debugPrint("isActionDisabled: $isActionDisabled");
+          debugPrint("=========================");
 
           return Stack(
             children: [
@@ -230,25 +268,31 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                           ),
                           const SizedBox(height: 20),
                           
-                          if (isTodayCompleted)
-                            // Today Completed Status (SCREEN 8)
+                          if (isActionDisabled)
+                            // Today Completed/Closed Status
                             Container(
                               width: double.infinity,
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF1B3326),
+                                color: isTodayMarkedAndCompleted ? const Color(0xFF1B3326) : const Color(0xFF331B1B),
                                 borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: const Color(0xFF2E7D32).withOpacity(0.3)),
+                                border: Border.all(color: (isTodayMarkedAndCompleted ? const Color(0xFF2E7D32) : Colors.red).withOpacity(0.3)),
                               ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(Icons.celebration, color: Color(0xFF4CAF50), size: 20),
+                                  Icon(
+                                    isTodayMarkedAndCompleted ? Icons.celebration : Icons.error_outline, 
+                                    color: isTodayMarkedAndCompleted ? const Color(0xFF4CAF50) : Colors.redAccent, 
+                                    size: 20
+                                  ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    isSankalpCompleted ? "Sankalp completed" : "Today Completed! Keep it up...",
+                                    isSankalpCompleted 
+                                      ? "Sankalp completed" 
+                                      : (isTodayMarkedAndCompleted ? "Today Completed! Keep it up..." : "This day was missed."),
                                     style: GoogleFonts.poppins(
-                                      color: const Color(0xFF4CAF50),
+                                      color: isTodayMarkedAndCompleted ? const Color(0xFF4CAF50) : Colors.redAccent,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14,
                                     ),
@@ -303,8 +347,20 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                           orElse: () => DailyReport(day: dayNum, status: 'not_reported'),
                         );
                         final status = report?.status ?? 'not_reported';
+                        
+                        // Check if missed by date
+                        bool isMissedByDate = false;
+                        if (status == 'not_reported' && report?.date != null) {
+                          final reportDateOnly = DateTime(report!.date!.year, report.date!.month, report.date!.day);
+                          final todayDateOnly = DateTime(now.year, now.month, now.day);
+                          if (reportDateOnly.isBefore(todayDateOnly)) {
+                            isMissedByDate = true;
+                          }
+                        }
+
                         final isCompleted = status == 'yes';
-                        final isToday = dayNum == currentDayDisplay && !isSankalpCompleted;
+                        final isMissed = status == 'no' || isMissedByDate;
+                        final isToday = dayNum == currentDayDisplay && !isSankalpCompleted && !isMissedByDate;
     
                         return Container(
                           margin: const EdgeInsets.only(bottom: 12),
@@ -315,7 +371,9 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                             border: Border.all(
                               color: isCompleted 
                                 ? const Color(0xFF2E7D32).withOpacity(0.5) 
-                                : Colors.white.withOpacity(0.05),
+                                : isMissed 
+                                  ? Colors.red.withOpacity(0.3)
+                                  : Colors.white.withOpacity(0.05),
                               width: 1.5,
                             ),
                           ),
@@ -331,7 +389,9 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                                     fontWeight: FontWeight.bold,
                                     color: isCompleted 
                                       ? const Color(0xFF4CAF50) 
-                                      : AppTheme.primaryGold.withOpacity(0.8),
+                                      : isMissed
+                                        ? Colors.red.withOpacity(0.6)
+                                        : AppTheme.primaryGold.withOpacity(0.8),
                                   ),
                                 ),
                               ),
@@ -376,15 +436,15 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                                     Row(
                                       children: [
                                         Icon(
-                                          isCompleted ? Icons.check_circle : Icons.circle_outlined,
+                                          isCompleted ? Icons.check_circle : isMissed ? Icons.cancel : Icons.circle_outlined,
                                           size: 14,
-                                          color: isCompleted ? const Color(0xFF4CAF50) : Colors.white.withOpacity(0.4),
+                                          color: isCompleted ? const Color(0xFF4CAF50) : isMissed ? Colors.redAccent : Colors.white.withOpacity(0.4),
                                         ),
                                         const SizedBox(width: 6),
                                         Text(
-                                          isCompleted ? "Completed" : "Not Completed",
+                                          isCompleted ? "Completed" : isMissed ? "Missed" : "Not Completed",
                                           style: GoogleFonts.poppins(
-                                            color: isCompleted ? const Color(0xFF4CAF50) : Colors.white.withOpacity(0.4),
+                                            color: isCompleted ? const Color(0xFF4CAF50) : isMissed ? Colors.redAccent : Colors.white.withOpacity(0.4),
                                             fontSize: 13,
                                             fontWeight: FontWeight.w500,
                                           ),
@@ -418,7 +478,7 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                         height: 56,
                         child: ElevatedButton(
                           onPressed: () {
-                            if (isTodayCompleted) {
+                            if (isActionDisabled) {
                               context.read<SankalpBloc>().add(ClearSankalpOperationStatus());
                               Get.back();
                             } else {
@@ -429,8 +489,8 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.primaryGold,
-                            foregroundColor: Colors.black,
+                            backgroundColor: isActionDisabled ? Colors.grey[800] : AppTheme.primaryGold,
+                            foregroundColor: isActionDisabled ? Colors.white70 : Colors.black,
                             elevation: 0,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                           ),
@@ -438,12 +498,12 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
-                                isTodayCompleted ? Icons.arrow_forward : Icons.check_circle_outline,
+                                isActionDisabled ? Icons.arrow_forward : Icons.check_circle_outline,
                                 size: 20,
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                isTodayCompleted 
+                                isActionDisabled
                                   ? "Go To My Sankalp" 
                                   : "Mark Day $currentDayDisplay Complete",
                                 style: GoogleFonts.poppins(
@@ -468,10 +528,11 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
   }
 
   void _showSuccessDialog(BuildContext context, String message) {
+    final sankalpBloc = context.read<SankalpBloc>();
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
           backgroundColor: const Color(0xFF1C1C1E),
           shape: RoundedRectangleBorder(
@@ -505,8 +566,8 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pop(context);
-                    context.read<SankalpBloc>().add(ClearSankalpOperationStatus());
+                    Navigator.pop(dialogContext);
+                    sankalpBloc.add(ClearSankalpOperationStatus());
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primaryGold,

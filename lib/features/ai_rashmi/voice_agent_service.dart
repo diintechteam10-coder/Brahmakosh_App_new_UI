@@ -1067,7 +1067,9 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
+import 'package:audio_session/audio_session.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:record/record.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -1253,6 +1255,31 @@ class VoiceAgentService extends ChangeNotifier {
         _hasVoiceActivity = false;
         _lastVoiceActivity = DateTime.now();
 
+        // Configure AudioSession for iOS Loudspeaker output
+        try {
+          final session = await AudioSession.instance;
+          await session.configure(const AudioSessionConfiguration(
+            avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
+            avAudioSessionCategoryOptions:
+                AVAudioSessionCategoryOptions.defaultToSpeaker,
+            avAudioSessionMode: AVAudioSessionMode.videoChat,
+            androidAudioAttributes: AndroidAudioAttributes(
+              contentType: AndroidAudioContentType.music,
+              flags: AndroidAudioFlags.none,
+              usage: AndroidAudioUsage.media,
+            ),
+            androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+          ));
+          await session.setActive(true);
+
+          // Explicitly set speakerphone ON using flutter_webrtc Helper
+          await Helper.setSpeakerphoneOn(true);
+
+          debugPrint(
+              '[VoiceAgent] AudioSession configured for loudspeaker using videoChat mode.');
+        } catch (e) {
+          debugPrint('[VoiceAgent] AudioSession Error: $e');
+        }
         // Start empty turn timeout (10s reset if no voice)
         _startEmptyTurnTimer();
 

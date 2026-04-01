@@ -137,7 +137,7 @@ class _GitaVerseListViewState extends State<_GitaVerseListView> {
           ),
         ),
         label: const Text(
-          "ASK KRISHNA",
+          "Ask Krishna",
           style: TextStyle(
             color: Color(0xFF8B4513),
             fontWeight: FontWeight.bold,

@@ -96,7 +96,7 @@ class MySankalpTab extends StatelessWidget {
                           child: const ChooseSankalpScreen(),
                         ),
                         transition: Transition.downToUp,
-                      );
+                      )?.then((_) => bloc.add(FetchUserSankalps()));
                     },
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(color: AppTheme.primaryGold.withOpacity(0.5), width: 1.5),
@@ -455,10 +455,11 @@ class MySankalpTab extends StatelessWidget {
   }
 
   void _showSuccessDialog(BuildContext context, String message) {
+    final sankalpBloc = context.read<SankalpBloc>();
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
           backgroundColor: const Color(0xFF1C1C1E),
           shape: RoundedRectangleBorder(
@@ -492,8 +493,8 @@ class MySankalpTab extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pop(context);
-                    context.read<SankalpBloc>().add(ClearSankalpOperationStatus());
+                    Navigator.pop(dialogContext);
+                    sankalpBloc.add(ClearSankalpOperationStatus());
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primaryGold,

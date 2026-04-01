@@ -1,4 +1,10 @@
 import 'dart:io';
+import 'dart:async';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../sankalp/blocs/sankalp_bloc.dart';
+import '../../sankalp/blocs/sankalp_state.dart';
+import '../../sankalp/models/sankalp_model.dart';
+import '../../sankalp/views/sankalp_screen.dart';
 import 'package:brahmakosh/features/home/controllers/home_controller.dart';
 import 'package:sizer/sizer.dart';
 import 'package:brahmakosh/features/astrology/controllers/astrology_controller.dart';
@@ -19,16 +25,10 @@ import 'package:brahmakosh/features/check_in/views/chanting_configuration_view.d
 import 'package:brahmakosh/features/check_in/views/prayer_configuration_view.dart';
 import 'package:brahmakosh/features/ai_rashmi/views/ai_guide_view.dart';
 import 'package:brahmakosh/common/api_urls.dart';
+import 'package:brahmakosh/common/widgets/custom_popups.dart';
 import 'package:brahmakosh/common/widgets/custom_profile_avatar.dart';
 import 'package:brahmakosh/features/profile/views/profile_view.dart'
     as brahmakosh_profile;
-import 'package:brahmakosh/features/pooja/blocs/pooja_bloc.dart';
-import 'package:brahmakosh/features/pooja/blocs/pooja_event.dart';
-import 'package:brahmakosh/features/pooja/blocs/pooja_state.dart';
-import 'package:brahmakosh/features/pooja/models/pooja_model.dart';
-import 'package:brahmakosh/features/pooja/repositories/pooja_repository.dart';
-import 'package:brahmakosh/features/pooja/views/pooja_detail_screen.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:brahmakosh/features/notifications/blocs/notification_bloc.dart';
 import 'package:brahmakosh/features/redeem/controllers/redeem_controller.dart';
 
@@ -56,9 +56,8 @@ class _NewHomeViewState extends State<NewHomeView> {
     "travel",
   ];
 
-  final PageController _bannerController = PageController();
-  int _currentBannerIndex = 0;
   int _selectedCheckInIndex = -1;
+
   List<Activities> _checkInActivities = [];
   bool _isCheckInLoading = false;
   String _selectedRemedyTab = "must_have";
@@ -79,7 +78,32 @@ class _NewHomeViewState extends State<NewHomeView> {
       _fetchCheckInData();
       _unfocusAll(); // Initial clean state
       context.read<NotificationBloc>().add(RefreshUnreadCount());
+      _startComingSoonTimer();
     });
+  }
+
+  void _startComingSoonTimer() {
+    _comingSoonTimer?.cancel();
+    _comingSoonTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
+      if (_comingSoonPageController.hasClients) {
+        int nextPage = (_comingSoonPageIndex + 1) % _comingSoonProjects.length;
+        _comingSoonPageController.animateToPage(
+          nextPage,
+          duration: const Duration(milliseconds: 800),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _comingSoonTimer?.cancel();
+    _comingSoonPageController.dispose();
+    _searchFocusNode.dispose();
+    _swapnaFocusNode.dispose();
+    _checkInScrollController.dispose();
+    super.dispose();
   }
 
   void _unfocusAll() {
@@ -132,15 +156,6 @@ class _NewHomeViewState extends State<NewHomeView> {
     );
   }
 
-  @override
-  void dispose() {
-    _bannerController.dispose();
-    _searchFocusNode.dispose();
-    _swapnaFocusNode.dispose();
-    _checkInScrollController.dispose();
-    super.dispose();
-  }
-
   Future<void> _handleRefresh() async {
     await Future.wait([
       homeController.refreshHomeData(),
@@ -173,7 +188,7 @@ class _NewHomeViewState extends State<NewHomeView> {
             ),
             slivers: [
               _buildHeader(),
-              _buildSearchBar(),
+              // _buildSearchBar(),
               _buildTitle(),
               _buildMainBanner(screenWidth),
               _buildFeatureGrid(isTablet),
@@ -183,10 +198,10 @@ class _NewHomeViewState extends State<NewHomeView> {
               _buildMuhuratSection(),
               if (!Platform.isIOS) _buildRemediesSection(screenWidth),
               // _buildSelfDiscoverySection(),
-              _buildPujaVidhi(screenWidth),
+              _buildSpiritualToolsSection(screenWidth),
               _buildSankalpTracker(),
               _buildSwapnaDecoder(),
-              _buildGitaBanner(screenWidth),
+              _buildComingSoonProjectsSection(screenWidth),
               _buildSponsorsSection(screenWidth),
               const SliverToBoxAdapter(child: SizedBox(height: 110)),
             ],
@@ -331,287 +346,211 @@ class _NewHomeViewState extends State<NewHomeView> {
     );
   }
 
-  Widget _buildSearchBar() {
-    final borderRadius = BorderRadius.circular(16);
+  // Widget _buildSearchBar() {
+  //   final borderRadius = BorderRadius.circular(16);
 
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(4.w, 1.5.h, 4.w, 0),
-        child: Container(
-          height: 6.h,
-          decoration: BoxDecoration(borderRadius: borderRadius),
-          child: TextField(
-            focusNode: _searchFocusNode,
-            style: TextStyle(color: Colors.white, fontSize: 11.sp),
-            textAlignVertical: TextAlignVertical.center,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: const Color(0xFF0A0A0A), // 👈 DARK COLOR
-              hintText: "search_hint".tr,
-              hintStyle: GoogleFonts.poppins(
-                color: Colors.white.withOpacity(0.35),
-                fontSize: 11.sp,
-                fontWeight: FontWeight.w500,
-              ),
+  //   return SliverToBoxAdapter(
+  //     child: Padding(
+  //       padding: EdgeInsets.fromLTRB(4.w, 1.5.h, 4.w, 0),
+  //       child: Container(
+  //         height: 6.h,
+  //         decoration: BoxDecoration(borderRadius: borderRadius),
+  //         child: TextField(
+  //           focusNode: _searchFocusNode,
+  //           style: TextStyle(color: Colors.white, fontSize: 11.sp),
+  //           textAlignVertical: TextAlignVertical.center,
+  //           decoration: InputDecoration(
+  //             filled: true,
+  //             fillColor: const Color(0xFF0A0A0A), // 👈 DARK COLOR
+  //             hintText: "Search rituals, puja, astrologers",
+  //             hintStyle: GoogleFonts.poppins(
+  //               color: Colors.white.withOpacity(0.35),
+  //               fontSize: 11.sp,
+  //               fontWeight: FontWeight.w500,
+  //             ),
 
-              prefixIcon: Padding(
-                padding: EdgeInsets.symmetric(vertical: 1.2.h, horizontal: 1.2.h),
-                child: SvgPicture.asset(
-                  'assets/icons/search.svg',
-                  colorFilter: ColorFilter.mode(
-                    Colors.white.withOpacity(0.4),
-                    BlendMode.srcIn
-                  ),
-                ),
-              ),
-                            border: OutlineInputBorder(
-                borderRadius: borderRadius,
-                borderSide: BorderSide.none,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: borderRadius,
-                borderSide: BorderSide.none,
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: borderRadius,
-                borderSide: const BorderSide(
-                  color: Color(0xFFD4AF37),
-                  width: 1.2,
-                ),
-              ),
+  //             prefixIcon: Padding(
+  //               padding: EdgeInsets.symmetric(vertical: 1.2.h, horizontal: 1.2.h),
+  //               child: SvgPicture.asset(
+  //                 'assets/icons/search.svg',
+  //                 colorFilter: ColorFilter.mode(
+  //                   Colors.white.withOpacity(0.4),
+  //                   BlendMode.srcIn
+  //                 ),
+  //               ),
+  //             ),
+  //                           border: OutlineInputBorder(
+  //               borderRadius: borderRadius,
+  //               borderSide: BorderSide.none,
+  //             ),
+  //             enabledBorder: OutlineInputBorder(
+  //               borderRadius: borderRadius,
+  //               borderSide: BorderSide.none,
+  //             ),
+  //             focusedBorder: OutlineInputBorder(
+  //               borderRadius: borderRadius,
+  //               borderSide: const BorderSide(
+  //                 color: Color(0xFFD4AF37),
+  //                 width: 1.2,
+  //               ),
+  //             ),
 
-              contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 8),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  //             contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 8),
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildTitle() {
     return SliverToBoxAdapter(
       child: Padding(
         padding: EdgeInsets.fromLTRB(4.w, 1.h, 4.w, 0.h),
         child: Center(
-          child: Text(
-            "BRAHMAKOSH",
-            style: GoogleFonts.lora(
-              color: const Color(0xFFD4AF37),
-              fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 3,
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "BRAHMAKOSH",
+                style: GoogleFonts.lora(
+                  color: const Color(0xFFD4AF37),
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 3,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                "Your Spiritual Operating System",
+                style: GoogleFonts.poppins(
+                  color: Colors.white.withOpacity(0.6),
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
+
 
   Widget _buildMainBanner(double screenWidth) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 1.h),
-        child: Obx(() {
-          final message = homeController.activeFounderMessage;
-          final krishaImageUrl =
-              message?.founderImage ?? 'assets/images/home_krishna_banner.png';
-
-          return Stack(
-            alignment: Alignment.bottomCenter,
+        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 3.h),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SizedBox(
-                height: screenWidth * 0.9, // Adaptive height
-                child: PageView(
-                  controller: _bannerController,
-                  onPageChanged: (index) {
-                    setState(() {
-                      _currentBannerIndex = index;
-                    });
-                  },
-                  children: [
-                    _buildBannerItem(
-                      krishaImageUrl,
-                      "talk_to_krishna".tr,
-                      () {
-                        _unfocusAll();
-                        Get.to(
-                          () => const AiGuideView(
-                            deityName: "deity_krishna",
-                            subtitle: "krishna_subtitle",
-                            backgroundImage:
-                                'assets/images/rashmi_background.jpeg',
-                            characterImagePath:
-                                'assets/images/Krishana_new.png',
-                            chatBackgroundImage:
-                                'assets/images/Krishna_chat.png',
-                          ),
-                        );
-                      },
-                      isNetwork: message?.founderImage != null,
-                    ),
-                    _buildBannerItem(
-                      'assets/images/TalkToRashmiBack.png',
-                      "talk_to_rashmi".tr,
-                      () {
-                        _unfocusAll();
-                        Get.to(
-                          () => const AiGuideView(
-                            deityName: "deity_rashmi",
-                            subtitle: "rashmi_subtitle",
-                            backgroundImage:
-                                'assets/images/rashmi_background.jpeg',
-                            characterImagePath: 'assets/images/Rashmi_new.png',
-                            chatBackgroundImage:
-                                'assets/images/Rashmi_chat.png',
-                          ),
-                        );
-                      },
-                      isNetwork: false,
-                    ),
-                  ],
-                ),
-              ),
-              Positioned(
-                bottom: 12,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(2, (index) {
-                    final bool isSelected = _currentBannerIndex == index;
-                    return AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      width: isSelected ? 20 : 6,
-                      height: 4,
-                      margin: const EdgeInsets.symmetric(horizontal: 3),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(2),
-                        color: isSelected
-                            ? Colors.white
-                            : Colors.white.withOpacity(0.5),
+              Expanded(
+                child: _buildBannerItem(
+                  title: "Rashmi",
+                  role: "Spiritual Guide",
+                  description: "Get guidance on astrology, puja, rituals & spiritual practice",
+                  buttonText: "ASK SPIRITUAL GUIDE",
+                  imageUrl: 'assets/icons/rashmi_new_avatar.png',
+                  alignment: const Alignment(0, -0.6), // Pull Rashmi up slightly
+                  onPressed: () {
+                    _unfocusAll();
+                    Get.to(
+                      () => const AiGuideView(
+                        deityName: "Rashmi",
+                        subtitle: "Your Spiritual Guide",
+                        backgroundImage: 'assets/icons/chat_bg_new.png',
+                        characterImagePath: 'assets/icons/Rashmi_new_chat.png',
+                        chatBackgroundImage: 'assets/icons/Rashmi_new_chat.png',
                       ),
                     );
-                  }),
+                  },
+                ),
+              ),
+              SizedBox(width: 3.w),
+              Expanded(
+                child: _buildBannerItem(
+                  title: "Talk to Krishna",
+                  description: "Seek timeless wisdom from the Bhagavad Gita.",
+                  buttonText: "START CONVERSATION",
+                  imageUrl: 'assets/icons/Krishna_new_avatar.png',
+                  alignment: Alignment.topCenter, // Keep Krishna as is
+                  onPressed: () {
+                    _unfocusAll();
+                    Get.to(
+                      () => const AiGuideView(
+                        deityName: "Krishna",
+                        subtitle: "Divine Cosmic Intelligence",
+                        backgroundImage: 'assets/icons/chat_bg_new.png',
+                        characterImagePath: 'assets/icons/krishna_neww.png',
+                        chatBackgroundImage: 'assets/images/Krishna_chat.png',
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
-          );
-        }),
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildBannerItem(
-    String imageUrl,
-    String buttonText,
-    VoidCallback onPressed, {
+
+
+  Widget _buildBannerItem({
+    required String title,
+    String? role,
+    required String description,
+    required String buttonText,
+    required String imageUrl,
+    required VoidCallback onPressed,
+    Alignment alignment = Alignment.topCenter, // Added this
     bool isNetwork = false,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          image: DecorationImage(
-            image: isNetwork
-                ? NetworkImage(ApiUrls.getFormattedImageUrl(imageUrl)!)
-                : AssetImage(imageUrl) as ImageProvider,
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Stack(
-          children: [
-            Positioned(
-              bottom: 25,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white.withOpacity(0.9),
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                  ),
-                  onPressed: onPressed,
-                  icon: Icon(Icons.call_rounded, size: 5.w),
-                  label: Text(
-                    buttonText,
-                    style: GoogleFonts.poppins(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F0F0F),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.20), width: 1),
       ),
-    );
-  }
-Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
-  return GestureDetector(
-    onTap: onTap,
-    child: Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Align(
-          alignment: Alignment.center,
-          child: Container(
-            height: 10.5.h,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.white.withOpacity(0.2),
-                  Colors.white.withOpacity(0.05),
-                ],
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.white.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
-                ),
-              ],
-            ),
-            padding: const EdgeInsets.all(1.2),
-            child: Container(
-              height: 10.h,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xff1E1E1E),
-                    Color(0xff000000),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Image part with gradient
+          SizedBox(
+            height: 22.h,
+            child: ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              child: Stack(
+                fit: StackFit.expand,
                 children: [
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 1.h),
-                    child: Text(
-                      title,
-                      textAlign: TextAlign.center,
-                      maxLines: 2, // ✅ force single line
-                      overflow: TextOverflow.ellipsis,
-                      softWrap: false,
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w400,
+                  isNetwork
+                      ? Image.network(
+                          ApiUrls.getFormattedImageUrl(imageUrl)!,
+                          fit: BoxFit.cover,
+                          alignment: alignment,
+                        )
+                      : Image.asset(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          alignment: alignment,
+                        ),
+                  // Bottom gradient overlay to transition to black
+                  Positioned.fill(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            const Color(0xFF0F0F0F).withOpacity(0.6),
+                            const Color(0xFF0F0F0F),
+                          ],
+                          stops: const [0.5, 0.85, 1.0],
+                        ),
                       ),
                     ),
                   ),
@@ -619,34 +558,81 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
               ),
             ),
           ),
-        ),
-
-
-          // 2. The Floating Icon
-          Positioned(
-            top: -10,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Container(
-                // Shadow to make the icon "pop"
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.6),
-                      blurRadius: 15,
-                      offset: const Offset(0, 8),
+          // Content part
+          Padding(
+            padding: EdgeInsets.fromLTRB(3.w, 0, 3.w, 2.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      title,
+                      style: GoogleFonts.lora(
+                        color: Colors.white,
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
+                    if (role != null) ...[
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Text(
+                          "•",
+                          style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 10.sp),
+                        ),
+                      ),
+                      Text(
+                        role,
+                        style: GoogleFonts.poppins(
+                          color: const Color(0xFFD4AF37),
+                          fontSize: 7.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
-                child: Image.asset(
-                  iconPath,
-                  width: 18.w,
-                  height: 18.w,
-                  fit: BoxFit.contain,
+                SizedBox(height: 0.5.h),
+                Text(
+                  description,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.poppins(
+                    color: Colors.white.withOpacity(0.6),
+                    fontSize: 10.sp,
+                    height: 1.2,
+                  ),
                 ),
-              ),
+                SizedBox(height: 1.5.h),
+                SizedBox(
+                  width: double.infinity,
+                  height: 4.5.h,
+                  child: ElevatedButton(
+                    onPressed: onPressed,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFD4AF37),
+                      foregroundColor: Colors.black,
+                      padding: EdgeInsets.zero,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      buttonText,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        fontSize: 8.5.sp,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -654,15 +640,111 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
     );
   }
 
+  Widget _buildComingSoonBadge() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          decoration: BoxDecoration(
+            color: const Color(0xFF4CAF50),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Text(
+            'Coming Soon',
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 6.sp,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        // Small triangle pointer
+        CustomPaint(
+          size: const Size(6, 4),
+          painter: TrianglePainter(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGridItem(
+    String title,
+    String iconPath, {
+    VoidCallback? onTap,
+    bool showComingSoon = false,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          // Card Background
+          Container(
+            width: double.infinity,
+            margin: EdgeInsets.only(top: 2.h),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.white.withOpacity(0.12),
+                  Colors.white.withOpacity(0.01),
+                ],
+              ),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.1),
+                width: 0.8,
+              ),
+            ),
+            child: Padding(
+              padding: EdgeInsets.only(top: 5.h, bottom: 1.h, left: 1.w, right: 1.w),
+              child: Text(
+                title,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.poppins(
+                  color: Colors.white.withOpacity(0.9),
+                  fontSize: 8.5.sp,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+          // Floating Icon
+          Positioned(
+            top: -1.h,
+            child: Image.asset(
+              iconPath,
+              height: 7.5.h,
+              fit: BoxFit.contain,
+            ),
+          ),
+          // Badge
+          if (showComingSoon)
+            Positioned(
+              top: -1.2.h,
+              child: _buildComingSoonBadge(),
+            ),
+        ],
+      ),
+    );
+  }
+
+
+
   Widget _buildFeatureGrid(bool isTablet) {
     return SliverPadding(
-      padding: EdgeInsets.fromLTRB(4.w, 1.5.h, 4.w, 1.5.h),
+      padding: EdgeInsets.fromLTRB(4.w, 4.h, 4.w, 2.h),
       sliver: SliverGrid(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: isTablet ? 4 : 3,
-          mainAxisSpacing: 3.5.h, // Space between rows
-          crossAxisSpacing: 3.w, // Space between columns
-          childAspectRatio: 0.82, // Adjusted to fit the icon + card height
+          crossAxisCount: 4,
+          mainAxisSpacing: 3.5.h, // Space for floating icons
+          crossAxisSpacing: 3.w,
+          childAspectRatio: 0.95,
         ),
         delegate: SliverChildListDelegate([
           _buildGridItem(
@@ -686,10 +768,16 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
             "assets/icons/expert_connect.png",
             onTap: () {
               _unfocusAll();
-              Provider.of<DashboardViewModel>(
-                context,
-                listen: false,
-              ).changeTab(3);
+              Provider.of<DashboardViewModel>(context, listen: false).changeTab(3);
+            },
+          ),
+          _buildGridItem(
+            "Reports",
+            "assets/icons/reports.png",
+            showComingSoon: false,
+            onTap: () {
+              _unfocusAll();
+              Get.dialog(const ComingSoonPopup(feature: "Reports"));
             },
           ),
           _buildGridItem(
@@ -697,10 +785,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
             "assets/icons/remedies.png",
             onTap: () {
               _unfocusAll();
-              Provider.of<DashboardViewModel>(
-                context,
-                listen: false,
-              ).changeTab(4);
+              Provider.of<DashboardViewModel>(context, listen: false).changeTab(4);
             },
           ),
           _buildGridItem(
@@ -719,18 +804,28 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
               Get.toNamed(AppConstants.routePoojaList);
             },
           ),
+          _buildGridItem(
+            "Courses",
+            "assets/icons/courses.png",
+            showComingSoon: true,
+            onTap: () {
+              _unfocusAll();
+              Get.dialog(const ComingSoonPopup(feature: "Courses"));
+            },
+          ),
         ]),
       ),
     );
   }
 
+
   // Placeholder methods for other sections
   Widget _buildSpiritualCheckIn() {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
+        padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 1.5.h),
         child: Container(
-          padding: EdgeInsets.all(5.w),
+          padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 2.h),
           decoration: BoxDecoration(
             color: const Color(0xFF111111), // Match dark background
             borderRadius: BorderRadius.circular(24),
@@ -742,24 +837,27 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    "are_you_spiritual".tr,
-                    style: GoogleFonts.poppins(
-                      // Cleaner look
-                      color: Colors.white.withOpacity(0.6),
-                      fontSize: 11.sp,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 3.w),
+                    child: Text(
+                      "are_you_spiritual".tr,
+                      style: GoogleFonts.poppins(
+                        // Cleaner look
+                        color: Colors.white.withOpacity(0.6),
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ),
-                  Text(
-                    "${_selectedCheckInIndex + 1}/${_checkInActivities.length}",
-                    style: GoogleFonts.poppins(
-                      color: const Color(0xFFFFD447), // Brighter gold
-                      fontSize: 11.sp,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+                  // Text(
+                  //   "${_selectedCheckInIndex + 1}/${_checkInActivities.length}",
+                  //   style: GoogleFonts.poppins(
+                  //     color: const Color(0xFFFFD447), // Brighter gold
+                  //     fontSize: 11.sp,
+                  //     fontWeight: FontWeight.w500,
+                  //   ),
+                  // ),
                 ],
               ),
               const SizedBox(height: 24),
@@ -778,7 +876,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                     children: List.generate(_checkInActivities.length, (index) {
                       final activity = _checkInActivities[index];
                       return Padding(
-                        padding: const EdgeInsets.only(right: 20.0),
+                        padding: EdgeInsets.symmetric(horizontal: 1.w),
                         child: GestureDetector(
                           onTap: () {
                             setState(() => _selectedCheckInIndex = index);
@@ -794,7 +892,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                     }),
                   ),
                 ),
-              SizedBox(height: 3.h),
+              SizedBox(height: 2.h),
               // The White Action Button
               SizedBox(
                 width: 45.w,
@@ -874,12 +972,12 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
     String imagePath, {
     bool isSelected = false,
   }) {
-    final double size = isSelected ? 26.w : 22.w;
+    final double size =  20.w;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
-          height: 26.w,
+          height: 20.w,
           child: Center(
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
@@ -887,11 +985,12 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
               height: size,
               width: size,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
+                color: Colors.black.withOpacity(0.4), // Set white background for all image cards
+                borderRadius: BorderRadius.circular(16),
                 // Clean gold border only when selected
                 border: isSelected
-                    ? Border.all(color: const Color(0xFFFFD447), width: 1.08)
-                    : Border.all(color: Colors.transparent, width: 2.0),
+                    ? Border.all(color: const Color(0xFFFFD447), width: 1)
+                    : Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
                 boxShadow: isSelected
                     ? [
                         BoxShadow(
@@ -902,10 +1001,10 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                       ]
                     : [],
               ),
-              padding: EdgeInsets.all(isSelected ? 4 : 0),
+              padding: const EdgeInsets.all(4), // Give uniform padding to keep image inside the borders nicely
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: Image.asset(imagePath, fit: BoxFit.cover),
+                child: Image.asset(imagePath, fit: BoxFit.contain), // Use contain prevent cropping
               ),
             ),
           ),
@@ -919,8 +1018,8 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
               title,
               style: GoogleFonts.poppins(
                 color: isSelected ? Colors.white : Colors.white.withOpacity(0.5),
-                fontSize: isSelected ? 12.sp : 10.sp,
-                fontWeight: isSelected ? FontWeight.w400 : FontWeight.w400,
+                fontSize: isSelected ? 10.sp : 9.sp,
+                fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
               ),
             ),
           ),
@@ -1161,8 +1260,8 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
             Obx(() {
               final experts = astrologyController.experts;
               if (astrologyController.isLoading.value && experts.isEmpty) {
-                return const SizedBox(
-                  height: 205,
+                return SizedBox(
+                  height: 24.h,
                   child: Center(
                     child: CircularProgressIndicator(color: Color(0xFFD4AF37)),
                   ),
@@ -1170,7 +1269,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
               }
               if (experts.isEmpty) {
                 return SizedBox(
-                  height: 205,
+                   height: 24.h,
                   child: Center(
                     child: Text(
                       "no_experts".tr,
@@ -1182,7 +1281,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                 );
               }
               return SizedBox(
-                height: 205,
+                height: 24.h,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -1487,13 +1586,13 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                       // Logic for Moonrise
                       formatTimeToAMPM(
                         (basic?.moonrise?.isNotEmpty ?? false)
-                            ? basic!.moonrise
+                            ? basic?.moonrise
                             : advanced?.moonrise,
                       ),
                       // Logic for Moonset
                       formatTimeToAMPM(
                         (basic?.moonset?.isNotEmpty ?? false)
-                            ? basic!.moonset
+                            ? basic?.moonset
                             : advanced?.moonset,
                       ),
                       Icons.nightlight_round_outlined,
@@ -2121,122 +2220,126 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
     );
   }
 
-  Widget _buildPujaVidhi(double screenWidth) {
+  Widget _buildSpiritualToolsSection(double screenWidth) {
+    final tools = [
+      {
+        "title": "Remedies",
+        "desc": "Protect your energy & remove negativity",
+        "icon": "assets/icons/remedies.png",
+        "onTap": () {
+          _unfocusAll();
+          Provider.of<DashboardViewModel>(context, listen: false).changeTab(4);
+        },
+      },
+      {
+        "title": "Puja Vidhi",
+        "desc": "Perform rituals with step-by-step guidance",
+        "icon": "assets/icons/puja_vidhi.png",
+        "onTap": () {
+          _unfocusAll();
+          Get.toNamed(AppConstants.routePoojaList);
+        },
+      },
+      {
+        "title": "Reports",
+        "desc": "Get deep insights into your life's path",
+        "icon": "assets/icons/reports.png",
+        "isComingSoon": true,
+        "onTap": () {
+          _unfocusAll();
+          Get.dialog(const ComingSoonPopup(feature: "Reports"));
+        },
+      },
+      {
+        "title": "Courses",
+        "desc": "Learn sacred wisdom from experts",
+        "icon": "assets/icons/courses.png",
+        "isComingSoon": true,
+        "onTap": () {
+          _unfocusAll();
+          Get.dialog(const ComingSoonPopup(feature: "Courses"));
+        },
+      },
+    ];
+
     return SliverToBoxAdapter(
-      child: BlocProvider(
-        create: (context) =>
-            PoojaBloc(repository: PoojaRepository())..add(FetchPoojas()),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 0.0,
-                ),
-                child: Text(
-                  "puja_vidhi_title".tr,
-                  style: GoogleFonts.poppins(
-                    color: Color(0xff8E8E93),
-                    fontSize: 13.5.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                "SPIRITUAL TOOLS",
+                style: GoogleFonts.poppins(
+                  color: Colors.white.withOpacity(0.5),
+                  fontSize: 11.sp,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.8,
                 ),
               ),
-              const SizedBox(height: 4),
-              BlocBuilder<PoojaBloc, PoojaState>(
-                builder: (context, state) {
-                  if (state is PoojaLoading) {
-                    return SizedBox(
-                      height: 22.5.h,
-                      child: const Center(
-                        child: CircularProgressIndicator(
-                          color: Color(0xFFD4AF37),
-                        ),
-                      ),
-                    );
-                  } else if (state is PoojaLoaded) {
-                    if (state.filteredPoojas.isEmpty) {
-                      return SizedBox(
-                        height: 100,
-                        child: Center(
-                          child: Text(
-                            "no_puja_available".tr,
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.5),
-                            ),
-                          ),
-                        ),
-                      );
-                    }
-                    return SizedBox(
-                      height: 22.5.h,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        itemCount: state.filteredPoojas.length,
-                        itemBuilder: (context, index) {
-                          final pooja = state.filteredPoojas[index];
-                          return _buildRealPujaCard(pooja, screenWidth);
-                        },
-                      ),
-                    );
-                  } else if (state is PoojaError) {
-                    return SizedBox(
-                      height: 100,
-                      child: Center(
-                        child: Text(
-                          "error_loading_puja".tr,
-                          style: TextStyle(color: Colors.red.withOpacity(0.7)),
-                        ),
-                      ),
-                    );
-                  }
-                  return const SizedBox.shrink();
+            ),
+            const SizedBox(height: 14),
+            SizedBox(
+              height: 20.h, // Adjusted height for more breathing room
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                itemCount: tools.length,
+                itemBuilder: (context, index) {
+                  final tool = tools[index];
+                  return _buildSpiritualToolCard(
+                    tool["title"] as String,
+                    tool["desc"] as String,
+                    tool["icon"] as String,
+                    screenWidth,
+                    tool["onTap"] as VoidCallback,
+                    isComingSoon: tool["isComingSoon"] as bool? ?? false,
+                  );
                 },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildRealPujaCard(PoojaModel pooja, double screenWidth) {
+  Widget _buildSpiritualToolCard(
+    String title,
+    String desc,
+    String iconPath,
+    double screenWidth,
+    VoidCallback onTap, {
+    bool isComingSoon = false,
+  }) {
     return GestureDetector(
-      onTap: () {
-        _unfocusAll();
-        Get.to(() => PoojaDetailScreen(poojaId: pooja.sId ?? ""));
-      },
+      onTap: onTap,
       child: Container(
-        width: screenWidth * 0.55, // Adaptive width
-        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+        width: screenWidth * 0.72, // Responsive width showing partial next card
+        margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: const Color(0xFF141414),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
-          image: pooja.thumbnailUrl != null && pooja.thumbnailUrl!.isNotEmpty
-              ? DecorationImage(
-                  image: NetworkImage(pooja.thumbnailUrl!),
-                  fit: BoxFit.cover,
-                  colorFilter: ColorFilter.mode(
-                    Colors.black.withOpacity(0.6),
-                    BlendMode.darken,
-                  ),
-                )
-              : null,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Colors.white.withOpacity(0.05)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.auto_awesome, color: Color(0xFFD4AF37), size: 5.w),
-                const SizedBox(width: 8),
+                // Icon
+                Image.asset(
+                  iconPath,
+                  width: 15.w,
+                  height: 15.w,
+                  fit: BoxFit.contain,
+                ),
+                const SizedBox(width: 14),
+                // Title and Description
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -2276,14 +2379,31 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              pooja.description ?? "Step-by-step guide for ritual.",
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.lora(
-                color: Colors.white.withOpacity(0.7),
-                fontSize: 7.5.sp,
+            const Spacer(),
+            // Explore Button
+            SizedBox(
+              width: double.infinity,
+              height: 5.h, // Increased height to prevent text clipping
+              child: ElevatedButton(
+                onPressed: onTap,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFD4AF37),
+                  foregroundColor: Colors.black,
+                  elevation: 0,
+                  padding: EdgeInsets.zero, // Clear default padding
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                ),
+                child: Text(
+                  "EXPLORE",
+                  style: GoogleFonts.poppins(
+                    fontSize: 12.5.sp,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                    height: 1.0, // Ensures text fits vertically
+                  ),
+                ),
               ),
             ),
           ],
@@ -2292,157 +2412,229 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
     );
   }
 
+
   Widget _buildSankalpTracker() {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "sankalp_tracker_title".tr,
-              style: GoogleFonts.poppins(
-                color: const Color(0xff8E8E93),
-                fontSize: 13.5.sp,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: const Color(0xFF141414),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.05),
-                  width: 1,
+    return BlocBuilder<SankalpBloc, SankalpState>(
+      builder: (context, state) {
+        List<UserSankalpModel> activeSankalps = [];
+        double avgProgress = 0;
+        int activeCount = 0;
+
+        if (state is SankalpLoaded) {
+          activeSankalps = state.userSankalps
+              .where((s) => s.status == 'active')
+              .toList();
+          
+          if (activeSankalps.isNotEmpty) {
+            double totalProgressSum = 0;
+            for (var us in activeSankalps) {
+              final completed = us.dailyReports.where((r) => r.status == 'yes').length;
+              totalProgressSum += us.totalDays > 0 ? (completed / us.totalDays) : 0;
+            }
+            avgProgress = totalProgressSum / activeSankalps.length;
+            activeCount = activeSankalps.length;
+          }
+        }
+
+        return SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "SANKALP TRACKER",
+                      style: GoogleFonts.poppins(
+                        color: const Color(0xff8E8E93),
+                        fontSize: 13.5.sp,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    if (activeSankalps.isNotEmpty)
+                    GestureDetector(
+                      onTap: () => Get.to(() => const SankalpScreen()),
+                      child: Text(
+                        "View All",
+                        style: GoogleFonts.poppins(
+                          color: AppTheme.primaryGold,
+                          fontSize: 11.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "morning_prayer".tr,
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontSize: 13.5.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              "morning_prayer_desc".tr,
-                              style: GoogleFonts.poppins(
-                                color: Colors.white.withOpacity(0.6),
-                                fontSize: 9.75.sp,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      // pray_new.svg with glow
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFFD4AF37).withOpacity(0.15),
-                              blurRadius: 25,
-                              spreadRadius: 3,
-                            ),
-                          ],
-                        ),
-                        child: SvgPicture.asset(
-                          'assets/icons/pray_new.svg',
-                          width: 8.w,
-                          height: 8.w,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "daily_progress".tr,
-                        style: GoogleFonts.poppins(
-                          color: Colors.white.withOpacity(0.5),
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      Text(
-                        "75%",
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: LinearProgressIndicator(
-                      value: 0.75,
-                      backgroundColor: Colors.white.withOpacity(0.1),
-                      valueColor: const AlwaysStoppedAnimation<Color>(
-                        Color(0xFFD4AF37),
-                      ),
-                      minHeight: 8,
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF141414),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.05),
+                      width: 1,
                     ),
                   ),
-                  SizedBox(height: 3.h),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 5.h,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFD4AF37),
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                      ),
-                      onPressed: () {
-                        _unfocusAll();
-                        Get.toNamed(AppConstants.routeSankalp);
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Icon(
-                            Icons.play_circle_outline,
-                            size: 22,
-                            color: Colors.black,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  activeCount > 0 ? "Daily Spiritual Progress" : "No Active Sankalp",
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                    fontSize: 13.5.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  activeCount > 0 
+                                    ? "Tracking $activeCount active spiritual habits."
+                                    : "Start a new Sankalp to track your spiritual journey.",
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white.withOpacity(0.6),
+                                    fontSize: 9.75.sp,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                           const SizedBox(width: 8),
-                          Text(
-                            "track_your_sankalp".tr,
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              color: Colors.black,
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.05),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFFD4AF37).withOpacity(0.15),
+                                  blurRadius: 25,
+                                  spreadRadius: 3,
+                                ),
+                              ],
+                            ),
+                            child: SvgPicture.asset(
+                              'assets/icons/pray_new.svg',
+                              width: 8.w,
+                              height: 8.w,
                             ),
                           ),
                         ],
                       ),
-                    ),
+                      
+                      if (activeSankalps.isNotEmpty) ...[
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "OVERALL PROGRESS",
+                              style: GoogleFonts.poppins(
+                                color: Colors.white.withOpacity(0.5),
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            Text(
+                              "${(avgProgress * 100).toInt()}%",
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Stack(
+                          children: [
+                            Container(
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                            FractionallySizedBox(
+                              widthFactor: avgProgress.clamp(0.0, 1.0),
+                              child: Container(
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [Color(0xFFD4AF37), Color(0xFFFFD700)],
+                                  ),
+                                  borderRadius: BorderRadius.circular(4),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppTheme.primaryGold.withOpacity(0.3),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 0),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        _buildTrackSankalpButton(),
+                      ] else ...[
+                        const SizedBox(height: 20),
+                        _buildTrackSankalpButton(),
+                      ],
+                    ],
                   ),
-                ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTrackSankalpButton() {
+    return SizedBox(
+      width: double.infinity,
+      height: 5.5.h,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFFD4AF37),
+          foregroundColor: Colors.black,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(100),
+          ),
+        ),
+        onPressed: () {
+          _unfocusAll();
+          Get.to(() => const SankalpScreen());
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.play_circle_outline,
+              size: 22,
+              color: Colors.black,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              "TRACK YOUR SANKALP",
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.bold,
+                fontSize: 12.sp,
+                color: Colors.black,
               ),
             ),
           ],
@@ -2519,11 +2711,17 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                                 ),
                                 const SizedBox(width: 8),
                                 // go_tab.svg icon at top right
-                                SvgPicture.asset(
-                                  'assets/icons/go_tab.svg',
-                                  width: 24,
-                                  height: 24,
-                                  color: Color(0xFFD4AF37),
+                                GestureDetector(
+                                  onTap: () {
+                                    _unfocusAll();
+                                    Get.toNamed(AppConstants.routeSwapnaDecoder);
+                                  },
+                                  child: SvgPicture.asset(
+                                    'assets/icons/go_tab.svg',
+                                    width: 24,
+                                    height: 24,
+                                    color: Color(0xFFD4AF37),
+                                  ),
                                 ),
                               ],
                             ),
@@ -2618,81 +2816,180 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
     );
   }
 
-  Widget _buildGitaBanner(double screenWidth) {
+  Widget _buildComingSoonProjectsSection(double screenWidth) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.fromLTRB(7.w, 1.5.h, 7.w, 1.5.h),
-        child: Container(
-          height: screenWidth * 1.0,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
-            image: const DecorationImage(
-              image: AssetImage('assets/images/bhagavad_gita_banner.png'),
-              fit: BoxFit.fill,
+        padding: const EdgeInsets.symmetric(vertical: 24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                "Coming Soon Projects",
+                style: GoogleFonts.lora(
+                  color: const Color(0xFFD4AF37),
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
-          ),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
-              // gradient: LinearGradient(
-              //   begin: Alignment.topCenter,
-              //   end: Alignment.bottomCenter,
-              //   colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
-              // ),
+            const SizedBox(height: 4),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                "Building spiritual ecosystem for growth and learning...",
+                style: GoogleFonts.poppins(
+                  color: Colors.white.withOpacity(0.5),
+                  fontSize: 10.sp,
+                ),
+              ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
+            const SizedBox(height: 20),
+            SizedBox(
+              height: 42.h,
+              child: PageView.builder(
+                controller: _comingSoonPageController,
+                itemCount: _comingSoonProjects.length,
+                onPageChanged: (index) {
+                  setState(() {
+                    _comingSoonPageIndex = index;
+                  });
+                },
+                itemBuilder: (context, index) {
+                  return _buildComingSoonProjectCard(
+                    _comingSoonProjects[index],
+                    screenWidth,
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Dots Indicator
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(_comingSoonProjects.length, (index) {
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  width: _comingSoonPageIndex == index ? 12 : 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: _comingSoonPageIndex == index
+                        ? const Color(0xFFD4AF37)
+                        : const Color(0xFFD4AF37).withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                );
+              }),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildComingSoonProjectCard(
+    Map<String, String> project,
+    double screenWidth,
+  ) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF141414),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Stack(
+          children: [
+            // Background Image
+            Image.asset(
+              project["image"]!,
+              width: double.infinity,
+              height: double.infinity,
+              fit: BoxFit.cover,
+            ),
+            // Dark Gradient Overlay
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.1),
+                    Colors.black.withOpacity(0.8),
+                  ],
+                ),
+              ),
+            ),
+            // Content
+            Padding(
+              padding: const EdgeInsets.all(20.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
-                    "learn_gita".tr,
-                    textAlign: TextAlign.center,
+                    project["title"]!,
                     style: GoogleFonts.lora(
-                      color: const Color(0xFFD4AF37),
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                      fontSize: 14.5.sp,
+                      fontWeight: FontWeight.bold,
+                      height: 1.2,
                     ),
                   ),
+                  const SizedBox(height: 6),
                   Text(
-                    "gita_wisdom".tr,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.lora(
-                      color: Color(0xff8E8E93),
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w400,
+                    project["subtitle"]!,
+                    style: GoogleFonts.poppins(
+                      color: Colors.white.withOpacity(0.7),
+                      fontSize: 9.sp,
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width / 1.5,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFD4AF37),
-                        foregroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
+                  const SizedBox(height: 16),
+                  // Coming Soon Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD4AF37).withOpacity(0.4),
+                      borderRadius: BorderRadius.circular(50),
+                      border: Border.all(
+                        color: const Color(0xFFD4AF37),
+                        width: 1,
                       ),
-                      onPressed: () {
-                        _unfocusAll();
-                        Get.toNamed(AppConstants.routeGita);
-                      },
-                      child: Text(
-                        "start_journey".tr,
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 10.5.sp,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: const BoxDecoration(
+                            color: Colors.black,
+                            shape: BoxShape.circle,
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 8),
+                        Text(
+                          "Coming Soon",
+                          style: GoogleFonts.poppins(
+                            color: Colors.black,
+                            fontSize: 8.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -2897,3 +3194,24 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
     );
   }
 }
+
+class TrianglePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFF4CAF50)
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    path.moveTo(0, 0);
+    path.lineTo(size.width, 0);
+    path.lineTo(size.width / 2, size.height);
+    path.close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
+

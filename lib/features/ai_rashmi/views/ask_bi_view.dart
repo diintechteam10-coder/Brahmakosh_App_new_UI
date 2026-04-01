@@ -180,7 +180,7 @@ class _AskBiViewState extends State<AskBiView> {
                           ),
                           characterImagePath: isKrishna
                               ? 'assets/icons/Krishna_new_avatar.png'
-                              : 'assets/images/Rashmi_new.png',
+                              : 'assets/icons/rashmi_new_avatar.png',
                           backgroundColor: const Color(0xFF1A1A1A),
                           textColor: Colors.white,
                           dividerColor: AppTheme.primaryGold.withOpacity(0.3),
@@ -233,10 +233,10 @@ print("Saved Agent ID: ${StorageService.getString('ai_selected_agent_id')}");
                                 firstMessage: agent.firstMessage,
                                 // subtitle: agent. "",
                                 backgroundImage:
-                                    'assets/images/rashmi_background.jpeg',
+                                    'assets/icons/chat_bg_new.png',
                                 characterImagePath: isKrishna
                                     ? 'assets/icons/krishna_neww.png'
-                                    : 'assets/images/Rashmi_new.png',
+                                    : 'assets/icons/Rashmi_new_chat.png',
                                 chatBackgroundImage: isKrishna
                                     ? 'assets/icons/krishna_neww.png'
                                     : 'assets/images/Rashmi_chat.png',

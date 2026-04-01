@@ -74,7 +74,7 @@ class _GitaChapterViewState extends State<_GitaChapterView> {
           ),
         ),
         label: const Text(
-          "ASK KRISHNA",
+          "Ask Krishna",
           style: TextStyle(
             color: Color(0xFF8B4513),
             fontWeight: FontWeight.bold,

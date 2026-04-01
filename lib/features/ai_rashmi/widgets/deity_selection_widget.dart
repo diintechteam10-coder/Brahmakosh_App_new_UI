@@ -45,7 +45,7 @@ class DeitySelectionWidget extends StatelessWidget {
               _buildDeityCard(
                 context,
                 "Ask Rashmi",
-                "assets/images/Small_rashmi.png",
+                "assets/icons/rashmi_new_avatar.png",
                 onSelectRashmi,
               ),
             ],

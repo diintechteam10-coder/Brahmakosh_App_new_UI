@@ -1,4 +1,5 @@
 import 'package:brahmakosh/features/ai_rashmi/ai_rashmi.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import '../../../../core/common_imports.dart';
 import '../../../common/utils.dart';
@@ -13,6 +14,10 @@ import '../../astrology/views/astrology_experts_view.dart';
 import '../../remedies/views/remedies_web_view.dart';
 import '../../../common/widgets/custom_popups.dart';
 
+import '../../sankalp/blocs/sankalp_bloc.dart';
+import '../../sankalp/blocs/sankalp_event.dart';
+import '../../sankalp/repositories/sankalp_repository.dart';
+
 class DashboardView extends StatelessWidget {
   const DashboardView({super.key});
 
@@ -24,20 +29,27 @@ class DashboardView extends StatelessWidget {
       Get.put(ServicesController());
     }
 
-    return ChangeNotifierProvider(
-      create: (_) {
-        final viewModel = DashboardViewModel();
-        if (Get.arguments != null && Get.arguments is int) {
-          viewModel.changeTab(Get.arguments);
-        }
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          viewModel.initLocationUpdate(
-            null,
-          ); // Passing null since it's outside any TickerProvider
-        });
-        return viewModel;
-      },
-      child: const DashboardLayout(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) {
+            final viewModel = DashboardViewModel();
+            if (Get.arguments != null && Get.arguments is int) {
+              viewModel.changeTab(Get.arguments);
+            }
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              viewModel.initLocationUpdate(null);
+            });
+            return viewModel;
+          },
+        ),
+      ],
+      child: BlocProvider(
+        create: (context) => SankalpBloc(
+          repository: SankalpRepository(),
+        )..add(FetchUserSankalps()),
+        child: const DashboardLayout(),
+      ),
     );
   }
 }
