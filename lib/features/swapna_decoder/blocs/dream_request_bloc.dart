@@ -2,6 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../repositories/swapna_repository.dart';
 import 'dream_request_event.dart';
 import 'dream_request_state.dart';
+import 'package:get/get.dart';
+import '../../../core/localization/translate_helper.dart';
 
 class DreamRequestBloc extends Bloc<DreamRequestEvent, DreamRequestState> {
   final SwapnaRepository repository;
@@ -19,6 +21,17 @@ class DreamRequestBloc extends Bloc<DreamRequestEvent, DreamRequestState> {
     emit(DreamRequestLoading());
     try {
       final requests = await repository.fetchDreamRequests();
+      
+      if (Get.locale?.languageCode == 'hi') {
+        for (var r in requests) {
+          r.dreamSymbol = await TranslateHelper.translate(r.dreamSymbol);
+          r.additionalDetails = await TranslateHelper.translate(r.additionalDetails);
+          if (r.completedDreamId != null) {
+            r.completedDreamId!.symbolName = await TranslateHelper.translate(r.completedDreamId!.symbolName);
+          }
+        }
+      }
+
       emit(DreamRequestLoaded(requests: requests));
     } catch (e) {
       emit(DreamRequestError(e.toString()));
@@ -39,7 +52,7 @@ class DreamRequestBloc extends Bloc<DreamRequestEvent, DreamRequestState> {
         clientId: event.clientId,
       );
       print("DreamRequestBloc: Repository call successful");
-      emit(const DreamRequestSuccess("Dream request submitted successfully"));
+      emit(DreamRequestSuccess("dream_submit_success".tr));
       // Refresh the list after submission
       add(FetchDreamRequests());
     } catch (e) {
@@ -55,6 +68,17 @@ class DreamRequestBloc extends Bloc<DreamRequestEvent, DreamRequestState> {
     emit(DreamRequestDetailLoading());
     try {
       final request = await repository.fetchDreamRequestDetail(event.id);
+      
+      if (Get.locale?.languageCode == 'hi') {
+        request.dreamSymbol = await TranslateHelper.translate(request.dreamSymbol);
+        request.additionalDetails = await TranslateHelper.translate(request.additionalDetails);
+        if (request.completedDreamId != null) {
+           request.completedDreamId!.symbolName = await TranslateHelper.translate(request.completedDreamId!.symbolName);
+           // Also translate full details of linked dream if needed
+           request.completedDreamId!.detailedInterpretation = await TranslateHelper.translate(request.completedDreamId!.detailedInterpretation ?? "");
+        }
+      }
+
       emit(DreamRequestDetailLoaded(request));
     } catch (e) {
       emit(DreamRequestError(e.toString()));

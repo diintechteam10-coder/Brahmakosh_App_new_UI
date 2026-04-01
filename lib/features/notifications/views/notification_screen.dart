@@ -50,139 +50,175 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: BlocBuilder<NotificationBloc, NotificationState>(
-        builder: (context, state) {
-          if (state is NotificationLoading) {
-            return _buildNotificationShimmer();
-          }
+      body: SafeArea(
+        bottom: false,
+        child: BlocBuilder<NotificationBloc, NotificationState>(
+          builder: (context, state) {
+            final bool hasNotifications = state is NotificationLoaded && state.notifications.isNotEmpty;
 
-          if (state is NotificationError) {
-            return Center(child: Text(state.message, style: const TextStyle(color: Colors.white)));
-          }
+            return Column(
+              children: [
+                // Premium Header
+                _buildHeader(context, showMarkAll: hasNotifications),
 
-          if (state is NotificationLoaded) {
-            final allNotifications = state.notifications;
-            
-            if (allNotifications.isEmpty) {
-              return _buildEmptyState();
-            }
-
-            final now = DateTime.now();
-            final todayStart = DateTime(now.year, now.month, now.day);
-            final weekStart = todayStart.subtract(const Duration(days: 7));
-
-            final today = allNotifications
-                .where((n) => n.createdAt.isAfter(todayStart))
-                .toList();
-            final thisWeek = allNotifications
-                .where(
-                  (n) =>
-                      n.createdAt.isAfter(weekStart) &&
-                      n.createdAt.isBefore(todayStart),
-                )
-                .toList();
-            final earlier = allNotifications
-                .where((n) => n.createdAt.isBefore(weekStart))
-                .toList();
-
-            return RefreshIndicator(
-              onRefresh: () async {
-                context.read<NotificationBloc>().add(const FetchNotifications());
-              },
-              color: AppTheme.primaryGold,
-              child: CustomScrollView(
-                controller: _scrollController,
-                slivers: [
-                  // Premium AppBar
-                  SliverToBoxAdapter(
-                    child: SafeArea(
-                      bottom: false,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            GestureDetector(
-                                onTap: () => Get.back(),
-                                child: Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.08),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.arrow_back_ios_new,
-                                    size: 16,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            Text(
-                              'NOTIFICATION',
-                              style: GoogleFonts.lora(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: AppTheme.primaryGold,
-                                letterSpacing: 2.0,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                context.read<NotificationBloc>().add(MarkAllReadEvent());
-                              },
-                              child: Text(
-                                'Mark all',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 12,
-                                  color: AppTheme.primaryGold,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // Today Section
-                  if (today.isNotEmpty) ...[
-                    _buildSectionHeader('Today'),
-                    _buildNotificationList(today, context),
-                  ],
-
-                  // This Week Section
-                  if (thisWeek.isNotEmpty) ...[
-                    _buildSectionHeader('This Week'),
-                    _buildNotificationList(thisWeek, context),
-                  ],
-
-                  // Earlier Section
-                  if (earlier.isNotEmpty) ...[
-                    _buildSectionHeader('Earlier'),
-                    _buildNotificationList(earlier, context),
-                  ],
-
-                  if (!state.hasReachedMax)
-                    const SliverToBoxAdapter(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 20),
-                        child: Center(child: CircularProgressIndicator(color: AppTheme.primaryGold, strokeWidth: 2)),
-                      ),
-                    ),
-
-                  // Bottom padding
-                  const SliverToBoxAdapter(child: SizedBox(height: 24)),
-                ],
-              ),
+                Expanded(
+                  child: _buildContent(context, state),
+                ),
+              ],
             );
-          }
-
-          return const SizedBox.shrink();
-        },
+          },
+        ),
       ),
     );
+  }
+
+  Widget _buildHeader(BuildContext context, {required bool showMarkAll}) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.08),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.arrow_back_ios_new,
+                size: 18,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          Text(
+            "notifications_title".tr,
+            style: GoogleFonts.lora(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.primaryGold,
+              letterSpacing: 2.0,
+            ),
+          ),
+          if (showMarkAll)
+            GestureDetector(
+              onTap: () {
+                context.read<NotificationBloc>().add(MarkAllReadEvent());
+              },
+              child: Text(
+                "mark_all".tr,
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  color: AppTheme.primaryGold,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            )
+          else
+            const SizedBox(width: 40), // Balance the row
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContent(BuildContext context, NotificationState state) {
+    if (state is NotificationLoading) {
+      return _buildNotificationShimmer();
+    }
+
+    if (state is NotificationError) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline,
+                color: AppTheme.errorRed.withOpacity(0.5), size: 48),
+            const SizedBox(height: 16),
+            Text(state.message, style: const TextStyle(color: Colors.white70)),
+            TextButton(
+              onPressed: () =>
+                  context.read<NotificationBloc>().add(const FetchNotifications()),
+              child: Text("retry".tr,
+                  style: TextStyle(color: AppTheme.primaryGold)),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (state is NotificationLoaded) {
+      final allNotifications = state.notifications;
+      if (allNotifications.isEmpty) {
+        return _buildEmptyState();
+      }
+
+      final now = DateTime.now();
+      final todayStart = DateTime(now.year, now.month, now.day);
+      final weekStart = todayStart.subtract(const Duration(days: 7));
+
+      final today = allNotifications
+          .where((n) => n.createdAt.isAfter(todayStart))
+          .toList();
+      final thisWeek = allNotifications
+          .where(
+            (n) =>
+                n.createdAt.isAfter(weekStart) &&
+                n.createdAt.isBefore(todayStart),
+          )
+          .toList();
+      final earlier = allNotifications
+          .where((n) => n.createdAt.isBefore(weekStart))
+          .toList();
+
+      return RefreshIndicator(
+        onRefresh: () async {
+          context.read<NotificationBloc>().add(const FetchNotifications());
+        },
+        color: AppTheme.primaryGold,
+        child: CustomScrollView(
+          controller: _scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            // Today Section
+            if (today.isNotEmpty) ...[
+              _buildSectionHeader("today".tr),
+              _buildNotificationList(today, context),
+            ],
+
+            // This Week Section
+            if (thisWeek.isNotEmpty) ...[
+              _buildSectionHeader("this_week".tr),
+              _buildNotificationList(thisWeek, context),
+            ],
+
+            // Earlier Section
+            if (earlier.isNotEmpty) ...[
+              _buildSectionHeader("earlier".tr),
+              _buildNotificationList(earlier, context),
+            ],
+
+            if (!state.hasReachedMax)
+              const SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20),
+                  child: Center(
+                    child: CircularProgressIndicator(
+                        color: AppTheme.primaryGold, strokeWidth: 2),
+                  ),
+                ),
+              ),
+
+            // Bottom padding
+            const SliverToBoxAdapter(child: SizedBox(height: 24)),
+          ],
+        ),
+      );
+    }
+
+    return const SizedBox.shrink();
   }
 
   Widget _buildEmptyState() {
@@ -190,12 +226,84 @@ class _NotificationScreenState extends State<NotificationScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.notifications_none_rounded, size: 64, color: Colors.white.withOpacity(0.2)),
-          const SizedBox(height: 16),
-          Text(
-            'No notifications yet',
-            style: GoogleFonts.poppins(color: Colors.white.withOpacity(0.5), fontSize: 16),
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              color: AppTheme.primaryGold.withOpacity(0.05),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.primaryGold.withOpacity(0.05),
+                  blurRadius: 40,
+                  spreadRadius: 10,
+                ),
+              ],
+            ),
+            child: Center(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Icon(
+                    Icons.notifications_none_rounded,
+                    size: 60,
+                    color: AppTheme.primaryGold.withOpacity(0.2),
+                  ),
+                  Icon(
+                    Icons.notifications_off_outlined,
+                    size: 32,
+                    color: AppTheme.primaryGold.withOpacity(0.8),
+                  ),
+                ],
+              ),
+            ),
           ),
+          const SizedBox(height: 32),
+          Text(
+            "no_notifications_title".tr,
+            style: GoogleFonts.lora(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              letterSpacing: 1.0,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 48),
+            child: Text(
+              "no_notifications_desc".tr,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: Colors.white.withOpacity(0.4),
+                height: 1.5,
+              ),
+            ),
+          ),
+          const SizedBox(height: 40),
+          TextButton.icon(
+            onPressed: () {
+              context.read<NotificationBloc>().add(const FetchNotifications());
+            },
+            icon: const Icon(Icons.refresh_rounded, size: 20),
+            label: Text(
+              "refresh_inbox".tr,
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+            ),
+            style: TextButton.styleFrom(
+              foregroundColor: AppTheme.primaryGold,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+                side: BorderSide(color: AppTheme.primaryGold.withOpacity(0.3)),
+              ),
+            ),
+          ),
+          const SizedBox(height: 100), // Push up slightly from true center
         ],
       ),
     );
@@ -264,56 +372,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Widget _buildNotificationShimmer() {
-    return Column(
-      children: [
-        // Fake AppBar Shimmer
-        SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
-            child: Shimmer.fromColors(
-              baseColor: Colors.white.withOpacity(0.05),
-              highlightColor: Colors.white.withOpacity(0.1),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  Container(
-                    width: 150,
-                    height: 24,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                  Container(
-                    width: 60,
-                    height: 16,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        // List Shimmers
-        Expanded(
-          child: ListView.builder(
-            itemCount: 8,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemBuilder: (context, index) => _buildShimmerItem(),
-          ),
-        ),
-      ],
+    return ListView.builder(
+      itemCount: 8,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      itemBuilder: (context, index) => _buildShimmerItem(),
     );
   }
 

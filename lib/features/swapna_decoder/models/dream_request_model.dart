@@ -1,16 +1,16 @@
 class DreamRequestModel {
-  final String id;
-  final String dreamSymbol;
-  final String additionalDetails;
-  final String? status;
-  final bool? notificationSent;
-  final DreamCompletedId? completedDreamId;
-  final String? createdAt;
-  final String? updatedAt;
-  final DreamUserModel? userId;
-  final String? userEmail;
-  final String? userName;
-  final String? clientId;
+  String id;
+  String dreamSymbol;
+  String additionalDetails;
+  String? status;
+  bool? notificationSent;
+  DreamCompletedId? completedDreamId;
+  String? createdAt;
+  String? updatedAt;
+  DreamUserModel? userId;
+  String? userEmail;
+  String? userName;
+  String? clientId;
 
   DreamRequestModel({
     required this.id,
@@ -54,14 +54,16 @@ class DreamRequestModel {
 }
 
 class DreamCompletedId {
-  final String id;
-  final String symbolName;
-  final String? symbolNameHindi;
+  String id;
+  String symbolName;
+  String? symbolNameHindi;
+  String? detailedInterpretation;
 
   DreamCompletedId({
     required this.id,
     required this.symbolName,
     this.symbolNameHindi,
+    this.detailedInterpretation,
   });
 
   factory DreamCompletedId.fromJson(Map<String, dynamic> json) {
@@ -69,6 +71,7 @@ class DreamCompletedId {
       id: json['_id'] ?? '',
       symbolName: json['symbolName'] ?? '',
       symbolNameHindi: json['symbolNameHindi'],
+      detailedInterpretation: json['detailedInterpretation'],
     );
   }
 }

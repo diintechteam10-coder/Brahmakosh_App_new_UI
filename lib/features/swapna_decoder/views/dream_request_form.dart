@@ -62,7 +62,7 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
             backgroundColor: Colors.black,
             appBar: AppBar(
               title: Text(
-                "Submit Dream Request",
+                "submit_dream_request_title".tr,
                 style: GoogleFonts.lora(
                   fontSize: 20,
                   color: Colors.white,
@@ -109,7 +109,7 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
                     const SizedBox(height: 8),
                     Center(
                       child: Text(
-                        "Tell us about your dream",
+                        "dream_tell_us".tr,
                         style: GoogleFonts.poppins(
                           fontSize: 14,
                           color: Colors.grey,
@@ -119,7 +119,7 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
                     const SizedBox(height: 28),
 
                     // Symbol field
-                    _buildFieldLabel("Dream Symbol", "🌙"),
+                    _buildFieldLabel("dream_symbol_label".tr, "🌙"),
                     const SizedBox(height: 8),
                     Container(
                       decoration: BoxDecoration(
@@ -138,7 +138,7 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
                           color: Colors.white,
                         ),
                         decoration: InputDecoration(
-                          hintText: "e.g., Snake, Ocean, Flying",
+                          hintText: "dream_symbol_hint".tr,
                           hintStyle: GoogleFonts.poppins(
                             fontSize: 14,
                             color: Colors.grey,
@@ -173,14 +173,14 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
                           ),
                         ),
                         validator: (value) =>
-                            value == null || value.isEmpty ? 'Required' : null,
+                            value == null || value.isEmpty ? 'required_field'.tr : null,
                       ),
                     ),
 
                     const SizedBox(height: 24),
 
                     // Details field
-                    _buildFieldLabel("Additional Details", "📝"),
+                    _buildFieldLabel("additional_details_label".tr, "📝"),
                     const SizedBox(height: 8),
                     Container(
                       decoration: BoxDecoration(
@@ -201,7 +201,7 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
                         ),
                         decoration: InputDecoration(
                           hintText:
-                              "Describe the context, your feelings, surroundings...",
+                              "dream_details_hint".tr,
                           hintStyle: GoogleFonts.poppins(
                             fontSize: 14,
                             color: Colors.grey,
@@ -228,7 +228,7 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
                           contentPadding: const EdgeInsets.all(16),
                         ),
                         validator: (value) =>
-                            value == null || value.isEmpty ? 'Required' : null,
+                            value == null || value.isEmpty ? 'required_field'.tr : null,
                       ),
                     ),
 
@@ -285,7 +285,7 @@ class _DreamRequestFormScreenState extends State<DreamRequestFormScreen> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    "Submit Request",
+                                    "submit_request_button".tr,
                                     style: GoogleFonts.poppins(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,

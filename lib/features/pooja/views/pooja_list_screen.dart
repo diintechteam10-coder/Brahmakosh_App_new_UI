@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -9,6 +10,7 @@ import '../blocs/pooja_state.dart';
 import '../models/pooja_model.dart';
 import '../repositories/pooja_repository.dart';
 import 'pooja_detail_screen.dart';
+import 'package:brahmakosh/core/localization/translate_helper.dart';
 
 class PoojaListScreen extends StatefulWidget {
   const PoojaListScreen({super.key});
@@ -92,7 +94,7 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                   decoration: InputDecoration(
                     fillColor: Colors.transparent,
                     filled: true,
-                    hintText: "Search rituals, puja, astrologers",
+                    hintText: "search_hint".tr,
                     hintStyle: GoogleFonts.poppins(
                       fontSize: 14,
                       color: Colors.white.withOpacity(0.3),
@@ -127,13 +129,15 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                       children: [
                         _buildFilterTab(
                           context,
-                          "ALL",
+                          "all_cap".tr,
                           selectedCategory == 'All',
+                          'All',
                         ),
                         _buildFilterTab(
                           context,
-                          "FESTIVAL",
+                          "festival_cap".tr,
                           selectedCategory == 'Festival',
+                          'Festival'
                         ),
                       ],
                     ),
@@ -176,10 +180,11 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
     BuildContext context,
     String label,
     bool isSelected,
+    String categoryKey,
   ) {
     return GestureDetector(
       onTap: () {
-        context.read<PoojaBloc>().add(FilterPoojas(label == "ALL" ? "All" : label));
+        context.read<PoojaBloc>().add(FilterPoojas(categoryKey));
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 10),
@@ -238,23 +243,35 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    pooja.pujaName ?? "Unknown Puja",
-                    style: GoogleFonts.lora(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                  FutureBuilder<String>(
+                    future: TranslateHelper.translate(pooja.pujaName ?? "Unknown Puja"),
+                    initialData: pooja.pujaName ?? "Unknown Puja",
+                    builder: (context, snapshot) {
+                      return Text(
+                        snapshot.data ?? (pooja.pujaName ?? "Unknown Puja"),
+                        style: GoogleFonts.lora(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
                         flex: 3,
-                        child: _buildInfoItem(
-                          Icons.local_fire_department,
-                          pooja.category ?? "Pooja",
-                          const Color(0xFFD4AF37),
+                        child: FutureBuilder<String>(
+                          future: TranslateHelper.translate(pooja.category ?? "Pooja"),
+                          initialData: pooja.category ?? "Pooja",
+                          builder: (context, snapshot) {
+                            return _buildInfoItem(
+                              Icons.local_fire_department,
+                              snapshot.data ?? (pooja.category ?? "Pooja"),
+                              const Color(0xFFD4AF37),
+                            );
+                          },
                         ),
                       ),
                       Container(width: 1, height: 16, color: Colors.white.withOpacity(0.1), margin: const EdgeInsets.symmetric(horizontal: 4)),
@@ -262,17 +279,23 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                         flex: 2,
                         child: _buildInfoItem(
                           Icons.access_time_filled,
-                          "${pooja.duration ?? 0} Mins",
+                          "min_suffix".trParams({'min': (pooja.duration ?? 0).toString()}),
                           const Color(0xFFD4AF37),
                         ),
                       ),
                       Container(width: 1, height: 16, color: Colors.white.withOpacity(0.1), margin: const EdgeInsets.symmetric(horizontal: 4)),
                       Expanded(
                         flex: 3,
-                        child: _buildInfoItem(
-                          Icons.calendar_month,
-                          pooja.bestDay ?? "Friday",
-                          const Color(0xFFD4AF37),
+                        child: FutureBuilder<String>(
+                          future: TranslateHelper.translate(pooja.bestDay ?? "Friday"),
+                          initialData: pooja.bestDay ?? "Friday",
+                          builder: (context, snapshot) {
+                            return _buildInfoItem(
+                              Icons.calendar_month,
+                              snapshot.data ?? (pooja.bestDay ?? "Friday"),
+                              const Color(0xFFD4AF37),
+                            );
+                          },
                         ),
                       ),
                     ],
@@ -297,9 +320,9 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                         ),
                         elevation: 0,
                       ),
-                      child: const Text(
-                        "View",
-                        style: TextStyle(
+                      child: Text(
+                        "view_btn".tr,
+                        style: const TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,

@@ -88,6 +88,7 @@ class AppTheme {
         elevation: 0,
         backgroundColor: primaryGold,
         foregroundColor: Colors.white,
+        systemOverlayStyle: SystemUiOverlayStyle.light, // White icons
         titleTextStyle: GoogleFonts.playfairDisplay(
           fontSize: 24,
           fontWeight: FontWeight.bold,

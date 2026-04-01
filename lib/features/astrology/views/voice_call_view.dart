@@ -114,7 +114,7 @@ class _VoiceCallViewState extends State<VoiceCallView> {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                "Recording...",
+                                "recording".tr,
                                 style: GoogleFonts.poppins(
                                   color: Colors.white,
                                   fontSize: 12,
@@ -137,7 +137,7 @@ class _VoiceCallViewState extends State<VoiceCallView> {
                   Column(
                     children: [
                       Text(
-                        "Voice Consultation",
+                        "voice_consultation_title".tr,
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -196,7 +196,7 @@ class _VoiceCallViewState extends State<VoiceCallView> {
                       Obx(() {
                         if (controller.isEnded.value) {
                           return Text(
-                            "Call Ended",
+                            "call_ended".tr,
                             style: GoogleFonts.poppins(
                               fontSize: 18,
                               color: Colors.redAccent,
@@ -204,7 +204,7 @@ class _VoiceCallViewState extends State<VoiceCallView> {
                           );
                         } else if (controller.isConnecting.value) {
                           return Text(
-                            "Connecting...",
+                            "connecting".tr,
                             style: GoogleFonts.poppins(
                               fontSize: 18,
                               color: AppTheme.primaryGold,
@@ -212,7 +212,7 @@ class _VoiceCallViewState extends State<VoiceCallView> {
                           );
                         } else if (controller.isRinging.value) {
                           return Text(
-                            "Ringing...",
+                            "ringing".tr,
                             style: GoogleFonts.poppins(
                               fontSize: 18,
                               color: Colors.white70,
@@ -251,7 +251,7 @@ class _VoiceCallViewState extends State<VoiceCallView> {
                             iconColor: controller.isMuted.value
                                 ? Colors.black87
                                 : Colors.white,
-                            label: controller.isMuted.value ? "Unmute" : "Mute",
+                            label: controller.isMuted.value ? "unmute".tr : "mute".tr,
                             onTap: () => controller.toggleMute(),
                           ),
                         ),
@@ -261,7 +261,7 @@ class _VoiceCallViewState extends State<VoiceCallView> {
                           icon: Icons.call_end,
                           color: Colors.redAccent,
                           iconColor: Colors.white,
-                          label: "End",
+                          label: "end_cap".tr,
                           size: 72,
                           iconSize: 36,
                           onTap: () {
@@ -282,8 +282,8 @@ class _VoiceCallViewState extends State<VoiceCallView> {
                                 ? Colors.black87
                                 : Colors.white,
                             label: controller.isSpeakerOn.value
-                                ? "Speaker On"
-                                : "Speaker",
+                                ? "speaker_on".tr
+                                : "speaker".tr,
                             onTap: () => controller.toggleSpeaker(),
                           ),
                         ),

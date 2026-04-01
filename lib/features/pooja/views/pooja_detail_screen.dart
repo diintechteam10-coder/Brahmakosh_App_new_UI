@@ -9,6 +9,7 @@ import '../blocs/pooja_state.dart';
 
 import '../repositories/pooja_repository.dart';
 import 'pooja_vidhi_screen.dart';
+import 'package:brahmakosh/core/localization/translate_helper.dart';
 
 class PoojaDetailScreen extends StatefulWidget {
   final String poojaId;
@@ -86,20 +87,32 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  Text(
-                                    pooja.pujaName ?? "",
-                                    style: GoogleFonts.lora(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
+                                  FutureBuilder<String>(
+                                    future: TranslateHelper.translate(pooja.pujaName ?? ""),
+                                    initialData: pooja.pujaName ?? "",
+                                    builder: (context, snapshot) {
+                                      return Text(
+                                        snapshot.data ?? (pooja.pujaName ?? ""),
+                                        style: GoogleFonts.lora(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      );
+                                    },
                                   ),
                                   const SizedBox(height: 12),
                                   Row(
                                     children: [
-                                      _buildSmallInfo(Icons.local_fire_department, pooja.category ?? "Pooja"),
+                                      FutureBuilder<String>(
+                                        future: TranslateHelper.translate(pooja.category ?? "Pooja"),
+                                        initialData: pooja.category ?? "Pooja",
+                                        builder: (context, snapshot) {
+                                          return _buildSmallInfo(Icons.local_fire_department, snapshot.data ?? (pooja.category ?? "Pooja"));
+                                        },
+                                      ),
                                   Spacer(),
-                                      _buildSmallInfo(Icons.access_time_filled, "${pooja.duration ?? 0} Mins"),
+                                      _buildSmallInfo(Icons.access_time_filled, "min_suffix".trParams({'min': (pooja.duration ?? 0).toString()})),
                                     ],
                                   ),
                                 ],
@@ -123,7 +136,7 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  _buildSectionHeader("Puja Significance"),
+                                  _buildSectionHeader("puja_significance".tr),
                                   const SizedBox(height: 16),
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -138,28 +151,40 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                                         const Icon(Icons.calendar_month, size: 16, color: Color(0xFFD4AF37)),
                                         const SizedBox(width: 8),
                                         Expanded(
-                                          child: Text(
-                                            "Best Timing: ${pooja.bestDay ?? "Friday"}",
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w600,
-                                              color: const Color(0xFFD4AF37),
-                                            ),
+                                          child: FutureBuilder<String>(
+                                            future: TranslateHelper.translate(pooja.bestDay ?? "Friday"),
+                                            initialData: pooja.bestDay ?? "Friday",
+                                            builder: (context, snapshot) {
+                                              return Text(
+                                                "best_timing".trParams({'day': snapshot.data ?? (pooja.bestDay ?? "Friday")}),
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: const Color(0xFFD4AF37),
+                                                ),
+                                              );
+                                            },
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
                                   const SizedBox(height: 16),
-                                  Text(
-                                    pooja.description!,
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 14,
-                                      color: Colors.white.withOpacity(0.5),
-                                      height: 1.6,
-                                    ),
-                                    maxLines: 6,
-                                    overflow: TextOverflow.ellipsis,
+                                  FutureBuilder<String>(
+                                    future: TranslateHelper.translate(pooja.description ?? ""),
+                                    initialData: pooja.description ?? "",
+                                    builder: (context, snapshot) {
+                                      return Text(
+                                        snapshot.data ?? (pooja.description ?? ""),
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 14,
+                                          color: Colors.white.withOpacity(0.5),
+                                          height: 1.6,
+                                        ),
+                                        maxLines: 6,
+                                        overflow: TextOverflow.ellipsis,
+                                      );
+                                    },
                                   ),
                                   // const SizedBox(height: 12),
                                   // GestureDetector(
@@ -198,7 +223,7 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _buildSectionHeader("Benefits/Results"),
+                                _buildSectionHeader("benefits_results".tr),
                                 const SizedBox(height: 16),
                                 // This would ideally be a list, but we'll adapt the single purpose string
                                 ... (pooja.purpose!.split('.').where((e) => e.trim().isNotEmpty).map((point) => 
@@ -230,17 +255,23 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              Text(
-                                                point.trim(),
-                                                style: GoogleFonts.poppins(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                ),
+                                              FutureBuilder<String>(
+                                                future: TranslateHelper.translate(point.trim()),
+                                                initialData: point.trim(),
+                                                builder: (context, snapshot) {
+                                                  return Text(
+                                                    snapshot.data ?? point.trim(),
+                                                    style: GoogleFonts.poppins(
+                                                      fontSize: 15,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  );
+                                                },
                                               ),
                                               const SizedBox(height: 4),
                                               Text(
-                                                "Benefit impact details",
+                                                "benefit_impact_details".tr,
                                                 style: GoogleFonts.poppins(
                                                   fontSize: 12,
                                                   color: Colors.white.withOpacity(0.4),
@@ -300,7 +331,7 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              "Start Puja Vidhi",
+                              "start_puja_vidhi".tr,
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,

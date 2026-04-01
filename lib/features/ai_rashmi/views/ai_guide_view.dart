@@ -125,7 +125,7 @@ class _AiGuideViewState extends State<AiGuideView> {
           
                   // Title
                   Text(
-                    "BRAHMAKOSH INTELLIGENCE",
+                    "brahmakosh_intelligence".tr,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.lora(
                       fontSize: 15.sp,
@@ -138,7 +138,7 @@ class _AiGuideViewState extends State<AiGuideView> {
           
                   // Subtitle
                   Text(
-                    "(${widget.deityName} - ${widget.subtitle})",
+                    "(${widget.deityName.tr} - ${widget.subtitle.tr})",
                     textAlign: TextAlign.center,
                     style: GoogleFonts.lora(
                       fontSize: 11.25.sp,
@@ -154,7 +154,7 @@ class _AiGuideViewState extends State<AiGuideView> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
                     child: Text(
-                      "Ask ${widget.deityName} about destiny, Karma, Horoscope or life guidance",
+                      "ask_deity_desc".trParams({ "deity": widget.deityName.tr }),
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
                         fontSize: 10.5.sp,
@@ -207,7 +207,7 @@ class _AiGuideViewState extends State<AiGuideView> {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    "Tap To Talk",
+                                    "tap_to_talk".tr,
                                     style: GoogleFonts.poppins(
                                       fontSize: 9.75.sp,
                                       fontWeight: FontWeight.w700,
@@ -244,7 +244,7 @@ class _AiGuideViewState extends State<AiGuideView> {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    "Text To Chat",
+                                    "text_to_chat".tr,
                                     style: GoogleFonts.poppins(
                                       fontSize: 9.75.sp,
                                       fontWeight: FontWeight.w600,

@@ -28,7 +28,7 @@ class ConversationHistoryView extends StatelessWidget {
           onPressed: () => Get.back(),
         ),
         title: Text(
-          'Chat History',
+          'chat_history_title'.tr,
           style: GoogleFonts.lora(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -43,7 +43,7 @@ class ConversationHistoryView extends StatelessWidget {
               color: Colors.white,
             ),
             onPressed: () => Get.to(() => const CallHistoryView()),
-            tooltip: 'Call Logs',
+            tooltip: 'call_logs'.tr,
           ),
         ],
       ),
@@ -78,7 +78,7 @@ class ConversationHistoryView extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'No conversations yet',
+                          'no_conversations_yet'.tr,
                           style: GoogleFonts.poppins(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -87,7 +87,7 @@ class ConversationHistoryView extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Start a chat with an expert to see it here',
+                          'start_chat_with_expert'.tr,
                           style: GoogleFonts.poppins(
                             fontSize: 13,
                             color: Colors.white.withOpacity(0.5),
@@ -135,7 +135,7 @@ class ConversationHistoryView extends StatelessWidget {
         : isEnded
         ? const Color(0xFF8D6E63)
         : Colors.orange;
-    String statusLabel = status[0].toUpperCase() + status.substring(1);
+    String statusLabel = "filter_${status.toLowerCase()}".tr;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -262,8 +262,8 @@ class ConversationHistoryView extends StatelessWidget {
               // Guard: prevent navigation with empty partner ID
               if (partnerId.isEmpty) {
                 Get.snackbar(
-                  'Error',
-                  'Could not identify the partner for this conversation.',
+                  'partner_error'.tr,
+                  'partner_error_msg'.tr,
                   backgroundColor: const Color(0xFFE57373),
                   colorText: Colors.white,
                   snackPosition: SnackPosition.BOTTOM,
@@ -316,6 +316,7 @@ class ConversationHistoryView extends StatelessWidget {
 
   Widget _buildFilterChips(ChatHistoryController controller) {
     final filters = ['All', 'Active', 'Pending', 'Accepted', 'Ended'];
+    final filterKeys = ['filter_all', 'filter_active', 'filter_pending', 'filter_accepted', 'filter_ended'];
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Container(
@@ -365,7 +366,7 @@ class ConversationHistoryView extends StatelessWidget {
                   ),
                   alignment: Alignment.center,
                   child: Text(
-                    filter.toUpperCase(),
+                    filterKeys[index].tr.toUpperCase(),
                     style: GoogleFonts.poppins(
                       fontSize: 11,
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,

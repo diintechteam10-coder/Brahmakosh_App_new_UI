@@ -2,6 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../repositories/pooja_repository.dart';
 import 'pooja_event.dart';
 import 'pooja_state.dart';
+import 'package:get/get.dart';
+import '../../../core/localization/translate_helper.dart';
 
 class PoojaBloc extends Bloc<PoojaEvent, PoojaState> {
   final PoojaRepository repository;
@@ -19,6 +21,15 @@ class PoojaBloc extends Bloc<PoojaEvent, PoojaState> {
     emit(PoojaLoading());
     try {
       final poojas = await repository.fetchPoojas();
+      
+      if (Get.locale?.languageCode == 'hi') {
+        for (var p in poojas) {
+          p.pujaName = await TranslateHelper.translate(p.pujaName ?? "");
+          p.category = await TranslateHelper.translate(p.category ?? "");
+          p.bestDay = await TranslateHelper.translate(p.bestDay ?? "");
+        }
+      }
+
       emit(PoojaLoaded(poojas: poojas, filteredPoojas: poojas));
     } catch (e) {
       emit(PoojaError(e.toString()));
@@ -103,6 +114,37 @@ class PoojaBloc extends Bloc<PoojaEvent, PoojaState> {
     emit(PoojaDetailLoading());
     try {
       final pooja = await repository.fetchPoojaDetail(event.id);
+      
+      if (Get.locale?.languageCode == 'hi') {
+        pooja.pujaName = await TranslateHelper.translate(pooja.pujaName ?? "");
+        pooja.category = await TranslateHelper.translate(pooja.category ?? "");
+        pooja.bestDay = await TranslateHelper.translate(pooja.bestDay ?? "");
+        pooja.description = await TranslateHelper.translate(pooja.description ?? "");
+        pooja.purpose = await TranslateHelper.translate(pooja.purpose ?? "");
+        pooja.specialInstructions = await TranslateHelper.translate(pooja.specialInstructions ?? "");
+        
+        if (pooja.samagriList != null) {
+          for (var s in pooja.samagriList!) {
+            s.itemName = await TranslateHelper.translate(s.itemName ?? "");
+            s.quantity = await TranslateHelper.translate(s.quantity ?? "");
+          }
+        }
+        
+        if (pooja.pujaVidhi != null) {
+          for (var v in pooja.pujaVidhi!) {
+            v.title = await TranslateHelper.translate(v.title ?? "");
+            v.description = await TranslateHelper.translate(v.description ?? "");
+          }
+        }
+
+        if (pooja.mantras != null) {
+          for (var m in pooja.mantras!) {
+            // Usually mantras are in Sanskrit, we might only translate meaning
+            m.meaning = await TranslateHelper.translate(m.meaning ?? "");
+          }
+        }
+      }
+
       emit(PoojaDetailLoaded(pooja));
     } catch (e) {
       emit(PoojaError(e.toString()));

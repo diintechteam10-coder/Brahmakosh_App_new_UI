@@ -149,10 +149,10 @@ class ProfileViewModel extends ChangeNotifier {
              if (responseBody['success'] == true) {
                 // Refresh profile to get updated data
                 await fetchProfile();
-                Get.snackbar("Success", "Profile updated successfully");
+                Get.snackbar("success".tr, "profile_updated_success".tr);
              } else {
                 _errorMessage = responseBody['message'] ?? 'Failed to update profile';
-                Get.snackbar("Error", _errorMessage!);
+                Get.snackbar("Error".tr, _errorMessage!);
              }
            } catch (e) {
               print("❌ Error parsing update response: $e");
@@ -230,10 +230,10 @@ class ProfileViewModel extends ChangeNotifier {
            var success = response['success'];
            if (success == true) {
               await fetchProfile(); // Refresh to get new image URL
-              Get.snackbar("Success", "Profile image updated successfully");
+              Get.snackbar("success".tr, "profile_image_updated_success".tr);
            } else {
               _errorMessage = response['message'] ?? 'Failed to upload image';
-              Get.snackbar("Error", _errorMessage!);
+              Get.snackbar("Error".tr, _errorMessage!);
            }
            _isLoading = false;
            _safeNotifyListeners();

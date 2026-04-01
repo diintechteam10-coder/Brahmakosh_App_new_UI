@@ -75,7 +75,7 @@ class LandingView extends StatelessWidget {
                   const SizedBox(height: 8),
 
                   Text(
-                    "Your Spiritual Operating System",
+                    "spiritual_os_tagline".tr,
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       color: AppTheme.authTextSecondary,
@@ -90,7 +90,7 @@ class LandingView extends StatelessWidget {
                     () => Column(
                       children: [
                         _buildSocialButton(
-                          text: "Continue with Google",
+                          text: "continue_google".tr,
                           imagePath: "assets/images/google.png",
                           onTap: authController.isLoading
                               ? null
@@ -104,7 +104,7 @@ class LandingView extends StatelessWidget {
                         if (Platform.isIOS) ...[
                           const SizedBox(height: 16),
                           _buildSocialButton(
-                            text: "Continue with Apple",
+                            text: "continue_apple".tr,
                             iconData: FontAwesomeIcons.apple,
                             onTap: authController.isLoading
                                 ? null
@@ -125,7 +125,7 @@ class LandingView extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   _buildPrimaryButton(
-                    text: "Log In",
+                    text: "login".tr,
                     onTap: () => Get.toNamed(AppConstants.routeEmailLogin),
                     backgroundColor: AppTheme.authPrimaryGold,
                     textColor: Colors.black,
@@ -134,7 +134,7 @@ class LandingView extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   _buildOutlinedButton(
-                    text: "Sign Up",
+                    text: "signup".tr,
                     onTap: () => Get.toNamed(AppConstants.routeRegister),
                     borderColor: AppTheme.authPrimaryGold,
                     textColor: AppTheme.authPrimaryGold,
@@ -281,7 +281,7 @@ class LandingView extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            "Or",
+            "or".tr,
             style: GoogleFonts.poppins(
               color: Colors.white.withOpacity(0.5),
               fontSize: 14,
@@ -302,7 +302,7 @@ class LandingView extends StatelessWidget {
             if (await canLaunchUrl(url)) await launchUrl(url);
           },
           child: Text(
-            "By Continue you agree to our Privacy and Policy",
+            "privacy_policy_agreement".tr,
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
               fontSize: 13,

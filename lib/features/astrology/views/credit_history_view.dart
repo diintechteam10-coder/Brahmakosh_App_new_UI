@@ -22,7 +22,7 @@ class CreditHistoryView extends StatelessWidget {
           onPressed: () => Get.back(),
         ),
         title: Text(
-          'Credit History',
+          'credit_history_title'.tr,
           style: GoogleFonts.lora(
             fontSize: 22,
             fontWeight: FontWeight.bold,
@@ -91,7 +91,7 @@ class CreditHistoryView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'No credit history yet',
+            'no_credit_history_msg'.tr,
             style: GoogleFonts.poppins(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -100,7 +100,7 @@ class CreditHistoryView extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Your credit usage will appear here',
+            'credit_usage_appear_msg'.tr,
             style: GoogleFonts.poppins(fontSize: 13, color: Colors.white38),
           ),
         ],
@@ -248,7 +248,7 @@ class CreditHistoryView extends StatelessWidget {
           Row(
             children: [
               // Duration
-              _buildInfoChip(Icons.timer_outlined, '$billableMinutes min'),
+              _buildInfoChip(Icons.timer_outlined, 'min_suffix'.trParams({'min': billableMinutes.toString()})),
               const SizedBox(width: 16),
               // Date
               _buildInfoChip(Icons.calendar_today_outlined, formattedDate),

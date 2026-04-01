@@ -82,7 +82,7 @@ class ConversationMessagesView extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '${controller.currentPartnerExperience} Years of Experience', // Static context
+                        '${controller.currentPartnerExperience} ${'years_experience_label'.tr}',
                         style: GoogleFonts.poppins(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
@@ -132,7 +132,7 @@ class ConversationMessagesView extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'No messages in this conversation',
+                  'no_messages_msg'.tr,
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     color: Colors.white.withOpacity(0.5),
@@ -204,7 +204,7 @@ class ConversationMessagesView extends StatelessWidget {
                     const Icon(Icons.chat_bubble_outline, color: Colors.white),
                     const SizedBox(width: 8),
                     Text(
-                      "New Chat",
+                      "new_chat".tr,
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -346,7 +346,7 @@ class ConversationMessagesView extends StatelessWidget {
               Icon(Icons.summarize, color: AppTheme.primaryGold, size: 20),
               const SizedBox(width: 8),
               Text(
-                'Session Summary',
+                'session_summary'.tr,
                 style: GoogleFonts.lora(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -359,15 +359,15 @@ class ConversationMessagesView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildSummaryStat('Duration', '${duration}m'),
-              _buildSummaryStat('Credits', '$credits'),
-              _buildSummaryStat('Messages', '${details['messagesCount'] ?? 0}'),
+              _buildSummaryStat('duration_cap'.tr, '${duration}m'),
+              _buildSummaryStat('credits'.tr, '$credits'),
+              _buildSummaryStat('messages_count'.tr, '${details['messagesCount'] ?? 0}'),
             ],
           ),
           if (summary.toString().isNotEmpty) ...[
             Divider(height: 24, color: Colors.white.withOpacity(0.1)),
             Text(
-              'Highlights',
+              'highlights'.tr,
               style: GoogleFonts.poppins(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,

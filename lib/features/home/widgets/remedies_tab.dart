@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:brahmakosh/common/models/user_complete_details_model.dart';
 
@@ -20,7 +21,7 @@ class RemediesTab extends StatelessWidget {
         color: _bgDark,
         child: Center(
           child: Text(
-            "No Gemstone Suggestions Available",
+            "no_gemstone_suggestions".tr,
             style: GoogleFonts.poppins(color: _textSecondary),
           ),
         ),
@@ -35,21 +36,21 @@ class RemediesTab extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildGemstoneCard(
-              "Life Stone",
+              "life_stone".tr,
               gemstoneSuggestion!.life,
               const Color(0xFFE53935), 
               Icons.favorite,
             ),
             const SizedBox(height: 16),
             _buildGemstoneCard(
-              "Benefic Stone",
+              "benefic_stone".tr,
               gemstoneSuggestion!.benefic,
               const Color(0xFF43A047), 
               Icons.verified,
             ),
             const SizedBox(height: 16),
             _buildGemstoneCard(
-              "Lucky Stone",
+              "lucky_stone".tr,
               gemstoneSuggestion!.lucky,
               const Color(0xFFFDD835), 
               Icons.star,
@@ -70,15 +71,15 @@ class RemediesTab extends StatelessWidget {
     if (detail == null) return const SizedBox();
 
     List<Widget> detailRows = [
-      _buildDetailRow("Gemstone", detail.name ?? "-", isBold: true, valueColor: _textPrimary),
+      _buildDetailRow("gemstone".tr, detail.name ?? "-", isBold: true, valueColor: _textPrimary),
       if (detail.semiGem != null && detail.semiGem!.isNotEmpty)
-        _buildDetailRow("Substitute", detail.semiGem ?? "-", valueColor: _textPrimary),
-      _buildDetailRow("Weight", detail.weightCaret ?? "-", valueColor: _textPrimary),
-      _buildDetailRow("Wear Finger", detail.wearFinger ?? "-", valueColor: _textPrimary),
-      _buildDetailRow("Metal", detail.wearMetal ?? "-", valueColor: _textPrimary),
-      _buildDetailRow("Day", detail.wearDay ?? "-", valueColor: _textPrimary),
+        _buildDetailRow("substitute".tr, detail.semiGem ?? "-", valueColor: _textPrimary),
+      _buildDetailRow("weight".tr, detail.weightCaret ?? "-", valueColor: _textPrimary),
+      _buildDetailRow("wear_finger".tr, detail.wearFinger ?? "-", valueColor: _textPrimary),
+      _buildDetailRow("metal".tr, detail.wearMetal ?? "-", valueColor: _textPrimary),
+      _buildDetailRow("day_label".tr, detail.wearDay ?? "-", valueColor: _textPrimary),
       if (detail.gemDeity != null && detail.gemDeity!.isNotEmpty)
-        _buildDetailRow("Deity", detail.gemDeity ?? "-", valueColor: _textPrimary),
+        _buildDetailRow("deity".tr, detail.gemDeity ?? "-", valueColor: _textPrimary),
     ];
 
     List<Widget> spacedChildren = [];

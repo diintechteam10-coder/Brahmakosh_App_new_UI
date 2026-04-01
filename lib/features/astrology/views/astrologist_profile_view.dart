@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:brahmakosh/core/services/storage_service.dart';
 import 'voice_call_view.dart';
 import 'package:brahmakosh/common/widgets/custom_profile_avatar.dart';
+import 'package:brahmakosh/core/localization/translate_helper.dart';
 
 class AstrologistProfileView extends StatefulWidget {
   final AstrologistItem expert;
@@ -23,6 +24,53 @@ class AstrologistProfileView extends StatefulWidget {
 
 class _AstrologistProfileViewState extends State<AstrologistProfileView> {
   int _selectedTabIndex = 0;
+  
+  // Translated Data
+  String? _translatedSummary;
+  String? _translatedExperience;
+  String? _translatedExpertise;
+  List<String> _translatedLanguages = [];
+
+  @override
+  void initState() {
+    super.initState();
+    
+    // Initialize with original values
+    _translatedSummary = widget.expert.profileSummary;
+    _translatedExperience = widget.expert.experience;
+    _translatedExpertise = widget.expert.expertise;
+    _translatedLanguages = widget.expert.languages ?? [];
+    
+    _translateExpertData();
+  }
+
+  Future<void> _translateExpertData() async {
+    if (Get.locale?.languageCode != 'hi') return;
+
+    if (_translatedSummary != null) {
+      TranslateHelper.translate(_translatedSummary).then((val) {
+        if (mounted) setState(() => _translatedSummary = val);
+      });
+    }
+
+    if (_translatedExperience != null) {
+      TranslateHelper.translate(_translatedExperience).then((val) {
+        if (mounted) setState(() => _translatedExperience = val);
+      });
+    }
+
+    if (_translatedExpertise != null) {
+      TranslateHelper.translate(_translatedExpertise).then((val) {
+        if (mounted) setState(() => _translatedExpertise = val);
+      });
+    }
+
+    if (_translatedLanguages.isNotEmpty) {
+      TranslateHelper.translateList(_translatedLanguages).then((val) {
+        if (mounted) setState(() => _translatedLanguages = val);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +128,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                           children: [
                             Expanded(
                               child: _buildProfileTab(
-                                "ABOUT",
+                                "about".tr,
                                 _selectedTabIndex == 0,
                                 () => setState(() => _selectedTabIndex = 0),
                               ),
@@ -88,7 +136,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: _buildProfileTab(
-                                "EXPERTISE",
+                                "expertise".tr,
                                 _selectedTabIndex == 1,
                                 () => setState(() => _selectedTabIndex = 1),
                               ),
@@ -96,7 +144,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: _buildProfileTab(
-                                "REVIEWS",
+                                "reviews".tr,
                                 _selectedTabIndex == 2,
                                 () => setState(() => _selectedTabIndex = 2),
                               ),
@@ -134,8 +182,8 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
           children: [
             Expanded(
               child: _buildProfileStatCard(
-                "${expert.experience ?? "No experience"}",
-                "Experience",
+                "${_translatedExperience ?? "No experience"}",
+                "experience".tr,
                 icon: Icons.auto_awesome,
               ),
             ),
@@ -143,7 +191,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
             Expanded(
               child: _buildProfileStatCard(
                 "${expert.rating ?? 4.9}",
-                "Rating",
+                "rating".tr,
                 icon: Icons.star,
               ),
             ),
@@ -161,8 +209,8 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
             border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           ),
           child: Text(
-            expert.profileSummary ??
-                "${expert.name} is a Vedic Astrologer with ${expert.experience ?? 14}+ years of experience. Expert in Kundli analysis, career guidance, and remedies. Known for accurate, clear insights that support confident life decisions.",
+            _translatedSummary ??
+                "${expert.name} ${'is_vedic_astrologer'.tr} ${_translatedExperience ?? '14+'} ${'years_experience'.tr}. ${'expert_in_kundli'.tr}.",
             style: GoogleFonts.poppins(
               fontSize: 10.sp,
               height: 1.6,
@@ -175,14 +223,14 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
   }
 
   Widget _buildExpertiseContent(AstrologistItem expert) {
-    final skills = expert.expertise?.split(',').map((e) => e.trim()).toList() ?? ["Vedic Astrology"];
-    final languages = expert.languages ?? ["Hindi", "English"];
+    final skills = _translatedExpertise?.split(',').map((e) => e.trim()).toList() ?? ["Vedic Astrology"];
+    final languages = _translatedLanguages.isNotEmpty ? _translatedLanguages : ["Hindi", "English"];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Core Expertise",
+          "core_expertise".tr,
           style: GoogleFonts.lora(
             fontSize: 14.sp,
             fontWeight: FontWeight.bold,
@@ -197,7 +245,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
         ),
         SizedBox(height: 4.h),
         Text(
-          "Languages",
+          "languages".tr,
           style: GoogleFonts.lora(
             fontSize: 14.sp,
             fontWeight: FontWeight.bold,
@@ -281,7 +329,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
           ),
           SizedBox(height: 0.5.h),
           Text(
-            expert.expertise?.split(',').firstOrNull ?? "Vedic Astrology",
+            _translatedExpertise?.split(',').firstOrNull ?? "Vedic Astrology",
             style: GoogleFonts.poppins(
               fontSize: 12.sp,
               color: Colors.white.withValues(alpha: 0.6),
@@ -294,14 +342,14 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
             children: [
               _buildBadge(
                 Icons.check_circle,
-                "Verified Astrologer",
+                "verified_astrologer".tr,
                 const Color(0xFF2E7D32).withValues(alpha: 0.2),
                 const Color(0xFF2E7D32),
               ),
               SizedBox(width: 3.w),
               _buildBadge(
                 null,
-                "15k+ Consults",
+                "15k+ ${"consults".tr}",
                 Colors.white.withValues(alpha: 0.1),
                 Colors.white.withValues(alpha: 0.6),
               ),
@@ -348,7 +396,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "User Reviews",
+              "user_reviews".tr,
               style: GoogleFonts.lora(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
@@ -358,7 +406,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
             TextButton(
               onPressed: () {},
               child: Text(
-                "See All",
+                "see_all".tr,
                 style: GoogleFonts.poppins(
                   color: const Color(0xFFFFD700),
                   fontSize: 10.sp,
@@ -369,9 +417,9 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
           ],
         ),
         SizedBox(height: 2.h),
-        _buildReviewCard("Rohan Sharma", "Very accurate and helpful insights. Highly recommended!"),
+        _buildReviewCard("Rohan Sharma", "accurate_review".tr),
         SizedBox(height: 1.5.h),
-        _buildReviewCard("Ananya Gupta", "Great session, clear guidance on my career path."),
+        _buildReviewCard("Ananya Gupta", "clear_guidance_review".tr),
       ],
     );
   }
@@ -440,7 +488,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
           Expanded(
             child: _buildBottomButton(
               Icons.chat_bubble_outline,
-              "₹${expert.chatCharge?.toInt() ?? 15}/min",
+              "₹${expert.chatCharge?.toInt() ?? 15}${"per_min".tr}",
               () {
                 final status = expert.status?.toLowerCase() ?? 'offline';
                 if (status != 'online') {
@@ -455,7 +503,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
           Expanded(
             child: _buildBottomButton(
               Icons.phone_outlined,
-              "₹${expert.voiceCharge?.toInt() ?? 20}/min",
+              "₹${expert.voiceCharge?.toInt() ?? 20}${"per_min".tr}",
               () {
                 final status = expert.status?.toLowerCase() ?? 'offline';
                 if (status != 'online') {
@@ -617,7 +665,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                 SizedBox(width: 4.w),
                 Expanded(
                   child: Text(
-                    "CHAT CONSULTATION",
+                    "chat_consultation_title".tr,
                     style: GoogleFonts.lora(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
@@ -631,7 +679,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
             SizedBox(height: 2.h),
 
             Text(
-              "You're about to start a live chat session with your chosen Expert.",
+              "start_chat_desc".tr,
               style: GoogleFonts.poppins(
                 fontSize: 10.sp,
                 color: Colors.white.withValues(alpha: 0.7),
@@ -643,7 +691,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
             SizedBox(height: 2.h),
 
             Text(
-              "Connect with an astrologer or guru through live chat and end the session at any time - credits are deducted only for the minutes used, so please ensure a stable internet connection for a smooth experience.",
+              "chat_instruction".tr,
               style: GoogleFonts.poppins(
                 fontSize: 9.sp,
                 color: Colors.white.withValues(alpha: 0.6),
@@ -653,7 +701,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
             SizedBox(height: 3.h),
 
             Text(
-              "This session will deduct ₹${expert.chatCharge ?? 15} per minute",
+              "deduction_msg".trParams({'charge': (expert.chatCharge ?? 15).toString()}),
               style: GoogleFonts.poppins(
                 fontSize: 11.sp,
                 fontWeight: FontWeight.w600,
@@ -663,7 +711,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
             SizedBox(height: 1.h),
 
             Text(
-              "Would you like to continue?",
+              "continue_question".tr,
               style: GoogleFonts.poppins(
                 fontSize: 10.sp,
                 color: Colors.white.withValues(alpha: 0.5),
@@ -686,7 +734,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                       ),
                     ),
                     child: Text(
-                      "CANCEL",
+                      "cancel_cap".tr,
                       style: GoogleFonts.poppins(
                         fontSize: 10.sp,
                         fontWeight: FontWeight.bold,
@@ -722,7 +770,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                           elevation: 0,
                         ),
                         child: Text(
-                          "CONTINUE",
+                          "continue_cap".tr,
                           style: GoogleFonts.poppins(
                             fontSize: 10.sp,
                             fontWeight: FontWeight.bold,
@@ -779,7 +827,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                 SizedBox(width: 4.w),
                 Expanded(
                   child: Text(
-                    "VOICE CONSULTATION",
+                    "voice_consultation_title".tr,
                     style: GoogleFonts.lora(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
@@ -793,7 +841,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
             SizedBox(height: 2.h),
 
             Text(
-              "You're about to start a voice call session with your chosen Expert.",
+              "voice_session_desc".tr,
               style: GoogleFonts.poppins(
                 fontSize: 10.sp,
                 color: Colors.white.withValues(alpha: 0.7),
@@ -805,7 +853,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
             SizedBox(height: 2.h),
 
             Text(
-              "Connect with an astrologer or guru through a live audio call and end the session at any time - credits are deducted only for the minutes used, so please ensure a stable internet connection for a smooth experience.",
+              "voice_disclaimer".tr,
               style: GoogleFonts.poppins(
                 fontSize: 9.sp,
                 color: Colors.white.withValues(alpha: 0.6),
@@ -815,7 +863,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
             SizedBox(height: 3.h),
 
             Text(
-              "This session will deduct ₹${expert.voiceCharge ?? 20} per minute",
+              "deduction_msg".trParams({'charge': (expert.voiceCharge ?? 20).toString()}),
               style: GoogleFonts.poppins(
                 fontSize: 11.sp,
                 fontWeight: FontWeight.w600,
@@ -825,7 +873,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
             SizedBox(height: 1.h),
 
             Text(
-              "Would you like to continue?",
+              "continue_question".tr,
               style: GoogleFonts.poppins(
                 fontSize: 10.sp,
                 color: Colors.white.withValues(alpha: 0.5),
@@ -848,7 +896,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                       ),
                     ),
                     child: Text(
-                      "CANCEL",
+                      "cancel_cap".tr,
                       style: GoogleFonts.poppins(
                         fontSize: 10.sp,
                         fontWeight: FontWeight.bold,
@@ -873,8 +921,8 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                             Get.to(() => VoiceCallView(expert: expert.toAstrologist()));
                           } else {
                             Get.snackbar(
-                              "Insufficient Credits",
-                              "You need at least ₹$minRequired for a 5-minute session.",
+                              "insufficient_credits".tr,
+                              "insufficient_credits_desc".trParams({'min': minRequired.toString()}),
                               backgroundColor: Colors.redAccent,
                               colorText: Colors.white,
                             );
@@ -890,7 +938,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                           elevation: 0,
                         ),
                         child: Text(
-                          "CONTINUE",
+                          "continue_cap".tr,
                           style: GoogleFonts.poppins(
                             fontSize: 10.sp,
                             fontWeight: FontWeight.bold,
@@ -918,14 +966,14 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
             borderRadius: BorderRadius.circular(24),
             side: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
         title: Text(
-          "Expert Offline",
+          "expert_offline_title".tr,
           style: GoogleFonts.lora(
               fontSize: 16.sp,
               fontWeight: FontWeight.bold,
               color: const Color(0xFFFFD700)),
         ),
         content: Text(
-          "This expert is currently offline. Please try again later.",
+          "expert_offline_msg".tr,
           style: GoogleFonts.poppins(
               fontSize: 10.sp, color: Colors.white.withValues(alpha: 0.7)),
         ),
@@ -933,7 +981,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
           TextButton(
             onPressed: () => Get.back(),
             child: Text(
-              "OK",
+              "ok".tr.toUpperCase(),
               style: GoogleFonts.poppins(
                 color: const Color(0xFFFFD700),
                 fontWeight: FontWeight.bold,
@@ -954,14 +1002,14 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
             borderRadius: BorderRadius.circular(24),
             side: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
         title: Text(
-          "Chat Required",
+          "chat_required_title".tr,
           style: GoogleFonts.lora(
               fontSize: 16.sp,
               fontWeight: FontWeight.bold,
               color: const Color(0xFFFFD700)),
         ),
         content: Text(
-          "Please initiate a chat with the expert first before making a call.",
+          "chat_required_msg".tr,
           style: GoogleFonts.poppins(
               fontSize: 10.sp, color: Colors.white.withValues(alpha: 0.7)),
         ),
@@ -969,7 +1017,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
           TextButton(
             onPressed: () => Get.back(),
             child: Text(
-              "OK",
+              "ok".tr.toUpperCase(),
               style: GoogleFonts.poppins(
                 color: const Color(0xFFFFD700),
                 fontWeight: FontWeight.bold,

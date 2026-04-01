@@ -47,7 +47,7 @@ class PhoneOtpView extends StatelessWidget {
 
                     Center(
                       child: Text(
-                        controller.isOtpSent.value ? "Verify OTP" : "Phone Verification",
+                        controller.isOtpSent.value ? "verify_otp".tr : "phone_verification".tr,
                         style: GoogleFonts.lora(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -61,8 +61,8 @@ class PhoneOtpView extends StatelessWidget {
                     Center(
                       child: Text(
                         controller.isOtpSent.value
-                            ? "Enter the 6-digit code sent to your number"
-                            : "We'll send you a one-time password to verify your account",
+                            ? "enter_otp_msg".tr
+                            : "send_otp_msg".tr,
                         textAlign: TextAlign.center,
                         style: GoogleFonts.poppins(
                           fontSize: 14,
@@ -75,7 +75,7 @@ class PhoneOtpView extends StatelessWidget {
 
                     if (controller.isOtpSent.value) ...[
                       // OTP INPUT STATE
-                      _label("Enter OTP"),
+                      _label("enter_otp_label".tr),
                       const SizedBox(height: 16),
 
                       // Custom OTP Input
@@ -153,7 +153,7 @@ class PhoneOtpView extends StatelessWidget {
                       const SizedBox(height: 40),
 
                       _buildButton(
-                        text: "Verify OTP",
+                        text: "verify_otp".tr,
                         onTap: controller.isLoading.value ? null : controller.verifyOtp,
                         isLoading: controller.isLoading.value,
                       ),
@@ -164,7 +164,7 @@ class PhoneOtpView extends StatelessWidget {
                         child: TextButton(
                           onPressed: controller.isLoading.value ? null : () => controller.isOtpSent.value = false,
                           child: Text(
-                            "Edit Phone Number",
+                            "edit_phone_number".tr,
                             style: GoogleFonts.poppins(
                               color: AppTheme.authPrimaryGold,
                               fontWeight: FontWeight.w600,
@@ -179,7 +179,7 @@ class PhoneOtpView extends StatelessWidget {
                         child: Column(
                           children: [
                             Text(
-                              "Didn't receive the code?",
+                              "didnt_receive_code".tr,
                               style: GoogleFonts.poppins(
                                 fontSize: 14,
                                 color: AppTheme.authTextSecondary,
@@ -191,7 +191,7 @@ class PhoneOtpView extends StatelessWidget {
                                   ? null
                                   : controller.resendOtp,
                               child: Text(
-                                "Resend OTP",
+                                "resend_otp".tr,
                                 style: GoogleFonts.poppins(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
@@ -205,7 +205,7 @@ class PhoneOtpView extends StatelessWidget {
                       ),
                     ] else ...[
                       // MOBILE NUMBER INPUT STATE
-                      _label("Mobile Number"),
+                      _label("mobile_number".tr),
                       const SizedBox(height: 12),
 
                       Container(
@@ -250,14 +250,14 @@ class PhoneOtpView extends StatelessWidget {
 
                       const SizedBox(height: 32),
 
-                      _label("Get OTP Via"),
+                      _label("get_otp_via".tr),
                       const SizedBox(height: 16),
 
                       Row(
                         children: [
                           Expanded(
                             child: _methodCard(
-                              title: "WhatsApp",
+                              title: "whatsapp".tr,
                               icon: FontAwesomeIcons.whatsapp,
                               isSelected: controller.selectedChannel.value == "whatsapp",
                               onTap: () => controller.selectedChannel.value = "whatsapp",
@@ -267,7 +267,7 @@ class PhoneOtpView extends StatelessWidget {
                           const SizedBox(width: 16),
                           Expanded(
                             child: _methodCard(
-                              title: "SMS",
+                              title: "sms".tr,
                               icon: Icons.sms_outlined,
                               isSelected: controller.selectedChannel.value == "phone",
                               onTap: () => controller.selectedChannel.value = "phone",
@@ -280,7 +280,7 @@ class PhoneOtpView extends StatelessWidget {
                       const SizedBox(height: 60),
 
                       _buildButton(
-                        text: "Send OTP",
+                        text: "send_otp".tr,
                         onTap: controller.isLoading.value ? null : controller.sendOtp,
                         isLoading: controller.isLoading.value,
                       ),

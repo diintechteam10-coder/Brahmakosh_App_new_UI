@@ -30,7 +30,7 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         title: Text(
-          "Choose Sankalp",
+          "choose_sankalp".tr,
           style: GoogleFonts.poppins(
             fontSize: 18,
             color: Colors.white,
@@ -85,7 +85,7 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
                 if (state is SankalpLoading) {
                   return const Center(child: CircularProgressIndicator(color: AppTheme.primaryGold));
                 }
-                return const Center(child: Text("No Sankalps Available", style: TextStyle(color: Colors.white70)));
+                return Center(child: Text("no_sankalps_available".tr, style: const TextStyle(color: Colors.white70)));
               }
 
               // Build a set of sankalp IDs that the user has already joined/completed
@@ -147,16 +147,16 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
   ) {
     final bool isAlreadyJoined = userStatus != null;
     final bool isCompleted = userStatus == 'completed';
-    final String statusLabel = isCompleted ? "Completed ✓" : "Already Joined";
+    final String statusLabel = isCompleted ? "completed_done".tr : "already_joined".tr;
 
     return InkWell(
       onTap: () {
         if (isAlreadyJoined) {
           Get.snackbar(
-            isCompleted ? "Already Completed" : "Already Active",
+            isCompleted ? "already_completed".tr : "already_active".tr,
             isCompleted
-                ? "You have already completed this sankalp."
-                : "This sankalp is already active in your list.",
+                ? "already_completed_desc".tr
+                : "already_active_desc".tr,
             backgroundColor: const Color(0xFF1C1C1E),
             colorText: Colors.white,
             snackPosition: SnackPosition.BOTTOM,
@@ -208,7 +208,7 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
                       ),
                     ),
                     child: Text(
-                      isAlreadyJoined ? statusLabel : "${sankalp.totalDays} Day",
+                      isAlreadyJoined ? statusLabel : "${sankalp.totalDays}${"day_suffix".tr}",
                       style: GoogleFonts.poppins(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
@@ -269,7 +269,7 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            "+${sankalp.karmaPointsPerDay} Karma / Day",
+                            "+${sankalp.karmaPointsPerDay}${"karma_per_day".tr}",
                             style: GoogleFonts.poppins(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -304,7 +304,7 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
                                 ),
                               ),
                               child: Text(
-                                "Begin",
+                                "begin".tr,
                                 style: GoogleFonts.poppins(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,

@@ -10,6 +10,7 @@ import '../../../core/services/storage_service.dart';
 import '../views/astrology_chat_view.dart';
 import '../views/astrologist_profile_view.dart';
 import '../views/conversation_history_view.dart';
+import '../../../core/localization/translate_helper.dart';
 
 class AstrologyController extends GetxController {
   final _experts = <AstrologistItem>[].obs;
@@ -102,11 +103,20 @@ class AstrologyController extends GetxController {
             print("✅ Parsed ${categoryList.length} categories");
 
             if (categoryList.isNotEmpty) {
-              _categories.value = categoryList.cast<Map<String, dynamic>>();
-
-              // Select first category by default if not "all"
-              // But usually "All" is the first tab.
-              // If we want to slide to position, we'll handle that in the view.
+              final castedCategories = categoryList.cast<Map<String, dynamic>>();
+              
+              // Dynamic Translation for categories if in Hindi mode
+              if (Get.locale?.languageCode == 'hi') {
+                final namesToTranslate = castedCategories.map((c) => c['name'] as String).toList();
+                TranslateHelper.translateList(namesToTranslate).then((translatedNames) {
+                  for (int i = 0; i < castedCategories.length; i++) {
+                    castedCategories[i]['name'] = translatedNames[i];
+                  }
+                  _categories.value = castedCategories;
+                });
+              } else {
+                _categories.value = castedCategories;
+              }
             }
           } else {
             print("❌ Categories API Success is false or data null");
@@ -276,7 +286,7 @@ class AstrologyController extends GetxController {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "RECHARGE WALLET",
+                  "recharge_wallet".tr.toUpperCase(),
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -292,7 +302,7 @@ class AstrologyController extends GetxController {
             ),
             const SizedBox(height: 8),
             Text(
-              "Insufficient balance to start consultation. Minimum ₹100 is required.",
+              "insufficient_balance_msg".tr,
               style: GoogleFonts.poppins(
                 fontSize: 14,
                 color: Colors.white.withOpacity(0.7),
@@ -311,8 +321,8 @@ class AstrologyController extends GetxController {
                   onTap: () {
                     Get.back();
                     Get.snackbar(
-                      "Processing",
-                      "Starting payment for ₹$amount...",
+                      "processing".tr,
+                      "starting_payment".trParams({'amount': amount.toString()}),
                       backgroundColor: const Color(0xFFD4AF37),
                       colorText: Colors.black,
                       snackPosition: SnackPosition.TOP,
@@ -352,7 +362,7 @@ class AstrologyController extends GetxController {
                   elevation: 0,
                 ),
                 child: Text(
-                  "PROCEED TO PAY",
+                  "proceed_to_pay".tr.toUpperCase(),
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -374,8 +384,8 @@ class AstrologyController extends GetxController {
 
   void openUserProfile() {
     Get.snackbar(
-      "Profile",
-      "Opening Account details...",
+      "profile_title".tr,
+      "opening_profile_msg".tr,
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: const Color(0xFF10B981),
       colorText: Colors.white,

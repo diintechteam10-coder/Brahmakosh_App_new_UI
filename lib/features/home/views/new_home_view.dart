@@ -7,6 +7,7 @@ import 'package:brahmakosh/core/common_imports.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:brahmakosh/core/localization/translate_helper.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:brahmakosh/features/home/views/sponsor_card.dart';
@@ -47,12 +48,12 @@ class _NewHomeViewState extends State<NewHomeView> {
   final RedeemController redeemController = Get.put(RedeemController());
   int _selectedDiscoveryIndex = 0;
   final List<String> _discoveryTabs = [
-    "Health",
-    "Emotions",
-    "Profession",
-    "Luck",
-    "Personal Life",
-    "Travel",
+    "health",
+    "emotions",
+    "profession",
+    "luck",
+    "personal_life",
+    "travel",
   ];
 
   final PageController _bannerController = PageController();
@@ -60,7 +61,7 @@ class _NewHomeViewState extends State<NewHomeView> {
   int _selectedCheckInIndex = -1;
   List<Activities> _checkInActivities = [];
   bool _isCheckInLoading = false;
-  String _selectedRemedyTab = "MUST HAVE";
+  String _selectedRemedyTab = "must_have";
 
   // Focus management
   final FocusNode _searchFocusNode = FocusNode();
@@ -210,7 +211,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: "Namaste ",
+                        text: "namaste".tr + " ",
                         style: GoogleFonts.poppins(
                           color: Colors.white,
                           fontSize: 15.sp,
@@ -346,7 +347,7 @@ class _NewHomeViewState extends State<NewHomeView> {
             decoration: InputDecoration(
               filled: true,
               fillColor: const Color(0xFF0A0A0A), // 👈 DARK COLOR
-              hintText: "Search rituals, puja, astrologers",
+              hintText: "search_hint".tr,
               hintStyle: GoogleFonts.poppins(
                 color: Colors.white.withOpacity(0.35),
                 fontSize: 11.sp,
@@ -430,13 +431,13 @@ class _NewHomeViewState extends State<NewHomeView> {
                   children: [
                     _buildBannerItem(
                       krishaImageUrl,
-                      "Talk to Krishna",
+                      "talk_to_krishna".tr,
                       () {
                         _unfocusAll();
                         Get.to(
                           () => const AiGuideView(
-                            deityName: "Krishna",
-                            subtitle: "Divine Cosmic Intelligence",
+                            deityName: "deity_krishna",
+                            subtitle: "krishna_subtitle",
                             backgroundImage:
                                 'assets/images/rashmi_background.jpeg',
                             characterImagePath:
@@ -450,13 +451,13 @@ class _NewHomeViewState extends State<NewHomeView> {
                     ),
                     _buildBannerItem(
                       'assets/images/TalkToRashmiBack.png',
-                      "Talk to Rashmi",
+                      "talk_to_rashmi".tr,
                       () {
                         _unfocusAll();
                         Get.to(
                           () => const AiGuideView(
-                            deityName: "Rashmi",
-                            subtitle: "Your Spiritual Guide",
+                            deityName: "deity_rashmi",
+                            subtitle: "rashmi_subtitle",
                             backgroundImage:
                                 'assets/images/rashmi_background.jpeg',
                             characterImagePath: 'assets/images/Rashmi_new.png',
@@ -665,7 +666,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
         ),
         delegate: SliverChildListDelegate([
           _buildGridItem(
-            "Check - In",
+            "check_in".tr,
             "assets/icons/check_in.png",
             onTap: () {
               _unfocusAll();
@@ -673,7 +674,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
             },
           ),
           _buildGridItem(
-            "Astrology",
+            "astrology".tr,
             "assets/icons/astrology.png",
             onTap: () {
               _unfocusAll();
@@ -681,7 +682,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
             },
           ),
           _buildGridItem(
-            "Expert Connect",
+            "expert_connect".tr,
             "assets/icons/expert_connect.png",
             onTap: () {
               _unfocusAll();
@@ -692,7 +693,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
             },
           ),
           _buildGridItem(
-            "Remedies",
+            "remedies".tr,
             "assets/icons/remedies.png",
             onTap: () {
               _unfocusAll();
@@ -703,7 +704,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
             },
           ),
           _buildGridItem(
-            "Sankalp Tracker",
+            "sankalp_tracker".tr,
             "assets/icons/sankalptracker.png",
             onTap: () {
               _unfocusAll();
@@ -711,7 +712,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
             },
           ),
           _buildGridItem(
-            "Puja Vidi",
+            "puja_vidhi".tr,
             "assets/icons/puja_vidhi.png",
             onTap: () {
               _unfocusAll();
@@ -742,7 +743,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "ARE YOU SPIRITUAL ?",
+                    "are_you_spiritual".tr,
                     style: GoogleFonts.poppins(
                       // Cleaner look
                       color: Colors.white.withOpacity(0.6),
@@ -784,7 +785,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                             _scrollToSelectedCheckIn(index);
                           },
                           child: _buildActivityItem(
-                            activity.title ?? "",
+                            activity.title?.toLowerCase().tr ?? "",
                             _getActivityIconPath(activity.title ?? ""),
                             isSelected: _selectedCheckInIndex == index,
                           ),
@@ -812,7 +813,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                   ),
                   onPressed: _onCheckInNowPressed,
                   child: Text(
-                    "CHECK-IN NOW",
+                    "check_in_now".tr,
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w600,
                       fontSize: 12.sp,
@@ -952,7 +953,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "KARMA DASHBOARD",
+                        "karma_dashboard".tr,
                         style: GoogleFonts.poppins(
                           color: Color(0xff8E8E93),
                           fontSize: 12.sp,
@@ -986,7 +987,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                             ],
                           ),
                           child: Text(
-                            "REDEEM",
+                            "redeem_cap".tr,
                             style: GoogleFonts.poppins(
                               color: const Color(0xFFD4AF37),
                               fontSize: 9.sp,
@@ -1004,7 +1005,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                       // Karma Points
                       Expanded(
                         child: _buildKarmaStat(
-                          "KARMA POINTS",
+                          "karma_points".tr,
                           NumberFormat("#,###").format(karmaPoints),
                           iconPath: "assets/icons/star_rounded.svg",
                         ),
@@ -1021,7 +1022,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                             .length;
                         return Expanded(
                           child: _buildKarmaStat(
-                            "SEVA DONE",
+                            "seva_done".tr,
                             completedCount.toString(),
                             iconPath: "assets/icons/support.svg",
                           ),
@@ -1031,7 +1032,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                       // Alignment
                       Expanded(
                         child: _buildKarmaStat(
-                          "ALIGNMENT",
+                          "alignment".tr,
                           "9.0",
                           suffix: "/10",
                         ),
@@ -1130,7 +1131,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "EXPERT CONNECT",
+                    "expert_connect_title".tr,
                     style: GoogleFonts.poppins(
                       color: Colors.white.withOpacity(0.7),
                       fontSize: 18,
@@ -1146,7 +1147,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                       ).changeTab(3);
                     },
                     child: Text(
-                      "View All",
+                      "view_all".tr,
                       style: GoogleFonts.poppins(
                         color: const Color(0xFFD4AF37),
                         fontSize: 16,
@@ -1172,7 +1173,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                   height: 205,
                   child: Center(
                     child: Text(
-                      "No experts available",
+                      "no_experts".tr,
                       style: GoogleFonts.lora(
                         color: Colors.white.withOpacity(0.5),
                       ),
@@ -1264,13 +1265,19 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                       Row(
                         children: [
                           Expanded(
-                            child: Text(
-                              expert.name ?? "Expert",
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w700,
-                              ),
+                            child: FutureBuilder<String>(
+                              future: TranslateHelper.translate(expert.name ?? "Expert"),
+                              initialData: expert.name ?? "Expert",
+                              builder: (context, snapshot) {
+                                return Text(
+                                  snapshot.data ?? "Expert",
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                );
+                              },
                             ),
                           ),
                           SizedBox(width: 8),
@@ -1286,7 +1293,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
-                              isOnline ? "ONLINE" : "OFFLINE",
+                              isOnline ? "online".tr : "offline".tr,
                               style: GoogleFonts.poppins(
                                 color: isOnline ? Colors.green : Colors.grey,
                                 fontSize: 10,
@@ -1296,15 +1303,21 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                           ),
                         ],
                       ),
-                      Text(
-                        expert.expertise ?? "Astrology",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.poppins(
-                          color: Colors.white.withOpacity(0.5),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                        ),
+                      FutureBuilder<String>(
+                        future: TranslateHelper.translate(expert.expertise ?? "Astrology"),
+                        initialData: expert.expertise ?? "Astrology",
+                        builder: (context, snapshot) {
+                          return Text(
+                            snapshot.data ?? "Astrology",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.poppins(
+                              color: Colors.white.withOpacity(0.5),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -1370,7 +1383,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                       _unfocusAll();
                       astrologyController.startChat(expert);
                     },
-                    child: _buildExpertActionButton("CHAT"),
+                    child: _buildExpertActionButton("chat".tr),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -1381,7 +1394,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                       _unfocusAll();
                       astrologyController.navigateToProfile(expert);
                     },
-                    child: _buildExpertActionButton("TALK", isPrimary: true),
+                    child: _buildExpertActionButton("talk".tr, isPrimary: true),
                   ),
                 ),
               ],
@@ -1442,7 +1455,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "TODAY'S MUHURAT",
+                    "todays_muhurat".tr,
                     style: GoogleFonts.poppins(
                       color: Color(0xff8E8E93),
                       fontSize: 13.sp,
@@ -1456,7 +1469,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                 children: [
                   Expanded(
                     child: _buildMuhuratTimeCard(
-                      "SUNRISES & SUNSET",
+                      "sunrise_sunset".tr,
                       formatTimeToAMPM(
                         basic?.sunrise,
                       ), // formats to e.g. "6:24 AM"
@@ -1470,7 +1483,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                   const SizedBox(width: 10),
                   Expanded(
                     child: _buildMuhuratTimeCard(
-                      "MOONRISE & MOONSET",
+                      "moonrise_moonset".tr,
                       // Logic for Moonrise
                       formatTimeToAMPM(
                         (basic?.moonrise?.isNotEmpty ?? false)
@@ -1493,7 +1506,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
               ),
               const SizedBox(height: 20),
               Text(
-                "PERSONALIZED ASTROLOGY MUHURAT",
+                "personalized_astrology_muhurat".tr,
                 style: GoogleFonts.poppins(
                   color: const Color(0xFFD4AF37),
                   fontSize: 18,
@@ -1502,9 +1515,9 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
               ),
               const SizedBox(height: 12),
               _buildDetailedMuhuratCard(
-                "Abhijit Muhurat",
+                "abhijit_muhurat".tr,
                 "${formatTimeToAMPM(advanced?.abhijitMuhurta?.start)} - ${formatTimeToAMPM(advanced?.abhijitMuhurta?.end)}",
-                "HIGHLY AUSPICIOUS",
+                "highly_auspicious".tr,
                 const Color(0xFF22C55E),
               ),
               Container(
@@ -1516,47 +1529,47 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                 child: Column(
                   children: [
                     _buildMuhuratRow(
-                      "Rahu Kaal",
+                      "rahu_kaal".tr,
                       "${formatTimeToAMPM(advanced?.rahukaal?.start)} - ${formatTimeToAMPM(advanced?.rahukaal?.end)}",
-                      "(AVOID)",
+                      "avoid_tag".tr,
                       Colors.red,
                     ),
                     _buildMuhuratRow(
-                      "Tithi",
+                      "tithi".tr,
                       basic?.tithi ?? "Loading...",
                       advanced?.panchang?.tithi?.endTime != null
-                          ? "Until ${(advanced!.panchang!.tithi!.endTime!.hour! % 24).toString().padLeft(2, '0')}:${advanced!.panchang!.tithi!.endTime!.minute.toString().padLeft(2, '0')}"
+                          ? "until".tr + " ${(advanced!.panchang!.tithi!.endTime!.hour! % 24).toString().padLeft(2, '0')}:${advanced!.panchang!.tithi!.endTime!.minute.toString().padLeft(2, '0')}"
                           : (basic?.paksha ?? ""),
                       const Color(0xFFD4AF37),
                     ),
                     _buildMuhuratRow(
-                      "Nakshatra",
+                      "nakshatra".tr,
                       basic?.nakshatra ?? "--",
                       advanced?.panchang?.nakshatra?.endTime != null
-                          ? "Until ${(advanced!.panchang!.nakshatra!.endTime!.hour! % 24).toString().padLeft(2, '0')}:${advanced!.panchang!.nakshatra!.endTime!.minute.toString().padLeft(2, '0')}"
+                          ? "until".tr + " ${(advanced!.panchang!.nakshatra!.endTime!.hour! % 24).toString().padLeft(2, '0')}:${advanced!.panchang!.nakshatra!.endTime!.minute.toString().padLeft(2, '0')}"
                           : "",
                       const Color(0xFFD4AF37),
                     ),
                     _buildMuhuratRow(
-                      "Hindu Month",
+                      "hindu_month".tr,
                       advanced?.hinduMaah?.purnimanta ?? "--",
                       "",
                       const Color(0xFFD4AF37),
                     ),
                     _buildMuhuratRow(
-                      "Ritu",
+                      "ritu".tr,
                       basic?.ritu ?? (advanced?.ritu ?? "--"),
                       "",
                       const Color(0xFFD4AF37),
                     ),
                     _buildMuhuratRow(
-                      "Direction",
+                      "direction".tr,
                       basic?.dishaShool ?? (advanced?.dishaShool ?? "--"),
                       "",
                       Colors.orange,
                     ),
                     _buildMuhuratRow(
-                      "Sun / Moon Sign",
+                      "sun_moon_sign".tr,
                       "${advanced?.sunSign ?? '--'} / ${advanced?.moonSign ?? '--'}",
                       "",
                       const Color(0xFFE67E22),
@@ -1590,7 +1603,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          "View Today's Panchang",
+                          "view_todays_panchang".tr,
                           style: GoogleFonts.poppins(
                             color: Colors.white,
                             fontSize: 14,
@@ -1880,7 +1893,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
       },
     ];
 
-    final displayedRemedies = _selectedRemedyTab == "MUST HAVE"
+    final displayedRemedies = _selectedRemedyTab == "must_have"
         ? mustHaveRemedies
         : goodToHaveRemedies;
 
@@ -1896,7 +1909,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                 vertical: 0.0,
               ),
               child: Text(
-                "PERSONALIZED REMEDIES",
+                "personalized_remedies".tr,
                 style: GoogleFonts.poppins(
                   color: Color(0xff8E8E93),
                   fontSize: 13.sp,
@@ -1917,22 +1930,22 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                   children: [
                     Expanded(
                       child: _buildTabButton(
-                        "MUST HAVE",
-                        isSelected: _selectedRemedyTab == "MUST HAVE",
+                        "must_have".tr,
+                        isSelected: _selectedRemedyTab == "must_have",
                         onTap: () {
                           setState(() {
-                            _selectedRemedyTab = "MUST HAVE";
+                            _selectedRemedyTab = "must_have";
                           });
                         },
                       ),
                     ),
                     Expanded(
                       child: _buildTabButton(
-                        "GOOD TO HAVE",
-                        isSelected: _selectedRemedyTab == "GOOD TO HAVE",
+                        "good_to_have".tr,
+                        isSelected: _selectedRemedyTab == "good_to_have",
                         onTap: () {
                           setState(() {
-                            _selectedRemedyTab = "GOOD TO HAVE";
+                            _selectedRemedyTab = "good_to_have";
                           });
                         },
                       ),
@@ -1950,13 +1963,23 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                 itemCount: displayedRemedies.length,
                 itemBuilder: (context, index) {
                   final remedy = displayedRemedies[index];
-                  return _buildProductCard(
-                    remedy["title"]!,
-                    remedy["subtitle"]!,
-                    remedy["price"]!,
-                    remedy["image"]!,
-                    screenWidth,
-                    isNetwork: true,
+                  return FutureBuilder<List<String>>(
+                    future: Future.wait([
+                      TranslateHelper.translate(remedy["title"]!),
+                      TranslateHelper.translate(remedy["subtitle"]!),
+                    ]),
+                    initialData: [remedy["title"]!, remedy["subtitle"]!],
+                    builder: (context, snapshot) {
+                      final translated = snapshot.data!;
+                      return _buildProductCard(
+                        translated[0],
+                        translated[1],
+                        remedy["price"]!,
+                        remedy["image"]!,
+                        screenWidth,
+                        isNetwork: true,
+                      );
+                    },
                   );
                 },
               ),
@@ -2083,7 +2106,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                   borderRadius: BorderRadius.circular(100),
                 ),
                 child: Text(
-                  "SHOP",
+                  "shop_btn".tr,
                   style: GoogleFonts.poppins(
                     color: Colors.black,
                     fontSize: 12,
@@ -2114,7 +2137,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                   vertical: 0.0,
                 ),
                 child: Text(
-                  "PUJA VIDHI",
+                  "puja_vidhi_title".tr,
                   style: GoogleFonts.poppins(
                     color: Color(0xff8E8E93),
                     fontSize: 13.5.sp,
@@ -2140,7 +2163,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                         height: 100,
                         child: Center(
                           child: Text(
-                            "No Puja available",
+                            "no_puja_available".tr,
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.5),
                             ),
@@ -2165,7 +2188,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                       height: 100,
                       child: Center(
                         child: Text(
-                          "Error loading Puja Vidhi",
+                          "error_loading_puja".tr,
                           style: TextStyle(color: Colors.red.withOpacity(0.7)),
                         ),
                       ),
@@ -2218,23 +2241,35 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        pooja.pujaName ?? "Unknown Puja",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.lora(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      FutureBuilder<String>(
+                        future: TranslateHelper.translate(pooja.pujaName ?? "Unknown Puja"),
+                        initialData: pooja.pujaName ?? "Unknown Puja",
+                        builder: (context, snapshot) {
+                          return Text(
+                            snapshot.data ?? "Unknown Puja",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.lora(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        },
                       ),
-                      Text(
-                        pooja.subcategory ?? pooja.category ?? "Ritual",
-                        style: GoogleFonts.lora(
-                          color: const Color(0xFFD4AF37),
-                          fontSize: 7.5.sp,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      FutureBuilder<String>(
+                        future: TranslateHelper.translate(pooja.subcategory ?? pooja.category ?? "Ritual"),
+                        initialData: pooja.subcategory ?? pooja.category ?? "Ritual",
+                        builder: (context, snapshot) {
+                          return Text(
+                            snapshot.data ?? "Ritual",
+                            style: GoogleFonts.lora(
+                              color: const Color(0xFFD4AF37),
+                              fontSize: 7.5.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -2265,7 +2300,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "SANKALP TRACKER",
+              "sankalp_tracker_title".tr,
               style: GoogleFonts.poppins(
                 color: const Color(0xff8E8E93),
                 fontSize: 13.5.sp,
@@ -2293,7 +2328,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Morning Prayer",
+                              "morning_prayer".tr,
                               style: GoogleFonts.poppins(
                                 color: Colors.white,
                                 fontSize: 13.5.sp,
@@ -2302,7 +2337,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              "A peaceful start to your spiritual journey.",
+                              "morning_prayer_desc".tr,
                               style: GoogleFonts.poppins(
                                 color: Colors.white.withOpacity(0.6),
                                 fontSize: 9.75.sp,
@@ -2339,7 +2374,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "DAILY PROGRESS",
+                        "daily_progress".tr,
                         style: GoogleFonts.poppins(
                           color: Colors.white.withOpacity(0.5),
                           fontSize: 12,
@@ -2396,7 +2431,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            "TRACK YOUR SANKALP",
+                            "track_your_sankalp".tr,
                             style: GoogleFonts.poppins(
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
@@ -2424,7 +2459,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "SWAPNA DECODER",
+              "swapna_decoder_title".tr,
               style: GoogleFonts.poppins(
                 color: const Color(0xff8E8E93),
                 fontSize: 13.5.sp,
@@ -2473,7 +2508,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    "Decode Your Dream",
+                                    "decode_your_dream".tr,
                                     style: GoogleFonts.poppins(
                                       color: Colors.white,
                                       fontSize: 13.5.sp,
@@ -2494,7 +2529,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              "What did you see in your sleep last night?",
+                              "decode_dream_msg".tr,
                               style: GoogleFonts.poppins(
                                 color: Colors.white.withOpacity(0.6),
                                 fontSize: 9.75.sp,
@@ -2528,7 +2563,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                       decoration: InputDecoration(
                         fillColor: const Color(0xFF0A0A0A),
                         filled: true,
-                        hintText: "Enter your dream....",
+                        hintText: "dream_hint".tr,
                         hintStyle: GoogleFonts.poppins(
                           color: Colors.white30,
                           fontSize: 10.5.sp,
@@ -2612,7 +2647,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
-                    "Learn Bhagavad Gita",
+                    "learn_gita".tr,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.lora(
                       color: const Color(0xFFD4AF37),
@@ -2621,7 +2656,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                     ),
                   ),
                   Text(
-                    "Timeless Wisdom for Modern Life",
+                    "gita_wisdom".tr,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.lora(
                       color: Color(0xff8E8E93),
@@ -2646,7 +2681,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                         Get.toNamed(AppConstants.routeGita);
                       },
                       child: Text(
-                        "START YOUR JOURNEY",
+                        "start_journey".tr,
                         style: GoogleFonts.poppins(
                           fontWeight: FontWeight.w400,
                           fontSize: 10.5.sp,
@@ -2671,7 +2706,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
             child: Text(
-              "PERSONALITY & SELF-DISCOVERY",
+              "self_discovery_title".tr,
               style: GoogleFonts.lora(
                 color: Colors.white.withOpacity(0.7),
                 fontSize: 10.5.sp,
@@ -2700,7 +2735,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      _discoveryTabs[index],
+                      _discoveryTabs[index].toLowerCase().tr,
                       style: GoogleFonts.lora(
                         color: isSelected
                             ? Colors.black
@@ -2829,7 +2864,7 @@ Widget _buildGridItem(String title, String iconPath, {VoidCallback? onTap}) {
                 vertical: 12.0,
               ),
               child: Text(
-                'OUR SPONSORS',
+                "our_sponsors".tr,
                 style: GoogleFonts.lora(
                   fontWeight: FontWeight.bold,
                   color: Colors.white.withOpacity(0.7),

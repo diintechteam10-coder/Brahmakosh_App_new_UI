@@ -116,8 +116,8 @@ class AstrologyChatController extends GetxController {
           isRequestAccepted.value = true;
           _startTimer();
           Get.snackbar(
-            "Consultation Started",
-            "Expert has joined the conversation.",
+            "consultation_started".tr,
+            "expert_joined_msg".tr,
             backgroundColor: Colors.green,
             colorText: Colors.white,
             snackPosition: SnackPosition.TOP,
@@ -540,8 +540,8 @@ class AstrologyChatController extends GetxController {
           isRequestAccepted.value = true;
           _startTimer();
           Get.snackbar(
-            "Consultation Started",
-            "Expert has joined the chat.",
+            "consultation_started".tr,
+            "expert_joined_msg".tr,
             backgroundColor: Colors.green,
             colorText: Colors.white,
           );
@@ -846,26 +846,27 @@ class AstrologyChatController extends GetxController {
     switch (selectedTopic.value) {
       case Topic.career:
         return [
-          {"q": "Which career is best for me?"},
-          {"q": "When will I get promotion or growth?"},
-          {"q": "Should I change my job now?"},
+          {"q": "career_q1".tr},
+          {"q": "career_q2".tr},
+          {"q": "career_q3".tr},
         ];
       case Topic.relationship:
         return [
-          {"q": "When will I meet my life partner?"},
-          {"q": "Is my relationship stable?"},
-          {"q": "Will my marriage be successful?"},
+          {"q": "rel_q1".tr},
+          {"q": "rel_q2".tr},
+          {"q": "rel_q3".tr},
         ];
       case Topic.finance:
         return [
-          {"q": "When will my income improve?"},
-          {"q": "Is this a good time to invest?"},
-          {"q": "Why is money getting blocked?"},
+          {"q": "fin_q1".tr},
+          {"q": "fin_q2".tr},
+          {"q": "fin_q3".tr},
         ];
       case Topic.health:
         return [
-          {"q": "Why do I feel low energy?"},
-          {"q": "Are there health concerns ahead?"},
+          {"q": "health_q1".tr},
+          {"q": "health_q2".tr},
+          {"q": "health_q3".tr},
         ];
       default:
         Utils.print("📌 EXIT getCurrentQuestions -> empty (no topic)");
@@ -921,7 +922,7 @@ class AstrologyChatController extends GetxController {
               ),
               const SizedBox(height: 20),
               Text(
-                "End Conversation?",
+                "end_conversation_q".tr,
                 style: GoogleFonts.lora(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -931,7 +932,7 @@ class AstrologyChatController extends GetxController {
               ),
               const SizedBox(height: 12),
               Text(
-                "Are you sure you want to end your session with ${expert.name}?",
+                "end_session_confirm".trParams({'name': expert.name}),
                 style: GoogleFonts.poppins(
                   fontSize: 14,
                   color: Colors.white70,
@@ -955,7 +956,7 @@ class AstrologyChatController extends GetxController {
                     ),
                   ),
                   child: Text(
-                    "End Chat",
+                    "end_cap".tr,
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -977,7 +978,7 @@ class AstrologyChatController extends GetxController {
                     ),
                   ),
                   child: Text(
-                    "Continue",
+                    "continue_cap".tr,
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

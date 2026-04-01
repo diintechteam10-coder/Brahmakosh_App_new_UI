@@ -72,7 +72,7 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
               Icon(Icons.error_outline_rounded, size: 48, color: Colors.grey[400]),
               const SizedBox(height: 12),
               Text(
-                "Failed to load details",
+                "failed_load_details".tr,
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -214,7 +214,7 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
             ),
             const SizedBox(height: 24),
             // Interpretation
-            _buildSectionTitle("Detailed Significance", Icons.info_outline),
+            _buildSectionTitle("detailed_significance".tr, Icons.info_outline),
             const SizedBox(height: 16),
             Text(
               swapna.detailedInterpretation ??
@@ -233,7 +233,7 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
                   if (swapna.positiveAspects != null &&
                       swapna.positiveAspects!.isNotEmpty) ...[
                     _buildSectionTitle(
-                      "Positive Aspects",
+                      "positive_aspects_title".tr,
                       Icons.wb_sunny_outlined,
                     ),
                     const SizedBox(height: 12),
@@ -251,7 +251,7 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
                   if (swapna.negativeAspects != null &&
                       swapna.negativeAspects!.isNotEmpty) ...[
                     _buildSectionTitle(
-                      "Negative Aspects",
+                      "negative_aspects_title".tr,
                       Icons.warning_amber_outlined,
                     ),
                     const SizedBox(height: 12),
@@ -267,14 +267,14 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
 
             // Remedies
             if (swapna.remedies != null) ...[
-              _buildSectionTitle("Remedies & Precautions", Icons.self_improvement),
+              _buildSectionTitle("remedies_precautions_title".tr, Icons.self_improvement),
               const SizedBox(height: 16),
 
               // Mantras
               if (swapna.remedies!.mantras != null &&
                   swapna.remedies!.mantras!.isNotEmpty) ...[
                 _buildRemedyCard(
-                  "Sacred Mantras",
+                  "sacred_mantras".tr,
                   Icons.self_improvement,
                   swapna.remedies!.mantras!,
                   const Color(0xFFD4AF37),
@@ -286,7 +286,7 @@ class _SwapnaDetailScreenState extends State<SwapnaDetailScreen> {
               if (swapna.remedies!.precautions != null &&
                   swapna.remedies!.precautions!.isNotEmpty) ...[
                 _buildRemedyCard(
-                  "Important Precautions",
+                  "important_precautions".tr,
                   Icons.warning_amber_rounded,
                   swapna.remedies!.precautions!,
                   const Color(0xFFFFB300),
