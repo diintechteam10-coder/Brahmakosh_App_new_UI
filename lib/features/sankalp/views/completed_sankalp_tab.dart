@@ -269,7 +269,7 @@ class CompletedSankalpTab extends StatelessWidget {
   void _showSuccessDialog(BuildContext context, String message) {
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -298,7 +298,7 @@ class CompletedSankalpTab extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.pop(dialogContext),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xffff7438),
                   shape: RoundedRectangleBorder(

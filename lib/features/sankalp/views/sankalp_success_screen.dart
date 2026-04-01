@@ -1,7 +1,6 @@
 import 'package:brahmakosh/core/common_imports.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
-import 'sankalp_screen.dart';
 
 class SankalpSuccessScreen extends StatefulWidget {
   final String sankalpTitle;
@@ -123,8 +122,8 @@ class _SankalpSuccessScreenState extends State<SankalpSuccessScreen> with Single
                     height: 56,
                     child: ElevatedButton(
                       onPressed: () {
-                        // Navigate to SankalpScreen (which hosts "My Sankalp" tab)
-                        Get.offAll(() => const SankalpScreen());
+                        Get.offAllNamed(AppConstants.routeDashboard);
+                        Get.toNamed(AppConstants.routeSankalp);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primaryGold,

@@ -78,7 +78,7 @@ class TalkToKrishnaCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "TALK TO KRISHNA",
+                              "Talk to Krishna",
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.lora(

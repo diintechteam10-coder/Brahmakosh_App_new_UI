@@ -3,9 +3,11 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
-
 import '../ai_rashmi_chat.dart';
+import '../ai_rashmi_service.dart';
+import '../deity_selection_service.dart';
 import 'package:brahmakosh/features/agent/controllers/agent_controller.dart';
+import 'package:brahmakosh/core/services/storage_service.dart';
 
 class AiGuideView extends StatefulWidget {
   final String deityName;
@@ -36,6 +38,56 @@ class _AiGuideViewState extends State<AiGuideView> {
     if (!Get.isRegistered<AgentController>()) {
       Get.put(AgentController());
     }
+    // Sync the deity selection so RashmiChat uses the correct agent
+    _syncDeitySelection();
+  }
+
+  /// Fetch agents from the API and set the correct deity in
+  /// DeitySelectionService + StorageService so that both voice
+  /// and text chat use the right AI persona.
+  Future<void> _syncDeitySelection() async {
+    try {
+      final agentController = Get.find<AgentController>();
+      if (agentController.avatars.isEmpty) {
+        await agentController.fetchAvatars(null);
+      }
+
+      // Match by deityName in the avatar list (same logic as ask_bi_view)
+      final targetAvatar = agentController.avatars.firstWhereOrNull(
+        (a) => (a.name ?? '')
+            .toLowerCase()
+            .contains(widget.deityName.toLowerCase()),
+      );
+
+      if (targetAvatar != null) {
+        DeitySelectionService().setSelectedDeity(targetAvatar);
+      }
+
+      // Also fetch the agents API to get the correct agent _id
+      // (the avatar list uses agentId, but StorageService needs the _id)
+      final agents = await AiRashmiService().fetchAgents();
+      final matchingAgent = agents.firstWhereOrNull(
+        (a) => (a.name ?? '')
+            .toLowerCase()
+            .contains(widget.deityName.toLowerCase()),
+      );
+
+      if (matchingAgent != null) {
+        StorageService.setString(
+          'ai_selected_agent_id',
+          matchingAgent.id ?? '',
+        );
+        StorageService.setString(
+          'ai_selected_agent_name',
+          matchingAgent.name ?? '',
+        );
+        debugPrint(
+          '[AiGuideView] Synced deity: ${matchingAgent.name} (${matchingAgent.id})',
+        );
+      }
+    } catch (e) {
+      debugPrint('[AiGuideView] Error syncing deity selection: $e');
+    }
   }
 
   void _onTapToTalk() {
@@ -43,7 +95,7 @@ class _AiGuideViewState extends State<AiGuideView> {
       () => RashmiChat(
         backgroundImage: widget.chatBackgroundImage,
         autoStartVoice: true,
-      
+        deityName: widget.deityName,
       ),
       transition: Transition.noTransition,
     );
@@ -53,7 +105,7 @@ class _AiGuideViewState extends State<AiGuideView> {
     Get.to(
       () => RashmiChat(
         backgroundImage: widget.chatBackgroundImage,
-        
+        deityName: widget.deityName,
       ),
       transition: Transition.noTransition,
     );
@@ -67,15 +119,13 @@ class _AiGuideViewState extends State<AiGuideView> {
         children: [
           // Background Image
           Image.asset(
-            'assets/icons/chat_bg_new.png',
+            widget.backgroundImage,
             fit: BoxFit.cover,
           ),
           Image.asset(
-                        widget.deityName == "Krishna"
-                            ? 'assets/icons/krishna_neww.png'
-                            : widget.characterImagePath,
-                        fit: BoxFit.contain,
-                      ),
+            widget.characterImagePath,
+            fit: BoxFit.cover,
+          ),
           // Dark gradient overlay for better text readability
           Container(
             decoration: BoxDecoration(

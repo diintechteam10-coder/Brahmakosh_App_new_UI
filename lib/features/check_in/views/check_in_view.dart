@@ -927,11 +927,19 @@ class _CheckInViewState extends State<CheckInView>
                         }
 
                         if (localAsset != null) {
-                          return Image.asset(localAsset, fit: BoxFit.cover);
+                          return Container(
+                            color: const Color(0xFF141414),
+                            child: Image.asset(
+                              localAsset,
+                              fit: BoxFit.contain,
+                              alignment: Alignment.bottomCenter,
+                            ),
+                          );
                         } else if (image != null && image.isNotEmpty) {
                           return CachedNetworkImage(
                             imageUrl: image,
-                            fit: BoxFit.cover,
+                            fit: BoxFit.contain,
+                            alignment: Alignment.bottomCenter,
                             placeholder: (context, url) => Container(
                               color: const Color(0xFF141414),
                               child: const Center(

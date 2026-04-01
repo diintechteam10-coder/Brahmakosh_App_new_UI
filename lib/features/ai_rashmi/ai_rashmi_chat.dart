@@ -27,6 +27,7 @@ class RashmiChat extends StatelessWidget {
   final bool autoStartVoice;
   final String? initialMessage;
   final bool autoAsk;
+  final String? deityName;
   const RashmiChat({
     super.key,
     this.backgroundImage,
@@ -34,6 +35,7 @@ class RashmiChat extends StatelessWidget {
     this.autoStartVoice = false,
     this.initialMessage,
     this.autoAsk = false,
+    this.deityName,
   });
 
   @override
@@ -48,6 +50,7 @@ class RashmiChat extends StatelessWidget {
       autoStartVoice: autoStartVoice,
       initialMessage: initialMessage,
       autoAsk: autoAsk,
+      deityName: deityName,
     );
   }
 }
@@ -58,12 +61,14 @@ class _RashmiChatView extends StatefulWidget {
   final bool autoStartVoice;
   final String? initialMessage;
   final bool autoAsk;
+  final String? deityName;
   const _RashmiChatView({
     this.backgroundImage,
     this.hideLearnGita = false,
     this.autoStartVoice = false,
     this.initialMessage,
     this.autoAsk = false,
+    this.deityName,
   });
 
   @override
@@ -283,9 +288,8 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
       // Navigate to the same screen with the new configuration to mimic Home Screen behavior
       Get.off(
         () => RashmiChat(
-          backgroundImage: deityName == 'Krishna'
-              ? 'assets/images/Krishna_chat.png'
-              : 'assets/images/Rashmi_chat.png',
+          backgroundImage: 'assets/icons/chat_bg_new.png',
+          deityName: deityName,
         ),
         preventDuplicates: false,
       );
@@ -294,9 +298,8 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
       // Fallback navigation even if logic fails
       Get.off(
         () => RashmiChat(
-          backgroundImage: deityName == 'Krishna'
-              ? 'assets/images/Krishna_chat.png'
-              : 'assets/images/Rashmi_chat.png',
+          backgroundImage: 'assets/icons/chat_bg_new.png',
+          deityName: deityName,
         ),
         preventDuplicates: false,
       );
@@ -308,8 +311,14 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
     return GetBuilder<AiRashmiController>(
       builder: (vm) {
         final theme = Theme.of(context);
-        final isKrishnaChat =
-            widget.backgroundImage?.contains('Krishna') ?? false;
+        final String currentDeityName = (widget.deityName ?? 
+                                         (_deityService.selectedDeity?.name ?? 'Krishna'));
+        final bool isRashmiChat = currentDeityName.toLowerCase().contains('rashmi');
+        final bool isKrishnaChat = !isRashmiChat; // Everything else defaults to Krishna
+        
+        final String displayDeityName = isRashmiChat ? 'Rashmi' : 'Krishna';
+        final String deityImageAsset = isRashmiChat ? 'assets/icons/rashmi_new_avatar.png' : 'assets/images/Small_krishna.png';
+        final String hintText = isRashmiChat ? 'Ask Rashmi anything' : 'Ask Krishna anything';
 
         return Scaffold(
           key: _scaffoldKey,
@@ -319,11 +328,13 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
               Builder(
                 builder: (context) {
                   String? currentBg = widget.backgroundImage;
-                  if (isKrishnaChat) {
+                  // Use the premium new chat background for both Krishna and Rashmi
+                  if (isKrishnaChat || isRashmiChat) {
                     currentBg = 'assets/icons/chat_bg_new.png';
-                  } else if (vm.messages.isNotEmpty && !isKrishnaChat) {
+                  } else if (vm.messages.isNotEmpty) {
                     currentBg = 'assets/images/Chat_background.png';
                   }
+                  
                   if (currentBg != null) {
                     return Positioned.fill(
                       child: Image.asset(currentBg, fit: BoxFit.cover),
@@ -333,28 +344,21 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                 },
               ),
 
-              // Dark overlay for Rashmi chat (removed for Krishna to keep vibrancy)
-              if (!isKrishnaChat)
+              // Dark overlay for Rashmi chat (kept subtle)
+              if (isRashmiChat)
                 Positioned.fill(
-                  child: Container(color: Colors.black.withOpacity(0.25)),
+                  child: Container(color: Colors.black.withOpacity(0.15)),
                 ),
 
-              // Krishna character overlay
-              if (isKrishnaChat)
+              // Character overlay (Krishna/Rashmi)
+              if (isKrishnaChat || isRashmiChat)
                 Positioned.fill(
                   child: IgnorePointer(
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                          bottom: MediaQuery.of(context).size.height * 0.08,
-                        ),
-                        child: Image.asset(
-                          'assets/icons/krishna_neww.png',
-                          fit: BoxFit.contain,
-                          width: double.infinity,
-                        ),
-                      ),
+                    child: Image.asset(
+                      isKrishnaChat 
+                        ? 'assets/icons/krishna_neww.png' 
+                        : 'assets/icons/Rashmi_new_chat.png',
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
@@ -366,8 +370,8 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                   Expanded(
                     child: vm.messages.isEmpty
                         ? (isKrishnaChat
-                              ? _buildKrishnaEmptyState(context, vm, theme)
-                              : _buildRashmiEmptyState(context, vm, theme))
+                              ? _buildKrishnaEmptyState(context, vm, theme, displayDeityName, hintText)
+                              : _buildRashmiEmptyState(context, vm, theme, displayDeityName, hintText))
                         : ListView.builder(
                             controller: _scrollController,
                              padding: EdgeInsets.symmetric(
@@ -389,7 +393,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                     top: false,
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(3.w, 0, 3.w, 1.5.h),
-                      child: _buildInputArea(context, vm, theme),
+                      child: _buildInputArea(context, vm, theme, deityName: displayDeityName, hintText: hintText),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -407,7 +411,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                       horizontal: 3.5.w,
                       vertical: 1.h,
                     ),
-                    child: _buildHeader(context),
+                    child: _buildHeader(context, displayDeityName, deityImageAsset),
                   ),
                 ),
               ),
@@ -435,27 +439,9 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
     BuildContext context,
     AiRashmiController vm,
     ThemeData theme, {
-    String? explicitDeityName,
+    required String deityName,
+    required String hintText,
   }) {
-    // Determine the current deity name for hint text
-    String deityName = explicitDeityName ?? 'Krishna';
-
-    if (explicitDeityName == null) {
-      if (_deityService.selectedDeity != null) {
-        final name = _deityService.selectedDeity!.name ?? '';
-        if (name.toLowerCase().contains('rashmi')) {
-          deityName = 'Rashmi';
-        } else if (name.toLowerCase().contains('krishna')) {
-          deityName = 'Krishna';
-        }
-      }
-      // Check widget config for default OVERRIDING the service if it explicitly passed Rashmi/Krishna
-      if (widget.backgroundImage?.toLowerCase().contains('rashmi') == true) {
-        deityName = 'Rashmi';
-      } else if (widget.backgroundImage?.toLowerCase().contains('krishna') == true) {
-        deityName = 'Krishna';
-      }
-    }
 
     // Check if chat has started (messages exist) to hide FAQs
     final bool hasMessages = vm.messages.isNotEmpty;
@@ -598,7 +584,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
               decoration: InputDecoration(
                 fillColor: Colors.transparent,
                 filled: true,
-                hintText: 'Ask $deityName anything',
+                hintText: hintText,
                 hintStyle: TextStyle(
                   color: Colors.grey.shade500,
                   fontSize: 11.sp,
@@ -690,31 +676,7 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    // Determine the current deity name and image logic
-    String deityName = 'Krishna';
-    String imageAsset = 'assets/images/Small_krishna.png';
-
-    // Check selected deity or fallback
-    if (_deityService.selectedDeity != null) {
-      final name = _deityService.selectedDeity!.name ?? '';
-      if (name.toLowerCase().contains('rashmi')) {
-        deityName = 'Rashmi';
-        imageAsset = 'assets/images/Small_rashmi.png';
-      } else if (name.toLowerCase().contains('krishna')) {
-        deityName = 'Krishna';
-        imageAsset = 'assets/images/Small_krishna.png';
-      }
-    }
-
-    // Check widget config for explicit override
-    if (widget.backgroundImage?.toLowerCase().contains('rashmi') == true) {
-      deityName = 'Rashmi';
-      imageAsset = 'assets/images/Small_rashmi.png';
-    } else if (widget.backgroundImage?.toLowerCase().contains('krishna') == true) {
-      deityName = 'Krishna';
-      imageAsset = 'assets/images/Small_krishna.png';
-    }
+  Widget _buildHeader(BuildContext context, String deityName, String imageAsset) {
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -816,6 +778,8 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
     BuildContext context,
     AiRashmiController vm,
     ThemeData theme,
+    String deityName,
+    String hintText,
   ) {
     return SingleChildScrollView(
       child: Padding(
@@ -853,7 +817,8 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                       ctx,
                       controller,
                       theme,
-                      explicitDeityName: 'Krishna',
+                      deityName: deityName,
+                      hintText: hintText,
                     ),
                     onSwitchDeity: (deityName) async {
                       // Switching context usually implies restarting or refreshing the chat view.
@@ -863,9 +828,8 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                       // Navigate to the same screen with the new configuration to mimic Home Screen behavior
                       Get.off(
                         () => RashmiChat(
-                          backgroundImage: deityName == 'Krishna'
-                              ? 'assets/images/Krishna_chat.png'
-                              : 'assets/images/Rashmi_chat.png',
+                          backgroundImage: 'assets/icons/chat_bg_new.png',
+                          deityName: deityName,
                         ),
                         preventDuplicates: false,
                       );
@@ -886,6 +850,8 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
     BuildContext context,
     AiRashmiController vm,
     ThemeData theme,
+    String deityName,
+    String hintText,
   ) {
     return SingleChildScrollView(
       child: Padding(
@@ -911,7 +877,8 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                       ctx,
                       controller,
                       theme,
-                      explicitDeityName: 'Rashmi',
+                      deityName: deityName,
+                      hintText: hintText,
                     ),
                     onSwitchDeity: (deityName) async {
                       // Switching context usually implies restarting or refreshing the chat view.
@@ -921,9 +888,8 @@ class _RashmiChatViewState extends State<_RashmiChatView> {
                       // Navigate to the same screen with the new configuration to mimic Home Screen behavior
                       Get.off(
                         () => RashmiChat(
-                          backgroundImage: deityName == 'Krishna'
-                              ? 'assets/images/Krishna_chat.png'
-                              : 'assets/images/Rashmi_chat.png',
+                          backgroundImage: 'assets/icons/chat_bg_new.png',
+                          deityName: deityName,
                         ),
                         preventDuplicates: false,
                       );

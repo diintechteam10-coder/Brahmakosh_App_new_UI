@@ -9,6 +9,8 @@ import '../repositories/sankalp_repository.dart';
 import 'my_sankalp_tab.dart';
 import 'completed_sankalp_tab.dart';
 import '../../notifications/views/notification_screen.dart';
+import '../../../../core/constants/app_constants.dart';
+
 
 class SankalpScreen extends StatefulWidget {
   const SankalpScreen({super.key});
@@ -62,7 +64,14 @@ class _SankalpScreenState extends State<SankalpScreen>
               ),
               child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 16),
             ),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              } else {
+                Get.offAllNamed(AppConstants.routeDashboard);
+              }
+            },
+
           ),
           actions: [
             IconButton(

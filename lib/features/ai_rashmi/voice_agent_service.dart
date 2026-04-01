@@ -204,9 +204,9 @@ class VoiceAgentService extends ChangeNotifier {
                 AVAudioSessionCategoryOptions.defaultToSpeaker,
             avAudioSessionMode: AVAudioSessionMode.videoChat,
             androidAudioAttributes: AndroidAudioAttributes(
-              contentType: AndroidAudioContentType.speech,
+              contentType: AndroidAudioContentType.music,
               flags: AndroidAudioFlags.none,
-              usage: AndroidAudioUsage.voiceCommunication,
+              usage: AndroidAudioUsage.media,
             ),
             androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
           ));
