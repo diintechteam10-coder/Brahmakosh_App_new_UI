@@ -61,7 +61,57 @@ class _NewHomeViewState extends State<NewHomeView> {
   List<Activities> _checkInActivities = [];
   bool _isCheckInLoading = false;
   String _selectedRemedyTab = "must_have";
+  // Coming Soon Projects State
+  final PageController _comingSoonPageController =
+      PageController(viewportFraction: 0.82);
+  int _comingSoonPageIndex = 0;
 
+final List<Map<String, String>> _comingSoonProjects = [
+    {
+      "title": "Brahmakosh \nExperience Centre",
+      "subtitle": "Immersive spiritual experiences",
+      "image": "assets/icons/Expereince.jpg",
+    },
+    {
+      "title": "Brahmagyaan Library",
+      "subtitle": "Knowledge meets consciousness",
+      "image": "assets/icons/library.jpg",
+    },
+    {
+      "title": "Brahma Bazar",
+      "subtitle": "Spiritual marketplace for all",
+      "image": "assets/icons/bazar.jpg",
+    },
+    {
+      "title": "Brahma Daan",
+      "subtitle": "Service with compassion",
+      "image": "assets/icons/charity.jpg",
+    },
+    {
+      "title": "Brahmakosh Gaushala",
+      "subtitle": "Protecting our sacred cows",
+      "image": "assets/icons/gaushala.jpg",
+    },
+    {
+      "title": "Brahmakosh Gurukul",
+      "subtitle": "Ancient wisdom for modern kids",
+      "image": "assets/icons/gurukul.jpg",
+    },
+    {
+      "title": "Brahma Vani",
+      "subtitle": "Voice of spiritual wisdom",
+      "image": "assets/icons/vani.jpg",
+    },
+    {
+      "title": "Brahma Yatra",
+      "subtitle": "Pilgrimage to sacred lands",
+      "image": "assets/icons/yatra.jpg",
+    },
+  ];
+
+  Timer? _comingSoonTimer;
+
+  // Focus management
   // Focus management
   final FocusNode _searchFocusNode = FocusNode();
   final FocusNode _swapnaFocusNode = FocusNode();
@@ -2345,11 +2395,11 @@ class _NewHomeViewState extends State<NewHomeView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       FutureBuilder<String>(
-                        future: TranslateHelper.translate(pooja.pujaName ?? "Unknown Puja"),
-                        initialData: pooja.pujaName ?? "Unknown Puja",
+                        future: TranslateHelper.translate(title),
+                        initialData: title,
                         builder: (context, snapshot) {
                           return Text(
-                            snapshot.data ?? "Unknown Puja",
+                            snapshot.data ?? title,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.lora(
@@ -2361,11 +2411,11 @@ class _NewHomeViewState extends State<NewHomeView> {
                         },
                       ),
                       FutureBuilder<String>(
-                        future: TranslateHelper.translate(pooja.subcategory ?? pooja.category ?? "Ritual"),
-                        initialData: pooja.subcategory ?? pooja.category ?? "Ritual",
+                        future: TranslateHelper.translate(desc),
+                        initialData: desc,
                         builder: (context, snapshot) {
                           return Text(
-                            snapshot.data ?? "Ritual",
+                            snapshot.data ?? desc,
                             style: GoogleFonts.lora(
                               color: const Color(0xFFD4AF37),
                               fontSize: 7.5.sp,
