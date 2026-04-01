@@ -3,11 +3,61 @@ import 'package:brahmakosh/features/redeem/models/redemption_history_model.dart'
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:brahmakosh/core/localization/translate_helper.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 
-class RedemptionHistoryView extends StatelessWidget {
+class RedemptionHistoryView extends StatefulWidget {
   const RedemptionHistoryView({super.key});
+
+  @override
+  State<RedemptionHistoryView> createState() => _RedemptionHistoryViewState();
+}
+
+class _RedemptionHistoryViewState extends State<RedemptionHistoryView> {
+  final Map<String, String> _dynamicTranslations = {};
+  String _lastLang = 'en';
+
+  Future<void> _translateAllContents(List<RedemptionHistoryModel> items) async {
+    final currentLang = Get.locale?.languageCode ?? 'en';
+    if (currentLang == 'en') {
+      if (_dynamicTranslations.isNotEmpty) {
+        setState(() {
+          _dynamicTranslations.clear();
+          _lastLang = 'en';
+        });
+      }
+      return;
+    }
+
+    final Set<String> toTranslate = {};
+
+    for (var h in items) {
+      final title = h.reward?.title;
+      if (title != null && title.isNotEmpty) toTranslate.add(title);
+    }
+
+    if (toTranslate.isEmpty) return;
+
+    final list = toTranslate.toList();
+    final results = await TranslateHelper.translateList(list);
+
+    bool changed = false;
+    for (int i = 0; i < list.length; i++) {
+      if (_dynamicTranslations[list[i]] != results[i]) {
+        _dynamicTranslations[list[i]] = results[i];
+        changed = true;
+      }
+    }
+
+    if (changed || _lastLang != currentLang) {
+      if (mounted) {
+        setState(() {
+          _lastLang = currentLang;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +69,10 @@ class RedemptionHistoryView extends StatelessWidget {
         controller.fetchRedemptionHistory();
       }
     });
+
+    if (controller.redemptionHistory.isNotEmpty) {
+      _translateAllContents(controller.redemptionHistory);
+    }
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -32,7 +86,7 @@ class RedemptionHistoryView extends StatelessWidget {
         centerTitle: false,
         titleSpacing: 0,
         title: Text(
-          "History",
+          "history_cap".tr,
           style: GoogleFonts.lora(
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
@@ -53,7 +107,7 @@ class RedemptionHistoryView extends StatelessWidget {
                 Icon(Icons.history_toggle_off, size: 50.sp, color: Colors.white10),
                 SizedBox(height: 2.h),
                 Text(
-                  "No history found",
+                  "no_history_found".tr,
                   style: GoogleFonts.poppins(color: Colors.white38, fontSize: 12.sp),
                 ),
               ],
@@ -122,7 +176,7 @@ class RedemptionHistoryView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      item.reward?.title ?? 'Sacred Offering',
+                      _dynamicTranslations[item.reward?.title] ?? (item.reward?.title ?? 'sacred_offering'.tr),
                       style: GoogleFonts.lora(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
@@ -165,7 +219,7 @@ class RedemptionHistoryView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Spent Karma",
+                "spent_karma".tr,
                 style: GoogleFonts.poppins(
                   fontSize: 10.sp,
                   color: Colors.white70,

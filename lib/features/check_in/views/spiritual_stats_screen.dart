@@ -7,9 +7,62 @@ import 'package:brahmakosh/features/profile/viewmodels/profile_viewmodel.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:brahmakosh/common/widgets/custom_profile_avatar.dart';
 import 'package:intl/intl.dart';
+import 'package:brahmakosh/core/localization/translate_helper.dart';
 
-class SpiritualStatsScreen extends StatelessWidget {
+class SpiritualStatsScreen extends StatefulWidget {
   const SpiritualStatsScreen({super.key});
+
+  @override
+  State<SpiritualStatsScreen> createState() => _SpiritualStatsScreenState();
+}
+
+class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
+  final Map<String, String> _dynamicTranslations = {};
+  String _lastLang = 'en';
+
+  Future<void> _translateAllContents(SpiritualStatsData data) async {
+    final currentLang = Get.locale?.languageCode ?? 'en';
+    if (currentLang == 'en') {
+      if (_dynamicTranslations.isNotEmpty) {
+        setState(() {
+          _dynamicTranslations.clear();
+          _lastLang = 'en';
+        });
+      }
+      return;
+    }
+
+    final Set<String> toTranslate = {};
+
+    // Total Stats labels if needed (though they are mostly static)
+    // Recent activities titles
+    if (data.recentActivities != null) {
+      for (var act in data.recentActivities!) {
+        if (act.title != null) toTranslate.add(act.title!);
+      }
+    }
+
+    if (toTranslate.isEmpty) return;
+
+    final list = toTranslate.toList();
+    final results = await TranslateHelper.translateList(list);
+
+    bool changed = false;
+    for (int i = 0; i < list.length; i++) {
+      if (_dynamicTranslations[list[i]] != results[i]) {
+        _dynamicTranslations[list[i]] = results[i];
+        changed = true;
+      }
+    }
+
+    if (changed || _lastLang != currentLang) {
+      if (mounted) {
+        setState(() {
+          _lastLang = currentLang;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +100,7 @@ class SpiritualStatsScreen extends StatelessWidget {
             ),
           ),
           title: Text(
-            'MY CHECK-IN',
+            'my_checkin_title'.tr,
             style: GoogleFonts.lora(
               color: const Color(0xFFD4AF37), // Primary Gold
               fontWeight: FontWeight.bold,
@@ -70,8 +123,10 @@ class SpiritualStatsScreen extends StatelessWidget {
                   ),
                 );
               } else if (state is SpiritualStatsLoaded) {
+                _translateAllContents(state.data);
                 return _buildContent(context, state.data);
               }
+
               return const SizedBox.shrink();
             },
           ),
@@ -102,8 +157,8 @@ class SpiritualStatsScreen extends StatelessWidget {
                 _buildTotalStatsGrid(data.totalStats!),
               const SizedBox(height: 32),
               if (data.categoryStats != null) ...[
-                Text(
-                  'ACTIVITY BREAKDOWN',
+                 Text(
+                  'activity_breakdown'.tr,
                   style: GoogleFonts.lora(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -118,7 +173,7 @@ class SpiritualStatsScreen extends StatelessWidget {
               if (data.recentActivities != null &&
                   data.recentActivities!.isNotEmpty) ...[
                 Text(
-                  'RECENT HISTORY',
+                  'recent_history'.tr,
                   style: GoogleFonts.lora(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -170,7 +225,7 @@ class SpiritualStatsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                user.name ?? 'Seeker',
+                user.name ?? 'seeker'.tr,
                 style: GoogleFonts.lora(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -200,7 +255,7 @@ class SpiritualStatsScreen extends StatelessWidget {
           children: [
             Expanded(
               child: _buildStatCard(
-                'Total Sessions',
+                'total_sessions'.tr,
                 '${stats.sessions ?? 0}',
                 Icons.spa,
               ),
@@ -208,7 +263,7 @@ class SpiritualStatsScreen extends StatelessWidget {
             const SizedBox(width: 16),
             Expanded(
               child: _buildStatCard(
-                'Karma Points',
+                'karma_points'.tr,
                 '${stats.karmaPoints ?? 0}',
                 Icons.star,
               ),
@@ -220,7 +275,7 @@ class SpiritualStatsScreen extends StatelessWidget {
           children: [
             Expanded(
               child: _buildStatCard(
-                'Minutes Spent',
+                'minutes_spent'.tr,
                 '${stats.minutes ?? 0}',
                 Icons.timer,
               ),
@@ -228,7 +283,7 @@ class SpiritualStatsScreen extends StatelessWidget {
             const SizedBox(width: 16),
             Expanded(
               child: _buildStatCard(
-                'Avg Completion',
+                'avg_completion'.tr,
                 '${stats.averageCompletion ?? 0}%',
                 Icons.pie_chart,
               ),
@@ -290,22 +345,22 @@ class SpiritualStatsScreen extends StatelessWidget {
     // Prepare data for Pie Chart
     final List<Map<String, dynamic>> categories = [
       {
-        'name': 'Chanting',
+        'name': 'chanting'.tr,
         'value': stats.chanting?.sessions ?? 0,
         'color': const Color(0xffFFB74D),
       },
       {
-        'name': 'Prayer',
+        'name': 'prayer'.tr,
         'value': stats.prayer?.sessions ?? 0,
         'color': const Color(0xff64B5F6),
       },
       {
-        'name': 'Meditation',
+        'name': 'meditation'.tr,
         'value': stats.meditation?.sessions ?? 0,
         'color': const Color(0xff81C784),
       },
       {
-        'name': 'Silence',
+        'name': 'silence'.tr,
         'value': stats.silence?.sessions ?? 0,
         'color': const Color(0xffBA68C8),
       },
@@ -314,7 +369,7 @@ class SpiritualStatsScreen extends StatelessWidget {
     if (categories.isEmpty) {
       return Center(
         child: Text(
-          "No category data available yet.",
+          "no_recent_activities".tr,
           style: GoogleFonts.lora(color: Colors.white54),
         ),
       );
@@ -409,8 +464,8 @@ class SpiritualStatsScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      activity.title ?? 'Unknown Activity',
+                      Text(
+                        _dynamicTranslations[activity.title] ?? activity.title ?? 'unknown_activity'.tr,
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -446,7 +501,7 @@ class SpiritualStatsScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        '+${activity.karmaPoints} Karma',
+                        "karma_points_earned".trParams({'points': '${activity.karmaPoints}'}),
                         style: GoogleFonts.poppins(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
@@ -456,7 +511,7 @@ class SpiritualStatsScreen extends StatelessWidget {
                     ),
                   const SizedBox(height: 4),
                   Text(
-                    activity.status == 'completed' ? 'Completed' : 'Incomplete',
+                    activity.status == 'completed' ? 'completed_cap'.tr : 'incomplete_cap'.tr,
                     style: GoogleFonts.poppins(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,

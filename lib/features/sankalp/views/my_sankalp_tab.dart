@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' hide Transition;
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/translate_helper.dart';
 
 import '../blocs/sankalp_bloc.dart';
 import '../blocs/sankalp_event.dart';
@@ -11,8 +12,58 @@ import '../models/sankalp_model.dart';
 import 'sankalp_progress_screen.dart';
 import 'choose_sankalp_screen.dart';
 
-class MySankalpTab extends StatelessWidget {
+class MySankalpTab extends StatefulWidget {
   const MySankalpTab({super.key});
+
+  @override
+  State<MySankalpTab> createState() => _MySankalpTabState();
+}
+
+class _MySankalpTabState extends State<MySankalpTab> {
+  final Map<String, String> _dynamicTranslations = {};
+  String _lastLang = 'en';
+
+  Future<void> _translateAllContents(List<UserSankalpModel> sankalps) async {
+    final currentLang = Get.locale?.languageCode ?? 'en';
+    if (currentLang == 'en') {
+      if (_dynamicTranslations.isNotEmpty) {
+        setState(() {
+          _dynamicTranslations.clear();
+          _lastLang = 'en';
+        });
+      }
+      return;
+    }
+
+    final Set<String> toTranslate = {};
+
+    for (var us in sankalps) {
+      if (us.sankalp.title.isNotEmpty) {
+        toTranslate.add(us.sankalp.title);
+      }
+    }
+
+    if (toTranslate.isEmpty) return;
+
+    final list = toTranslate.toList();
+    final results = await TranslateHelper.translateList(list);
+
+    bool changed = false;
+    for (int i = 0; i < list.length; i++) {
+      if (_dynamicTranslations[list[i]] != results[i]) {
+        _dynamicTranslations[list[i]] = results[i];
+        changed = true;
+      }
+    }
+
+    if (changed || _lastLang != currentLang) {
+      if (mounted) {
+        setState(() {
+          _lastLang = currentLang;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +82,9 @@ class MySankalpTab extends StatelessWidget {
           activeSankalps = state.userSankalps
               .where((s) => s.status == 'active')
               .toList();
+          _translateAllContents(activeSankalps);
         }
+
 
         if (activeSankalps.isEmpty) {
           if (state is SankalpLoading) {
@@ -109,7 +162,7 @@ class MySankalpTab extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "Choose Another Sankalp",
+                          "choose_another_sankalp".tr,
                           style: GoogleFonts.poppins(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -154,7 +207,7 @@ class MySankalpTab extends StatelessWidget {
                 text: TextSpan(
                   children: [
                     TextSpan(
-                      text: "Start your first ",
+                      text: "start_first_sankalp".tr,
                       style: GoogleFonts.poppins(
                         fontSize: 22,
                         fontWeight: FontWeight.w500,
@@ -176,7 +229,7 @@ class MySankalpTab extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 50),
                 child: Text(
-                  "Choose a sankalp to begin your journey\ntowards a more mindful life.",
+                    "sankalp_journey_desc".tr,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
                     fontSize: 13,
@@ -221,7 +274,7 @@ class MySankalpTab extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        "Choose Sankalp",
+                        "choose_sankalp".tr,
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -240,7 +293,7 @@ class MySankalpTab extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               Text(
-                "YOUR SPRITUAL PATH AWAITS",
+                "your_spiritual_path".tr,
                 style: GoogleFonts.poppins(
                   fontSize: 11,
                   letterSpacing: 1.2,
@@ -282,7 +335,7 @@ class MySankalpTab extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  sankalp.title,
+                  _dynamicTranslations[sankalp.title] ?? sankalp.title,
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -341,7 +394,7 @@ class MySankalpTab extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "DAILY PROGESS",
+                "daily_progress".tr,
                 style: GoogleFonts.poppins(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -437,7 +490,7 @@ class MySankalpTab extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "View Progress",
+                    "view_progress".tr,
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -472,7 +525,7 @@ class MySankalpTab extends StatelessWidget {
               const Icon(Icons.check_circle, color: Color(0xFF4CAF50), size: 60),
               const SizedBox(height: 16),
               Text(
-                "Great Job!",
+                "great_job".tr,
                 style: GoogleFonts.lora(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -505,7 +558,7 @@ class MySankalpTab extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                   child: Text(
-                    "Keep Going",
+                    "keep_going".tr,
                     style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
                   ),
                 ),

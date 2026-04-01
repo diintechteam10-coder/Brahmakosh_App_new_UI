@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' hide Transition;
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/translate_helper.dart';
 import '../blocs/sankalp_bloc.dart';
 import '../blocs/sankalp_event.dart';
 import '../blocs/sankalp_state.dart';
@@ -17,6 +18,49 @@ class ChooseSankalpScreen extends StatefulWidget {
 }
 
 class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
+  final Map<String, String> _dynamicTranslations = {};
+  String _lastLang = 'en';
+
+  Future<void> _translateAllContents(List<SankalpModel> sankalps) async {
+    final currentLang = Get.locale?.languageCode ?? 'en';
+    if (currentLang == 'en') {
+      if (_dynamicTranslations.isNotEmpty) {
+        setState(() {
+          _dynamicTranslations.clear();
+          _lastLang = 'en';
+        });
+      }
+      return;
+    }
+
+    final Set<String> toTranslate = {};
+
+    for (var s in sankalps) {
+      if (s.title.isNotEmpty) toTranslate.add(s.title);
+      if (s.description.isNotEmpty) toTranslate.add(s.description);
+    }
+
+    if (toTranslate.isEmpty) return;
+
+    final list = toTranslate.toList();
+    final results = await TranslateHelper.translateList(list);
+
+    bool changed = false;
+    for (int i = 0; i < list.length; i++) {
+      if (_dynamicTranslations[list[i]] != results[i]) {
+        _dynamicTranslations[list[i]] = results[i];
+        changed = true;
+      }
+    }
+
+    if (changed || _lastLang != currentLang) {
+      if (mounted) {
+        setState(() {
+          _lastLang = currentLang;
+        });
+      }
+    }
+  }
   @override
   void initState() {
     super.initState();
@@ -79,7 +123,9 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
               if (state is SankalpLoaded) {
                 sankalps = state.availableSankalps;
                 userSankalps = state.userSankalps;
+                _translateAllContents(sankalps);
               }
+
 
               if (sankalps.isEmpty) {
                 if (state is SankalpLoading) {
@@ -184,7 +230,7 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
                 children: [
                   Expanded(
                     child: Text(
-                      sankalp.title,
+                      _dynamicTranslations[sankalp.title] ?? sankalp.title,
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -243,7 +289,7 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    sankalp.description,
+                    _dynamicTranslations[sankalp.description] ?? sankalp.description,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.poppins(

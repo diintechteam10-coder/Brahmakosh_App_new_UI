@@ -30,6 +30,8 @@ class _CheckInViewState extends State<CheckInView>
   // final CheckInController controller = Get.put(CheckInController()); // Removed
   int _currentStatIndex = 0;
   Timer? _timer;
+  final Map<String, String> _dynamicTranslations = {};
+  String _lastLang = 'en';
 
   @override
   void initState() {
@@ -73,6 +75,62 @@ class _CheckInViewState extends State<CheckInView>
     }
   }
 
+  Future<void> _translateAllContents(Data data) async {
+    final currentLang = Get.locale?.languageCode ?? 'en';
+    if (currentLang == 'en') {
+      if (_dynamicTranslations.isNotEmpty) {
+        setState(() {
+          _dynamicTranslations.clear();
+          _lastLang = 'en';
+        });
+      }
+      return;
+    }
+
+    final Set<String> toTranslate = {};
+    
+    // Activity titles
+    if (data.activities != null) {
+      for (var act in data.activities!) {
+        if (act.title != null) toTranslate.add(act.title!);
+      }
+    }
+
+    // Recent activity titles
+    if (data.recentActivities != null) {
+      for (var act in data.recentActivities!) {
+        if (act.title != null) toTranslate.add(act.title!);
+      }
+    }
+
+    // Motivation text
+    if (data.motivation?.text != null) {
+      toTranslate.add(data.motivation!.text!);
+    }
+
+    if (toTranslate.isEmpty) return;
+
+    final list = toTranslate.toList();
+    final results = await TranslateHelper.translateList(list);
+
+    bool changed = false;
+    for (int i = 0; i < list.length; i++) {
+      if (_dynamicTranslations[list[i]] != results[i]) {
+        _dynamicTranslations[list[i]] = results[i];
+        changed = true;
+      }
+    }
+
+    if (changed || _lastLang != currentLang) {
+      if (mounted) {
+        setState(() {
+          _lastLang = currentLang;
+        });
+      }
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -112,7 +170,9 @@ class _CheckInViewState extends State<CheckInView>
           } else if (state is CheckInLoaded) {
             // Close any lingering dialogs if needed (e.g. from refresh)
             if (Get.isDialogOpen == true) Get.back();
+            _translateAllContents(state.data);
           }
+
         },
         builder: (context, state) {
           if (state is CheckInLoading) {
@@ -192,8 +252,8 @@ class _CheckInViewState extends State<CheckInView>
                                   },
                                 ),
                               ),
-                              Text(
-                                '#AreYouSpiritual',
+                                Text(
+                                  'are_you_spiritual'.tr,
                                 style: GoogleFonts.lora(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -273,42 +333,36 @@ class _CheckInViewState extends State<CheckInView>
                               itemBuilder: (context, index) {
                                 final activities = finalData.activities!;
                                 final activity = activities[index];
-                                return FutureBuilder<String>(
-                                  future: TranslateHelper.translate(activity.title ?? ''),
-                                  initialData: activity.title ?? '',
-                                  builder: (context, snapshot) {
-                                    return _card(
-                                      image: activity.image,
-                                      title: snapshot.data?.toUpperCase() ?? '',
-                                      onTap: () {
-                                        if (activity.route != null) {
-                                          final title = activity.title ?? '';
-                                          if (title == 'Chanting') {
-                                            Get.to(
-                                              () => ChantingConfigurationView(
-                                                chantingCategoryId: activity.id!,
-                                              ),
-                                            );
-                                          } else if (title == 'Prayer' &&
-                                              activity.id != null) {
-                                            Get.to(
-                                              () => PrayerConfigurationView(
-                                                prayerCategoryId: activity.id!,
-                                              ),
-                                            );
-                                          } else if (activity.id != null) {
-                                            context.read<CheckInBloc>().add(
-                                              SelectActivity(
-                                                activityId: activity.id!,
-                                                route: AppConstants
-                                                    .routeSpiritualConfiguration,
-                                                title: activity.title,
-                                              ),
-                                            );
-                                          }
-                                        }
-                                      },
-                                    );
+                                return _card(
+                                  image: activity.image,
+                                  title: (_dynamicTranslations[activity.title] ?? activity.title ?? '').toUpperCase(),
+                                  onTap: () {
+                                    if (activity.route != null) {
+                                      final title = activity.title ?? '';
+                                      if (title == 'Chanting') {
+                                        Get.to(
+                                          () => ChantingConfigurationView(
+                                            chantingCategoryId: activity.id!,
+                                          ),
+                                        );
+                                      } else if (title == 'Prayer' &&
+                                          activity.id != null) {
+                                        Get.to(
+                                          () => PrayerConfigurationView(
+                                            prayerCategoryId: activity.id!,
+                                          ),
+                                        );
+                                      } else if (activity.id != null) {
+                                        context.read<CheckInBloc>().add(
+                                          SelectActivity(
+                                            activityId: activity.id!,
+                                            route: AppConstants
+                                                .routeSpiritualConfiguration,
+                                            title: activity.title,
+                                          ),
+                                        );
+                                      }
+                                    }
                                   },
                                 );
                               },
@@ -657,15 +711,15 @@ class _CheckInViewState extends State<CheckInView>
             if (stats.bonus != null) ...[
               const Divider(color: Colors.white12, height: 1),
               _bonusRedemptionRow(
-                'Bonus',
-                '${stats.bonus!.count} bonuses • ${stats.bonus!.totalBonusPoints} points',
+                'bonus'.tr,
+                '${"bonuses_label".trParams({'count': '${stats.bonus!.count}'})} • ${"points_label".trParams({'count': '${stats.bonus!.totalBonusPoints}'})}',
               ),
             ],
             if (stats.redemption != null) ...[
               const Divider(color: Colors.white12, height: 1),
               _bonusRedemptionRow(
-                'Redemption',
-                '${stats.redemption!.count} redemptions • ${stats.redemption!.totalRedeemPoints} points',
+                'redemption'.tr,
+                '${"redemptions_label".trParams({'count': '${stats.redemption!.count}'})} • ${"points_label".trParams({'count': '${stats.redemption!.totalRedeemPoints}'})}',
               ),
             ],
           ],
@@ -724,7 +778,7 @@ class _CheckInViewState extends State<CheckInView>
           Expanded(
             flex: 1,
             child: Text(
-              '${detail.minutes} m',
+              '${detail.minutes} ${"mins_short".tr}',
               textAlign: TextAlign.right,
               style: GoogleFonts.poppins(fontSize: 13, color: Colors.white54),
             ),
@@ -787,19 +841,13 @@ class _CheckInViewState extends State<CheckInView>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          FutureBuilder<String>(
-                            future: TranslateHelper.translate(activity.title ?? ''),
-                            initialData: activity.title ?? '',
-                            builder: (context, snapshot) {
-                              return Text(
-                                snapshot.data ?? '',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              );
-                            },
+                          Text(
+                            _dynamicTranslations[activity.title] ?? activity.title ?? '',
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Text(

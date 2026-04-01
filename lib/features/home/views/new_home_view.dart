@@ -66,7 +66,7 @@ class _NewHomeViewState extends State<NewHomeView> {
       PageController(viewportFraction: 0.82);
   int _comingSoonPageIndex = 0;
 
-final List<Map<String, String>> _comingSoonProjects = [
+  final List<Map<String, String>> _comingSoonProjects = [
     {
       "title": "Brahmakosh \nExperience Centre",
       "subtitle": "Immersive spiritual experiences",
@@ -109,6 +109,73 @@ final List<Map<String, String>> _comingSoonProjects = [
     },
   ];
 
+  // Remedy lists moved to class level for pre-translation
+  final List<Map<String, String>> _mustHaveRemedies = [
+    {
+      "title": "7 Mukhi Rudraksha",
+      "subtitle": "For spiritual protection & planet Saturn...",
+      "price": "1,299",
+      "image":
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSs1hx27RUdRVHpThGV_4DN3712p8UCKtndeA&s",
+    },
+    {
+      "title": "Yellow Sapphire",
+      "subtitle": "For wealth, prosperity & planet Jupiter...",
+      "price": "15,500",
+      "image":
+          "https://www.shivaago.com/wp-content/uploads/2021/03/IMG_20210307_160026_compress32-600x486.jpg",
+    },
+  ];
+
+  final List<Map<String, String>> _goodToHaveRemedies = [
+    {
+      "title": "Sphatik Mala",
+      "subtitle": "For peace, concentration & planet Moon...",
+      "price": "850",
+      "image":
+          "https://ik.imagekit.io/gemsonline/wp-content/uploads/2026/01/Spetics-mala-3-scaled.jpg",
+    },
+    {
+      "title": "Gomati Chakra",
+      "subtitle": "For protection, prosperity and bringing luck...",
+      "price": "150",
+      "image":
+          "https://m.media-amazon.com/images/I/A1QIkWYHngL._AC_UY1100_.jpg",
+    },
+  ];
+
+  final List<Map<String, dynamic>> _spiritualTools = [
+    {
+      "title": "Remedies",
+      "desc": "Protect your energy & remove negativity",
+      "icon": "assets/icons/remedies.png",
+      "onTapId": 4, // Tab index
+    },
+    {
+      "title": "Puja Vidhi",
+      "desc": "Perform rituals with step-by-step guidance",
+      "icon": "assets/icons/puja_vidhi.png",
+      "route": AppConstants.routePoojaList,
+    },
+    {
+      "title": "Reports",
+      "desc": "Get deep insights into your life's path",
+      "icon": "assets/icons/reports.png",
+      "isComingSoon": true,
+    },
+    {
+      "title": "Courses",
+      "desc": "Learn sacred wisdom from experts",
+      "icon": "assets/icons/courses.png",
+      "isComingSoon": true,
+    },
+  ];
+
+  // Dynamic Translation Cache for this view
+  final Map<String, String> _dynamicTranslations = {};
+  String _lastLang = 'en';
+
+
   Timer? _comingSoonTimer;
 
   // Focus management
@@ -122,14 +189,77 @@ final List<Map<String, String>> _comingSoonProjects = [
   @override
   void initState() {
     super.initState();
+    _lastLang = Get.locale?.languageCode ?? 'en';
     // Ensure data is fresh when viewing
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _translateAllContents();
       _handleRefresh();
       _fetchCheckInData();
       _unfocusAll(); // Initial clean state
       context.read<NotificationBloc>().add(RefreshUnreadCount());
       _startComingSoonTimer();
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final currentLang = Get.locale?.languageCode ?? 'en';
+    if (currentLang != _lastLang) {
+      _lastLang = currentLang;
+      _translateAllContents();
+    }
+  }
+
+  Future<void> _translateAllContents() async {
+    final lang = Get.locale?.languageCode ?? 'en';
+    if (lang == 'en') {
+      setState(() => _dynamicTranslations.clear());
+      return;
+    }
+
+    final Set<String> toTranslate = {};
+
+    // Collect from coming soon
+    for (var p in _comingSoonProjects) {
+      if (p["title"] != null) toTranslate.add(p["title"]!);
+      if (p["subtitle"] != null) toTranslate.add(p["subtitle"]!);
+    }
+
+    // Collect from remedies
+    for (var r in _mustHaveRemedies) {
+      if (r["title"] != null) toTranslate.add(r["title"]!);
+      if (r["subtitle"] != null) toTranslate.add(r["subtitle"]!);
+    }
+    for (var r in _goodToHaveRemedies) {
+      if (r["title"] != null) toTranslate.add(r["title"]!);
+      if (r["subtitle"] != null) toTranslate.add(r["subtitle"]!);
+    }
+
+    // Collect from tools
+    for (var t in _spiritualTools) {
+      if (t["title"] != null) toTranslate.add(t["title"]!);
+      if (t["desc"] != null) toTranslate.add(t["desc"]!);
+    }
+
+    // Collect from experts currently loaded
+    for (var e in astrologyController.experts) {
+      if (e.name != null) toTranslate.add(e.name!);
+      if (e.expertise != null) toTranslate.add(e.expertise!);
+    }
+
+    if (toTranslate.isEmpty) return;
+
+    final list = toTranslate.toList();
+    final results = await TranslateHelper.translateList(list);
+
+    if (mounted) {
+      setState(() {
+        for (int i = 0; i < list.length; i++) {
+          _dynamicTranslations[list[i]] = results[i];
+        }
+      });
+    }
   }
 
   void _startComingSoonTimer() {
@@ -214,6 +344,7 @@ final List<Map<String, String>> _comingSoonProjects = [
       Provider.of<ProfileViewModel>(context, listen: false).refreshProfile(),
     ]);
     if (mounted) {
+      _translateAllContents(); // Update translations for newly loaded experts
       context.read<NotificationBloc>().add(RefreshUnreadCount());
     }
   }
@@ -472,7 +603,7 @@ final List<Map<String, String>> _comingSoonProjects = [
               ),
               const SizedBox(height: 4),
               Text(
-                "Your Spiritual Operating System",
+                "your_spiritual_os".tr,
                 style: GoogleFonts.poppins(
                   color: Colors.white.withOpacity(0.6),
                   fontSize: 12.sp,
@@ -498,9 +629,9 @@ final List<Map<String, String>> _comingSoonProjects = [
               Expanded(
                 child: _buildBannerItem(
                   title: "Rashmi",
-                  role: "Spiritual Guide",
-                  description: "Get guidance on astrology, puja, rituals & spiritual practice",
-                  buttonText: "ASK SPIRITUAL GUIDE",
+                  role: "spiritual_guide".tr,
+                  description: "ask_deity_desc_short".tr,
+                  buttonText: "ask_spiritual_guide".tr,
                   imageUrl: 'assets/icons/rashmi_new_avatar.png',
                   alignment: const Alignment(0, -0.6), // Pull Rashmi up slightly
                   onPressed: () {
@@ -520,9 +651,9 @@ final List<Map<String, String>> _comingSoonProjects = [
               SizedBox(width: 3.w),
               Expanded(
                 child: _buildBannerItem(
-                  title: "Talk to Krishna",
-                  description: "Seek timeless wisdom from the Bhagavad Gita.",
-                  buttonText: "START CONVERSATION",
+                  title: "talk_to_krishna".tr,
+                  description: "krishna_desc".tr,
+                  buttonText: "start_conversation".tr,
                   imageUrl: 'assets/icons/Krishna_new_avatar.png',
                   alignment: Alignment.topCenter, // Keep Krishna as is
                   onPressed: () {
@@ -701,7 +832,7 @@ final List<Map<String, String>> _comingSoonProjects = [
             borderRadius: BorderRadius.circular(10),
           ),
           child: Text(
-            'Coming Soon',
+            'coming_soon'.tr,
             style: GoogleFonts.poppins(
               color: Colors.white,
               fontSize: 6.sp,
@@ -822,12 +953,12 @@ final List<Map<String, String>> _comingSoonProjects = [
             },
           ),
           _buildGridItem(
-            "Reports",
+            "reports".tr,
             "assets/icons/reports.png",
             showComingSoon: false,
             onTap: () {
               _unfocusAll();
-              Get.dialog(const ComingSoonPopup(feature: "Reports"));
+              Get.dialog(ComingSoonPopup(feature: "reports".tr));
             },
           ),
           _buildGridItem(
@@ -855,12 +986,12 @@ final List<Map<String, String>> _comingSoonProjects = [
             },
           ),
           _buildGridItem(
-            "Courses",
+            "courses".tr,
             "assets/icons/courses.png",
             showComingSoon: true,
             onTap: () {
               _unfocusAll();
-              Get.dialog(const ComingSoonPopup(feature: "Courses"));
+              Get.dialog(ComingSoonPopup(feature: "courses".tr));
             },
           ),
         ]),
@@ -1414,19 +1545,13 @@ final List<Map<String, String>> _comingSoonProjects = [
                       Row(
                         children: [
                           Expanded(
-                            child: FutureBuilder<String>(
-                              future: TranslateHelper.translate(expert.name ?? "Expert"),
-                              initialData: expert.name ?? "Expert",
-                              builder: (context, snapshot) {
-                                return Text(
-                                  snapshot.data ?? "Expert",
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.white,
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                );
-                              },
+                            child: Text(
+                              _dynamicTranslations[expert.name] ?? expert.name ?? "Expert",
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
                           SizedBox(width: 8),
@@ -1452,21 +1577,15 @@ final List<Map<String, String>> _comingSoonProjects = [
                           ),
                         ],
                       ),
-                      FutureBuilder<String>(
-                        future: TranslateHelper.translate(expert.expertise ?? "Astrology"),
-                        initialData: expert.expertise ?? "Astrology",
-                        builder: (context, snapshot) {
-                          return Text(
-                            snapshot.data ?? "Astrology",
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.poppins(
-                              color: Colors.white.withOpacity(0.5),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          );
-                        },
+                      Text(
+                        _dynamicTranslations[expert.expertise] ?? expert.expertise ?? "Astrology",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.poppins(
+                          color: Colors.white.withOpacity(0.5),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                     ],
                   ),
@@ -2007,44 +2126,9 @@ final List<Map<String, String>> _comingSoonProjects = [
   }
 
   Widget _buildRemediesSection(double screenWidth) {
-    // Hardcoded remedy data
-    final mustHaveRemedies = [
-      {
-        "title": "7 Mukhi Rudraksha",
-        "subtitle": "For spiritual protection & planet Saturn...",
-        "price": "1,299",
-        "image":
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSs1hx27RUdRVHpThGV_4DN3712p8UCKtndeA&s",
-      },
-      {
-        "title": "Yellow Sapphire",
-        "subtitle": "For wealth, prosperity & planet Jupiter...",
-        "price": "15,500",
-        "image":
-            "https://www.shivaago.com/wp-content/uploads/2021/03/IMG_20210307_160026_compress32-600x486.jpg",
-      },
-    ];
-
-    final goodToHaveRemedies = [
-      {
-        "title": "Sphatik Mala",
-        "subtitle": "For peace, concentration & planet Moon...",
-        "price": "850",
-        "image":
-            "https://ik.imagekit.io/gemsonline/wp-content/uploads/2026/01/Spetics-mala-3-scaled.jpg",
-      },
-      {
-        "title": "Gomati Chakra",
-        "subtitle": "For protection, prosperity and bringing luck...",
-        "price": "150",
-        "image":
-            "https://m.media-amazon.com/images/I/A1QIkWYHngL._AC_UY1100_.jpg",
-      },
-    ];
-
     final displayedRemedies = _selectedRemedyTab == "must_have"
-        ? mustHaveRemedies
-        : goodToHaveRemedies;
+        ? _mustHaveRemedies
+        : _goodToHaveRemedies;
 
     return SliverToBoxAdapter(
       child: Padding(
@@ -2112,23 +2196,16 @@ final List<Map<String, String>> _comingSoonProjects = [
                 itemCount: displayedRemedies.length,
                 itemBuilder: (context, index) {
                   final remedy = displayedRemedies[index];
-                  return FutureBuilder<List<String>>(
-                    future: Future.wait([
-                      TranslateHelper.translate(remedy["title"]!),
-                      TranslateHelper.translate(remedy["subtitle"]!),
-                    ]),
-                    initialData: [remedy["title"]!, remedy["subtitle"]!],
-                    builder: (context, snapshot) {
-                      final translated = snapshot.data!;
-                      return _buildProductCard(
-                        translated[0],
-                        translated[1],
-                        remedy["price"]!,
-                        remedy["image"]!,
-                        screenWidth,
-                        isNetwork: true,
-                      );
-                    },
+                  final title = remedy["title"]!;
+                  final subtitle = remedy["subtitle"]!;
+                  
+                  return _buildProductCard(
+                    _dynamicTranslations[title] ?? title,
+                    _dynamicTranslations[subtitle] ?? subtitle,
+                    remedy["price"]!,
+                    remedy["image"]!,
+                    screenWidth,
+                    isNetwork: true,
                   );
                 },
               ),
@@ -2271,46 +2348,6 @@ final List<Map<String, String>> _comingSoonProjects = [
   }
 
   Widget _buildSpiritualToolsSection(double screenWidth) {
-    final tools = [
-      {
-        "title": "Remedies",
-        "desc": "Protect your energy & remove negativity",
-        "icon": "assets/icons/remedies.png",
-        "onTap": () {
-          _unfocusAll();
-          Provider.of<DashboardViewModel>(context, listen: false).changeTab(4);
-        },
-      },
-      {
-        "title": "Puja Vidhi",
-        "desc": "Perform rituals with step-by-step guidance",
-        "icon": "assets/icons/puja_vidhi.png",
-        "onTap": () {
-          _unfocusAll();
-          Get.toNamed(AppConstants.routePoojaList);
-        },
-      },
-      {
-        "title": "Reports",
-        "desc": "Get deep insights into your life's path",
-        "icon": "assets/icons/reports.png",
-        "isComingSoon": true,
-        "onTap": () {
-          _unfocusAll();
-          Get.dialog(const ComingSoonPopup(feature: "Reports"));
-        },
-      },
-      {
-        "title": "Courses",
-        "desc": "Learn sacred wisdom from experts",
-        "icon": "assets/icons/courses.png",
-        "isComingSoon": true,
-        "onTap": () {
-          _unfocusAll();
-          Get.dialog(const ComingSoonPopup(feature: "Courses"));
-        },
-      },
-    ];
 
     return SliverToBoxAdapter(
       child: Padding(
@@ -2336,15 +2373,24 @@ final List<Map<String, String>> _comingSoonProjects = [
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                itemCount: tools.length,
+                itemCount: _spiritualTools.length,
                 itemBuilder: (context, index) {
-                  final tool = tools[index];
+                  final tool = _spiritualTools[index];
                   return _buildSpiritualToolCard(
                     tool["title"] as String,
                     tool["desc"] as String,
                     tool["icon"] as String,
                     screenWidth,
-                    tool["onTap"] as VoidCallback,
+                    () {
+                      _unfocusAll();
+                      if (tool["onTapId"] != null) {
+                        Provider.of<DashboardViewModel>(context, listen: false).changeTab(tool["onTapId"] as int);
+                      } else if (tool["route"] != null) {
+                        Get.toNamed(tool["route"] as String);
+                      } else if (tool["isComingSoon"] == true) {
+                        Get.dialog(ComingSoonPopup(feature: tool["title"] as String));
+                      }
+                    },
                     isComingSoon: tool["isComingSoon"] as bool? ?? false,
                   );
                 },
@@ -2394,35 +2440,23 @@ final List<Map<String, String>> _comingSoonProjects = [
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      FutureBuilder<String>(
-                        future: TranslateHelper.translate(title),
-                        initialData: title,
-                        builder: (context, snapshot) {
-                          return Text(
-                            snapshot.data ?? title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.lora(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          );
-                        },
+                      Text(
+                        _dynamicTranslations[title] ?? title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.lora(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      FutureBuilder<String>(
-                        future: TranslateHelper.translate(desc),
-                        initialData: desc,
-                        builder: (context, snapshot) {
-                          return Text(
-                            snapshot.data ?? desc,
-                            style: GoogleFonts.lora(
-                              color: const Color(0xFFD4AF37),
-                              fontSize: 7.5.sp,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          );
-                        },
+                      Text(
+                        _dynamicTranslations[desc] ?? desc,
+                        style: GoogleFonts.lora(
+                          color: const Color(0xFFD4AF37),
+                          fontSize: 7.5.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
                   ),
@@ -2446,7 +2480,7 @@ final List<Map<String, String>> _comingSoonProjects = [
                   ),
                 ),
                 child: Text(
-                  "EXPLORE",
+                  "explore_cap".tr,
                   style: GoogleFonts.poppins(
                     fontSize: 12.5.sp,
                     fontWeight: FontWeight.bold,
@@ -2982,7 +3016,7 @@ final List<Map<String, String>> _comingSoonProjects = [
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
-                    project["title"]!,
+                    _dynamicTranslations[project["title"]] ?? project["title"]!,
                     style: GoogleFonts.lora(
                       color: Colors.white,
                       fontSize: 14.5.sp,
@@ -2992,7 +3026,7 @@ final List<Map<String, String>> _comingSoonProjects = [
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    project["subtitle"]!,
+                    _dynamicTranslations[project["subtitle"]] ?? project["subtitle"]!,
                     style: GoogleFonts.poppins(
                       color: Colors.white.withOpacity(0.7),
                       fontSize: 9.sp,

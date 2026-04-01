@@ -20,6 +20,50 @@ class PoojaListScreen extends StatefulWidget {
 }
 
 class _PoojaListScreenState extends State<PoojaListScreen> {
+  final Map<String, String> _dynamicTranslations = {};
+  String _lastLang = 'en';
+
+  Future<void> _translateAllContents(List<PoojaModel> poojas) async {
+    final currentLang = Get.locale?.languageCode ?? 'en';
+    if (currentLang == 'en') {
+      if (_dynamicTranslations.isNotEmpty) {
+        setState(() {
+          _dynamicTranslations.clear();
+          _lastLang = 'en';
+        });
+      }
+      return;
+    }
+
+    final Set<String> toTranslate = {};
+    for (var pooja in poojas) {
+      if (pooja.pujaName != null) toTranslate.add(pooja.pujaName!);
+      if (pooja.category != null) toTranslate.add(pooja.category!);
+      if (pooja.bestDay != null) toTranslate.add(pooja.bestDay!);
+    }
+
+    if (toTranslate.isEmpty) return;
+
+    final list = toTranslate.toList();
+    final results = await TranslateHelper.translateList(list);
+
+    bool changed = false;
+    for (int i = 0; i < list.length; i++) {
+      if (_dynamicTranslations[list[i]] != results[i]) {
+        _dynamicTranslations[list[i]] = results[i];
+        changed = true;
+      }
+    }
+
+    if (changed || _lastLang != currentLang) {
+      if (mounted) {
+        setState(() {
+          _lastLang = currentLang;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -153,6 +197,11 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                   if (state is PoojaLoading) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (state is PoojaLoaded) {
+                    // Trigger translation
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _translateAllContents(state.filteredPoojas);
+                    });
+                    
                     return ListView.builder(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       itemCount: state.filteredPoojas.length,
@@ -243,35 +292,23 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  FutureBuilder<String>(
-                    future: TranslateHelper.translate(pooja.pujaName ?? "Unknown Puja"),
-                    initialData: pooja.pujaName ?? "Unknown Puja",
-                    builder: (context, snapshot) {
-                      return Text(
-                        snapshot.data ?? (pooja.pujaName ?? "Unknown Puja"),
-                        style: GoogleFonts.lora(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      );
-                    },
+                  Text(
+                    _dynamicTranslations[pooja.pujaName] ?? (pooja.pujaName ?? "Unknown Puja"),
+                    style: GoogleFonts.lora(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
                         flex: 3,
-                        child: FutureBuilder<String>(
-                          future: TranslateHelper.translate(pooja.category ?? "Pooja"),
-                          initialData: pooja.category ?? "Pooja",
-                          builder: (context, snapshot) {
-                            return _buildInfoItem(
-                              Icons.local_fire_department,
-                              snapshot.data ?? (pooja.category ?? "Pooja"),
-                              const Color(0xFFD4AF37),
-                            );
-                          },
+                        child: _buildInfoItem(
+                          Icons.local_fire_department,
+                          _dynamicTranslations[pooja.category] ?? (pooja.category ?? "Pooja"),
+                          const Color(0xFFD4AF37),
                         ),
                       ),
                       Container(width: 1, height: 16, color: Colors.white.withOpacity(0.1), margin: const EdgeInsets.symmetric(horizontal: 4)),
@@ -286,16 +323,10 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                       Container(width: 1, height: 16, color: Colors.white.withOpacity(0.1), margin: const EdgeInsets.symmetric(horizontal: 4)),
                       Expanded(
                         flex: 3,
-                        child: FutureBuilder<String>(
-                          future: TranslateHelper.translate(pooja.bestDay ?? "Friday"),
-                          initialData: pooja.bestDay ?? "Friday",
-                          builder: (context, snapshot) {
-                            return _buildInfoItem(
-                              Icons.calendar_month,
-                              snapshot.data ?? (pooja.bestDay ?? "Friday"),
-                              const Color(0xFFD4AF37),
-                            );
-                          },
+                        child: _buildInfoItem(
+                          Icons.calendar_month,
+                          _dynamicTranslations[pooja.bestDay] ?? (pooja.bestDay ?? "Friday"),
+                          const Color(0xFFD4AF37),
                         ),
                       ),
                     ],

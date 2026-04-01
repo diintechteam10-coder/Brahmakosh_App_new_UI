@@ -13,7 +13,6 @@ import 'voice_call_view.dart'; // Added VoiceCallView import
 import 'package:brahmakosh/core/services/storage_service.dart';
 import 'package:brahmakosh/features/dashboard/viewmodels/dashboard_viewmodel.dart';
 import '../../../../common/widgets/custom_profile_avatar.dart';
-import '../../../../core/localization/translate_helper.dart';
 
 class AstrologyExpertsView extends StatelessWidget {
   final String? screenTitle;
@@ -109,19 +108,13 @@ class AstrologyExpertsView extends StatelessWidget {
                     final id = cat['_id'];
                     final name = cat['name'];
                     final isSelected = selectedId == id;
-                    return FutureBuilder<String>(
-                      future: TranslateHelper.translate(name),
-                      initialData: name,
-                      builder: (context, snapshot) {
-                        return _buildFilterChip(
-                          context,
-                          snapshot.data ?? name,
-                          id,
-                          isSelected,
-                          controller,
-                          index,
-                        );
-                      },
+                    return _buildFilterChip(
+                      context,
+                      controller.translatedData[name] ?? name,
+                      id,
+                      isSelected,
+                      controller,
+                      index,
                     );
                   },
                 );
@@ -349,7 +342,7 @@ class AstrologyExpertsView extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: Text(
-                                  expert.name ?? 'astrologer'.tr,
+                                  controller.translatedData[expert.name] ?? expert.name ?? 'astrologer'.tr,
                                   style: GoogleFonts.lora(
                                     fontSize: 14.sp,
                                     fontWeight: FontWeight.bold,
@@ -374,18 +367,12 @@ class AstrologyExpertsView extends StatelessWidget {
                             ],
                           ),
                           const SizedBox(height: 4),
-                          FutureBuilder<String>(
-                            future: TranslateHelper.translate(expert.expertise?.split(',').take(2).join(", ") ?? "vedic_astrology".tr),
-                            initialData: expert.expertise?.split(',').take(2).join(", ") ?? "vedic_astrology".tr,
-                            builder: (context, snapshot) {
-                              return Text(
-                                snapshot.data ?? '',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 10.sp,
-                                  color: Colors.white.withValues(alpha: 0.5),
-                                ),
-                              );
-                            },
+                          Text(
+                            controller.translatedData[expert.expertise] ?? expert.expertise?.split(',').take(2).join(", ") ?? "vedic_astrology".tr,
+                            style: GoogleFonts.poppins(
+                              fontSize: 10.sp,
+                              color: Colors.white.withValues(alpha: 0.5),
+                            ),
                           ),
                           SizedBox(height: 1.h),
                           Row(

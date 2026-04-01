@@ -6,12 +6,65 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:brahmakosh/core/localization/translate_helper.dart';
 import 'package:sizer/sizer.dart';
 
-class RedeemDetailView extends StatelessWidget {
+class RedeemDetailView extends StatefulWidget {
   final RedeemItemModel item;
 
   const RedeemDetailView({super.key, required this.item});
+
+  @override
+  State<RedeemDetailView> createState() => _RedeemDetailViewState();
+}
+
+class _RedeemDetailViewState extends State<RedeemDetailView> {
+  final Map<String, String> _dynamicTranslations = {};
+  String _lastLang = 'en';
+
+  Future<void> _translateAllContents(RedeemItemModel item) async {
+    final currentLang = Get.locale?.languageCode ?? 'en';
+    if (currentLang == 'en') {
+      if (_dynamicTranslations.isNotEmpty) {
+        setState(() {
+          _dynamicTranslations.clear();
+          _lastLang = 'en';
+        });
+      }
+      return;
+    }
+
+    final Set<String> toTranslate = {};
+    if (item.title.isNotEmpty) toTranslate.add(item.title);
+    if (item.detailedDescription.isNotEmpty) toTranslate.add(item.detailedDescription);
+
+    if (toTranslate.isEmpty) return;
+
+    final list = toTranslate.toList();
+    final results = await TranslateHelper.translateList(list);
+
+    bool changed = false;
+    for (int i = 0; i < list.length; i++) {
+      if (_dynamicTranslations[list[i]] != results[i]) {
+        _dynamicTranslations[list[i]] = results[i];
+        changed = true;
+      }
+    }
+
+    if (changed || _lastLang != currentLang) {
+      if (mounted) {
+        setState(() {
+          _lastLang = currentLang;
+        });
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _translateAllContents(widget.item);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +148,7 @@ class RedeemDetailView extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: CachedNetworkImage(
-                  imageUrl: item.imagePath,
+                  imageUrl: widget.item.imagePath,
                   width: double.infinity,
                   height: 25.h,
                   fit: BoxFit.cover,
@@ -122,7 +175,7 @@ class RedeemDetailView extends StatelessWidget {
 
             // Title
             Text(
-              item.title,
+              _dynamicTranslations[widget.item.title] ?? widget.item.title,
               style: GoogleFonts.lora(
                 fontSize: 20.sp,
                 fontWeight: FontWeight.bold,
@@ -133,7 +186,7 @@ class RedeemDetailView extends StatelessWidget {
 
             // Detailed Description
             Text(
-              item.detailedDescription,
+              _dynamicTranslations[widget.item.detailedDescription] ?? widget.item.detailedDescription,
               style: GoogleFonts.poppins(
                 fontSize: 11.sp,
                 height: 1.6,
@@ -164,7 +217,7 @@ class RedeemDetailView extends StatelessWidget {
                   SizedBox(width: 4.w),
                   Expanded(
                     child: Text(
-                      "${item.devoteesRedeemed} devotees have redeemed this offering",
+                      "devotees_count".trParams({'count': '${widget.item.devoteesRedeemed}'}),
                       style: GoogleFonts.poppins(
                         fontSize: 10.sp,
                         color: Colors.white,
@@ -179,7 +232,7 @@ class RedeemDetailView extends StatelessWidget {
             SizedBox(height: 3.h),
 
             Text(
-              "Redeem Summary",
+              "redeem_summary".tr,
               style: GoogleFonts.lora(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
@@ -209,7 +262,7 @@ class RedeemDetailView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Karma Points Required",
+                        "karma_label".tr,
                         style: GoogleFonts.lora(
                           fontSize: 13.sp,
                           fontWeight: FontWeight.bold,
@@ -221,7 +274,7 @@ class RedeemDetailView extends StatelessWidget {
                           Icon(Icons.stars, color: const Color(0xFFD4AF37), size: 16.sp),
                           SizedBox(width: 2.w),
                           Text(
-                            "${item.requiredPoints}",
+                            "${widget.item.requiredPoints}",
                             style: GoogleFonts.poppins(
                               fontSize: 16.sp,
                               fontWeight: FontWeight.bold,
@@ -241,11 +294,11 @@ class RedeemDetailView extends StatelessWidget {
                     height: 6.h,
                     child: ElevatedButton(
                       onPressed: () {
-                        if (controller.userPoints.value < item.requiredPoints) {
+                        if (controller.userPoints.value < widget.item.requiredPoints) {
                           showDialog(
                             context: context,
                             builder: (context) => InsufficientKarmaPopup(
-                              requiredPoints: item.requiredPoints,
+                              requiredPoints: widget.item.requiredPoints,
                               currentPoints: controller.userPoints.value,
                             ),
                           );
@@ -254,10 +307,10 @@ class RedeemDetailView extends StatelessWidget {
                         showDialog(
                           context: context,
                           builder: (context) => ConfirmationPopup(
-                            item: item,
+                            item: widget.item,
                             onConfirm: () {
                               controller.redeemReward(
-                                item.id,
+                                widget.item.id,
                                 onSuccess: () {
                                   // Show Success
                                   Get.dialog(const SuccessPopup());
@@ -286,7 +339,7 @@ class RedeemDetailView extends StatelessWidget {
                         elevation: 0,
                       ),
                       child: Text(
-                        "Redeem Now",
+                        "redeem_cap".tr,
                         style: GoogleFonts.poppins(
                           fontSize: 12.sp,
                           fontWeight: FontWeight.bold,
@@ -309,7 +362,7 @@ class RedeemDetailView extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 3.w),
                   child: Text(
-                    "What Happens Next",
+                    "what_happens_next".tr,
                     style: GoogleFonts.lora(
                       fontSize: 15.sp,
                       fontWeight: FontWeight.bold,
@@ -325,19 +378,19 @@ class RedeemDetailView extends StatelessWidget {
             SizedBox(height: 3.h),
 
             _buildStepRow(
-              "Your Karma Points will be used to sponsor nutritious feed for a sacred cow.",
+              "redeem_step_1".tr,
             ),
             SizedBox(height: 1.5.h),
             _buildStepRow(
-              "You will receive a blessing photo and details of the cow you have nourished",
+              "redeem_step_2".tr,
             ),
             SizedBox(height: 1.5.h),
             _buildStepRow(
-              "A prayer of gratitude will be offered on your behalf at a local gawshala (cow sanctuary)",
+              "redeem_step_3".tr,
             ),
             SizedBox(height: 1.5.h),
             _buildStepRow(
-              "You may receive updates on the well-being of the cows supported by this offering",
+              "redeem_step_4".tr,
             ),
 
             SizedBox(height: 5.h),

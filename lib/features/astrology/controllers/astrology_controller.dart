@@ -22,6 +22,13 @@ class AstrologyController extends GetxController {
   final isLoading = false.obs;
   bool _hasLoadedOnce = false;
 
+  // Dynamic Translation Maps
+  final RxMap<String, String> _translatedData = <String, String>{}.obs;
+  String _lastLang = 'en';
+
+  Map<String, String> get translatedData => _translatedData;
+
+
   List<AstrologistItem> get experts => _experts;
   List<Map<String, dynamic>> get categories => _categories;
   String get selectedCategoryId => _selectedCategoryId.value;
@@ -69,12 +76,46 @@ class AstrologyController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _lastLang = Get.locale?.languageCode ?? 'en';
     fetchCategories();
     fetchExperts(); // initial load (cached by fetchExperts)
     searchController.addListener(() {
       _searchQuery.value = searchController.text;
     });
   }
+
+
+  Future<void> _translateAll() async {
+    if (_lastLang == 'en') {
+      _translatedData.clear();
+      return;
+    }
+
+    final Set<String> toTranslate = {};
+
+    // Categories
+    for (var cat in _categories) {
+      if (cat['name'] != null) toTranslate.add(cat['name']);
+    }
+
+    // Experts
+    for (var expert in _experts) {
+      if (expert.name != null) toTranslate.add(expert.name!);
+      if (expert.expertise != null) toTranslate.add(expert.expertise!);
+    }
+
+    if (toTranslate.isEmpty) return;
+
+    final list = toTranslate.toList();
+    final results = await TranslateHelper.translateList(list);
+
+    final Map<String, String> newTranslations = {};
+    for (int i = 0; i < list.length; i++) {
+      newTranslations[list[i]] = results[i];
+    }
+    _translatedData.assignAll(newTranslations);
+  }
+
 
   Future<void> fetchCategories() async {
     try {
@@ -104,20 +145,10 @@ class AstrologyController extends GetxController {
 
             if (categoryList.isNotEmpty) {
               final castedCategories = categoryList.cast<Map<String, dynamic>>();
-              
-              // Dynamic Translation for categories if in Hindi mode
-              if (Get.locale?.languageCode == 'hi') {
-                final namesToTranslate = castedCategories.map((c) => c['name'] as String).toList();
-                TranslateHelper.translateList(namesToTranslate).then((translatedNames) {
-                  for (int i = 0; i < castedCategories.length; i++) {
-                    castedCategories[i]['name'] = translatedNames[i];
-                  }
-                  _categories.value = castedCategories;
-                });
-              } else {
-                _categories.value = castedCategories;
-              }
+              _categories.value = castedCategories;
+              _translateAll();
             }
+
           } else {
             print("❌ Categories API Success is false or data null");
           }
@@ -216,6 +247,7 @@ class AstrologyController extends GetxController {
                 print("👤 Expert Data: ${json.encode(expert.toJson())}");
               }
               _experts.value = parsedExperts;
+              _translateAll();
 
               // Fallback to mock data if API returns empty
               if (_experts.isEmpty) {

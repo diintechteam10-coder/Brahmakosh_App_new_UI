@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/localization/translate_helper.dart';
 
 import 'sankalp_success_screen.dart';
 
@@ -23,6 +24,43 @@ class SankalpDetailScreen extends StatefulWidget {
 }
 
 class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
+  final Map<String, String> _dynamicTranslations = {};
+  String _lastLang = 'en';
+
+  Future<void> _translateAllContents(SankalpModel s) async {
+    final currentLang = Get.locale?.languageCode ?? 'en';
+    if (currentLang == 'en') {
+      if (_dynamicTranslations.isNotEmpty) {
+        setState(() {
+          _dynamicTranslations.clear();
+          _lastLang = 'en';
+        });
+      }
+      return;
+    }
+
+    final Set<String> toTranslate = {s.title, s.description};
+    if (toTranslate.isEmpty) return;
+
+    final list = toTranslate.toList();
+    final results = await TranslateHelper.translateList(list);
+
+    bool changed = false;
+    for (int i = 0; i < list.length; i++) {
+      if (_dynamicTranslations[list[i]] != results[i]) {
+        _dynamicTranslations[list[i]] = results[i];
+        changed = true;
+      }
+    }
+
+    if (changed || _lastLang != currentLang) {
+      if (mounted) {
+        setState(() {
+          _lastLang = currentLang;
+        });
+      }
+    }
+  }
   // Duration Selection: 0->5, 1->14, 2->21, 3->Custom
   int _selectedDurationIndex = 0;
   final TextEditingController _customDaysController = TextEditingController();
@@ -99,7 +137,9 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
             displaySankalp = state.selectedSankalp!;
           }
           isLoading = state.isDetailLoading;
+          _translateAllContents(displaySankalp);
         }
+
 
         return Scaffold(
           backgroundColor: Colors.black,
@@ -171,7 +211,7 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    "About this Sankalp".toUpperCase(),
+                                    "about_sankalp".tr.toUpperCase(),
                                     style: GoogleFonts.lora(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
@@ -189,7 +229,7 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
 
                             // Description
                             Text(
-                              displaySankalp.description,
+                              _dynamicTranslations[displaySankalp.description] ?? displaySankalp.description,
                               style: GoogleFonts.poppins(
                                 fontSize: 13,
                                 color: Colors.white.withOpacity(0.5),
@@ -204,7 +244,7 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
 
                       // Duration Section
                       Text(
-                        "Duration".toUpperCase(),
+                        "duration".tr.toUpperCase(),
                         style: GoogleFonts.lora(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -214,13 +254,13 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
                       const SizedBox(height: 16),
                       Row(
                         children: [
-                          _buildDurationOption("5 Days", 0),
+                          _buildDurationOption("5 ${'day_suffix'.tr}s", 0),
                           const SizedBox(width: 8),
-                          _buildDurationOption("14 Days", 1),
+                          _buildDurationOption("14 ${'day_suffix'.tr}s", 1),
                           const SizedBox(width: 8),
-                          _buildDurationOption("21 Days", 2),
+                          _buildDurationOption("21 ${'day_suffix'.tr}s", 2),
                           const SizedBox(width: 8),
-                          _buildDurationOption("Custom", 3),
+                          _buildDurationOption("custom".tr, 3),
                         ],
                       ),
 
@@ -376,7 +416,7 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            "Number of Days",
+            "number_of_days".tr,
             style: GoogleFonts.lora(
               color: Colors.white,
               fontSize: 14,
@@ -430,7 +470,7 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Daily Reminder".toUpperCase(),
+            "daily_reminder".tr.toUpperCase(),
             style: GoogleFonts.lora(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -457,7 +497,7 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    "Status Active",
+                    "status_active".tr,
                     style: GoogleFonts.lora(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -530,18 +570,18 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
         backgroundColor: const Color(0xFF1C1C1E),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
-          "Confirm Commitment",
+          "confirm_commitment".tr,
           style: GoogleFonts.poppins(color: Colors.white),
         ),
         content: Text(
-          "Are you ready for this $_currentTotalDays day journey?",
+          "ready_for_journey".trParams({'days': '$_currentTotalDays'}),
           style: GoogleFonts.poppins(color: Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
             child: Text(
-              "CANCEL",
+                "cancel".tr.toUpperCase(),
               style: TextStyle(color: Colors.white.withOpacity(0.5)),
             ),
           ),
@@ -575,8 +615,8 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
                   borderRadius: BorderRadius.circular(20),
                 ),
               ),
-              child: const Text(
-                "I'M READY",
+              child: Text(
+                "im_ready".tr,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),

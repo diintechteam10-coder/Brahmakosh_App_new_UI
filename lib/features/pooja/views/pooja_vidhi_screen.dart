@@ -76,60 +76,71 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
   }
 
   Future<void> _translateDynamicData() async {
-    if (Get.locale?.languageCode != 'hi') return;
+    final currentLang = Get.locale?.languageCode ?? 'en';
+    if (currentLang == 'en') return;
 
-    // Translate Pooja Name
-    if (_translatedPoojaName != null) {
-      TranslateHelper.translate(_translatedPoojaName).then((val) {
-        if (mounted) setState(() => _translatedPoojaName = val);
+    final Set<String> toTranslate = {};
+
+    if (widget.pooja.pujaName != null) toTranslate.add(widget.pooja.pujaName!);
+    if (widget.pooja.muhurat != null) toTranslate.add(widget.pooja.muhurat!);
+    if (widget.pooja.specialInstructions != null) toTranslate.add(widget.pooja.specialInstructions!);
+
+    for (var step in widget.pooja.pujaVidhi ?? []) {
+      if (step.title != null) toTranslate.add(step.title!);
+      if (step.description != null) toTranslate.add(step.description!);
+    }
+
+    for (var item in widget.pooja.samagriList ?? []) {
+      if (item.itemName != null) toTranslate.add(item.itemName!);
+    }
+
+    for (var mantra in widget.pooja.mantras ?? []) {
+      if (mantra.meaning != null) toTranslate.add(mantra.meaning!);
+    }
+
+    if (toTranslate.isEmpty) return;
+
+    final list = toTranslate.toList();
+    final results = await TranslateHelper.translateList(list);
+    final translationMap = Map.fromIterables(list, results);
+
+    if (mounted) {
+      setState(() {
+        if (widget.pooja.pujaName != null) {
+          _translatedPoojaName = translationMap[widget.pooja.pujaName];
+        }
+        if (widget.pooja.muhurat != null) {
+          _translatedMuhurat = translationMap[widget.pooja.muhurat];
+        }
+        if (widget.pooja.specialInstructions != null) {
+          _translatedInstructions = translationMap[widget.pooja.specialInstructions];
+        }
+
+        // Steps
+        _translatedSteps = (widget.pooja.pujaVidhi ?? []).map((step) {
+          return PujaVidhi(
+            stepNumber: step.stepNumber,
+            title: step.title != null ? translationMap[step.title] : step.title,
+            description: step.description != null ? translationMap[step.description] : step.description,
+          );
+        }).toList();
+
+        // Samagri
+        _translatedSamagri = (widget.pooja.samagriList ?? []).map((item) {
+          return SamagriList(
+            itemName: item.itemName != null ? translationMap[item.itemName] : item.itemName,
+            quantity: item.quantity,
+          );
+        }).toList();
+
+        // Mantras
+        _translatedMantras = (widget.pooja.mantras ?? []).map((mantra) {
+          return Mantras(
+            mantraText: mantra.mantraText,
+            meaning: mantra.meaning != null ? translationMap[mantra.meaning] : mantra.meaning,
+          );
+        }).toList();
       });
-    }
-
-    // Translate Muhurat & Instructions
-    if (_translatedMuhurat != null) {
-      TranslateHelper.translate(_translatedMuhurat).then((val) {
-        if (mounted) setState(() => _translatedMuhurat = val);
-      });
-    }
-    
-    if (_translatedInstructions != null) {
-      TranslateHelper.translate(_translatedInstructions).then((val) {
-        if (mounted) setState(() => _translatedInstructions = val);
-      });
-    }
-
-    // Translate Steps
-    for (var step in _translatedSteps) {
-      if (step.title != null) {
-        TranslateHelper.translate(step.title).then((val) {
-          if (mounted) setState(() => step.title = val);
-        });
-      }
-      if (step.description != null) {
-        TranslateHelper.translate(step.description).then((val) {
-          if (mounted) setState(() => step.description = val);
-        });
-      }
-    }
-
-    // Translate Samagri
-    for (var item in _translatedSamagri) {
-      if (item.itemName != null) {
-        TranslateHelper.translate(item.itemName).then((val) {
-          if (mounted) setState(() => item.itemName = val);
-        });
-      }
-    }
-
-    // Translate Mantras
-    for (var mantra in _translatedMantras) {
-      // We don't usually translate the Sanskrit mantra text itself, 
-      // but we should translate its meaning.
-      if (mantra.meaning != null) {
-        TranslateHelper.translate(mantra.meaning).then((val) {
-          if (mounted) setState(() => mantra.meaning = val);
-        });
-      }
     }
   }
 
