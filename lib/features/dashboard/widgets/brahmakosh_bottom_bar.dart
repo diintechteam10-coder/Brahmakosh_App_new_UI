@@ -43,7 +43,7 @@ class BrahmakoshBottomBar extends StatelessWidget {
           
           // Center Logo (Ask BI) - Positioned higher
           Positioned(
-            top: -15,
+            top: -25,
             left: 0,
             right: 0,
             child: Center(
@@ -64,7 +64,7 @@ class BrahmakoshBottomBar extends StatelessWidget {
                   ),
                   child: ClipOval(
                     child: Image.asset(
-                      'assets/images/brahmkosh_logo.jpeg',
+                      'assets/images/brahmkosh_logo.png',
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -91,7 +91,7 @@ class BrahmakoshBottomBar extends StatelessWidget {
                    const Expanded(child: SizedBox()),
                    
                    _buildNavItem(3, 'assets/icons/connect_new.svg', 'Connect'),
-                   _buildNavItem(4, 'assets/icons/cart_new.svg', 'Remedies'),
+                   _buildNavItem(4, 'assets/rewards/silver.svg', 'Rewards'),
                 ],
               ),
             ),
@@ -120,6 +120,7 @@ class BrahmakoshBottomBar extends StatelessWidget {
 
   Widget _buildNavItem(int index, String assetPath, String label) {
     final isSelected = currentIndex == index;
+    final double iconSize = index == 4 ? 18 : 22; // Adjust for visual weight
     return Expanded(
       child: GestureDetector(
         onTap: () => onTap(index),
@@ -134,8 +135,8 @@ class BrahmakoshBottomBar extends StatelessWidget {
                 isSelected ? AppTheme.primaryGold : Colors.grey[400]!,
                 BlendMode.srcIn
               ),
-              width: 20,
-              height: 20,
+              width: iconSize,
+              height: iconSize,
             ),
             const SizedBox(height: 4),
             Text(

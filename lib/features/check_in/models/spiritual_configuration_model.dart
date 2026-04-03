@@ -30,6 +30,7 @@ class SpiritualConfigurationResponse {
 class SpiritualConfiguration {
   String? sId;
   String? title;
+  String? subtitle;
   String? description;
   String? duration;
   String? type;
@@ -37,6 +38,8 @@ class SpiritualConfiguration {
   int? karmaPoints;
   String? chantingType;
   String? customChantingType;
+  String? category;
+  String? subcategory;
   bool? isActive;
   bool? isDeleted;
   String? prayerType;
@@ -49,6 +52,7 @@ class SpiritualConfiguration {
   SpiritualConfiguration({
     this.sId,
     this.title,
+    this.subtitle,
     this.description,
     this.duration,
     this.type,
@@ -56,6 +60,8 @@ class SpiritualConfiguration {
     this.karmaPoints,
     this.chantingType,
     this.customChantingType,
+    this.category,
+    this.subcategory,
     this.isActive,
     this.isDeleted,
     this.prayerType,
@@ -69,6 +75,7 @@ class SpiritualConfiguration {
   SpiritualConfiguration.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
     title = json['title'];
+    subtitle = json['subtitle'];
     description = json['description'];
     duration = json['duration'];
     type = json['type'];
@@ -76,6 +83,8 @@ class SpiritualConfiguration {
     karmaPoints = json['karmaPoints'];
     chantingType = json['chantingType'];
     customChantingType = json['customChantingType'];
+    category = json['category'];
+    subcategory = json['subcategory'];
     isActive = json['isActive'];
     isDeleted = json['isDeleted'];
     prayerType = json['prayerType'];
@@ -90,6 +99,7 @@ class SpiritualConfiguration {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['_id'] = sId;
     data['title'] = title;
+    data['subtitle'] = subtitle;
     data['description'] = description;
     data['duration'] = duration;
     data['type'] = type;
@@ -97,6 +107,8 @@ class SpiritualConfiguration {
     data['karmaPoints'] = karmaPoints;
     data['chantingType'] = chantingType;
     data['customChantingType'] = customChantingType;
+    data['category'] = category;
+    data['subcategory'] = subcategory;
     data['isActive'] = isActive;
     data['isDeleted'] = isDeleted;
     data['prayerType'] = prayerType;

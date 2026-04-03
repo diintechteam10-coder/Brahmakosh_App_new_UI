@@ -6,6 +6,7 @@ import 'package:brahmakosh/features/auth/views/reset_password.dart';
 import 'package:brahmakosh/features/auth/views/verify_reset_otp.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:brahmakosh/core/utils/app_snackbar.dart';
 
 class ForgotPasswordController extends GetxController {
   final emailController = TextEditingController();
@@ -23,7 +24,7 @@ class ForgotPasswordController extends GetxController {
   /// 1️⃣ Request forgot password OTP
   Future<void> requestForgotPassword() async {
     if (emailController.text.isEmpty) {
-      Get.snackbar("Error", "Please enter your email");
+      AppSnackBar.showError("Error", "Please enter your email");
       return;
     }
 
@@ -31,7 +32,7 @@ class ForgotPasswordController extends GetxController {
 
     // Basic email validation
     if (!GetUtils.isEmail(email)) {
-      Get.snackbar("Error", "Please enter a valid email");
+      AppSnackBar.showError("Error", "Please enter a valid email");
       return;
     }
 
@@ -64,7 +65,7 @@ class ForgotPasswordController extends GetxController {
 
             if (response.statusCode == 200 || response.statusCode == 201) {
               userEmail = email;
-              Get.snackbar(
+              AppSnackBar.showSuccess(
                 "Success",
                 responseBody['message'] ?? "OTP sent to your email",
               );
@@ -72,30 +73,30 @@ class ForgotPasswordController extends GetxController {
               Get.to(() => VerifyResetOtpView(email: email));
             } else {
               final message = responseBody['message'] ?? "Failed to send OTP";
-              Get.snackbar("Error", message);
+              AppSnackBar.showError("Error", message);
             }
           } catch (e) {
             print("❌ Error parsing response: $e");
-            Get.snackbar("Error", "Failed to send OTP");
+            AppSnackBar.showError("Error", "Failed to send OTP");
           }
         },
         onError: (error) {
           isLoading.value = false;
           print("❌ Forgot password error: $error");
-          Get.snackbar("Error", "Failed to send OTP. Please try again.");
+          AppSnackBar.showError("Error", "Failed to send OTP. Please try again.");
         },
       );
     } catch (e) {
       isLoading.value = false;
       print("❌ Error: $e");
-      Get.snackbar("Error", "Something went wrong. Please try again.");
+      AppSnackBar.showError("Error", "Something went wrong. Please try again.");
     }
   }
 
   /// 2️⃣ Verify reset OTP
   Future<void> verifyResetOtp({required String email}) async {
     if (otpController.text.isEmpty) {
-      Get.snackbar("Error", "Please enter OTP");
+      AppSnackBar.showError("Error", "Please enter OTP");
       return;
     }
 
@@ -131,7 +132,7 @@ class ForgotPasswordController extends GetxController {
                   responseBody['data']?['token'];
               userEmail = email;
 
-              Get.snackbar(
+              AppSnackBar.showSuccess(
                 "Success",
                 responseBody['message'] ?? "OTP verified successfully",
               );
@@ -145,23 +146,23 @@ class ForgotPasswordController extends GetxController {
               );
             } else {
               final message = responseBody['message'] ?? "Invalid OTP";
-              Get.snackbar("Error", message);
+              AppSnackBar.showError("Error", message);
             }
           } catch (e) {
             print("❌ Error parsing response: $e");
-            Get.snackbar("Error", "Failed to verify OTP");
+            AppSnackBar.showError("Error", "Failed to verify OTP");
           }
         },
         onError: (error) {
           isOtpLoading.value = false;
           print("❌ Verify OTP error: $error");
-          Get.snackbar("Error", "Failed to verify OTP. Please try again.");
+          AppSnackBar.showError("Error", "Failed to verify OTP. Please try again.");
         },
       );
     } catch (e) {
       isOtpLoading.value = false;
       print("❌ Error: $e");
-      Get.snackbar("Error", "Something went wrong. Please try again.");
+      AppSnackBar.showError("Error", "Something went wrong. Please try again.");
     }
   }
 
@@ -171,17 +172,17 @@ class ForgotPasswordController extends GetxController {
     required String resetToken,
   }) async {
     if (newPasswordController.text.isEmpty) {
-      Get.snackbar("Error", "Please enter new password");
+      AppSnackBar.showError("Error", "Please enter new password");
       return;
     }
 
     if (newPasswordController.text.length < 6) {
-      Get.snackbar("Error", "Password must be at least 6 characters");
+      AppSnackBar.showError("Error", "Password must be at least 6 characters");
       return;
     }
 
     if (newPasswordController.text != confirmPasswordController.text) {
-      Get.snackbar("Error", "Passwords do not match");
+      AppSnackBar.showError("Error", "Passwords do not match");
       return;
     }
 
@@ -211,7 +212,7 @@ class ForgotPasswordController extends GetxController {
             print("✅ Reset password response: $responseBody");
 
             if (response.statusCode == 200 || response.statusCode == 201) {
-              Get.snackbar(
+              AppSnackBar.showSuccess(
                 "Success",
                 responseBody['message'] ?? "Password reset successfully",
               );
@@ -223,23 +224,23 @@ class ForgotPasswordController extends GetxController {
             } else {
               final message =
                   responseBody['message'] ?? "Failed to reset password";
-              Get.snackbar("Error", message);
+              AppSnackBar.showError("Error", message);
             }
           } catch (e) {
             print("❌ Error parsing response: $e");
-            Get.snackbar("Error", "Failed to reset password");
+            AppSnackBar.showError("Error", "Failed to reset password");
           }
         },
         onError: (error) {
           isResetLoading.value = false;
           print("❌ Reset password error: $error");
-          Get.snackbar("Error", "Failed to reset password. Please try again.");
+          AppSnackBar.showError("Error", "Failed to reset password. Please try again.");
         },
       );
     } catch (e) {
       isResetLoading.value = false;
       print("❌ Error: $e");
-      Get.snackbar("Error", "Something went wrong. Please try again.");
+      AppSnackBar.showError("Error", "Something went wrong. Please try again.");
     }
   }
 

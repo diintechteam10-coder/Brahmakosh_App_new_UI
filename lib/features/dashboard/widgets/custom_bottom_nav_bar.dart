@@ -164,7 +164,7 @@
 //                             width: 70,
 //                             height: 70,
 //                             child: Image.asset(
-//                               'assets/images/brahmkosh_logo.jpeg',
+//                               'assets/images/brahmkosh_logo.png',
 //                               fit: BoxFit.cover,
 //                             ),
 //                           ),

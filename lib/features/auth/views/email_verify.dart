@@ -53,7 +53,7 @@ class EmailOtpView extends StatelessWidget {
                         shape: BoxShape.circle,
                         // border: Border.all(color: AppTheme.authPrimaryGold, width: 2),
                         image: const DecorationImage(
-                          image: AssetImage('assets/images/brahmkosh_logo.jpeg'),
+                          image: AssetImage('assets/images/brahmkosh_logo.png'),
                           fit: BoxFit.cover,
                         ),
                       ),

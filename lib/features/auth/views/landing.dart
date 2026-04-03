@@ -52,7 +52,7 @@ class LandingView extends StatelessWidget {
                         ],
                         image: const DecorationImage(
                           image: AssetImage(
-                            'assets/images/brahmkosh_logo.jpeg',
+                            'assets/images/brahmkosh_logo.png',
                           ),
                           fit: BoxFit.cover,
                         ),

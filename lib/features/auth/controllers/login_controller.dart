@@ -7,6 +7,7 @@ import '../../../../common/api_urls.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/services/storage_service.dart';
 import '../../../../core/services/push_notification_service.dart';
+import '../../../../core/utils/app_snackbar.dart';
 
 class LoginController extends GetxController {
   // Controllers
@@ -62,26 +63,18 @@ class LoginController extends GetxController {
             }
           }
 
-          Get.snackbar(
+          AppSnackBar.showSuccess(
             'Success',
             responseBody['message'] ?? 'Login successful!',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
-            duration: const Duration(seconds: 2),
           );
 
           // Navigate to dashboard
           Get.offAllNamed(AppConstants.routeDashboard);
         } catch (e) {
           print("❌ Error parsing login response: $e");
-          Get.snackbar(
+          AppSnackBar.showSuccess(
             'Success',
             'Login successful!',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
-            duration: const Duration(seconds: 2),
           );
           Get.offAllNamed(
             AppConstants.mobileOtp,
@@ -93,13 +86,9 @@ class LoginController extends GetxController {
         isLoading.value = false;
         Get.offAllNamed(AppConstants.routeDashboard);
         if (error is SocketException) {
-          Get.snackbar(
+          AppSnackBar.showError(
             'Connection Error',
             'Unable to connect to server. Please make sure the server is running on ${ApiUrls.baseUrl}',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
-            duration: const Duration(seconds: 4),
           );
         }
         // Other error handling is done in api_services.dart

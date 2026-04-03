@@ -63,7 +63,7 @@ class LoginView extends StatelessWidget {
                           ),
                         ],
                         image: const DecorationImage(
-                          image: AssetImage('assets/images/brahmkosh_logo.jpeg'),
+                          image: AssetImage('assets/images/brahmkosh_logo.png'),
                           fit: BoxFit.cover,
                         ),
                       ),

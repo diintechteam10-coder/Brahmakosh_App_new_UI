@@ -93,14 +93,36 @@ class SpiritualRepository {
     }
 
     if (responseBody != null) {
-      // print('************************************************');
-      // print('🚀 PROGRESS DATA RESPONSE (Spiritual Check-In):');
-      // // Print in chunks to avoid console truncation
-      // final pattern = RegExp('.{1,1000}');
-      // pattern
-      //     .allMatches(responseBody!)
-      //     .forEach((match) => print(match.group(0)));
-      // print('************************************************');
+      print('************************************************');
+      print('🚀 SPIRITUAL CHECK-IN ACTIVITIES:');
+      final decoded = jsonDecode(responseBody!);
+      if (decoded['data'] != null && decoded['data']['activities'] != null) {
+        for (var activity in decoded['data']['activities']) {
+          print('📌 ${activity['title']}: ${activity['id']}');
+        }
+        // ══════════════════════════════════════════════════════════════
+        // 🔕 SILENCE CATEGORY ID — highlighted for easy reference
+        // ══════════════════════════════════════════════════════════════
+        final silenceActivity = (decoded['data']['activities'] as List)
+            .cast<Map<String, dynamic>>()
+            .firstWhere(
+              (a) =>
+                  (a['title'] as String?)?.toLowerCase().contains('silence') ==
+                  true,
+              orElse: () => {},
+            );
+        if (silenceActivity.isNotEmpty) {
+          print('');
+          print('╔══════════════════════════════════════════════════════╗');
+          print('║  🔕 SILENCE  category ID: ${silenceActivity['id']}  ║');
+          print('╚══════════════════════════════════════════════════════╝');
+          print('');
+        } else {
+          print('⚠️  No "Silence" activity found in check-in response!');
+        }
+        // ══════════════════════════════════════════════════════════════
+      }
+      print('************************************************');
 
       return await compute(_parseCheckInResponse, responseBody!);
     }

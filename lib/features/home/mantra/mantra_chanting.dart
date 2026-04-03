@@ -1,7 +1,6 @@
 import 'package:brahmakosh/core/common_imports.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:brahmakosh/features/home/controllers/mantra_chanting_controller.dart';
@@ -9,6 +8,7 @@ import 'package:brahmakosh/features/home/blocs/mantra/mantra_bloc.dart';
 import 'package:brahmakosh/features/check_in/repositories/spiritual_repository.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_session_model.dart';
 import 'package:brahmakosh/core/constants/app_constants.dart';
+import '../../../core/utils/app_snackbar.dart';
 
 class MantraChantingView extends StatelessWidget {
   const MantraChantingView({super.key});
@@ -35,11 +35,9 @@ class MantraChantingView extends StatelessWidget {
             _showResultDialog(context, state.responseData);
           } else if (state is MantraError) {
             if (Get.isDialogOpen ?? false) Get.back(); // Close Loader
-            Get.snackbar(
+            AppSnackBar.showError(
               "Error",
               state.message,
-              backgroundColor: Colors.redAccent,
-              colorText: Colors.white,
             );
           }
         },

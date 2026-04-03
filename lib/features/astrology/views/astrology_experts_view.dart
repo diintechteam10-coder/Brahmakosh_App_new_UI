@@ -13,6 +13,7 @@ import 'voice_call_view.dart'; // Added VoiceCallView import
 import 'package:brahmakosh/core/services/storage_service.dart';
 import 'package:brahmakosh/features/dashboard/viewmodels/dashboard_viewmodel.dart';
 import '../../../../common/widgets/custom_profile_avatar.dart';
+import '../../../core/utils/app_snackbar.dart';
 
 class AstrologyExpertsView extends StatelessWidget {
   final String? screenTitle;
@@ -788,11 +789,9 @@ class AstrologyExpertsView extends StatelessWidget {
                           if (credits >= minRequired) {
                             Get.to(() => VoiceCallView(expert: expert.toAstrologist()));
                           } else {
-                            Get.snackbar(
+                            AppSnackBar.showError(
                               "Insufficient Credits",
                               "You need at least ₹$minRequired for a 5-minute session.",
-                              backgroundColor: Colors.redAccent,
-                              colorText: Colors.white,
                             );
                             controller.showRechargeBottomSheet(context);
                           }

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:brahmakosh/common/api_urls.dart';
 
 import 'package:brahmakosh/features/auth/views/email_verify.dart';
+import 'package:brahmakosh/core/utils/app_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -18,7 +19,7 @@ class RegisterController extends GetxController {
     print("📩 Register Step 1 called");
 
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-      Get.snackbar("Error", "Email & Password required");
+      AppSnackBar.showError("Error", "Email & Password required");
       return;
     }
 
@@ -56,20 +57,20 @@ class RegisterController extends GetxController {
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("✅ Registration step 1 success");
 
-        Get.snackbar("Success", "OTP sent to your email");
+        AppSnackBar.showSuccess("Success", "OTP sent to your email");
 
         Get.to(() => EmailOtpView(email: emailController.text.trim()));
       } else {
         print("❌ API Error: ${data['message']}");
 
-        Get.snackbar("Error", data['message'] ?? "Something went wrong");
+        AppSnackBar.showError("Error", data['message'] ?? "Something went wrong");
       }
     } catch (e, stack) {
       print("🔥 Exception occurred");
       print("Error: $e");
       print("StackTrace: $stack");
 
-      Get.snackbar("Error", "Server error");
+      AppSnackBar.showError("Error", "Server error");
     } finally {
       isLoading.value = false;
       print("✅ Loading stopped");

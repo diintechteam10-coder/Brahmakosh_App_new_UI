@@ -217,19 +217,33 @@ class _RechargePlansViewState extends State<RechargePlansView> {
                       color: AppTheme.primaryGold,
                     ),
                   )
-                : GridView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 20,
-                      mainAxisSpacing: 20,
-                      childAspectRatio: 0.72,
-                    ),
-                    itemCount: _plans.length,
-                    itemBuilder: (context, index) {
-                      final plan = _plans[index];
-                      final isSelected = _selectedPlanIndex == index;
-                      return _buildPlanCard(plan, index, isSelected);
+                : LayoutBuilder(
+                    builder: (context, constraints) {
+                      final gridWidth = constraints.maxWidth - 40;
+                      final cardWidth = (gridWidth - 20) / 2;
+                      // Dynamically compute a ratio that fits card content
+                      final double safeRatio =
+                          (cardWidth / (constraints.maxHeight / 2.1))
+                              .clamp(0.75, 1.0);
+                      return GridView.builder(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 16,
+                        ),
+                        gridDelegate:
+                            SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 20,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: safeRatio,
+                        ),
+                        itemCount: _plans.length,
+                        itemBuilder: (context, index) {
+                          final plan = _plans[index];
+                          final isSelected = _selectedPlanIndex == index;
+                          return _buildPlanCard(plan, index, isSelected);
+                        },
+                      );
                     },
                   ),
           ),
@@ -239,18 +253,15 @@ class _RechargePlansViewState extends State<RechargePlansView> {
     );
   }
 
-  Widget _buildPlanCard(Map<String, dynamic> plan, int index, bool isSelected) {
+  Widget _buildPlanCard(
+      Map<String, dynamic> plan, int index, bool isSelected) {
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedPlanIndex = index;
-        });
-      },
+      onTap: () => setState(() => _selectedPlanIndex = index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         decoration: BoxDecoration(
           color: const Color(0xFF1A1A1A),
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected
                 ? AppTheme.primaryGold
@@ -270,82 +281,91 @@ class _RechargePlansViewState extends State<RechargePlansView> {
         child: Column(
           children: [
             Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryGold.withOpacity(0.1),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: AppTheme.primaryGold.withOpacity(0.25),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 2.w),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(3.w),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryGold.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppTheme.primaryGold.withOpacity(0.25),
+                        ),
                       ),
-                    ),
-                    child: Icon(
-                      Icons.monetization_on,
-                      size: 28,
-                      color: AppTheme.primaryGold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    "${plan['credits']}",
-                    style: GoogleFonts.lora(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Text(
-                    "Credits",
-                    style: GoogleFonts.lora(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white54,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryGold.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: AppTheme.primaryGold.withOpacity(0.3),
-                      ),
-                    ),
-                    child: Text(
-                      "₹ ${plan['price']}",
-                      style: GoogleFonts.lora(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                      child: Icon(
+                        Icons.monetization_on,
+                        size: 6.w,
                         color: AppTheme.primaryGold,
                       ),
                     ),
-                  ),
-                ],
+                    SizedBox(height: 0.8.h),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        "${plan['credits']}",
+                        style: GoogleFonts.lora(
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      "Credits",
+                      style: GoogleFonts.lora(
+                        fontSize: 9.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white54,
+                      ),
+                    ),
+                    SizedBox(height: 0.8.h),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 3.w,
+                        vertical: 0.5.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryGold.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: AppTheme.primaryGold.withOpacity(0.3),
+                        ),
+                      ),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          "₹ ${plan['price']}",
+                          style: GoogleFonts.lora(
+                            fontSize: 11.sp,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.primaryGold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: EdgeInsets.symmetric(vertical: 1.1.h),
               decoration: BoxDecoration(
                 color: isSelected
                     ? AppTheme.primaryGold
                     : Colors.white.withOpacity(0.05),
                 borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(22),
+                  bottom: Radius.circular(18),
                 ),
               ),
               child: Text(
                 isSelected ? "SELECTED" : "SELECT",
                 textAlign: TextAlign.center,
                 style: GoogleFonts.lora(
-                  fontSize: 12,
+                  fontSize: 9.sp,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
                   color: isSelected ? Colors.black : Colors.white54,
@@ -390,7 +410,7 @@ class _RechargePlansViewState extends State<RechargePlansView> {
             // if (success) {
             //   _showCreditRequestPopup();
             // } else {
-            //   Get.snackbar("Error", "Payment failed");
+            //   AppSnackBar.showError("Error", "Payment failed");
             // }
             _showCreditRequestPopup();
           },

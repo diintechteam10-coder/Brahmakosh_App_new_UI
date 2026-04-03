@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../core/utils/app_snackbar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' hide Transition;
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -152,16 +153,11 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
     return InkWell(
       onTap: () {
         if (isAlreadyJoined) {
-          Get.snackbar(
+          AppSnackBar.showInfo(
             isCompleted ? "Already Completed" : "Already Active",
             isCompleted
                 ? "You have already completed this sankalp."
                 : "This sankalp is already active in your list.",
-            backgroundColor: const Color(0xFF1C1C1E),
-            colorText: Colors.white,
-            snackPosition: SnackPosition.BOTTOM,
-            margin: const EdgeInsets.all(16),
-            borderRadius: 12,
           );
         } else {
           _handleNavigation(context, sankalp);
@@ -260,7 +256,7 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
                         children: [
                           ClipOval(
                             child: Image.asset(
-                              'assets/images/brahmkosh_logo.jpeg',
+                              'assets/images/brahmkosh_logo.png',
                               width: 18,
                               height: 18,
                               fit: BoxFit.cover,

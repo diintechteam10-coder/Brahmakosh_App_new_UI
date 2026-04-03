@@ -10,6 +10,7 @@ import '../../../core/services/storage_service.dart';
 import '../views/astrology_chat_view.dart';
 import '../views/astrologist_profile_view.dart';
 import '../views/conversation_history_view.dart';
+import '../../../core/utils/app_snackbar.dart';
 
 class AstrologyController extends GetxController {
   final _experts = <AstrologistItem>[].obs;
@@ -310,12 +311,9 @@ class AstrologyController extends GetxController {
                 return InkWell(
                   onTap: () {
                     Get.back();
-                    Get.snackbar(
+                    AppSnackBar.showInfo(
                       "Processing",
                       "Starting payment for ₹$amount...",
-                      backgroundColor: const Color(0xFFD4AF37),
-                      colorText: Colors.black,
-                      snackPosition: SnackPosition.TOP,
                     );
                   },
                   child: Container(
@@ -373,12 +371,9 @@ class AstrologyController extends GetxController {
   }
 
   void openUserProfile() {
-    Get.snackbar(
+    AppSnackBar.showSuccess(
       "Profile",
       "Opening Account details...",
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: const Color(0xFF10B981),
-      colorText: Colors.white,
     );
   }
 

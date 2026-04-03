@@ -1,7 +1,9 @@
 import 'package:brahmakosh/core/common_imports.dart';
 import 'package:brahmakosh/core/constants/app_constants.dart';
-import 'package:brahmakosh/features/check_in/views/prayer_configuration_view.dart';
-import 'package:brahmakosh/features/check_in/views/chanting_configuration_view.dart';
+import 'package:brahmakosh/features/check_in/views/prayer_selection_view_v2.dart';
+import 'package:brahmakosh/features/check_in/views/chanting_selection_view_v2.dart';
+import 'package:brahmakosh/features/check_in/views/meditation_selection_view_v2.dart';
+import 'package:brahmakosh/features/check_in/views/silence_selection_view_v2.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_checkin_model.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -279,15 +281,33 @@ class _CheckInViewState extends State<CheckInView>
                                     if (activity.route != null) {
                                       if (activity.title == 'Chanting') {
                                         Get.to(
-                                          () => ChantingConfigurationView(
-                                            chantingCategoryId: activity.id!,
-                                          ),
+                                          () => const ChantingSelectionViewV2(),
                                         );
                                       } else if (activity.title == 'Prayer' &&
                                           activity.id != null) {
                                         Get.to(
-                                          () => PrayerConfigurationView(
+                                          () => PrayerSelectionViewV2(
                                             prayerCategoryId: activity.id!,
+                                          ),
+                                        );
+                                      } else if ((activity.title ==
+                                                  'Meditation' ||
+                                              activity.title == 'Mediation') &&
+                                          activity.id != null) {
+                                        Get.to(
+                                          () =>
+                                              MeditationSelectionViewV2(
+                                                 meditationCategoryId:
+                                                     activity.id!,
+                                               )
+,
+                                        );
+                                      } else if ((activity.title == 'Silence' ||
+                                              activity.title == 'silence') &&
+                                          activity.id != null) {
+                                        Get.to(
+                                          () => SilenceSelectionViewV2(
+                                            silenceCategoryId: activity.id!,
                                           ),
                                         );
                                       } else if (activity.id != null) {
@@ -975,8 +995,8 @@ class _CheckInViewState extends State<CheckInView>
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
-                        color: const Color(0xFFD4AF37), // Solid gold
-                        width: 1.5,
+                        color: Colors.white.withOpacity(0.1), // Solid gold
+                        width: 1.75,
                       ),
                     ),
                   ),

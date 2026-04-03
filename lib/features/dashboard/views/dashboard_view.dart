@@ -11,7 +11,7 @@ import '../../services/controllers/services_controller.dart';
 import '../../report/views/report_view.dart';
 import '../../check_in/views/check_in_view.dart';
 import '../../astrology/views/astrology_experts_view.dart';
-import '../../remedies/views/remedies_web_view.dart';
+import '../../rewards/views/rewards_view.dart';
 import '../../../common/widgets/custom_popups.dart';
 
 import '../../sankalp/blocs/sankalp_bloc.dart';
@@ -183,9 +183,7 @@ class _DashboardLayoutState extends State<DashboardLayout>
                     scrollController: _connectScrollController,
                   ),
                   // Only load WebView when active to prevent crashes/memory issues
-                  currentIndex == 4
-                      ? RemediesWebView(onBack: () => Provider.of<DashboardViewModel>(context, listen: false).changeTab(0))
-                      : const SizedBox(),
+                  RewardsView(),
                   ReportView(), // Keeping ReportView for My Kosh (Drawer navigation)
                 ],
               ),
@@ -195,7 +193,6 @@ class _DashboardLayoutState extends State<DashboardLayout>
         bottomNavigationBar: Selector<DashboardViewModel, int>(
           selector: (_, viewModel) => viewModel.currentIndex,
           builder: (context, currentIndex, child) {
-            if (currentIndex == 4) return const SizedBox.shrink();
             return BrahmakoshBottomBar(
               currentIndex: currentIndex,
               onTap: (index) => Provider.of<DashboardViewModel>(context, listen: false).changeTab(index),

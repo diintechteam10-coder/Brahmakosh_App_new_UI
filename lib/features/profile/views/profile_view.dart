@@ -303,18 +303,6 @@ class _ProfileViewState extends State<ProfileView> {
                 _buildSectionContainer(
                   title: "Others",
                   children: [
-                    if (!Platform.isIOS) ...[
-                      _buildListTile(
-                        icon: Icons.account_balance_wallet_outlined,
-                        title: "My Kosh",
-                        onTap: () {
-                          // ProfileView is pushed from NewHomeView via Navigator.push.
-                          // We safely pop and return the desired tab index back to NewHomeView.
-                          Get.back(result: 5);
-                        },
-                      ),
-                      const Divider(color: Colors.white10, height: 1),
-                    ],
                     if (!Platform.isIOS)
                       _buildListTile(
                         icon: Icons.shopping_cart_outlined,

@@ -13,6 +13,7 @@ import '../../../core/services/storage_service.dart';
 import '../../../core/services/chat_notification_service.dart';
 import '../../astrology/models/chat_models.dart';
 import '../../../core/services/socket_service.dart';
+import '../../../core/utils/app_snackbar.dart';
 
 extension StringExtension on String {
   String capitalizeFirstLetter() {
@@ -115,12 +116,9 @@ class AstrologyChatController extends GetxController {
         if (message.senderId == expert.id && !isRequestAccepted.value) {
           isRequestAccepted.value = true;
           _startTimer();
-          Get.snackbar(
+          AppSnackBar.showSuccess(
             "Consultation Started",
             "Expert has joined the conversation.",
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
-            snackPosition: SnackPosition.TOP,
           );
         }
 
@@ -436,11 +434,9 @@ class AstrologyChatController extends GetxController {
         _requestChat();
       }
     } else {
-      Get.snackbar(
+      AppSnackBar.showError(
         "Error",
         "Could not start chat session",
-        backgroundColor: Colors.redAccent,
-        colorText: Colors.white,
       );
     }
     Utils.print("📌 EXIT _initializeChat");
@@ -539,11 +535,9 @@ class AstrologyChatController extends GetxController {
         if (!isRequestAccepted.value) {
           isRequestAccepted.value = true;
           _startTimer();
-          Get.snackbar(
+          AppSnackBar.showSuccess(
             "Consultation Started",
             "Expert has joined the chat.",
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
           );
         }
       }
@@ -1082,31 +1076,23 @@ class AstrologyChatController extends GetxController {
           // Navigate back to Experts View
           Get.back();
 
-          Get.snackbar(
+          AppSnackBar.showSuccess(
             "Thank You",
             "Your feedback has been submitted.",
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
-            snackPosition: SnackPosition.BOTTOM,
-            margin: const EdgeInsets.all(16),
           );
         } else {
           Utils.print("❌ Feedback failed: ${response.body}");
-          Get.snackbar(
+          AppSnackBar.showError(
             "Error",
             data['message'] ?? "Failed to submit feedback",
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
           );
         }
       },
       onError: (error) {
         Utils.print("❌ Feedback error: $error");
-        Get.snackbar(
+        AppSnackBar.showError(
           "Error",
           "Something went wrong. Please try again.",
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
         );
       },
     );
