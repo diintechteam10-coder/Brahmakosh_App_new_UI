@@ -154,6 +154,20 @@ class AstrologyExpertsView extends StatelessWidget {
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(color: AppTheme.textSecondary),
                         ),
+                        const SizedBox(height: 24),
+                        ElevatedButton.icon(
+                          onPressed: controller.refreshExperts,
+                          icon: const Icon(Icons.refresh, size: 20),
+                          label: const Text("REFRESH"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFFFD700),
+                            foregroundColor: Colors.black,
+                            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 1.2.h),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   );

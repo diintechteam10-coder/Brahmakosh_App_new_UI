@@ -123,7 +123,35 @@ class _CheckInViewState extends State<CheckInView>
           }
 
           if (state is CheckInError) {
-            return SafeArea(child: Center(child: Text(state.message)));
+            return SafeArea(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error_outline, size: 48, color: Colors.red.withValues(alpha: 0.7)),
+                    const SizedBox(height: 16),
+                    Text(
+                      state.message,
+                      style: GoogleFonts.poppins(color: Colors.white, fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFD4AF37),
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                      ),
+                      onPressed: () {
+                        context.read<CheckInBloc>().add(LoadCheckIn());
+                      },
+                      child: const Text('RETRY', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
 
           Data? data;
@@ -135,9 +163,32 @@ class _CheckInViewState extends State<CheckInView>
             data = state.previousState.data;
           }
 
-          if (data == null) {
-            // Fallback or Initial
-            return const SafeArea(child: Center(child: Text("Loading...")));
+          if (data == null || (data.activities == null && data.stats == null)) {
+            return SafeArea(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset('assets/images/logo.png', width: 80, opacity: const AlwaysStoppedAnimation(0.5)),
+                    const SizedBox(height: 24),
+                    const CircularProgressIndicator(color: Color(0xFFD4AF37)),
+                    const SizedBox(height: 24),
+                    Text(
+                      "Connecting to spiritual realm...",
+                      style: GoogleFonts.poppins(color: Colors.white70, fontSize: 14),
+                    ),
+                    const SizedBox(height: 32),
+                    TextButton.icon(
+                      onPressed: () {
+                        context.read<CheckInBloc>().add(LoadCheckIn());
+                      },
+                      icon: const Icon(Icons.refresh, color: Color(0xFFD4AF37)),
+                      label: const Text('RELOAD', style: TextStyle(color: Color(0xFFD4AF37))),
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
 
           final finalData = data;
