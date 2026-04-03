@@ -132,10 +132,10 @@ class _DashboardLayoutState extends State<DashboardLayout>
       context: context,
       builder: (context) {
         return ActionConfirmationPopup(
-          title: 'Exit App',
-          description: 'Are you sure you want to exit the app?',
-          confirmLabel: 'Yes',
-          cancelLabel: 'No',
+          title: 'exit_app'.tr,
+          description: 'exit_description'.tr,
+          confirmLabel: 'yes'.tr,
+          cancelLabel: 'no'.tr,
           onConfirm: () {}, // Handled by showDialog return value
           confirmColor: Colors.red,
         );
@@ -179,7 +179,7 @@ class _DashboardLayoutState extends State<DashboardLayout>
                   CheckInView(scrollController: _checkInScrollController),
                   RashmiAi(),
                   AstrologyExpertsView(
-                    screenTitle: "Connect",
+                    screenTitle: "connect".tr,
                     scrollController: _connectScrollController,
                   ),
                   // Only load WebView when active to prevent crashes/memory issues

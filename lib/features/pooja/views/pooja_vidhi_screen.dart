@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../../core/utils/app_snackbar.dart';
 
 import '../models/pooja_model.dart';
+import 'package:brahmakosh/core/localization/translate_helper.dart';
 
 class PoojaVidhiScreen extends StatefulWidget {
   final PoojaModel pooja;
@@ -21,6 +22,14 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
   Duration _duration = Duration.zero;
   Duration _position = Duration.zero;
   bool _isLoading = false;
+  
+  // Translated Data
+  String? _translatedMuhurat;
+  String? _translatedInstructions;
+  String? _translatedPoojaName;
+  List<PujaVidhi> _translatedSteps = [];
+  List<SamagriList> _translatedSamagri = [];
+  List<Mantras> _translatedMantras = [];
 
   @override
   void initState() {
@@ -56,6 +65,85 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
 
     // Automatically prepare audio if url is present?
     // Maybe better to wait for user to click play to load data efficiently.
+    
+    // Initialize translated data with original values
+    _translatedMuhurat = widget.pooja.muhurat;
+    _translatedInstructions = widget.pooja.specialInstructions;
+    _translatedPoojaName = widget.pooja.pujaName;
+    _translatedSteps = List.from(widget.pooja.pujaVidhi ?? []);
+    _translatedSamagri = List.from(widget.pooja.samagriList ?? []);
+    _translatedMantras = List.from(widget.pooja.mantras ?? []);
+
+    _translateDynamicData();
+  }
+
+  Future<void> _translateDynamicData() async {
+    final currentLang = Get.locale?.languageCode ?? 'en';
+    if (currentLang == 'en') return;
+
+    final Set<String> toTranslate = {};
+
+    if (widget.pooja.pujaName != null) toTranslate.add(widget.pooja.pujaName!);
+    if (widget.pooja.muhurat != null) toTranslate.add(widget.pooja.muhurat!);
+    if (widget.pooja.specialInstructions != null) toTranslate.add(widget.pooja.specialInstructions!);
+
+    for (var step in widget.pooja.pujaVidhi ?? []) {
+      if (step.title != null) toTranslate.add(step.title!);
+      if (step.description != null) toTranslate.add(step.description!);
+    }
+
+    for (var item in widget.pooja.samagriList ?? []) {
+      if (item.itemName != null) toTranslate.add(item.itemName!);
+    }
+
+    for (var mantra in widget.pooja.mantras ?? []) {
+      if (mantra.meaning != null) toTranslate.add(mantra.meaning!);
+    }
+
+    if (toTranslate.isEmpty) return;
+
+    final list = toTranslate.toList();
+    final results = await TranslateHelper.translateList(list);
+    final translationMap = Map.fromIterables(list, results);
+
+    if (mounted) {
+      setState(() {
+        if (widget.pooja.pujaName != null) {
+          _translatedPoojaName = translationMap[widget.pooja.pujaName];
+        }
+        if (widget.pooja.muhurat != null) {
+          _translatedMuhurat = translationMap[widget.pooja.muhurat];
+        }
+        if (widget.pooja.specialInstructions != null) {
+          _translatedInstructions = translationMap[widget.pooja.specialInstructions];
+        }
+
+        // Steps
+        _translatedSteps = (widget.pooja.pujaVidhi ?? []).map((step) {
+          return PujaVidhi(
+            stepNumber: step.stepNumber,
+            title: step.title != null ? translationMap[step.title] : step.title,
+            description: step.description != null ? translationMap[step.description] : step.description,
+          );
+        }).toList();
+
+        // Samagri
+        _translatedSamagri = (widget.pooja.samagriList ?? []).map((item) {
+          return SamagriList(
+            itemName: item.itemName != null ? translationMap[item.itemName] : item.itemName,
+            quantity: item.quantity,
+          );
+        }).toList();
+
+        // Mantras
+        _translatedMantras = (widget.pooja.mantras ?? []).map((mantra) {
+          return Mantras(
+            mantraText: mantra.mantraText,
+            meaning: mantra.meaning != null ? translationMap[mantra.meaning] : mantra.meaning,
+          );
+        }).toList();
+      });
+    }
   }
 
   @override
@@ -66,9 +154,9 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
 
   Future<void> _playPause() async {
     if (widget.pooja.audioUrl == null || widget.pooja.audioUrl!.isEmpty) {
-      AppSnackBar.showError(
-        "Error",
-        "Audio not available for this pooja",
+ AppSnackBar.showError(
+        "error".tr,
+        "audio_not_available".tr,
       );
       return;
     }
@@ -93,9 +181,9 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
       setState(() {
         _isLoading = false;
       });
-      AppSnackBar.showError(
-        "Error",
-        "Could not play audio: $e",
+         AppSnackBar.showError(
+        "error".tr,
+        "audio_play_error".trParams({'error': e.toString()}),
       );
     }
   }
@@ -124,7 +212,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         title: Text(
-          "Vidhi",
+          "vidhi".tr,
           style: GoogleFonts.lora(
             fontSize: 16.sp,
             color: Colors.white,
@@ -218,7 +306,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
             SizedBox(height: 3.h),
 
             // Puja Vidhi Steps
-            _sectionHeader("Puja Vidhi"),
+            _sectionHeader("puja_vidhi_title".tr),
             SizedBox(height: 1.5.h),
             if (widget.pooja.pujaVidhi != null && widget.pooja.pujaVidhi!.isNotEmpty)
               ..._buildVidhiContent()
@@ -255,10 +343,9 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _sectionHeader("Required Samagri"),
+                  _sectionHeader("required_samagri".tr),
                   SizedBox(height: 2.h),
-                  if (widget.pooja.samagriList != null && widget.pooja.samagriList!.isNotEmpty)
-                    ...widget.pooja.samagriList!.map(
+                    ..._translatedSamagri.map(
                       (item) => Padding(
                         padding: EdgeInsets.only(bottom: 1.h),
                         child: Row(
@@ -304,7 +391,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
             SizedBox(height: 2.h),
 
             // Main Audio Player (Redesigned Design 3 Large Gold Card)
-            if (widget.pooja.mantras != null && widget.pooja.mantras!.isNotEmpty)
+            if (_translatedMantras.isNotEmpty)
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.all(6.w),
@@ -325,7 +412,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        "MANTRA",
+                        "mantra_cap".tr,
                         style: GoogleFonts.poppins(
                           fontSize: 8.sp,
                           letterSpacing: 2,
@@ -336,7 +423,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                     ),
                     SizedBox(height: 1.5.h),
                     Text(
-                      widget.pooja.pujaName ?? "Mantra",
+                      _translatedPoojaName ?? "Mantra",
                       style: GoogleFonts.poppins(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
@@ -354,28 +441,28 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                       ),
                       child: Column(
                         children: [
-                          Text(
-                            widget.pooja.mantras![0].mantraText ?? "",
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.notoSans(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              height: 1.4,
-                            ),
-                          ),
-                          if (widget.pooja.mantras![0].meaning != null) ...[
-                            SizedBox(height: 1.5.h),
                             Text(
-                              "\"${widget.pooja.mantras![0].meaning!}\"",
+                              _translatedMantras[0].mantraText ?? "",
                               textAlign: TextAlign.center,
-                              style: GoogleFonts.poppins(
-                                fontSize: 10.sp,
-                                color: Colors.white.withOpacity(0.9),
-                                fontStyle: FontStyle.italic,
+                              style: GoogleFonts.notoSans(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                height: 1.4,
                               ),
                             ),
-                          ],
+                            if (_translatedMantras[0].meaning != null) ...[
+                              SizedBox(height: 1.5.h),
+                              Text(
+                                "\"${_translatedMantras[0].meaning!}\"",
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 10.sp,
+                                  color: Colors.white.withOpacity(0.9),
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ],
                         ],
                       ),
                     ),
@@ -414,14 +501,14 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
             SizedBox(height: 3.h),
 
             // Guidelines (Do's & Don'ts Layout)
-            _sectionHeader("Puja Guidelines"),
+            _sectionHeader("puja_guidelines".tr),
             SizedBox(height: 1.5.h),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(child: _buildGuidelineCard("Do's", true)),
+                Expanded(child: _buildGuidelineCard("dos".tr, true)),
                 SizedBox(width: 3.w),
-                Expanded(child: _buildGuidelineCard("Don'ts", false)),
+                Expanded(child: _buildGuidelineCard("donts".tr, false)),
               ],
             ),
 
@@ -432,7 +519,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _sectionHeader("Special Instructions"),
+                  _sectionHeader("special_instructions".tr),
                   SizedBox(height: 1.5.h),
                   Container(
                     padding: EdgeInsets.all(4.w),
@@ -442,7 +529,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                       border: Border.all(color: Colors.white.withOpacity(0.05)),
                     ),
                     child: Text(
-                      widget.pooja.specialInstructions!,
+                        _translatedInstructions!,
                       style: GoogleFonts.poppins(
                         fontSize: 11.sp,
                         color: Colors.white.withOpacity(0.7),
@@ -486,14 +573,14 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
 
   List<Widget> _buildVidhiContent() {
     List<Widget> content = [];
-    final steps = widget.pooja.pujaVidhi ?? [];
+    final steps = _translatedSteps;
     
     for (int i = 0; i < steps.length; i++) {
       content.add(_buildStepCard(steps[i]));
       
       // Inject Mantra To Chant Card after step 2 (index 1) if available
-      if (i == 1 && widget.pooja.mantras != null && widget.pooja.mantras!.isNotEmpty) {
-        content.add(_buildMantraToChantCard(widget.pooja.mantras![0]));
+      if (i == 1 && _translatedMantras.isNotEmpty) {
+        content.add(_buildMantraToChantCard(_translatedMantras[0]));
       }
     }
     return content;
@@ -581,7 +668,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
               Icon(Icons.music_note, color: Colors.white, size: 12.sp),
               SizedBox(width: 2.w),
               Text(
-                "MANTRA TO CHANT",
+                "mantra_to_chant".tr,
                 style: GoogleFonts.poppins(
                   fontSize: 9.sp,
                   fontWeight: FontWeight.w900,
@@ -636,7 +723,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
           ),
           SizedBox(height: 1.2.h),
           Text(
-            isDo ? "• Face East/North\n• Wear clean clothes\n• Maintain Silence" : "• Don't rush steps\n• No leather items\n• Avoid Interruptions",
+            isDo ? "dos_list".tr : "donts_list".tr,
             style: GoogleFonts.poppins(
               fontSize: 10.sp,
               color: isDo ? const Color(0xFF2E7D32).withOpacity(0.9) : const Color(0xFFC62828).withOpacity(0.9),

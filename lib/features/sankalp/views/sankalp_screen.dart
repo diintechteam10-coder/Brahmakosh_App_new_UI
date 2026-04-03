@@ -45,7 +45,7 @@ class _SankalpScreenState extends State<SankalpScreen>
         backgroundColor: Colors.black,
         appBar: AppBar(
           title: Text(
-            "My Sankalp",
+            "my_sankalp".tr,
             style: GoogleFonts.poppins(
               fontSize: 18,
               color: Colors.white,
@@ -144,9 +144,9 @@ class _SankalpScreenState extends State<SankalpScreen>
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
                     ),
-                    tabs: const [
-                      Tab(text: "MY SANKALP"),
-                      Tab(text: "COMPLETED"),
+                    tabs: [
+                      Tab(text: "my_sankalp_cap".tr),
+                      Tab(text: "completed_cap".tr),
                     ],
                   ),
                 ),

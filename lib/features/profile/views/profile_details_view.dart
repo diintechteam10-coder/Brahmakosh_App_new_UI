@@ -107,17 +107,17 @@ class ProfileDetailsView extends StatelessWidget {
 
                       // Personal Information Container
                       _buildSectionContainer(
-                        title: "Personal Information",
+                        title: "personal_info".tr,
                         children: [
                           _buildInfoTile(
                             icon: Icons.person_outline,
-                            label: "Name",
-                            value: user?.name ?? "Sushant",
+                            label: "full_name".tr,
+                            value: user?.name ?? "User",
                           ),
                           const Divider(color: Colors.white10, height: 1),
                           _buildInfoTile(
                             icon: Icons.phone_outlined,
-                            label: "Mobile",
+                            label: "mobile".tr,
                             value: profile?.mobile ?? "+91 ****",
                           ),
                         ],
@@ -127,29 +127,29 @@ class ProfileDetailsView extends StatelessWidget {
 
                       // Birth Details Container
                       _buildSectionContainer(
-                        title: "Birth Details",
+                        title: "birth_details".tr,
                         children: [
                           _buildInfoTile(
                             icon: Icons.calendar_today_outlined,
-                            label: "Date Of Birth",
-                            value: user?.dob?.split('T').first ?? "2000 - 03 - 23",
+                            label: "dob".tr,
+                            value: user?.dob?.split('T').first ?? "2000-03-23",
                           ),
                           const Divider(color: Colors.white10, height: 1),
                           _buildInfoTile(
                             icon: Icons.access_time_outlined,
-                            label: "Time Of Birth",
+                            label: "tob".tr,
                             value: user?.timeOfBirth ?? "7:17 AM",
                           ),
                           const Divider(color: Colors.white10, height: 1),
                           _buildInfoTile(
                             icon: Icons.place_outlined,
-                            label: "Place Of Birth",
+                            label: "pob".tr,
                             value: user?.placeOfBirth ?? "Nawada, Bihar, India",
                           ),
                            const Divider(color: Colors.white10, height: 1),
                           _buildInfoTile(
                             icon: Icons.auto_awesome_outlined,
-                            label: "Profession",
+                            label: "profession".tr,
                             value: user?.gowthra ?? "Designer",
                           ),
                         ],

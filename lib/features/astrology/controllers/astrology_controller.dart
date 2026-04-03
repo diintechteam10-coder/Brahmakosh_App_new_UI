@@ -11,6 +11,7 @@ import '../views/astrology_chat_view.dart';
 import '../views/astrologist_profile_view.dart';
 import '../views/conversation_history_view.dart';
 import '../../../core/utils/app_snackbar.dart';
+import '../../../core/localization/translate_helper.dart';
 
 class AstrologyController extends GetxController {
   final _experts = <AstrologistItem>[].obs;
@@ -21,6 +22,13 @@ class AstrologyController extends GetxController {
   final categoryScrollController = ScrollController();
   final isLoading = false.obs;
   bool _hasLoadedOnce = false;
+
+  // Dynamic Translation Maps
+  final RxMap<String, String> _translatedData = <String, String>{}.obs;
+  String _lastLang = 'en';
+
+  Map<String, String> get translatedData => _translatedData;
+
 
   List<AstrologistItem> get experts => _experts;
   List<Map<String, dynamic>> get categories => _categories;
@@ -69,12 +77,46 @@ class AstrologyController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _lastLang = Get.locale?.languageCode ?? 'en';
     fetchCategories();
     fetchExperts(); // initial load (cached by fetchExperts)
     searchController.addListener(() {
       _searchQuery.value = searchController.text;
     });
   }
+
+
+  Future<void> _translateAll() async {
+    if (_lastLang == 'en') {
+      _translatedData.clear();
+      return;
+    }
+
+    final Set<String> toTranslate = {};
+
+    // Categories
+    for (var cat in _categories) {
+      if (cat['name'] != null) toTranslate.add(cat['name']);
+    }
+
+    // Experts
+    for (var expert in _experts) {
+      if (expert.name != null) toTranslate.add(expert.name!);
+      if (expert.expertise != null) toTranslate.add(expert.expertise!);
+    }
+
+    if (toTranslate.isEmpty) return;
+
+    final list = toTranslate.toList();
+    final results = await TranslateHelper.translateList(list);
+
+    final Map<String, String> newTranslations = {};
+    for (int i = 0; i < list.length; i++) {
+      newTranslations[list[i]] = results[i];
+    }
+    _translatedData.assignAll(newTranslations);
+  }
+
 
   Future<void> fetchCategories() async {
     try {
@@ -103,12 +145,11 @@ class AstrologyController extends GetxController {
             print("✅ Parsed ${categoryList.length} categories");
 
             if (categoryList.isNotEmpty) {
-              _categories.value = categoryList.cast<Map<String, dynamic>>();
-
-              // Select first category by default if not "all"
-              // But usually "All" is the first tab.
-              // If we want to slide to position, we'll handle that in the view.
+              final castedCategories = categoryList.cast<Map<String, dynamic>>();
+              _categories.value = castedCategories;
+              _translateAll();
             }
+
           } else {
             print("❌ Categories API Success is false or data null");
           }
@@ -207,6 +248,7 @@ class AstrologyController extends GetxController {
                 print("👤 Expert Data: ${json.encode(expert.toJson())}");
               }
               _experts.value = parsedExperts;
+              _translateAll();
 
               // Fallback to mock data if API returns empty
               if (_experts.isEmpty) {
@@ -277,7 +319,7 @@ class AstrologyController extends GetxController {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "RECHARGE WALLET",
+                  "recharge_wallet".tr.toUpperCase(),
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -293,7 +335,7 @@ class AstrologyController extends GetxController {
             ),
             const SizedBox(height: 8),
             Text(
-              "Insufficient balance to start consultation. Minimum ₹100 is required.",
+              "insufficient_balance_msg".tr,
               style: GoogleFonts.poppins(
                 fontSize: 14,
                 color: Colors.white.withOpacity(0.7),
@@ -312,8 +354,8 @@ class AstrologyController extends GetxController {
                   onTap: () {
                     Get.back();
                     AppSnackBar.showInfo(
-                      "Processing",
-                      "Starting payment for ₹$amount...",
+                      "processing".tr,
+                      "starting_payment".trParams({'amount': amount.toString()}),
                     );
                   },
                   child: Container(
@@ -350,7 +392,7 @@ class AstrologyController extends GetxController {
                   elevation: 0,
                 ),
                 child: Text(
-                  "PROCEED TO PAY",
+                  "proceed_to_pay".tr.toUpperCase(),
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -372,8 +414,8 @@ class AstrologyController extends GetxController {
 
   void openUserProfile() {
     AppSnackBar.showSuccess(
-      "Profile",
-      "Opening Account details...",
+      "profile_title".tr,
+      "opening_profile_msg".tr,
     );
   }
 

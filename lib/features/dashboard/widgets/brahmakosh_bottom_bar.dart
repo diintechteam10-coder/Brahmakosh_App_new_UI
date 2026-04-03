@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:get/get.dart';
 import '../../../../core/theme/app_theme.dart';
 
 class BrahmakoshBottomBar extends StatelessWidget {
@@ -84,13 +85,15 @@ class BrahmakoshBottomBar extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                   _buildNavItem(0, 'assets/icons/home_new.svg', 'Home'),
-                   _buildNavItem(1, 'assets/icons/check_in_new.svg', 'Check - In'),
+                   _buildNavItem(0, 'assets/icons/home_new.svg', 'home'.tr),
+                   _buildNavItem(1, 'assets/icons/check_in_new.svg', 'check_in_nav'.tr),
                    
                    // Center Spacer for Ask BI
                    const Expanded(child: SizedBox()),
                    
-                   _buildNavItem(3, 'assets/icons/connect_new.svg', 'Connect'),
+                   _buildNavItem(3, 'assets/icons/connect_new.svg', 'connect'.tr),
+                  //  _buildNavItem(4, 'assets/icons/cart_new.svg', 'remedies_nav'.tr),
+                  //  _buildNavItem(3, 'assets/icons/connect_new.svg', 'Connect'),
                    _buildNavItem(4, 'assets/rewards/silver.svg', 'Rewards'),
                 ],
               ),
@@ -104,7 +107,7 @@ class BrahmakoshBottomBar extends StatelessWidget {
             right: 0,
             child: Center(
               child: Text(
-                'Ask BI',
+                'ask_bi'.tr,
                 style: GoogleFonts.poppins(
                   fontSize: 12,
                   fontWeight: currentIndex == 2 ? FontWeight.w600 : FontWeight.w400,

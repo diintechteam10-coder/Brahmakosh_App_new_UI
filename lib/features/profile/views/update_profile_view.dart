@@ -1,5 +1,6 @@
 import 'package:brahmakosh/core/common_imports.dart';
 import 'package:brahmakosh/features/profile/viewmodels/profile_viewmodel.dart';
+import 'package:brahmakosh/core/localization/translate_helper.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -42,6 +43,25 @@ class _UpdateProfileViewState extends State<UpdateProfileView> {
     _timeController = TextEditingController(text: profile?.timeOfBirth ?? '');
     _placeController = TextEditingController(text: profile?.placeOfBirth ?? '');
     _gowthraController = TextEditingController(text: profile?.gowthra ?? '');
+    
+    // Translate dynamic data from API if locale is Hindi
+    _translateInitialData();
+  }
+
+  Future<void> _translateInitialData() async {
+    if (Get.locale?.languageCode == 'hi') {
+      final translatedPlace = await TranslateHelper.translate(_placeController.text);
+      final translatedGowthra = await TranslateHelper.translate(_gowthraController.text);
+      final translatedName = await TranslateHelper.translate(_nameController.text);
+      
+      if (mounted) {
+        setState(() {
+          _placeController.text = translatedPlace;
+          _gowthraController.text = translatedGowthra;
+          _nameController.text = translatedName;
+        });
+      }
+    }
   }
 
   @override
@@ -114,7 +134,7 @@ class _UpdateProfileViewState extends State<UpdateProfileView> {
       backgroundColor: Colors.black, // Dark background
       appBar: AppBar(
         title: Text(
-          'Update Profile',
+          'update_profile'.tr,
           style: GoogleFonts.lora(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -139,10 +159,10 @@ class _UpdateProfileViewState extends State<UpdateProfileView> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      _buildTextField("Full Name", _nameController, Icons.person_outline),
+                      _buildTextField("full_name".tr, _nameController, Icons.person_outline),
                       const SizedBox(height: 16),
                       _buildTextField(
-                        "Date of Birth", 
+                        "dob".tr, 
                         _dobController, 
                         Icons.calendar_today,
                         isReadOnly: true,
@@ -150,16 +170,16 @@ class _UpdateProfileViewState extends State<UpdateProfileView> {
                       ),
                       const SizedBox(height: 16),
                       _buildTextField(
-                        "Time of Birth", 
+                        "tob".tr, 
                         _timeController, 
                         Icons.access_time,
                         isReadOnly: true,
                         onTap: () => _selectTime(context),
                       ),
                       const SizedBox(height: 16),
-                      _buildTextField("Place of Birth", _placeController, Icons.place_outlined),
+                      _buildTextField("pob".tr, _placeController, Icons.place_outlined),
                       const SizedBox(height: 16),
-                      _buildTextField("Profession", _gowthraController, Icons.auto_awesome_outlined),
+                      _buildTextField("profession".tr, _gowthraController, Icons.auto_awesome_outlined),
                       
                       const SizedBox(height: 48),
                       
@@ -203,7 +223,7 @@ class _UpdateProfileViewState extends State<UpdateProfileView> {
                                   child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2)
                                 )
                               : Text(
-                                  "Save Changes", 
+                                  "save_changes".tr, 
                                   style: GoogleFonts.poppins(
                                     fontSize: 16, 
                                     fontWeight: FontWeight.w600,
@@ -245,7 +265,7 @@ class _UpdateProfileViewState extends State<UpdateProfileView> {
           controller: controller,
           readOnly: isReadOnly,
           onTap: onTap,
-          validator: (value) => value == null || value.isEmpty ? "$label is required" : null,
+          validator: (value) => value == null || value.isEmpty ? "$label ${'is_required'.tr}" : null,
           style: GoogleFonts.poppins(color: Colors.white),
           decoration: InputDecoration(
             hintText: label,

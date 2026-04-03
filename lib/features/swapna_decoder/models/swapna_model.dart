@@ -1,26 +1,26 @@
 class SwapnaModel {
-  final String id;
-  final String symbolName;
-  final String symbolNameHindi;
-  final String category;
-  final String subcategory;
-  final String? thumbnailUrl;
-  final String? shortDescription;
-  final String? detailedInterpretation;
-  final List<SwapnaPoint>? positiveAspects;
-  final List<SwapnaPoint>? negativeAspects;
-  final List<SwapnaContext>? contextVariations;
-  final String? astrologicalSignificance;
-  final String? vedicReferences;
-  final SwapnaRemedies? remedies;
-  final List<String>? relatedSymbols;
-  final String? frequencyImpact;
-  final SwapnaTimeSignificance? timeSignificance;
-  final SwapnaGenderSpecific? genderSpecific;
-  final List<String>? tags;
-  final int? sortOrder;
-  final int? viewCount;
-  final String? createdAt;
+  String id;
+  String symbolName;
+  String symbolNameHindi;
+  String category;
+  String subcategory;
+  String? thumbnailUrl;
+  String? shortDescription;
+  String? detailedInterpretation;
+  List<SwapnaPoint>? positiveAspects;
+  List<SwapnaPoint>? negativeAspects;
+  List<SwapnaContext>? contextVariations;
+  String? astrologicalSignificance;
+  String? vedicReferences;
+  SwapnaRemedies? remedies;
+  List<String>? relatedSymbols;
+  String? frequencyImpact;
+  SwapnaTimeSignificance? timeSignificance;
+  SwapnaGenderSpecific? genderSpecific;
+  List<String>? tags;
+  int? sortOrder;
+  int? viewCount;
+  String? createdAt;
 
   SwapnaModel({
     required this.id,
@@ -90,8 +90,8 @@ class SwapnaModel {
 }
 
 class SwapnaPoint {
-  final String point;
-  final String description;
+  String point;
+  String description;
 
   SwapnaPoint({required this.point, required this.description});
 
@@ -104,8 +104,8 @@ class SwapnaPoint {
 }
 
 class SwapnaContext {
-  final String context;
-  final String meaning;
+  String context;
+  String meaning;
 
   SwapnaContext({required this.context, required this.meaning});
 
@@ -118,10 +118,10 @@ class SwapnaContext {
 }
 
 class SwapnaRemedies {
-  final List<String>? mantras;
-  final List<String>? pujas;
-  final List<String>? donations;
-  final List<String>? precautions;
+  List<String>? mantras;
+  List<String>? pujas;
+  List<String>? donations;
+  List<String>? precautions;
 
   SwapnaRemedies({this.mantras, this.pujas, this.donations, this.precautions});
 
@@ -144,9 +144,9 @@ class SwapnaRemedies {
 }
 
 class SwapnaTimeSignificance {
-  final String? morning;
-  final String? night;
-  final String? brahmaMuhurat;
+  String? morning;
+  String? night;
+  String? brahmaMuhurat;
 
   SwapnaTimeSignificance({this.morning, this.night, this.brahmaMuhurat});
 
@@ -160,9 +160,9 @@ class SwapnaTimeSignificance {
 }
 
 class SwapnaGenderSpecific {
-  final String? male;
-  final String? female;
-  final String? common;
+  String? male;
+  String? female;
+  String? common;
 
   SwapnaGenderSpecific({this.male, this.female, this.common});
 

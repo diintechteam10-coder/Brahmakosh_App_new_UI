@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -11,6 +12,7 @@ import '../blocs/pooja_state.dart';
 import '../models/pooja_model.dart';
 import '../repositories/pooja_repository.dart';
 import 'pooja_detail_screen.dart';
+import 'package:brahmakosh/common/widgets/translated_text.dart';
 
 class PoojaListScreen extends StatefulWidget {
   const PoojaListScreen({super.key});
@@ -20,6 +22,7 @@ class PoojaListScreen extends StatefulWidget {
 }
 
 class _PoojaListScreenState extends State<PoojaListScreen> {
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -94,7 +97,7 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                   decoration: InputDecoration(
                     fillColor: Colors.transparent,
                     filled: true,
-                    hintText: "Search rituals, puja, astrologers",
+                    hintText: "search_hint".tr,
                     hintStyle: GoogleFonts.poppins(
                       fontSize: 13.sp,
                       color: Colors.white.withOpacity(0.3),
@@ -129,13 +132,15 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                       children: [
                         _buildFilterTab(
                           context,
-                          "ALL",
+                          "all_cap".tr,
                           selectedCategory == 'All',
+                          'All',
                         ),
                         _buildFilterTab(
                           context,
-                          "FESTIVAL",
+                          "festival_cap".tr,
                           selectedCategory == 'Festival',
+                          'Festival'
                         ),
                       ],
                     ),
@@ -204,6 +209,7 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
     BuildContext context,
     String label,
     bool isSelected,
+    String categoryKey,
   ) {
     return GestureDetector(
       onTap: () {
@@ -273,7 +279,7 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  TranslatedText(
                     pooja.pujaName ?? "Unknown Puja",
                     style: GoogleFonts.lora(
                       fontSize: 16.sp,
@@ -300,7 +306,7 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                         flex: 2,
                         child: _buildInfoItem(
                           Icons.access_time_filled,
-                          "${pooja.duration ?? 0} Mins",
+                          "min_suffix".trParams({'min': (pooja.duration ?? 0).toString()}),
                           const Color(0xFFD4AF37),
                         ),
                       ),
@@ -374,7 +380,7 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
           Icon(icon, size: 14.sp, color: iconColor),
         SizedBox(width: 1.5.w),
         Expanded(
-          child: Text(
+          child: TranslatedText(
             text,
             style: GoogleFonts.poppins(
               fontSize: 10.sp,

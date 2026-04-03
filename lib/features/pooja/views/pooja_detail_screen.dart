@@ -11,6 +11,7 @@ import '../blocs/pooja_state.dart';
 
 import '../repositories/pooja_repository.dart';
 import 'pooja_vidhi_screen.dart';
+import 'package:brahmakosh/common/widgets/translated_text.dart';
 
 class PoojaDetailScreen extends StatefulWidget {
   final String poojaId;
@@ -21,6 +22,7 @@ class PoojaDetailScreen extends StatefulWidget {
 }
 
 class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -54,6 +56,7 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
               return const Center(child: CircularProgressIndicator());
             } else if (state is PoojaDetailLoaded) {
               final pooja = state.pooja;
+
               return Stack(
                 children: [
                   CustomScrollView(
@@ -94,13 +97,13 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        pooja.pujaName ?? "Unknown Puja",
-                                        style: GoogleFonts.lora(
-                                          fontSize: 18.sp,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
+                                       TranslatedText(
+                                    pooja.pujaName ?? "",
+                                    style: GoogleFonts.lora(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
                                       ),
                                       SizedBox(height: 1.5.h),
                                       Divider(color: Colors.white.withOpacity(0.05), height: 1),
@@ -149,7 +152,7 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  _buildSectionHeader("Puja Significance"),
+                                  _buildSectionHeader("puja_significance".tr),
                                   SizedBox(height: 1.5.h),
                                   Container(
                                     padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
@@ -164,21 +167,23 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                                         Icon(Icons.calendar_month, size: 14.sp, color: Color(0xFFD4AF37)),
                                         SizedBox(width: 2.w),
                                         Expanded(
-                                          child: Text(
-                                            "Best Timing: ${pooja.bestDay ?? "Friday"}",
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 11.sp,
-                                              fontWeight: FontWeight.w600,
-                                              color: const Color(0xFFD4AF37),
-                                            ),
-                                          ),
+                                      child: TranslatedText(
+                                      "best_timing".trParams({
+                                        'day': pooja.bestDay ?? "Friday",
+                                      }),
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: const Color(0xFFD4AF37),
+                                      ),
+                                    ),
                                         ),
                                       ],
                                     ),
                                   ),
                                   SizedBox(height: 2.h),
-                                  Text(
-                                    pooja.description!,
+                                  TranslatedText(
+                                    pooja.description ?? "",
                                     style: GoogleFonts.poppins(
                                       fontSize: 11.sp,
                                       color: Colors.white.withOpacity(0.5),
@@ -202,7 +207,7 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _buildSectionHeader("Benefits/Results"),
+                                _buildSectionHeader("benefits_results".tr),
                                 SizedBox(height: 1.5.h),
                                 // This would ideally be a list, but we'll adapt the single purpose string
                                 ... (pooja.purpose!.split('.').where((e) => e.trim().isNotEmpty).map((point) => 
@@ -231,13 +236,26 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                                         ),
                                         SizedBox(width: 4.w),
                                         Expanded(
-                                          child: Text(
-                                            point.trim(),
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 11.sp,
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.white.withOpacity(0.9),
-                                            ),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              TranslatedText(
+                                                point.trim(),
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                "benefit_impact_details".tr,
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 12,
+                                                  color: Colors.white.withOpacity(0.4),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
@@ -313,7 +331,7 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                             ),
                             SizedBox(width: 2.w),
                             Text(
-                              "Start Puja Vidhi",
+                              "start_puja_vidhi".tr,
                               style: GoogleFonts.poppins(
                                 fontSize: 13.sp,
                                 fontWeight: FontWeight.bold,
@@ -375,7 +393,7 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
           Icon(icon, size: 14.sp, color: const Color(0xFFD4AF37)),
         SizedBox(width: 1.5.w),
         Expanded(
-          child: Text(
+          child: TranslatedText(
             text,
             style: GoogleFonts.poppins(
               fontSize: 10.sp,

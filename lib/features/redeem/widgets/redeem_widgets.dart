@@ -9,8 +9,15 @@ import 'package:sizer/sizer.dart';
 
 class RedeemCard extends StatelessWidget {
   final RedeemItemModel item;
+  final String? translatedTitle;
+  final String? translatedDescription;
 
-  const RedeemCard({super.key, required this.item});
+  const RedeemCard({
+    super.key,
+    required this.item,
+    this.translatedTitle,
+    this.translatedDescription,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +75,7 @@ class RedeemCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    item.title.split(' (')[0],
+                    (translatedTitle ?? item.title).split(' (')[0],
                     style: GoogleFonts.lora(
                       fontSize: 12.sp,
                       fontWeight: FontWeight.bold,
@@ -79,7 +86,7 @@ class RedeemCard extends StatelessWidget {
                   ),
                   if (item.title.contains(' ('))
                     Text(
-                      ' (${item.title.split(' (')[1]}',
+                      ' (${(translatedTitle ?? item.title).split(' (')[1]}',
                       style: GoogleFonts.poppins(
                         fontSize: 9.sp,
                         color: Colors.white60,
@@ -89,7 +96,7 @@ class RedeemCard extends StatelessWidget {
                     ),
                   SizedBox(height: 0.5.h),
                   Text(
-                    item.description,
+                    translatedDescription ?? item.description,
                     style: GoogleFonts.poppins(
                       fontSize: 9.sp,
                       color: Colors.white70,
@@ -106,7 +113,7 @@ class RedeemCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Required",
+                            "required_label".tr,
                             style: GoogleFonts.poppins(
                               fontSize: 8.sp,
                               color: Colors.white38,
@@ -147,7 +154,7 @@ class RedeemCard extends StatelessWidget {
                           elevation: 0,
                         ),
                         child: Text(
-                          "Redeem",
+                          "redeem_cap".tr,
                           style: GoogleFonts.poppins(
                             fontWeight: FontWeight.bold,
                             fontSize: 9.sp,
@@ -199,7 +206,7 @@ class ConfirmationPopup extends StatelessWidget {
               children: [
                 const SizedBox(width: 24),
                 Text(
-                  "Confirmation",
+                  "confirmation_title".tr,
                   style: GoogleFonts.lora(
                     fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
@@ -214,7 +221,7 @@ class ConfirmationPopup extends StatelessWidget {
             ),
             SizedBox(height: 2.h),
             Text(
-              "You’re about to offer a sacred act using\nyour earned Karma Points.",
+              "redeem_confirm_desc".tr,
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: 11.sp,
@@ -237,7 +244,7 @@ class ConfirmationPopup extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Offering",
+                        "offering_label".tr,
                         style: GoogleFonts.poppins(
                           fontSize: 11.sp,
                           color: Colors.white38,
@@ -262,7 +269,7 @@ class ConfirmationPopup extends StatelessWidget {
                   ),
                   SizedBox(height: 2.h),
                   _buildPricingRow(
-                    "Balance",
+                    "balance_label".tr,
                     "$currentBalance",
                     false,
                   ),
@@ -277,7 +284,7 @@ class ConfirmationPopup extends StatelessWidget {
                   const Divider(color: Colors.white10, thickness: 1),
                   SizedBox(height: 1.5.h),
                   _buildPricingRow(
-                    "Remaining Balance",
+                    "remaining_balance_label".tr,
                     "$remainingBalance",
                     true,
                     valueColor: const Color(0xFFD4AF37),
@@ -304,7 +311,7 @@ class ConfirmationPopup extends StatelessWidget {
                   elevation: 0,
                 ),
                 child: Text(
-                  "Confirm Now",
+                  "confirm_now".tr,
                   style: GoogleFonts.poppins(
                     fontSize: 13.sp,
                     fontWeight: FontWeight.bold,
@@ -315,7 +322,7 @@ class ConfirmationPopup extends StatelessWidget {
             ),
             SizedBox(height: 2.h),
             Text(
-              "This sacred act will be performed\non your behalf.",
+              "sacred_act_desc".tr,
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: 9.sp,
@@ -391,7 +398,7 @@ class SuccessPopup extends StatelessWidget {
             ),
             SizedBox(height: 3.h),
             Text(
-              "Blessing Received",
+              "blessing_received".tr,
               style: GoogleFonts.lora(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
@@ -400,7 +407,7 @@ class SuccessPopup extends StatelessWidget {
             ),
             SizedBox(height: 2.h),
             Text(
-              "Your Karma Points have been redeemed\nsuccessfully.",
+              "redeem_success_desc".tr,
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: 11.sp,
@@ -421,7 +428,7 @@ class SuccessPopup extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  "Great",
+                  "great_btn".tr,
                   style: GoogleFonts.poppins(
                     fontSize: 12.sp,
                     fontWeight: FontWeight.bold,
@@ -473,7 +480,7 @@ class InsufficientKarmaPopup extends StatelessWidget {
             ),
             SizedBox(height: 3.h),
             Text(
-              "Incomplete Karma",
+              "incomplete_karma".tr,
               style: GoogleFonts.lora(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
@@ -482,7 +489,10 @@ class InsufficientKarmaPopup extends StatelessWidget {
             ),
             SizedBox(height: 2.h),
             Text(
-              "You need $requiredPoints Karma Points for this offering. You currently have $currentPoints.",
+              "need_karma_desc".trParams({
+                'required': '$requiredPoints',
+                'current': '$currentPoints',
+              }),
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: 11.sp,
@@ -503,7 +513,7 @@ class InsufficientKarmaPopup extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  "Got It",
+                  "got_it".tr,
                   style: GoogleFonts.poppins(
                     fontSize: 12.sp,
                     fontWeight: FontWeight.bold,

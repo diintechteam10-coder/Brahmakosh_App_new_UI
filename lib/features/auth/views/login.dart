@@ -87,7 +87,7 @@ class LoginView extends StatelessWidget {
 
                   Center(
                     child: Text(
-                      "Your Spiritual Operating System",
+                      "spiritual_os_tagline".tr,
                       style: GoogleFonts.lora(
                         fontSize: 14,
                         color: AppTheme.authTextSecondary,
@@ -121,7 +121,7 @@ class LoginView extends StatelessWidget {
                   // Email Field
                   AuthInputField(
                     controller: authController.emailController,
-                    hint: "Email Address",
+                    hint: "email_address".tr,
                     icon: Icons.email_outlined,
                   ),
 
@@ -131,7 +131,7 @@ class LoginView extends StatelessWidget {
                   Obx(
                     () => AuthInputField(
                       controller: authController.passwordController,
-                      hint: "Password",
+                      hint: "password".tr,
                       icon: Icons.lock_outline,
                       obscure: authController.isLoginPasswordHidden.value,
                       suffix: GestureDetector(
@@ -157,7 +157,7 @@ class LoginView extends StatelessWidget {
                     child: GestureDetector(
                       onTap: () => Get.to(() => ForgotPasswordView()),
                       child: Text(
-                        "Forgot Password?",
+                        "forgot_password".tr,
                         style: GoogleFonts.poppins(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -171,7 +171,7 @@ class LoginView extends StatelessWidget {
 
                   // Login Button
                   Obx(() => _buildPrimaryButton(
-                    text: "Log In",
+                    text: "login".tr,
                     onTap: authController.isEmailLoading.value ? null : () => authController.loginWithEmail(),
                     isLoading: authController.isEmailLoading.value,
                     backgroundColor: AppTheme.authPrimaryGold,
@@ -190,7 +190,7 @@ class LoginView extends StatelessWidget {
                     () => Column(
                       children: [
                         _buildSocialButton(
-                          text: "Continue with Google",
+                          text: "continue_google".tr,
                           imagePath: "assets/images/google.png",
                           onTap: authController.isLoading
                               ? null
@@ -204,7 +204,7 @@ class LoginView extends StatelessWidget {
                         if (Platform.isIOS) ...[
                           const SizedBox(height: 16),
                           _buildSocialButton(
-                            text: "Continue with Apple",
+                            text: "continue_apple".tr,
                             iconData: FontAwesomeIcons.apple,
                             onTap: authController.isLoading
                                 ? null
@@ -225,7 +225,7 @@ class LoginView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Don’t have an account?",
+                        "dont_have_account".tr,
                         style: GoogleFonts.poppins(
                           fontSize: 14,
                           color: AppTheme.authTextSecondary,
@@ -234,7 +234,7 @@ class LoginView extends StatelessWidget {
                       GestureDetector(
                         onTap: () => Get.toNamed(AppConstants.routeRegister),
                         child: Text(
-                          "Sign Up",
+                          "signup".tr,
                           style: GoogleFonts.poppins(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -360,7 +360,7 @@ class LoginView extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            "or",
+            "or".tr,
             style: GoogleFonts.poppins(
               color: Color(0xffD9D9D9),
               fontSize: 14,

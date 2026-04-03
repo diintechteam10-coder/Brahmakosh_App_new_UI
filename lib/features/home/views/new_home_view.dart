@@ -28,6 +28,8 @@ import 'package:brahmakosh/features/report/views/report_view.dart';
 import 'package:brahmakosh/features/ai_rashmi/views/ai_guide_view.dart';
 import 'package:brahmakosh/common/api_urls.dart';
 import 'package:brahmakosh/common/widgets/custom_popups.dart';
+import 'package:brahmakosh/common/widgets/translated_text.dart';
+import 'package:brahmakosh/core/localization/translate_helper.dart';
 import 'package:brahmakosh/common/widgets/custom_profile_avatar.dart';
 import 'package:brahmakosh/features/profile/views/profile_view.dart'
     as brahmakosh_profile;
@@ -37,8 +39,7 @@ import 'package:brahmakosh/features/remedies/views/remedies_web_view.dart';
 
 class NewHomeView extends StatefulWidget {
   final ScrollController? scrollController;
-  const NewHomeView({super.key, this.scrollController});
-
+ NewHomeView({super.key, this.scrollController});
   @override
   State<NewHomeView> createState() => _NewHomeViewState();
 }
@@ -51,20 +52,19 @@ class _NewHomeViewState extends State<NewHomeView> {
   final RedeemController redeemController = Get.put(RedeemController());
   int _selectedDiscoveryIndex = 0;
   final List<String> _discoveryTabs = [
-    "Health",
-    "Emotions",
-    "Profession",
-    "Luck",
-    "Personal Life",
-    "Travel",
+    "health",
+    "emotions",
+    "profession",
+    "luck",
+    "personal_life",
+    "travel",
   ];
 
   int _selectedCheckInIndex = -1;
 
   List<Activities> _checkInActivities = [];
   bool _isCheckInLoading = false;
-  String _selectedRemedyTab = "MUST HAVE";
-
+  String _selectedRemedyTab = "must_have";
   // Coming Soon Projects State
   final PageController _comingSoonPageController =
       PageController(viewportFraction: 0.82);
@@ -113,8 +113,14 @@ class _NewHomeViewState extends State<NewHomeView> {
     },
   ];
 
+  // Remedy lists moved to class level for pre-translation
+
+  String _lastLang = 'en';
+
+
   Timer? _comingSoonTimer;
 
+  // Focus management
   // Focus management
   final FocusNode _searchFocusNode = FocusNode();
   final FocusNode _swapnaFocusNode = FocusNode();
@@ -125,6 +131,7 @@ class _NewHomeViewState extends State<NewHomeView> {
   @override
   void initState() {
     super.initState();
+    _lastLang = Get.locale?.languageCode ?? 'en';
     // Ensure data is fresh when viewing
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _handleRefresh();
@@ -132,8 +139,68 @@ class _NewHomeViewState extends State<NewHomeView> {
       _unfocusAll(); // Initial clean state
       context.read<NotificationBloc>().add(RefreshUnreadCount());
       _startComingSoonTimer();
+      _warmupTranslations();
     });
   }
+
+  void _warmupTranslations() {
+    final List<String> stringsToWarmup = [];
+
+    // 1. Spiritual Tools
+    const tools = [
+      {"title": "Pooja Vidhi", "desc": "Step-by-step guidance for rituals"},
+      {"title": "Daily Panchang", "desc": "Auspicious timings and planetary positions"},
+      {"title": "Sankalp Tracker", "desc": "Commit to your spiritual goals"},
+      {"title": "Muhurat", "desc": "Find the perfect time for new beginnings"},
+      {"title": "Reports", "desc": "Detailed analysis of your spiritual journey"},
+      {"title": "Remedies", "desc": "Personalized solutions for life's challenges"},
+    ];
+    for (var t in tools) {
+      stringsToWarmup.add(t["title"] as String);
+      stringsToWarmup.add(t["desc"] as String);
+    }
+
+    // 2. Coming Soon Projects
+    const comingSoon = [
+      {"title": "Brahmakosh \nExperience Centre", "subtitle": "Immersive spiritual experiences"},
+      {"title": "Spiritual \nRetreats", "subtitle": "Guided journeys to sacred places"},
+      {"title": "Global \nCommunity", "subtitle": "Connect with seekers worldwide"},
+    ];
+    for (var cs in comingSoon) {
+      stringsToWarmup.add(cs["title"] as String);
+      stringsToWarmup.add(cs["subtitle"] as String);
+    }
+
+    // 3. Expert Categories
+    stringsToWarmup.addAll(["Astrology", "Numerology", "Vastu", "Palmistry", "Tarot"]);
+
+    // 4. Section Headers & Key Strings
+    stringsToWarmup.addAll([
+      "SANKALP TRACKER",
+      "DAILY SPIRITUAL PROGRESS",
+      "SPIRITUAL TOOLS",
+      "COMING SOON PROJECTS",
+      "CONNECT WITH EXPERTS",
+      "SWAPNA DECODER",
+      "MUHURAT",
+      "Daily Spiritual Progress",
+      "No Active Sankalp",
+      "Tracking active spiritual habits.",
+      "Start a new Sankalp to track your spiritual journey.",
+    ]);
+
+    TranslateHelper.warmup(stringsToWarmup);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final currentLang = Get.locale?.languageCode ?? 'en';
+    if (currentLang != _lastLang) {
+      _lastLang = currentLang;
+    }
+  }
+
 
   void _startComingSoonTimer() {
     _comingSoonTimer?.cancel();
@@ -281,7 +348,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: "Namaste ",
+                        text: "namaste".tr + " ",
                         style: GoogleFonts.poppins(
                           color: Colors.white,
                           fontSize: 15.sp,
@@ -477,7 +544,7 @@ class _NewHomeViewState extends State<NewHomeView> {
               ),
               const SizedBox(height: 4),
               Text(
-                "Your Spiritual Operating System",
+                "your_spiritual_os".tr,
                 style: GoogleFonts.poppins(
                   color: Colors.white.withOpacity(0.6),
                   fontSize: 12.sp,
@@ -503,9 +570,9 @@ class _NewHomeViewState extends State<NewHomeView> {
               Expanded(
                 child: _buildBannerItem(
                   title: "Rashmi",
-                  role: "Spiritual Guide",
-                  description: "Get guidance on astrology, puja, rituals & spiritual practice",
-                  buttonText: "ASK SPIRITUAL GUIDE",
+                  role: "spiritual_guide".tr,
+                  description: "ask_deity_desc_short".tr,
+                  buttonText: "ask_spiritual_guide".tr,
                   imageUrl: 'assets/icons/rashmi_new_avatar.png',
                   alignment: const Alignment(0, -0.6), // Pull Rashmi up slightly
                   onPressed: () {
@@ -525,9 +592,9 @@ class _NewHomeViewState extends State<NewHomeView> {
               SizedBox(width: 3.w),
               Expanded(
                 child: _buildBannerItem(
-                  title: "Talk to Krishna",
-                  description: "Seek timeless wisdom from the Bhagavad Gita.",
-                  buttonText: "START CONVERSATION",
+                  title: "talk_to_krishna".tr,
+                  description: "krishna_desc".tr,
+                  buttonText: "start_conversation".tr,
                   imageUrl: 'assets/icons/Krishna_new_avatar.png',
                   alignment: Alignment.topCenter, // Keep Krishna as is
                   onPressed: () {
@@ -711,7 +778,7 @@ class _NewHomeViewState extends State<NewHomeView> {
             borderRadius: BorderRadius.circular(10),
           ),
           child: Text(
-            'Coming Soon',
+            'coming_soon'.tr,
             style: GoogleFonts.poppins(
               color: Colors.white,
               fontSize: 6.sp,
@@ -808,7 +875,7 @@ class _NewHomeViewState extends State<NewHomeView> {
         ),
         delegate: SliverChildListDelegate([
           _buildGridItem(
-            "Check - In",
+            "check_in".tr,
             "assets/icons/check_in.png",
             onTap: () {
               _unfocusAll();
@@ -816,7 +883,7 @@ class _NewHomeViewState extends State<NewHomeView> {
             },
           ),
           _buildGridItem(
-            "Astrology",
+            "astrology".tr,
             "assets/icons/astrology.png",
             onTap: () {
               _unfocusAll();
@@ -824,7 +891,7 @@ class _NewHomeViewState extends State<NewHomeView> {
             },
           ),
           _buildGridItem(
-            "Expert Connect",
+            "expert_connect".tr,
             "assets/icons/expert_connect.png",
             onTap: () {
               _unfocusAll();
@@ -832,7 +899,7 @@ class _NewHomeViewState extends State<NewHomeView> {
             },
           ),
           _buildGridItem(
-            "Reports",
+            "reports".tr,
             "assets/icons/reports.png",
             showComingSoon: false,
             onTap: () {
@@ -841,7 +908,7 @@ class _NewHomeViewState extends State<NewHomeView> {
             },
           ),
           _buildGridItem(
-            "Remedies",
+            "remedies".tr,
             "assets/icons/remedies.png",
             onTap: () {
               _unfocusAll();
@@ -849,7 +916,7 @@ class _NewHomeViewState extends State<NewHomeView> {
             },
           ),
           _buildGridItem(
-            "Sankalp Tracker",
+            "sankalp_tracker".tr,
             "assets/icons/sankalptracker.png",
             onTap: () {
               _unfocusAll();
@@ -857,7 +924,7 @@ class _NewHomeViewState extends State<NewHomeView> {
             },
           ),
           _buildGridItem(
-            "Puja Vidhi",
+            "puja_vidhi".tr,
             "assets/icons/puja_vidhi.png",
             onTap: () {
               _unfocusAll();
@@ -865,12 +932,12 @@ class _NewHomeViewState extends State<NewHomeView> {
             },
           ),
           _buildGridItem(
-            "Courses",
+            "courses".tr,
             "assets/icons/courses.png",
             showComingSoon: true,
             onTap: () {
               _unfocusAll();
-              Get.dialog(const ComingSoonPopup(feature: "Courses"));
+              Get.dialog(ComingSoonPopup(feature: "courses".tr));
             },
           ),
         ]),
@@ -900,7 +967,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 3.w),
                     child: Text(
-                      "ARE YOU SPIRITUAL ?",
+                      "are_you_spiritual".tr,
                       style: GoogleFonts.poppins(
                         // Cleaner look
                         color: Colors.white.withOpacity(0.6),
@@ -943,7 +1010,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                             _scrollToSelectedCheckIn(index);
                           },
                           child: _buildActivityItem(
-                            activity.title ?? "",
+                            activity.title?.toLowerCase().tr ?? "",
                             _getActivityIconPath(activity.title ?? ""),
                             isSelected: _selectedCheckInIndex == index,
                           ),
@@ -971,7 +1038,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                   ),
                   onPressed: _onCheckInNowPressed,
                   child: Text(
-                    "CHECK-IN NOW",
+                    "check_in_now".tr,
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w600,
                       fontSize: 12.sp,
@@ -1118,7 +1185,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "KARMA DASHBOARD",
+                        "karma_dashboard".tr,
                         style: GoogleFonts.poppins(
                           color: Color(0xff8E8E93),
                           fontSize: 12.sp,
@@ -1152,7 +1219,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                             ],
                           ),
                           child: Text(
-                            "REDEEM",
+                            "redeem_cap".tr,
                             style: GoogleFonts.poppins(
                               color: const Color(0xFFD4AF37),
                               fontSize: 9.sp,
@@ -1170,7 +1237,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                       // Karma Points
                       Expanded(
                         child: _buildKarmaStat(
-                          "KARMA POINTS",
+                          "karma_points".tr,
                           NumberFormat("#,###").format(karmaPoints),
                           iconPath: "assets/icons/star_rounded.svg",
                         ),
@@ -1187,7 +1254,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                             .length;
                         return Expanded(
                           child: _buildKarmaStat(
-                            "SEVA DONE",
+                            "seva_done".tr,
                             completedCount.toString(),
                             iconPath: "assets/icons/support.svg",
                           ),
@@ -1197,7 +1264,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                       // Alignment
                       Expanded(
                         child: _buildKarmaStat(
-                          "ALIGNMENT",
+                          "alignment".tr,
                           "9.0",
                           suffix: "/10",
                         ),
@@ -1287,35 +1354,41 @@ class _NewHomeViewState extends State<NewHomeView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "EXPERT CONNECT",
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 0.0,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "expert_connect_title".tr,
                   style: GoogleFonts.poppins(
                     color: Colors.white.withOpacity(0.7),
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                GestureDetector(
-                  onTap: () {
-                    _unfocusAll();
-                    Provider.of<DashboardViewModel>(
-                      context,
-                      listen: false,
-                    ).changeTab(3);
-                  },
-                  child: Text(
-                    "View All",
-                    style: GoogleFonts.poppins(
-                      color: const Color(0xFFD4AF37),
-                      fontSize: 10.sp,
-                      fontWeight: FontWeight.w600,
+                  GestureDetector(
+                    onTap: () {
+                      _unfocusAll();
+                      Provider.of<DashboardViewModel>(
+                        context,
+                        listen: false,
+                      ).changeTab(3);
+                    },
+                    child: Text(
+                      "view_all".tr,
+                      style: GoogleFonts.poppins(
+                        color: const Color(0xFFD4AF37),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             Obx(() {
               final experts = astrologyController.experts;
@@ -1332,7 +1405,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                    height: 24.h,
                   child: Center(
                     child: Text(
-                      "No experts available",
+                      "no_experts".tr,
                       style: GoogleFonts.lora(
                         color: Colors.white.withOpacity(0.5),
                       ),
@@ -1341,7 +1414,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                 );
               }
               return SizedBox(
-                height: isTablet ? 22.h : 21.h,
+                height: isTablet ? 25.h : 23.5.h, // Increased height to prevent translated text overflow
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   padding:  EdgeInsets.symmetric(horizontal: 2.w),
@@ -1425,11 +1498,11 @@ class _NewHomeViewState extends State<NewHomeView> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
-                            child: Text(
+                            child: TranslatedText(
                               expert.name ?? "Expert",
                               style: GoogleFonts.poppins(
                                 color: Colors.white,
-                                fontSize: 10.sp,
+                                fontSize: 12.sp,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -1447,7 +1520,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
-                              isOnline ? "ONLINE" : "OFFLINE",
+                              isOnline ? "online".tr : "offline".tr,
                               style: GoogleFonts.poppins(
                                 color: isOnline ? Colors.green : Colors.grey,
                                 fontSize: 8,
@@ -1457,13 +1530,13 @@ class _NewHomeViewState extends State<NewHomeView> {
                           ),
                         ],
                       ),
-                      Text(
+                      TranslatedText(
                         expert.expertise ?? "Astrology",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.poppins(
                           color: Colors.white.withOpacity(0.5),
-                          fontSize: 8.sp,
+                          fontSize: 12,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -1531,7 +1604,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                       _unfocusAll();
                       astrologyController.startChat(expert);
                     },
-                    child: _buildExpertActionButton("CHAT"),
+                    child: _buildExpertActionButton("chat".tr),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -1542,7 +1615,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                       _unfocusAll();
                       astrologyController.navigateToProfile(expert);
                     },
-                    child: _buildExpertActionButton("TALK", isPrimary: true),
+                    child: _buildExpertActionButton("talk".tr, isPrimary: true),
                   ),
                 ),
               ],
@@ -1603,7 +1676,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "TODAY'S MUHURAT",
+                    "todays_muhurat".tr,
                     style: GoogleFonts.poppins(
                       color: Color(0xff8E8E93),
                       fontSize: 13.sp,
@@ -1617,7 +1690,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                 children: [
                   Expanded(
                     child: _buildMuhuratTimeCard(
-                      "SUNRISES & SUNSET",
+                      "sunrise_sunset".tr,
                       formatTimeToAMPM(
                         basic?.sunrise,
                       ), // formats to e.g. "6:24 AM"
@@ -1631,7 +1704,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: _buildMuhuratTimeCard(
-                      "MOONRISE & MOONSET",
+                      "moonrise_moonset".tr,
                       // Logic for Moonrise
                       formatTimeToAMPM(
                         (basic?.moonrise?.isNotEmpty ?? false)
@@ -1654,7 +1727,7 @@ class _NewHomeViewState extends State<NewHomeView> {
               ),
               const SizedBox(height: 20),
               Text(
-                "PERSONALIZED ASTROLOGY MUHURAT",
+                "personalized_astrology_muhurat".tr,
                 style: GoogleFonts.poppins(
                   color: const Color(0xFFD4AF37),
                   fontSize: 18,
@@ -1663,9 +1736,9 @@ class _NewHomeViewState extends State<NewHomeView> {
               ),
               const SizedBox(height: 12),
               _buildDetailedMuhuratCard(
-                "Abhijit Muhurat",
+                "abhijit_muhurat".tr,
                 "${formatTimeToAMPM(advanced?.abhijitMuhurta?.start)} - ${formatTimeToAMPM(advanced?.abhijitMuhurta?.end)}",
-                "HIGHLY AUSPICIOUS",
+                "highly_auspicious".tr,
                 const Color(0xFF22C55E),
               ),
               Container(
@@ -1677,47 +1750,47 @@ class _NewHomeViewState extends State<NewHomeView> {
                 child: Column(
                   children: [
                     _buildMuhuratRow(
-                      "Rahu Kaal",
+                      "rahu_kaal".tr,
                       "${formatTimeToAMPM(advanced?.rahukaal?.start)} - ${formatTimeToAMPM(advanced?.rahukaal?.end)}",
-                      "(AVOID)",
+                      "avoid_tag".tr,
                       Colors.red,
                     ),
                     _buildMuhuratRow(
-                      "Tithi",
+                      "tithi".tr,
                       basic?.tithi ?? "Loading...",
                       advanced?.panchang?.tithi?.endTime != null
-                          ? "Until ${(advanced!.panchang!.tithi!.endTime!.hour! % 24).toString().padLeft(2, '0')}:${advanced!.panchang!.tithi!.endTime!.minute.toString().padLeft(2, '0')}"
+                          ? "until".tr + " ${(advanced!.panchang!.tithi!.endTime!.hour! % 24).toString().padLeft(2, '0')}:${advanced!.panchang!.tithi!.endTime!.minute.toString().padLeft(2, '0')}"
                           : (basic?.paksha ?? ""),
                       const Color(0xFFD4AF37),
                     ),
                     _buildMuhuratRow(
-                      "Nakshatra",
+                      "nakshatra".tr,
                       basic?.nakshatra ?? "--",
                       advanced?.panchang?.nakshatra?.endTime != null
-                          ? "Until ${(advanced!.panchang!.nakshatra!.endTime!.hour! % 24).toString().padLeft(2, '0')}:${advanced!.panchang!.nakshatra!.endTime!.minute.toString().padLeft(2, '0')}"
+                          ? "until".tr + " ${(advanced!.panchang!.nakshatra!.endTime!.hour! % 24).toString().padLeft(2, '0')}:${advanced!.panchang!.nakshatra!.endTime!.minute.toString().padLeft(2, '0')}"
                           : "",
                       const Color(0xFFD4AF37),
                     ),
                     _buildMuhuratRow(
-                      "Hindu Month",
+                      "hindu_month".tr,
                       advanced?.hinduMaah?.purnimanta ?? "--",
                       "",
                       const Color(0xFFD4AF37),
                     ),
                     _buildMuhuratRow(
-                      "Ritu",
+                      "ritu".tr,
                       basic?.ritu ?? (advanced?.ritu ?? "--"),
                       "",
                       const Color(0xFFD4AF37),
                     ),
                     _buildMuhuratRow(
-                      "Direction",
+                      "direction".tr,
                       basic?.dishaShool ?? (advanced?.dishaShool ?? "--"),
                       "",
                       Colors.orange,
                     ),
                     _buildMuhuratRow(
-                      "Sun / Moon Sign",
+                      "sun_moon_sign".tr,
                       "${advanced?.sunSign ?? '--'} / ${advanced?.moonSign ?? '--'}",
                       "",
                       const Color(0xFFE67E22),
@@ -1751,7 +1824,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          "View Today's Panchang",
+                          "view_todays_panchang".tr,
                           style: GoogleFonts.poppins(
                             color: Colors.white,
                             fontSize: 14,
@@ -2308,7 +2381,7 @@ class _NewHomeViewState extends State<NewHomeView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            TranslatedText(
               "SPIRITUAL TOOLS",
                style: GoogleFonts.poppins(
                 color:Colors.white.withOpacity(0.7),
@@ -2382,27 +2455,23 @@ class _NewHomeViewState extends State<NewHomeView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 4.0),
-                        child: Text(
-                          title,
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      TranslatedText(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.lora(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 6),
-                      Text(
+                      TranslatedText(
                         desc,
-                        style: GoogleFonts.poppins(
-                          color: Colors.white.withOpacity(0.6),
-                          fontSize: 9.5.sp,
-                          height: 1.25,
+                        style: GoogleFonts.lora(
+                          color: const Color(0xFFD4AF37),
+                          fontSize: 7.5.sp,
+                          fontWeight: FontWeight.w500,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -2426,7 +2495,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                   ),
                 ),
                 child: Text(
-                  "EXPLORE",
+                  "explore_cap".tr,
                   style: GoogleFonts.poppins(
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w600,
@@ -2473,14 +2542,14 @@ class _NewHomeViewState extends State<NewHomeView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      "SANKALP TRACKER",
-                      style: GoogleFonts.poppins(
-                color:Colors.white.withOpacity(0.7),
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w500,
-              ),
-                    ),
+                TranslatedText(
+                  "SANKALP TRACKER",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white.withOpacity(0.7),
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
                     if (activeSankalps.isNotEmpty)
                     GestureDetector(
                       onTap: () => Get.to(() => const SankalpScreen()),
@@ -2515,7 +2584,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                TranslatedText(
                                   activeCount > 0 ? "Daily Spiritual Progress" : "No Active Sankalp",
                                   style: GoogleFonts.poppins(
                                     color: Colors.white,
@@ -2524,7 +2593,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                                   ),
                                 ),
                                 const SizedBox(height: 4),
-                                Text(
+                                TranslatedText(
                                   activeCount > 0 
                                     ? "Tracking $activeCount active spiritual habits."
                                     : "Start a new Sankalp to track your spiritual journey.",
@@ -2564,7 +2633,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
+                            TranslatedText(
                               "OVERALL PROGRESS",
                               style: GoogleFonts.poppins(
                                 color: Colors.white.withOpacity(0.5),
@@ -2657,7 +2726,7 @@ class _NewHomeViewState extends State<NewHomeView> {
               color: Colors.black,
             ),
             const SizedBox(width: 8),
-            Text(
+            TranslatedText(
               "TRACK YOUR SANKALP",
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.bold,
@@ -2679,10 +2748,10 @@ class _NewHomeViewState extends State<NewHomeView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "SWAPNA DECODER",
-               style: GoogleFonts.poppins(
-                color:Colors.white.withOpacity(0.7),
-                fontSize: 12.sp,
+              "swapna_decoder_title".tr,
+              style: GoogleFonts.poppins(
+                color: const Color(0xff8E8E93),
+                fontSize: 13.5.sp,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -2728,7 +2797,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    "Decode Your Dream",
+                                    "decode_your_dream".tr,
                                     style: GoogleFonts.poppins(
                                       color: Colors.white,
                                       fontSize: 12.sp,
@@ -2755,7 +2824,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              "What did you see in your sleep last night?",
+                              "decode_dream_msg".tr,
                               style: GoogleFonts.poppins(
                                 color: Colors.white.withOpacity(0.6),
                                 fontSize: 9.75.sp,
@@ -2789,7 +2858,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                       decoration: InputDecoration(
                         fillColor: const Color(0xFF0A0A0A),
                         filled: true,
-                        hintText: "Enter your dream....",
+                        hintText: "dream_hint".tr,
                         hintStyle: GoogleFonts.poppins(
                           color: Colors.white30,
                           fontSize: 10.5.sp,
@@ -2851,7 +2920,7 @@ class _NewHomeViewState extends State<NewHomeView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            TranslatedText(
               "Coming Soon Projects",
               style: GoogleFonts.lora(
                 color: const Color(0xFFD4AF37),
@@ -2860,7 +2929,7 @@ class _NewHomeViewState extends State<NewHomeView> {
               ),
             ),
             const SizedBox(height: 4),
-            Text(
+            TranslatedText(
               "Building spiritual ecosystem for growth and learning...",
               style: GoogleFonts.poppins(
                 color: Colors.white.withOpacity(0.5),
@@ -2953,7 +3022,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text(
+                  TranslatedText(
                     project["title"]!,
                     style: GoogleFonts.lora(
                       color: Colors.white,
@@ -2963,7 +3032,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Text(
+                  TranslatedText(
                     project["subtitle"]!,
                     style: GoogleFonts.poppins(
                       color: Colors.white.withOpacity(0.7),
@@ -2997,8 +3066,8 @@ class _NewHomeViewState extends State<NewHomeView> {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          "Coming Soon",
+                        TranslatedText(
+                          "coming_soon",
                           style: GoogleFonts.poppins(
                             color: Colors.black,
                             fontSize: 8.sp,
@@ -3025,7 +3094,7 @@ class _NewHomeViewState extends State<NewHomeView> {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 1.5.h),
             child: Text(
-              "PERSONALITY & SELF-DISCOVERY",
+              "self_discovery_title".tr,
               style: GoogleFonts.lora(
                 color: Colors.white.withOpacity(0.7),
                 fontSize: 10.5.sp,
@@ -3054,7 +3123,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      _discoveryTabs[index],
+                      _discoveryTabs[index].toLowerCase().tr,
                       style: GoogleFonts.lora(
                         color: isSelected
                             ? Colors.black
@@ -3183,7 +3252,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                 vertical: 12.0,
               ),
               child: Text(
-                'OUR SPONSORS',
+                "our_sponsors".tr,
                 style: GoogleFonts.lora(
                   fontWeight: FontWeight.bold,
                   color: Colors.white.withOpacity(0.7),

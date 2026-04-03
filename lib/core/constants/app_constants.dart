@@ -32,6 +32,8 @@ class AppConstants {
   static const String keyUserName = 'user_name';
   static const String keyUserImage = 'user_image';
   static const String keyUserLocation = 'user_location_address';
+  static const String keySelectedLanguage =
+      'selected_language'; // Added for language persistence
   static const String routeCheckIn = '/checkIn';
   static const String routeMeditate = '/meditate';
   static const String routeMantraChanting = '/mantraChanting';
@@ -56,4 +58,8 @@ class AppConstants {
   static const String cacheSponsors = 'cache_sponsors';
   static const String cacheUserCompleteDetails = 'cache_user_complete_details';
   static const String cacheSpiritualActivities = 'cache_spiritual_activities';
+
+  // API Keys
+  static const String googleTranslateApiKey =
+      'AIzaSyASXr38cIMlsZZlhscuDYysL8tuqTf-gh0'; // Placeholder
 }

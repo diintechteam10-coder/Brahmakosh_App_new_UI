@@ -23,7 +23,7 @@ class CallHistoryView extends StatelessWidget {
           onPressed: () => Get.back(),
         ),
         title: Text(
-          'Call Logs',
+          'call_logs'.tr,
           style: GoogleFonts.lora(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -56,7 +56,7 @@ class CallHistoryView extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Failed to load call logs',
+                    'failed_load_calls'.tr,
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -69,7 +69,7 @@ class CallHistoryView extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryGold,
                     ),
-                    child: const Text('Retry'),
+                    child: Text('retry'.tr),
                   ),
                 ],
               ),
@@ -88,7 +88,7 @@ class CallHistoryView extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No voice calls yet',
+                    'no_calls_yet'.tr,
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -97,7 +97,7 @@ class CallHistoryView extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Start a voice call with an expert to see it here',
+                    'start_call_with_expert'.tr,
                     style: GoogleFonts.poppins(
                       fontSize: 13,
                       color: Colors.white.withOpacity(0.5),
@@ -144,10 +144,10 @@ class CallHistoryView extends StatelessWidget {
         ? const Color(0xFFE57373)
         : Colors.orange;
     String statusLabel = isEnded
-        ? 'Completed'
+        ? 'completed'.tr
         : (status.isNotEmpty
-              ? status[0].toUpperCase() + status.substring(1)
-              : 'Ended');
+              ? "filter_${status.toLowerCase()}".tr
+              : 'filter_ended'.tr);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -240,7 +240,7 @@ class CallHistoryView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '$billableMin Min',
+                      'min_suffix'.trParams({'min': billableMin.toString()}),
                       style: GoogleFonts.poppins(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,

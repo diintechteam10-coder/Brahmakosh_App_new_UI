@@ -1,4 +1,6 @@
+import 'package:brahmakosh/core/localization/translate_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -42,7 +44,7 @@ class SwapnaListView extends StatelessWidget {
                 Icon(Icons.cloud_off_rounded, size: 48, color: Colors.grey[400]),
                 const SizedBox(height: 12),
                 Text(
-                  "Something went wrong",
+                  "something_went_wrong".tr,
                   style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -81,7 +83,7 @@ class SwapnaListView extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        "No dream symbols found",
+                        "no_dream_symbols".tr,
                         style: GoogleFonts.lora(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -90,7 +92,7 @@ class SwapnaListView extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        "Pull down to refresh",
+                        "pull_to_refresh".tr,
                         style: GoogleFonts.poppins(
                           fontSize: 13,
                           color: const Color(0xff8D6E63),
@@ -170,28 +172,41 @@ class SwapnaListView extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         // Title
-                        Text(
-                          swapna.symbolName,
-                          style: GoogleFonts.lora(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        FutureBuilder<String>(
+                          future: TranslateHelper.translate(swapna.symbolName),
+                          initialData: swapna.symbolName,
+                          builder: (context, snapshot) {
+                            return Text(
+                              snapshot.data ?? swapna.symbolName,
+                              style: GoogleFonts.lora(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            );
+                          },
                         ),
                         const SizedBox(height: 4),
                         // Short description
                         Expanded(
-                          child: Text(
-                            swapna.shortDescription ?? swapna.category,
-                            style: GoogleFonts.poppins(
-                              fontSize: 11,
-                              color: Colors.grey,
-                              height: 1.3,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+                          child: FutureBuilder<String>(
+                            future: TranslateHelper.translate(
+                                swapna.shortDescription ?? swapna.category),
+                            initialData: swapna.shortDescription ?? swapna.category,
+                            builder: (context, snapshot) {
+                              return Text(
+                                snapshot.data ?? (swapna.shortDescription ?? swapna.category),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 11,
+                                  color: Colors.grey,
+                                  height: 1.3,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              );
+                            },
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -203,16 +218,14 @@ class SwapnaListView extends StatelessWidget {
                             color: const Color(0xFFD4AF37),
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: Center(
                             child: Text(
-                              "REVEAL MEANING",
+                              "reveal_meaning".tr,
                               style: GoogleFonts.poppins(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
                             ),
-                          ),
                         ),
                       ],
                     ),

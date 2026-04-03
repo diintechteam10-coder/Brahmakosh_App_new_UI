@@ -108,7 +108,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
 
   Widget _buildDateDivider(DateTime date) {
     final now = DateTime.now();
-    String dateStr = "TODAY, ${date.day} ${controller.getMonthName(date.month)}";
+    String dateStr = "${"today".tr}, ${date.day} ${controller.getMonthName(date.month)}";
     if (date.day != now.day) {
       dateStr = "${date.day} ${controller.getMonthName(date.month)}, ${date.year}";
     }
@@ -216,7 +216,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                     Obx(() {
                       final status = controller.onlineStatus.value;
                       return Text(
-                        status,
+                        status.tr,
                         style: GoogleFonts.poppins(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
@@ -246,8 +246,8 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                 onTap: () {
                   if (controller.isRequestAccepted.value) {
                     controller.showEndChatDialog(
-                      "End Chat?",
-                      "Are you sure you want to end this session?",
+                      "end_chat_q".tr,
+                      "end_chat_confirm".tr,
                     );
                   } else {
                     controller.cancelChatRequest();
@@ -263,7 +263,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    controller.isRequestAccepted.value ? "END" : "CANCEL",
+                    controller.isRequestAccepted.value ? "end_cap".tr : "cancel_cap".tr,
                     style: GoogleFonts.poppins(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
@@ -308,7 +308,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
             ),
             const SizedBox(height: 24),
             Text(
-              "Consultation Ended",
+              "consultation_ended".tr,
               style: GoogleFonts.lora(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -317,7 +317,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
             ),
             const SizedBox(height: 8),
             Text(
-              "Thank you for consulting with\n${expert.name}",
+              "${"thank_you_consulting".tr}\n${expert.name}",
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: 16,
@@ -343,7 +343,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                 child: Column(
                   children: [
                     Text(
-                      "DURATION",
+                      "duration_cap".tr,
                       style: GoogleFonts.poppins(
                         fontSize: 12,
                         color: const Color(0xFFD4AF37),
@@ -377,7 +377,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                   ),
                 ),
                 child: Text(
-                  "New Chat",
+                  "new_chat".tr,
                   style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -406,7 +406,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                   ),
                 ),
                 child: Text(
-                  "Give Feedback",
+                  "give_feedback".tr,
                   style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -443,7 +443,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
           ),
           const SizedBox(height: 24),
           Text(
-            "Request Declined",
+            "request_declined".tr,
             style: GoogleFonts.lora(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -452,7 +452,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
           ),
           const SizedBox(height: 16),
           Text(
-            "The expert is currently unavailable and has declined your request.\nPlease try again later or consult another expert.",
+            "expert_unavailable_msg".tr,
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
               fontSize: 16,
@@ -475,7 +475,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                 ),
               ),
               child: Text(
-                "Find Another Expert",
+                "find_another_expert".tr,
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -499,7 +499,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                 ),
               ),
               child: Text(
-                "Go Back",
+                "go_back".tr,
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -534,7 +534,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
               const Icon(Icons.summarize, color: Color(0xFFD4AF37), size: 20),
               const SizedBox(width: 8),
               Text(
-                'Session Summary',
+                "session_summary".tr,
                 style: GoogleFonts.lora(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -547,9 +547,9 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildSummaryStat('Duration', '${duration}m'),
-              _buildSummaryStat('Credits', '$credits'),
-              _buildSummaryStat('Messages', '${details['messagesCount'] ?? 0}'),
+              _buildSummaryStat("duration_cap".tr, '${duration}m'),
+              _buildSummaryStat("credits".tr, '$credits'),
+              _buildSummaryStat("messages_count".tr, '${details['messagesCount'] ?? 0}'),
             ],
           ),
           if (summary.toString().isNotEmpty) ...[
@@ -558,7 +558,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
               child: Divider(color: Colors.white12),
             ),
             Text(
-              'Highlights',
+              "highlights".tr,
               style: GoogleFonts.poppins(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -606,7 +606,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
       child: Column(
         children: [
           Text(
-            "WHAT YOU WOULD LIKE TO DISCUS?",
+            "discuss_q".tr,
             style: GoogleFonts.poppins(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -620,7 +620,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
             context,
             icon: Icons.trending_up,
             iconColor: Colors.orange,
-            label: "Career Growth",
+            label: "career_growth".tr,
             topic: Topic.career,
           ),
           const SizedBox(height: 12),
@@ -628,7 +628,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
             context,
             icon: Icons.favorite,
             iconColor: Colors.pink,
-            label: "Relationship Advice",
+            label: "relationship_advice".tr,
             topic: Topic.relationship,
           ),
           const SizedBox(height: 12),
@@ -636,7 +636,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
             context,
             icon: Icons.spa,
             iconColor: Colors.green,
-            label: "Health & Wellness",
+            label: "health_wellness".tr,
             topic: Topic.health,
           ),
           const SizedBox(height: 12),
@@ -644,7 +644,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
             context,
             icon: Icons.account_balance_wallet,
             iconColor: Colors.blue,
-            label: "Financial Stability",
+            label: "financial_stability".tr,
             topic: Topic.finance,
           ),
         ],
@@ -716,7 +716,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
               ),
               const SizedBox(width: 8),
               Text(
-                "$topicName Questions",
+                "questions_title".trParams({'topic': topicName}),
                 style: GoogleFonts.lora(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -855,7 +855,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
               ),
               const SizedBox(width: 12),
               Text(
-                "Waiting for expert to accept...",
+                "waiting_expert".tr,
                 style: GoogleFonts.poppins(
                   fontSize: 14,
                   color: Colors.white54,
@@ -898,7 +898,7 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
                   cursorColor: Colors.white,
                   style: GoogleFonts.poppins(color: Colors.white, fontSize: 14),
                   decoration: InputDecoration(
-                    hintText: "Ask about your......",
+                    hintText: "ask_hint".tr,
                     hintStyle: GoogleFonts.poppins(color: Colors.white30, fontSize: 14),
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,

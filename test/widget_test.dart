@@ -54,7 +54,7 @@ void main() {
 
     // Build our app and trigger a frame.
     await tester.pumpWidget(
-      const MyApp(initialRoute: AppConstants.routeSplash),
+      const MyApp(),
     );
 
     // Verify that our app starts with the SplashView

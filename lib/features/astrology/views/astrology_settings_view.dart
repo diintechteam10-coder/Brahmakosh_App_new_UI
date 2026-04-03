@@ -1,8 +1,6 @@
-import 'package:brahmakosh/features/astrology/controllers/astrology_controller.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/common_imports.dart';
+import '../../profile/viewmodels/profile_viewmodel.dart';
+import '../controllers/astrology_controller.dart';
 
 class AstrologySettingsView extends StatelessWidget {
   const AstrologySettingsView({super.key});
@@ -18,7 +16,7 @@ class AstrologySettingsView extends StatelessWidget {
         elevation: 0,
         centerTitle: false,
         title: Text(
-          "Settings",
+          "settings_title".tr,
           style: GoogleFonts.lora(
             fontSize: 22,
             fontWeight: FontWeight.bold,
@@ -40,7 +38,7 @@ class AstrologySettingsView extends StatelessWidget {
             const SizedBox(height: 32),
 
             Text(
-              "Account & Support",
+              "account_support_title".tr,
               style: GoogleFonts.lora(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
@@ -60,22 +58,22 @@ class AstrologySettingsView extends StatelessWidget {
               children: [
                 _buildActionTile(
                   Icons.history_rounded,
-                  "History",
-                  "Chat & Call logs",
+                  "history_title".tr,
+                  "history_subtitle".tr,
                   const Color(0xFF6366F1),
                   () => controller.openHistory(),
                 ),
                 _buildActionTile(
                   Icons.person_outline_rounded,
-                  "Profile",
-                  "Account details",
+                  "profile_title".tr,
+                  "profile_subtitle".tr,
                   const Color(0xFF10B981),
                   () => controller.openUserProfile(),
                 ),
                 _buildActionTile(
                   Icons.help_outline_rounded,
-                  "FAQs",
-                  "Help & Support",
+                  "faqs_title".tr,
+                  "faqs_subtitle".tr,
                   const Color(0xFFF59E0B),
                   () => controller.openFAQs(),
                 ),
@@ -130,7 +128,7 @@ class AstrologySettingsView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Total Credits",
+                          "total_credits".tr,
                           style: GoogleFonts.poppins(
                             fontSize: 14,
                             color: Colors.grey[600],
@@ -138,13 +136,18 @@ class AstrologySettingsView extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        Text(
-                          "\u20B9 150.80",
-                          style: GoogleFonts.poppins(
-                            fontSize: 32,
-                            color: const Color(0xFF1A1A1A),
-                            fontWeight: FontWeight.w800,
-                          ),
+                        Consumer<ProfileViewModel>(
+                          builder: (context, profileVM, child) {
+                            final credits = profileVM.profile?.credits ?? 0;
+                            return Text(
+                              "\u20B9 ${credits.toStringAsFixed(2)}",
+                              style: GoogleFonts.poppins(
+                                fontSize: 32,
+                                color: const Color(0xFF1A1A1A),
+                                fontWeight: FontWeight.w800,
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -182,7 +185,7 @@ class AstrologySettingsView extends StatelessWidget {
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        "Recharge Wallet",
+                        "recharge_wallet".tr,
                         style: GoogleFonts.poppins(
                           fontWeight: FontWeight.bold,
                           color: Colors.white,

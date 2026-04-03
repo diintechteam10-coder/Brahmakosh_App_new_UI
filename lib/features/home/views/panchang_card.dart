@@ -10,25 +10,25 @@ class PanchangCard extends StatelessWidget {
     final items = [
       {
         'icon': Icons.wb_sunny,
-        'label': 'Tithi',
+        'label': 'tithi'.tr,
         'color': const Color(0xFFFFC107),
         'route': AppConstants.routeTithi,
       }, // Yellow
       {
         'icon': Icons.cloud,
-        'label': 'Nakshatra',
+        'label': 'nakshatra'.tr,
         'color': const Color(0xFF64B5F6),
         'route': AppConstants.routeNakshatra,
       }, // Blue
       {
         'icon': Icons.star,
-        'label': 'Yoga',
+        'label': 'yoga'.tr,
         'color': const Color(0xFFFF5722),
         'route': AppConstants.routeYoga,
       }, // Orange
       {
         'icon': Icons.access_time,
-        'label': 'Karan',
+        'label': 'karan'.tr,
         'color': const Color(0xFF4CAF50),
         'route': AppConstants.routeKaran,
       }, // Green
@@ -68,7 +68,7 @@ class PanchangCard extends StatelessWidget {
                 child: Row(
                   children: [
                     Text(
-                      "Panchang",
+                      "panchang".tr,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: AppTheme.textPrimary,
                         fontWeight: FontWeight.w700,

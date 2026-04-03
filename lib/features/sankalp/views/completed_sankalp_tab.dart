@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' hide Transition;
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/localization/translate_helper.dart';
 
 import '../blocs/sankalp_bloc.dart';
 import '../blocs/sankalp_event.dart';
@@ -9,8 +10,62 @@ import '../blocs/sankalp_state.dart';
 import '../models/sankalp_model.dart';
 import 'sankalp_progress_screen.dart';
 
-class CompletedSankalpTab extends StatelessWidget {
+class CompletedSankalpTab extends StatefulWidget {
   const CompletedSankalpTab({super.key});
+
+  @override
+  State<CompletedSankalpTab> createState() => _CompletedSankalpTabState();
+}
+
+class _CompletedSankalpTabState extends State<CompletedSankalpTab> {
+  final Map<String, String> _dynamicTranslations = {};
+  String _lastLang = 'en';
+
+  Future<void> _translateAllContents(List<UserSankalpModel> sankalps) async {
+    final currentLang = Get.locale?.languageCode ?? 'en';
+    if (currentLang == 'en') {
+      if (_dynamicTranslations.isNotEmpty) {
+        setState(() {
+          _dynamicTranslations.clear();
+          _lastLang = 'en';
+        });
+      }
+      return;
+    }
+
+    final Set<String> toTranslate = {};
+
+    for (var us in sankalps) {
+      if (us.sankalp.title.isNotEmpty) {
+        toTranslate.add(us.sankalp.title);
+      }
+      final descPrefix = us.sankalp.description.split('\n').first;
+      if (descPrefix.isNotEmpty) {
+        toTranslate.add(descPrefix);
+      }
+    }
+
+    if (toTranslate.isEmpty) return;
+
+    final list = toTranslate.toList();
+    final results = await TranslateHelper.translateList(list);
+
+    bool changed = false;
+    for (int i = 0; i < list.length; i++) {
+      if (_dynamicTranslations[list[i]] != results[i]) {
+        _dynamicTranslations[list[i]] = results[i];
+        changed = true;
+      }
+    }
+
+    if (changed || _lastLang != currentLang) {
+      if (mounted) {
+        setState(() {
+          _lastLang = currentLang;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +102,15 @@ class CompletedSankalpTab extends StatelessWidget {
                 state.userSankalps
                     .where((s) => s.status == 'completed')
                     .toList();
+            
+            // Trigger translation
+            if (completedSankalps.isNotEmpty) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                _translateAllContents(completedSankalps);
+              });
+            }
           }
+
 
           if (completedSankalps.isEmpty) {
             return RefreshIndicator(
@@ -94,7 +157,7 @@ class CompletedSankalpTab extends StatelessWidget {
           Icon(Icons.history_rounded, size: 80, color: Colors.white.withOpacity(0.1)),
           const SizedBox(height: 24),
           Text(
-            "No Completed Sankalps",
+            "no_completed_sankalps".tr,
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -103,7 +166,7 @@ class CompletedSankalpTab extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            "Complete your active sankalps to see them here.",
+            "complete_active_desc".tr,
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
               fontSize: 13,
@@ -147,7 +210,7 @@ class CompletedSankalpTab extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      sankalp.title,
+                      _dynamicTranslations[sankalp.title] ?? sankalp.title,
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -165,7 +228,7 @@ class CompletedSankalpTab extends StatelessWidget {
                       border: Border.all(color: Colors.green.withOpacity(0.2)),
                     ),
                     child: Text(
-                      "SUCCESS",
+                      "success_cap".tr,
                       style: GoogleFonts.poppins(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
@@ -198,7 +261,7 @@ class CompletedSankalpTab extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "${userSankalp.totalDays} Days Daily ${sankalp.description.split('\n').first}",
+                    "${userSankalp.totalDays} ${'day_suffix'.tr} Daily ${_dynamicTranslations[sankalp.description.split('\n').first] ?? sankalp.description.split('\n').first}",
                     style: GoogleFonts.poppins(
                       fontSize: 12,
                       color: Colors.white.withOpacity(0.5),
@@ -222,7 +285,7 @@ class CompletedSankalpTab extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            "${userSankalp.totalDays * sankalp.karmaPointsPerDay} Karma Earned",
+                            "${userSankalp.totalDays * sankalp.karmaPointsPerDay} ${'karma_earned'.tr}",
                             style: GoogleFonts.poppins(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -244,7 +307,7 @@ class CompletedSankalpTab extends StatelessWidget {
                         child: Row(
                           children: [
                             Text(
-                              "View Details",
+                              "view_details".tr,
                               style: GoogleFonts.poppins(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
@@ -280,7 +343,7 @@ class CompletedSankalpTab extends StatelessWidget {
               const Icon(Icons.check_circle, color: Colors.green, size: 60),
               const SizedBox(height: 16),
               Text(
-                "Great Job!",
+                "great_job".tr,
                 style: GoogleFonts.lora(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -305,7 +368,7 @@ class CompletedSankalpTab extends StatelessWidget {
                     borderRadius: BorderRadius.circular(25),
                   ),
                 ),
-                child: const Text("Keep Going"),
+                child: Text("keep_going".tr),
               ),
             ],
           ),

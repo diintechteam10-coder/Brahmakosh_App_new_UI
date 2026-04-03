@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../blocs/dream_request_bloc.dart';
@@ -6,6 +7,7 @@ import '../blocs/dream_request_event.dart';
 import '../blocs/dream_request_state.dart';
 import '../repositories/swapna_repository.dart';
 import 'dream_request_form.dart';
+import 'package:brahmakosh/core/localization/translate_helper.dart';
 import 'dream_request_detail_screen.dart';
 
 class DreamRequestsTab extends StatelessWidget {
@@ -89,7 +91,7 @@ class DreamRequestsView extends StatelessWidget {
                             size: 48, color: Colors.grey[600]),
                         const SizedBox(height: 12),
                         Text(
-                          "Something went wrong",
+                          "something_went_wrong".tr,
                           style: GoogleFonts.poppins(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -141,7 +143,7 @@ class DreamRequestsView extends StatelessWidget {
                         ),
                         const SizedBox(height: 20),
                         Text(
-                          "No dream requests yet",
+                          "no_dream_requests".tr,
                           style: GoogleFonts.lora(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -152,7 +154,7 @@ class DreamRequestsView extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 40),
                           child: Text(
-                            "Submit your dream symbol and our experts will decode its spiritual meaning for you.",
+                            "submit_dream_desc".tr,
                             textAlign: TextAlign.center,
                             style: GoogleFonts.poppins(
                               fontSize: 14,
@@ -233,24 +235,36 @@ class DreamRequestsView extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      request.dreamSymbol,
-                                      style: GoogleFonts.lora(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
+                                    FutureBuilder<String>(
+                                      future: TranslateHelper.translate(request.dreamSymbol),
+                                      initialData: request.dreamSymbol,
+                                      builder: (context, snapshot) {
+                                        return Text(
+                                          snapshot.data ?? request.dreamSymbol,
+                                          style: GoogleFonts.lora(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        );
+                                      },
                                     ),
                                     const SizedBox(height: 6),
-                                    Text(
-                                      request.additionalDetails,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 13,
-                                        height: 1.4,
-                                        color: Colors.grey,
-                                      ),
+                                    FutureBuilder<String>(
+                                      future: TranslateHelper.translate(request.additionalDetails),
+                                      initialData: request.additionalDetails,
+                                      builder: (context, snapshot) {
+                                        return Text(
+                                          snapshot.data ?? request.additionalDetails,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 13,
+                                            height: 1.4,
+                                            color: Colors.grey,
+                                          ),
+                                        );
+                                      },
                                     ),
                                   ],
                                 ),
@@ -283,13 +297,19 @@ class DreamRequestsView extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 10),
                                   Expanded(
-                                    child: Text(
-                                      "Decoded: ${request.completedDreamId?.symbolName}",
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600,
-                                        color: const Color(0xFFD4AF37),
-                                      ),
+                                    child: FutureBuilder<String>(
+                                      future: TranslateHelper.translate(request.completedDreamId?.symbolName ?? ''),
+                                      initialData: request.completedDreamId?.symbolName ?? '',
+                                      builder: (context, snapshot) {
+                                        return Text(
+                                          "${"decoded_prefix".tr}${snapshot.data ?? ''}",
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
+                                            color: const Color(0xFFD4AF37),
+                                          ),
+                                        );
+                                      },
                                     ),
                                   ),
                                   const Icon(
@@ -329,6 +349,11 @@ class DreamRequestsView extends StatelessWidget {
   }
 
   Widget _buildStatusChip(String status, Color color) {
+    String translatedStatus = status.toUpperCase();
+    if (status.toLowerCase() == 'completed') translatedStatus = "completed_cap".tr;
+    if (status.toLowerCase() == 'in progress') translatedStatus = "in_progress_cap".tr;
+    if (status.toLowerCase() == 'pending') translatedStatus = "pending_cap".tr;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
@@ -337,7 +362,7 @@ class DreamRequestsView extends StatelessWidget {
         border: Border.all(color: color.withOpacity(0.2)),
       ),
       child: Text(
-        status.toUpperCase(),
+        translatedStatus,
         style: GoogleFonts.poppins(
           fontSize: 9,
           letterSpacing: 0.5,

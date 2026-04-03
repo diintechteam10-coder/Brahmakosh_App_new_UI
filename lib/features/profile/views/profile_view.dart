@@ -135,7 +135,7 @@ class _ProfileViewState extends State<ProfileView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              user?.name ?? 'User',
+                              user?.name ?? 'guest'.tr,
                               style: GoogleFonts.lora(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -188,7 +188,7 @@ class _ProfileViewState extends State<ProfileView> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                "Edit",
+                                "edit".tr,
                                 style: GoogleFonts.poppins(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
@@ -206,11 +206,11 @@ class _ProfileViewState extends State<ProfileView> {
 
                 // Preferences Section
                 _buildSectionContainer(
-                  title: "Preferences",
+                  title: "preferences".tr,
                   children: [
                     _buildListTile(
                       icon: Icons.person_outline,
-                      title: "My Profile",
+                      title: "my_profile".tr,
                       onTap: () => Get.to(() => const ProfileDetailsView()),
                     ),
                     const Divider(color: Colors.white10, height: 1),
@@ -229,29 +229,28 @@ class _ProfileViewState extends State<ProfileView> {
                           const SizedBox(width: 16),
                           Expanded(
                             child: Text(
-                              "Change Language",
+                              "change_language".tr,
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 color: Colors.white,
                               ),
                             ),
                           ),
-                          GestureDetector(
-                            onTap: () => Get.dialog(
-                              const ComingSoonPopup(feature: "Language Change"),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF1E1E1E),
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF1E1E1E),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  _buildLangToggle("En", true),
-                                  _buildLangToggle("Hi", false),
-                                ],
-                              ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                _buildLangToggle("En", Get.locale?.languageCode == 'en', () {
+                                  _changeLanguage('en');
+                                }),
+                                _buildLangToggle("Hi", Get.locale?.languageCode == 'hi', () {
+                                  _changeLanguage('hi');
+                                }),
+                              ],
                             ),
                           ),
                         ],
@@ -273,10 +272,10 @@ class _ProfileViewState extends State<ProfileView> {
                       // Karma Wallet
                       Expanded(
                         child: _buildWalletCard(
-                          title: "Karma Wallet",
+                          title: "karma_wallet".tr,
                           value: "${profile?.karmaPoints ?? 56}",
-                          subtitle: "Your Karma Points",
-                          buttonLabel: "Redeem",
+                          subtitle: "your_karma_points".tr,
+                          buttonLabel: "redeem".tr,
                           isKarma: true,
                           onTap: () => Get.to(() => const RedeemListView()),
                         ),
@@ -285,10 +284,10 @@ class _ProfileViewState extends State<ProfileView> {
                       // Credit Wallet
                       Expanded(
                         child: _buildWalletCard(
-                          title: "Credit Wallet",
+                          title: "credit_wallet".tr,
                           value: "${profile?.credits ?? 1000}",
-                          subtitle: "Your Credit Points",
-                          buttonLabel: "Add Credit",
+                          subtitle: "your_credit_points".tr,
+                          buttonLabel: "add_credit".tr,
                           isKarma: false,
                           onTap: () => Get.to(() => const RechargePlansView()),
                         ),
@@ -301,50 +300,50 @@ class _ProfileViewState extends State<ProfileView> {
 
                 // Others Section
                 _buildSectionContainer(
-                  title: "Others",
+                  title: "others".tr,
                   children: [
                     if (!Platform.isIOS)
                       _buildListTile(
                         icon: Icons.shopping_cart_outlined,
-                        title: "Orders",
-                        onTap: () => Utils.showToast('Coming soon'),
+                        title: "orders".tr,
+                        onTap: () => Utils.showToast('coming_soon'.tr),
                       ),
                     const Divider(color: Colors.white10, height: 1),
                     if (!Platform.isIOS)
                       _buildListTile(
                         icon: Icons.receipt_long_outlined,
-                        title: "Credit History",
+                        title: "credit_history".tr,
                         onTap: () => Get.to(() => const CreditHistoryView()),
                       ),
                     const Divider(color: Colors.white10, height: 1),
                     if (!Platform.isIOS)
                       _buildListTile(
                         icon: Icons.settings_outlined,
-                        title: "Settings",
-                        onTap: () => Utils.showToast('Coming soon'),
+                        title: "settings".tr,
+                        onTap: () => Utils.showToast('coming_soon'.tr),
                       ),
                     const Divider(color: Colors.white10, height: 1),
                     _buildListTile(
                       icon: Icons.help_outline,
-                      title: "Help & Support",
+                      title: "help_support".tr,
                       onTap: () => Get.to(() => const HelpSupportView()),
                     ),
                     const Divider(color: Colors.white10, height: 1),
                     _buildListTile(
                       icon: Icons.info_outline,
-                      title: "About Us",
+                      title: "about_us".tr,
                       onTap: () => Get.to(() => const AboutUsView()),
                     ),
                     const Divider(color: Colors.white10, height: 1),
                     _buildListTile(
                       icon: Icons.delete_outline,
-                      title: "Delete Account",
+                      title: "delete_account".tr,
                       onTap: () {
                         Get.dialog(
                           ActionConfirmationPopup(
-                            title: "Delete Account",
-                            description: "Are you sure you want to delete your account?\nThis action will permanently remove your data from Brahmakosh.",
-                            confirmLabel: "Delete",
+                            title: "delete_account".tr,
+                            description: "confirm_delete_account".tr,
+                            confirmLabel: "delete".tr,
                             onConfirm: () => _launchDeleteAccountEmail(
                               context,
                               profile?.email ?? '',
@@ -367,9 +366,9 @@ class _ProfileViewState extends State<ProfileView> {
                       onTap: () {
                         Get.dialog(
                           ActionConfirmationPopup(
-                            title: "Logout",
-                            description: "Are you sure you want to logout from Brahmakosh?",
-                            confirmLabel: "Logout",
+                            title: "logout".tr,
+                            description: "confirm_logout".tr,
+                            confirmLabel: "logout".tr,
                             onConfirm: _logout,
                           ),
                         );
@@ -393,7 +392,7 @@ class _ProfileViewState extends State<ProfileView> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              "Logout",
+                              "logout".tr,
                               style: GoogleFonts.poppins(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -610,24 +609,44 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  Widget _buildLangToggle(String text, bool isSelected) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: isSelected
-            ? const Color(0xFFFFCA28)
-            : Colors.transparent, // Gold selected
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Text(
-        text,
-        style: GoogleFonts.poppins(
-          fontSize: 14,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          color: isSelected ? Colors.black : Colors.white54,
+  Widget _buildLangToggle(String text, bool isSelected, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? const Color(0xFFFFCA28)
+              : Colors.transparent, // Gold selected
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Text(
+          text,
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            color: isSelected ? Colors.black : Colors.white54,
+          ),
         ),
       ),
     );
+  }
+
+  void _changeLanguage(String langCode) async {
+    Locale locale;
+    if (langCode == 'hi') {
+      locale = const Locale('hi', 'IN');
+    } else {
+      locale = const Locale('en', 'US');
+    }
+
+    Get.updateLocale(locale);
+    await StorageService.setString(AppConstants.keySelectedLanguage, langCode);
+    
+    // Optional: Show a subtle toast or just rebuild
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> _logout() async {
@@ -670,9 +689,9 @@ class _ProfileViewState extends State<ProfileView> {
       if (!launched) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text(
-                'Could not open Mail app. Please email contact@brahmakosh.com directly.',
+                'mail_app_error'.tr,
               ),
               backgroundColor: Colors.redAccent,
             ),
@@ -683,9 +702,9 @@ class _ProfileViewState extends State<ProfileView> {
       debugPrint('Could not launch email: $e');
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              'Could not open Mail app. Please email contact@brahmakosh.com directly.',
+              'mail_app_error'.tr,
             ),
             backgroundColor: Colors.redAccent,
           ),
@@ -727,7 +746,7 @@ class _ProfileViewState extends State<ProfileView> {
                 child: Icon(Icons.person, color: Colors.black, size: 20),
               ),
               title: Text(
-                'View Profile Picture',
+                'view_profile_pic'.tr,
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.w600,
                   fontSize: 16,
@@ -753,7 +772,7 @@ class _ProfileViewState extends State<ProfileView> {
                 child: Icon(Icons.edit, color: Colors.black, size: 20),
               ),
               title: Text(
-                'Edit Profile Picture',
+                'edit_profile_pic'.tr,
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.w600,
                   fontSize: 16,
@@ -787,7 +806,7 @@ class _ProfileViewState extends State<ProfileView> {
             ListTile(
               leading: const Icon(Icons.camera_alt, color: Colors.white70),
               title: Text(
-                "Camera",
+                "camera".tr,
                 style: GoogleFonts.poppins(color: Colors.white),
               ),
               onTap: () async {
@@ -806,7 +825,7 @@ class _ProfileViewState extends State<ProfileView> {
             ListTile(
               leading: const Icon(Icons.photo, color: Colors.white70),
               title: Text(
-                "Gallery",
+                "gallery".tr,
                 style: GoogleFonts.poppins(color: Colors.white),
               ),
               onTap: () async {

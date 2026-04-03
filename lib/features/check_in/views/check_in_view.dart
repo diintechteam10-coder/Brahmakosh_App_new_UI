@@ -16,6 +16,7 @@ import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'package:brahmakosh/features/check_in/views/spiritual_stats_screen.dart';
+import 'package:brahmakosh/core/localization/translate_helper.dart';
 
 class CheckInView extends StatefulWidget {
   final ScrollController? scrollController;
@@ -283,7 +284,7 @@ class _CheckInViewState extends State<CheckInView>
 
                         // Main title & Subtitle
                         Text(
-                          'DAILY SPIRITUAL CHECK - IN',
+                          'daily_checkin_title'.tr,
                           textAlign: TextAlign.center,
                           style: GoogleFonts.lora(
                             fontSize: 22,
@@ -294,7 +295,7 @@ class _CheckInViewState extends State<CheckInView>
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Take a moment for yourself',
+                          'daily_checkin_subtitle'.tr,
                           textAlign: TextAlign.center,
                           style: GoogleFonts.poppins(
                             fontSize: 15,
@@ -419,7 +420,7 @@ class _CheckInViewState extends State<CheckInView>
                               ),
                             const SizedBox(height: 12),
                             Text(
-                              'Earn Karma points',
+                              'earn_karma_points'.tr,
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -462,13 +463,13 @@ class _CheckInViewState extends State<CheckInView>
     Stats stats,
     List<RecentActivities>? recentActivities,
   ) {
-    String lastCheckInText = 'No Recent Check-Ins';
+    String lastCheckInText = 'no_recent_checkins'.tr;
     if (recentActivities != null && recentActivities.isNotEmpty) {
       // Format as "Today - 7:32 PM" if it's today, else standard format
       final dt = DateTime.parse(recentActivities.first.createdAt!).toLocal();
       final now = DateTime.now();
       if (dt.year == now.year && dt.month == now.month && dt.day == now.day) {
-        lastCheckInText = 'Today - ${DateFormat('h:mm a').format(dt)}';
+        lastCheckInText = '${"today".tr} - ${DateFormat('h:mm a').format(dt)}';
       } else {
         lastCheckInText = DateFormat('MMM d - h:mm a').format(dt);
       }
@@ -490,7 +491,7 @@ class _CheckInViewState extends State<CheckInView>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'LAST CHECK - IN',
+                  'last_checkin_cap'.tr,
                   style: GoogleFonts.poppins(
                     fontSize: 11,
                     letterSpacing: 1.2,
@@ -539,7 +540,7 @@ class _CheckInViewState extends State<CheckInView>
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              'Karma Points',
+                              'karma_points'.tr,
                               style: GoogleFonts.poppins(
                                 fontSize: 13,
                                 color: Colors.white54,
@@ -566,7 +567,7 @@ class _CheckInViewState extends State<CheckInView>
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              'Total Check-ins',
+                              'total_checkins'.tr,
                               style: GoogleFonts.poppins(
                                 fontSize: 13,
                                 color: Colors.white54,
@@ -594,7 +595,7 @@ class _CheckInViewState extends State<CheckInView>
                 ),
               ),
               child: Text(
-                'REDEEM',
+                'redeem_cap'.tr,
                 style: GoogleFonts.poppins(
                   color: Colors.black87,
                   fontSize: 12,
@@ -611,7 +612,7 @@ class _CheckInViewState extends State<CheckInView>
 
   void _shareCheckInDetails(BuildContext context, Data data) {
     if (data.stats == null) {
-      Utils.showToast("No stats to share yet.");
+      Utils.showToast("no_recent_checkins".tr);
       return;
     }
     const String playStoreUrl =
@@ -626,24 +627,16 @@ class _CheckInViewState extends State<CheckInView>
         ? data.recentActivities!.first
         : null;
 
-    String shareMessage =
-        "I just completed my spiritual check-in on Brahmakosh! 🧘✨\n\n";
-
-    shareMessage += "📊 My Progress:\n";
-    shareMessage += "• Total Sessions: ${stats.sessions ?? 0}\n";
-    shareMessage += "• Karma Points: ${stats.points ?? 0}\n";
-
+    String shareMessage = "share_stats_msg".tr + "\n\n";
+    shareMessage += "my_progress_share".tr + "\n";
+    shareMessage += "${"total_sessions_share".tr} ${stats.sessions ?? 0}\n";
+    shareMessage += "${"karma_points_share".tr} ${stats.points ?? 0}\n";
     if (recent != null) {
-      shareMessage +=
-          "• Last Activity: ${recent.title ?? 'Spiritual Practice'}\n";
+      shareMessage += "${"last_activity_share".tr} ${recent.title ?? ''}\n";
     }
-
-    shareMessage +=
-        "\nJoin me on my spiritual journey! Download Brahmakosh now.\n";
+    shareMessage += "join_me_share".tr;
     shareMessage += "Android:\n$playStoreUrl\n\n";
-
     shareMessage += "iOS:\n$appStoreUrl\n\n";
-
     shareMessage += "#Brahmakosh #Spirituality";
     final box = context.findRenderObject() as RenderBox?;
 
@@ -672,7 +665,7 @@ class _CheckInViewState extends State<CheckInView>
                 Expanded(
                   flex: 2,
                   child: Text(
-                    'YOUR PROGRESS',
+                    'your_progress'.tr,
                     style: GoogleFonts.poppins(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
@@ -684,7 +677,7 @@ class _CheckInViewState extends State<CheckInView>
                 Expanded(
                   flex: 1,
                   child: Text(
-                    'SESSIONS',
+                    'sessions_cap'.tr,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.poppins(
                       fontSize: 11,
@@ -697,7 +690,7 @@ class _CheckInViewState extends State<CheckInView>
                 Expanded(
                   flex: 1,
                   child: Text(
-                    'TIME',
+                    'time_cap'.tr,
                     textAlign: TextAlign.right,
                     style: GoogleFonts.poppins(
                       fontSize: 11,
@@ -712,18 +705,18 @@ class _CheckInViewState extends State<CheckInView>
             const SizedBox(height: 16),
 
             if (stats.meditation != null)
-              _categoryRow('Mediation', stats.meditation!),
+              _categoryRow('meditation'.tr, stats.meditation!),
             if (stats.chanting != null) ...[
               const Divider(color: Colors.white12, height: 1),
-              _categoryRow('Chanting', stats.chanting!),
+              _categoryRow('chanting'.tr, stats.chanting!),
             ],
             if (stats.prayer != null) ...[
               const Divider(color: Colors.white12, height: 1),
-              _categoryRow('Prayer', stats.prayer!),
+              _categoryRow('prayer'.tr, stats.prayer!),
             ],
             if (stats.silence != null) ...[
               const Divider(color: Colors.white12, height: 1),
-              _categoryRow('Silence', stats.silence!),
+              _categoryRow('silence'.tr, stats.silence!),
             ],
             if (stats.bonus != null) ...[
               const Divider(color: Colors.white12, height: 1),
@@ -812,7 +805,7 @@ class _CheckInViewState extends State<CheckInView>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'RECENT ACTIVITIES',
+            'recent_activities_cap'.tr,
             style: GoogleFonts.lora(
               fontSize: 12,
               fontWeight: FontWeight.bold,
@@ -858,13 +851,19 @@ class _CheckInViewState extends State<CheckInView>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            activity.title ?? '',
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
+                          FutureBuilder<String>(
+                            future: TranslateHelper.translate(activity.title ?? ''),
+                            initialData: activity.title ?? '',
+                            builder: (context, snapshot) {
+                              return Text(
+                                snapshot.data ?? '',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              );
+                            },
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -895,7 +894,7 @@ class _CheckInViewState extends State<CheckInView>
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
-                              '+${activity.karmaPoints} Karma',
+                              '+${activity.karmaPoints} ${'karma'.tr}',
                               style: GoogleFonts.poppins(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
@@ -907,7 +906,7 @@ class _CheckInViewState extends State<CheckInView>
                           ),
                         const SizedBox(height: 6),
                         Text(
-                          isComplete ? 'Completed' : 'Incomplete',
+                          isComplete ? 'completed'.tr : 'incomplete'.tr,
                           style: GoogleFonts.poppins(
                             fontSize: 11,
                             fontWeight: FontWeight.w500,

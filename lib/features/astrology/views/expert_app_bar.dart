@@ -1,6 +1,6 @@
 import '../../../core/common_imports.dart';
 import '../controllers/astrology_controller.dart';
-import '../../../core/theme/app_theme.dart'; // Import AppTheme
+import '../../profile/viewmodels/profile_viewmodel.dart';
 
 class AstrologyAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
@@ -10,7 +10,7 @@ class AstrologyAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final AstrologyController controller = Get.find<AstrologyController>();
-    final displayTitle = title ?? 'Expert Connect';
+    final displayTitle = title ?? 'expert_connect_title'.tr;
 
     return AppBar(
       elevation: 0,
@@ -64,13 +64,18 @@ class AstrologyAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
               const SizedBox(width: 6),
-              Text(
-                "2,500",
-                style: GoogleFonts.lora(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.textPrimary,
-                ), // Use Cinzel and textPrimary
+              Consumer<ProfileViewModel>(
+                builder: (context, profileVM, child) {
+                  final credits = profileVM.profile?.credits ?? 0;
+                  return Text(
+                    credits.toString(),
+                    style: GoogleFonts.lora(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.textPrimary,
+                    ),
+                  );
+                },
               ),
             ],
           ),

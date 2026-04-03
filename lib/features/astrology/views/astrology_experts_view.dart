@@ -13,6 +13,7 @@ import 'voice_call_view.dart'; // Added VoiceCallView import
 import 'package:brahmakosh/core/services/storage_service.dart';
 import 'package:brahmakosh/features/dashboard/viewmodels/dashboard_viewmodel.dart';
 import '../../../../common/widgets/custom_profile_avatar.dart';
+import '../../../../core/localization/translate_helper.dart';
 import '../../../core/utils/app_snackbar.dart';
 
 class AstrologyExpertsView extends StatelessWidget {
@@ -57,7 +58,7 @@ class AstrologyExpertsView extends StatelessWidget {
           },
         ),
         title: Text(
-          "Connect",
+          "connect".tr,
           style: GoogleFonts.lora(
             fontSize: 16.sp,
             fontWeight: FontWeight.bold,
@@ -95,7 +96,7 @@ class AstrologyExpertsView extends StatelessWidget {
               ),
               child: Obx(() {
                 final allCategories = [
-                  {'name': 'All', '_id': 'all'},
+                  {'name': 'all'.tr, '_id': 'all'},
                   ...controller.categories,
                 ];
                 final selectedId = controller.selectedCategoryId;
@@ -111,7 +112,7 @@ class AstrologyExpertsView extends StatelessWidget {
                     final isSelected = selectedId == id;
                     return _buildFilterChip(
                       context,
-                      name,
+                      controller.translatedData[name] ?? name,
                       id,
                       isSelected,
                       controller,
@@ -150,7 +151,7 @@ class AstrologyExpertsView extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'No experts found',
+                          'no_experts_found'.tr,
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(color: AppTheme.textSecondary),
                         ),
@@ -206,7 +207,7 @@ class AstrologyExpertsView extends StatelessWidget {
         controller: controller.searchController,
         style: GoogleFonts.poppins(color: Colors.white),
         decoration: InputDecoration(
-          hintText: "Search",
+          hintText: "search".tr,
           hintStyle: GoogleFonts.poppins(color: Colors.white.withValues(alpha: 0.4)),
           prefixIcon: Icon(Icons.search, color: Colors.white.withValues(alpha: 0.4)),
           filled: false,
@@ -357,7 +358,7 @@ class AstrologyExpertsView extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: Text(
-                                  expert.name ?? 'Astrologer',
+                                  controller.translatedData[expert.name] ?? expert.name ?? 'astrologer'.tr,
                                   style: GoogleFonts.lora(
                                     fontSize: 14.sp,
                                     fontWeight: FontWeight.bold,
@@ -383,7 +384,7 @@ class AstrologyExpertsView extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            expert.expertise?.split(',').take(2).join(", ") ?? "Vedic Astrology",
+                            controller.translatedData[expert.expertise] ?? expert.expertise?.split(',').take(2).join(", ") ?? "vedic_astrology".tr,
                             style: GoogleFonts.poppins(
                               fontSize: 10.sp,
                               color: Colors.white.withValues(alpha: 0.5),
@@ -395,7 +396,7 @@ class AstrologyExpertsView extends StatelessWidget {
                               Icon(Icons.work_outline, color: const Color(0xFFFFD700), size: 3.5.w),
                               SizedBox(width: 2.w),
                               Text(
-                                "${expert.experience ?? '0'}+ Years Exp.",
+                                "${expert.experience ?? '0'}+ ${"years_exp".tr}",
                                 style: GoogleFonts.poppins(
                                   fontSize: 9.sp,
                                   color: const Color(0xFFFFD700),
@@ -416,7 +417,7 @@ class AstrologyExpertsView extends StatelessWidget {
                     Expanded(
                       child: _buildActionButton(
                         icon: Icons.chat_outlined,
-                        price: "₹${expert.chatCharge?.toInt() ?? ""}/min",
+                        price: "₹${expert.chatCharge?.toInt() ?? ""}${"per_min".tr}",
                         onTap: () {
                           if (status != 'online') {
                             _showExpertOfflineDialog(context);
@@ -430,7 +431,7 @@ class AstrologyExpertsView extends StatelessWidget {
                     Expanded(
                       child: _buildActionButton(
                         icon: Icons.phone_outlined,
-                        price: "₹${expert.voiceCharge?.toInt() ?? 0}/min",
+                        price: "₹${expert.voiceCharge?.toInt() ?? 0}${"per_min".tr}",
                         onTap: () {
                           if (status != 'online') {
                             _showExpertOfflineDialog(context);
@@ -545,7 +546,7 @@ class AstrologyExpertsView extends StatelessWidget {
                 SizedBox(width: 4.w),
                 Expanded(
                   child: Text(
-                    "START CHAT CONSULTATION",
+                    "start_chat_consultation".tr,
                     style: GoogleFonts.lora(
                       fontSize: 14.sp,
                       fontWeight: FontWeight.bold,
@@ -559,7 +560,7 @@ class AstrologyExpertsView extends StatelessWidget {
             SizedBox(height: 3.h),
 
             Text(
-              "You're about to start a live chat session with your chosen Expert.",
+              "chat_session_desc".tr,
               style: GoogleFonts.poppins(
                 fontSize: 11.sp,
                 color: Colors.white.withValues(alpha: 0.9),
@@ -571,7 +572,7 @@ class AstrologyExpertsView extends StatelessWidget {
             SizedBox(height: 2.h),
 
             Text(
-              "Connect with an astrologer or guru through live chat and end the session at any time - credits are deducted only for the minutes used, so please ensure a stable internet connection for a smooth experience.",
+              "chat_disclaimer".tr,
               style: GoogleFonts.poppins(
                 fontSize: 10.sp,
                 color: Colors.white.withValues(alpha: 0.6),
@@ -593,7 +594,7 @@ class AstrologyExpertsView extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      "CANCEL",
+                      "cancel_cap".tr,
                       style: GoogleFonts.poppins(
                         fontSize: 11.sp,
                         fontWeight: FontWeight.w600,
@@ -631,7 +632,7 @@ class AstrologyExpertsView extends StatelessWidget {
                           elevation: 0,
                         ),
                         child: Text(
-                          "CONTINUE",
+                          "continue_cap".tr,
                           style: GoogleFonts.poppins(
                             fontSize: 11.sp,
                             fontWeight: FontWeight.bold,
@@ -700,7 +701,7 @@ class AstrologyExpertsView extends StatelessWidget {
                 SizedBox(width: 4.w),
                 Expanded(
                   child: Text(
-                    "VOICE CONSULTATION",
+                    "voice_consultation".tr,
                     style: GoogleFonts.lora(
                       fontSize: 14.sp,
                       fontWeight: FontWeight.bold,
@@ -714,7 +715,7 @@ class AstrologyExpertsView extends StatelessWidget {
             SizedBox(height: 3.h),
 
             Text(
-              "You're about to start a voice call session with your chosen Expert.",
+              "voice_session_desc".tr,
               style: GoogleFonts.poppins(
                 fontSize: 11.sp,
                 color: Colors.white.withValues(alpha: 0.9),
@@ -726,7 +727,7 @@ class AstrologyExpertsView extends StatelessWidget {
             SizedBox(height: 2.h),
 
             Text(
-              "Connect with an astrologer or guru through a live audio call and end the session at any time - credits are deducted only for the minutes used, so please ensure a stable internet connection for a smooth experience.",
+              "voice_disclaimer".tr,
               style: GoogleFonts.poppins(
                 fontSize: 10.sp,
                 color: Colors.white.withValues(alpha: 0.6),
@@ -745,14 +746,14 @@ class AstrologyExpertsView extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Session Cost",
+                    "session_cost".tr,
                     style: GoogleFonts.poppins(
                       fontSize: 11.sp,
                       color: Colors.white70,
                     ),
                   ),
                   Text(
-                    "₹${expert.voiceCharge?.toInt() ?? 20} / min",
+                    "₹${expert.voiceCharge?.toInt() ?? 20} ${"per_min".tr}",
                     style: GoogleFonts.poppins(
                       fontSize: 12.sp,
                       fontWeight: FontWeight.bold,
@@ -777,7 +778,7 @@ class AstrologyExpertsView extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      "CANCEL",
+                      "cancel_cap".tr,
                       style: GoogleFonts.poppins(
                         fontSize: 11.sp,
                         fontWeight: FontWeight.w600,
@@ -804,8 +805,8 @@ class AstrologyExpertsView extends StatelessWidget {
                             Get.to(() => VoiceCallView(expert: expert.toAstrologist()));
                           } else {
                             AppSnackBar.showError(
-                              "Insufficient Credits",
-                              "You need at least ₹$minRequired for a 5-minute session.",
+                              "insufficient_credits".tr,
+                              "insufficient_credits_desc".trParams({'min': minRequired.toString()}),
                             );
                             controller.showRechargeBottomSheet(context);
                           }
@@ -819,7 +820,7 @@ class AstrologyExpertsView extends StatelessWidget {
                           elevation: 0,
                         ),
                         child: Text(
-                          "CONTINUE",
+                          "continue_cap".tr,
                           style: GoogleFonts.poppins(
                             fontSize: 11.sp,
                             fontWeight: FontWeight.bold,
@@ -848,7 +849,7 @@ class AstrologyExpertsView extends StatelessWidget {
           side: BorderSide(color: Colors.white.withValues(alpha: 0.1), width: 0.5),
         ),
         title: Text(
-          "Expert Offline",
+          "expert_offline_title".tr,
           style: GoogleFonts.lora(
             fontWeight: FontWeight.bold,
             color: const Color(0xFFFFD700),
@@ -856,7 +857,7 @@ class AstrologyExpertsView extends StatelessWidget {
           ),
         ),
         content: Text(
-          "This expert is currently offline. Please try again later.",
+          "expert_offline_msg".tr,
           style: GoogleFonts.poppins(
             color: Colors.white70,
             fontSize: 11.sp,
@@ -866,7 +867,7 @@ class AstrologyExpertsView extends StatelessWidget {
           TextButton(
             onPressed: () => Get.back(),
             child: Text(
-              "OK",
+              "ok".tr.toUpperCase(),
               style: GoogleFonts.poppins(
                 color: const Color(0xFFFFD700),
                 fontWeight: FontWeight.bold,
@@ -888,7 +889,7 @@ class AstrologyExpertsView extends StatelessWidget {
           side: BorderSide(color: Colors.white.withValues(alpha: 0.1), width: 0.5),
         ),
         title: Text(
-          "Chat Required",
+          "chat_required_title".tr,
           style: GoogleFonts.lora(
             fontWeight: FontWeight.bold,
             color: const Color(0xFFFFD700),
@@ -896,7 +897,7 @@ class AstrologyExpertsView extends StatelessWidget {
           ),
         ),
         content: Text(
-          "Please initiate a chat with the expert first before making a call.",
+          "chat_required_msg".tr,
           style: GoogleFonts.poppins(
             color: Colors.white70,
             fontSize: 11.sp,
@@ -906,7 +907,7 @@ class AstrologyExpertsView extends StatelessWidget {
           TextButton(
             onPressed: () => Get.back(),
             child: Text(
-              "OK",
+              "ok".tr.toUpperCase(),
               style: GoogleFonts.poppins(
                 color: const Color(0xFFFFD700),
                 fontWeight: FontWeight.bold,

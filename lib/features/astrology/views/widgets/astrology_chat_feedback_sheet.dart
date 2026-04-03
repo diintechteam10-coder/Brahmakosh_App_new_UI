@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/astrology_chat_controller.dart';
 
@@ -46,7 +47,7 @@ class _AstrologyChatFeedbackSheetState
             const SizedBox(height: 32),
 
             Text(
-              "Rate your Experience",
+              "rate_experience_title".tr,
               style: GoogleFonts.lora(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -55,7 +56,7 @@ class _AstrologyChatFeedbackSheetState
             ),
             const SizedBox(height: 8),
             Text(
-              "How was your conversation?",
+              "how_was_conversation_msg".tr,
               style: GoogleFonts.poppins(
                 fontSize: 14,
                 color: Colors.white60,
@@ -94,27 +95,27 @@ class _AstrologyChatFeedbackSheetState
               children: [
                 _buildSentimentChip(
                   "very_unhappy",
-                  "Very Unhappy",
+                  "very_unhappy".tr,
                   Icons.sentiment_very_dissatisfied,
                 ),
                 _buildSentimentChip(
                   "unhappy",
-                  "Unhappy",
+                  "unhappy".tr,
                   Icons.sentiment_dissatisfied,
                 ),
                 _buildSentimentChip(
                   "neutral",
-                  "Neutral",
+                  "neutral".tr,
                   Icons.sentiment_neutral,
                 ),
                 _buildSentimentChip(
                   "happy",
-                  "Happy",
+                  "happy".tr,
                   Icons.sentiment_satisfied,
                 ),
                 _buildSentimentChip(
                   "very_happy",
-                  "Very Happy",
+                  "very_happy".tr,
                   Icons.sentiment_very_satisfied,
                 ),
               ],
@@ -127,7 +128,7 @@ class _AstrologyChatFeedbackSheetState
               style: GoogleFonts.poppins(color: Colors.white),
               maxLines: 3,
               decoration: InputDecoration(
-                hintText: "Add a comment (optional)",
+                hintText: "add_comment_hint".tr,
                 hintStyle: GoogleFonts.poppins(color: Colors.white24),
                 filled: true,
                 fillColor: const Color(0xFF1A1A1A),
@@ -172,7 +173,7 @@ class _AstrologyChatFeedbackSheetState
                   disabledForegroundColor: Colors.white24,
                 ),
                 child: Text(
-                  "Submit Review",
+                  "submit_feedback".tr,
                   style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

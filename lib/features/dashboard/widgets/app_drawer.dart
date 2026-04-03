@@ -57,7 +57,7 @@ class AppDrawer extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 16),
                                 Text(
-                                  "Profile",
+                                  "profile".tr,
                                   style: GoogleFonts.lora(
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold,
@@ -221,10 +221,10 @@ class AppDrawer extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   // PREFERENCES
-                                  _sectionHeader("Preferences"),
+                                  _sectionHeader("preferences".tr),
                                   _menuItem(
                                     icon: Icons.person_outline,
-                                    label: "My Profile",
+                                    label: "my_profile".tr,
                                     onTap: () {
                                       Navigator.pop(context);
                                       Get.to(() => const ProfileDetailsView());
@@ -234,7 +234,6 @@ class AppDrawer extends StatelessWidget {
 
                                   const SizedBox(height: 16),
 
-                                  // KARMA POINTS
                                   _karmaPointsCard(
                                     context,
                                     profile?.karmaPoints ?? 0,
@@ -251,10 +250,10 @@ class AppDrawer extends StatelessWidget {
                                   const SizedBox(height: 16),
 
                                   // SANKALP SECTION
-                                  _sectionHeader("Sankalp"),
+                                  _sectionHeader("sankalp".tr),
                                   _menuItem(
                                     icon: Icons.spa_outlined,
-                                    label: "My Sankalp",
+                                    label: "my_sankalp".tr,
                                     onTap: () {
                                       Navigator.pop(context);
                                       Get.to(() => const SankalpScreen());
@@ -263,10 +262,10 @@ class AppDrawer extends StatelessWidget {
                                   const SizedBox(height: 16),
 
                                   // POOJA PADHATTI SECTION
-                                  _sectionHeader("Pooja Padhatti"),
+                                  _sectionHeader("pooja_padhatti".tr),
                                   _menuItem(
                                     icon: Icons.temple_hindu_outlined,
-                                    label: "Pooja Vidhi",
+                                    label: "pooja_vidhi".tr,
                                     onTap: () {
                                       Navigator.pop(context);
                                       Get.to(() => const PoojaListScreen());
@@ -275,10 +274,10 @@ class AppDrawer extends StatelessWidget {
                                   const SizedBox(height: 16),
 
                                   // SWAPNA DECODER SECTION
-                                  _sectionHeader("Swapna Decoder"),
+                                  _sectionHeader("swapna_decoder".tr),
                                   _menuItem(
                                     icon: Icons.nightlight_round_outlined,
-                                    label: "Swapna Decoder",
+                                    label: "swapna_decoder".tr,
                                     onTap: () {
                                       Navigator.pop(context);
                                       Get.to(() => const SwapnaDecoderScreen());
@@ -287,7 +286,7 @@ class AppDrawer extends StatelessWidget {
                                   const SizedBox(height: 16),
 
                                   // OTHERS
-                                  _sectionHeader("Others"),
+                                  _sectionHeader("others".tr),
                                   Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -295,7 +294,7 @@ class AppDrawer extends StatelessWidget {
                                       _menuItem(
                                         icon: Icons
                                             .account_balance_wallet_outlined,
-                                        label: "My Kosh",
+                                        label: "my_kosh".tr,
                                         onTap: () {
                                           Navigator.pop(context);
                                           Provider.of<DashboardViewModel>(
@@ -306,14 +305,14 @@ class AppDrawer extends StatelessWidget {
                                       ),
                                       _menuItem(
                                         icon: Icons.shopping_cart_outlined,
-                                        label: "Orders",
+                                        label: "orders".tr,
                                         onTap: () {
                                           Get.dialog(const ComingSoonPopup(feature: "Orders"));
                                         },
                                       ),
                                       _menuItem(
                                         icon: Icons.receipt_long_outlined,
-                                        label: "Credit History",
+                                        label: "credit_history".tr,
                                         onTap: () {
                                           Navigator.pop(context);
                                           Get.to(
@@ -328,7 +327,7 @@ class AppDrawer extends StatelessWidget {
                                       // ),
                                       _menuItem(
                                         icon: Icons.face_unlock_outlined,
-                                        label: "Avatar Agent",
+                                        label: "avatar_agent".tr,
                                         onTap: () {
                                           Navigator.pop(context);
                                           Get.to(() => const AvatarAgentPage());
@@ -336,14 +335,14 @@ class AppDrawer extends StatelessWidget {
                                       ),
                                       _menuItem(
                                         icon: Icons.settings_outlined,
-                                        label: "Settings",
+                                        label: "settings".tr,
                                         onTap: () {
                                           Get.dialog(const ComingSoonPopup(feature: "Settings"));
                                         },
                                       ),
                                       _menuItem(
                                         icon: Icons.help_outline,
-                                        label: "Help & Support",
+                                        label: "help_support".tr,
                                         onTap: () {
                                           Navigator.pop(context);
                                           Get.to(() => const HelpSupportView());
@@ -351,7 +350,7 @@ class AppDrawer extends StatelessWidget {
                                       ),
                                       _menuItem(
                                         icon: Icons.info_outline,
-                                        label: "About Us",
+                                        label: "about_us".tr,
                                         onTap: () {
                                           Navigator.pop(context);
                                           Get.to(() => const AboutUsView());
@@ -359,7 +358,7 @@ class AppDrawer extends StatelessWidget {
                                       ),
                                       _menuItem(
                                         icon: Icons.delete_outline,
-                                        label: "Delete Account",
+                                        label: "delete_account".tr,
                                         onTap: () {
                                           Navigator.pop(context);
                                           _launchDeleteAccountEmail(
@@ -424,7 +423,7 @@ class AppDrawer extends StatelessWidget {
                                           ),
                                           const SizedBox(width: 6),
                                           Text(
-                                            "Logout",
+                                            "logout".tr,
                                             style: GoogleFonts.lora(
                                               fontSize: 13,
                                               fontWeight: FontWeight.w600,
@@ -560,7 +559,7 @@ class AppDrawer extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                "Change Language",
+                "change_language".tr,
                 style: GoogleFonts.lora(
                   fontSize: 15, // Reduced font size
                   fontWeight: FontWeight.w500,
@@ -625,7 +624,7 @@ class AppDrawer extends StatelessWidget {
               children: [
                 // Text Part
                 Text(
-                  "Karma Wallet",
+                  "karma_wallet".tr,
                   style: GoogleFonts.lora(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -654,7 +653,7 @@ class AppDrawer extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "Your Karma Points",
+                  "your_karma_points".tr,
                   style: GoogleFonts.lora(
                     fontSize: 10,
                     color: const Color(0xff5D4037).withOpacity(0.8),
@@ -679,7 +678,7 @@ class AppDrawer extends StatelessWidget {
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: Text(
-                  "Redeem",
+                  "redeem".tr,
                   style: GoogleFonts.lora(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -721,7 +720,7 @@ class AppDrawer extends StatelessWidget {
               children: [
                 // Text Part
                 Text(
-                  "Credit Wallet",
+                  "credit_wallet".tr,
                   style: GoogleFonts.lora(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -750,7 +749,7 @@ class AppDrawer extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "Your Credit Points",
+                  "your_credit_points".tr,
                   style: GoogleFonts.lora(
                     fontSize: 10,
                     color: const Color(0xff5D4037).withOpacity(0.8),
@@ -775,7 +774,7 @@ class AppDrawer extends StatelessWidget {
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: Text(
-                  "Add Credit",
+                  "add_credit".tr,
                   style: GoogleFonts.lora(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,

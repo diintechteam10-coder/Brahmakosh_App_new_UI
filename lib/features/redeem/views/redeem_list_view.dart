@@ -1,13 +1,79 @@
 import 'package:brahmakosh/features/redeem/controllers/redeem_controller.dart';
+import 'package:brahmakosh/features/redeem/models/redeem_item_model.dart';
 import 'package:brahmakosh/features/redeem/views/redemption_history_view.dart';
 import 'package:brahmakosh/features/redeem/widgets/redeem_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:brahmakosh/core/localization/translate_helper.dart';
 import 'package:sizer/sizer.dart';
 
-class RedeemListView extends StatelessWidget {
+class RedeemListView extends StatefulWidget {
   const RedeemListView({super.key});
+
+  @override
+  State<RedeemListView> createState() => _RedeemListViewState();
+}
+
+class _RedeemListViewState extends State<RedeemListView> {
+  final Map<String, String> _dynamicTranslations = {};
+  String _lastLang = 'en';
+
+  Future<void> _translateAllContents(List<RedeemItemModel> items, List<String> categories) async {
+    final currentLang = Get.locale?.languageCode ?? 'en';
+    if (currentLang == 'en') {
+      if (_dynamicTranslations.isNotEmpty) {
+        setState(() {
+          _dynamicTranslations.clear();
+          _lastLang = 'en';
+        });
+      }
+      return;
+    }
+
+    final Set<String> toTranslate = {};
+
+    for (var item in items) {
+      if (item.title.isNotEmpty) toTranslate.add(item.title);
+      if (item.description.isNotEmpty) toTranslate.add(item.description);
+    }
+
+    for (var cat in categories) {
+      if (cat != 'All' && cat.isNotEmpty) toTranslate.add(cat);
+    }
+
+    if (toTranslate.isEmpty) return;
+
+    final list = toTranslate.toList();
+    final results = await TranslateHelper.translateList(list);
+
+    bool changed = false;
+    for (int i = 0; i < list.length; i++) {
+      if (_dynamicTranslations[list[i]] != results[i]) {
+        _dynamicTranslations[list[i]] = results[i];
+        changed = true;
+      }
+    }
+
+    if (changed || _lastLang != currentLang) {
+      if (mounted) {
+        setState(() {
+          _lastLang = currentLang;
+        });
+      }
+    }
+  }
+
+  // Helper to translate categories
+  String _getTranslatedCategory(String category) {
+    if (category == 'All') return 'category_all'.tr;
+    final lower = category.toLowerCase();
+    if (lower == 'donations') return 'category_donations'.tr;
+    if (lower == 'puja') return 'category_puja'.tr;
+    if (lower == 'merch') return 'category_merch'.tr;
+    if (lower == 'mantra') return 'category_mantra'.tr;
+    return _dynamicTranslations[category] ?? category;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +92,7 @@ class RedeemListView extends StatelessWidget {
         centerTitle: false,
         titleSpacing: 0,
         title: Text(
-          "Redeem",
+          "redeem_cap".tr,
           style: GoogleFonts.lora(
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
@@ -121,7 +187,7 @@ class RedeemListView extends StatelessWidget {
                           Icon(Icons.stars, size: 30.sp, color: const Color(0xFFD4AF37)),
                           SizedBox(height: 1.h),
                           Text(
-                            "Redeem Points for Sacred Offerings",
+                            "redeem_subtitle".tr,
                             style: GoogleFonts.lora(
                               color: Colors.white,
                               fontSize: 12.sp,
@@ -142,16 +208,27 @@ class RedeemListView extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: 5.w),
             child: Obx(
-              () => Row(
-                children: controller.categories
-                    .map(
-                      (category) => Padding(
-                        padding: EdgeInsets.only(right: 3.w),
-                        child: _buildFilterChip(category, controller),
-                      ),
-                    )
-                    .toList(),
-              ),
+              () {
+                // Trigger translation in post frame callback to avoid build-time setState
+                if (controller.redeemItems.isNotEmpty) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _translateAllContents(controller.redeemItems, controller.categories);
+                  });
+                }
+                
+                return Row(
+                  children: controller.categories
+                      .map(
+                        (category) {
+                          return Padding(
+                            padding: EdgeInsets.only(right: 3.w),
+                            child: _buildFilterChip(category, controller),
+                          );
+                        }
+                      )
+                      .toList(),
+                );
+              },
             ),
           ),
 
@@ -167,7 +244,7 @@ class RedeemListView extends StatelessWidget {
               if (items.isEmpty) {
                 return Center(
                   child: Text(
-                    "No items found",
+                    "no_items_found".tr,
                     style: GoogleFonts.poppins(color: Colors.white70, fontSize: 12.sp),
                   ),
                 );
@@ -176,7 +253,11 @@ class RedeemListView extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 5.w),
                 itemCount: items.length,
                 itemBuilder: (context, index) {
-                  return RedeemCard(item: items[index]);
+                  return RedeemCard(
+                    item: items[index],
+                    translatedTitle: _dynamicTranslations[items[index].title],
+                    translatedDescription: _dynamicTranslations[items[index].description],
+                  );
                 },
               );
             }),
@@ -212,7 +293,7 @@ class RedeemListView extends StatelessWidget {
                 : [],
           ),
           child: Text(
-            label,
+            _getTranslatedCategory(label),
             style: GoogleFonts.poppins(
               fontSize: 11.sp,
               fontWeight: FontWeight.bold,

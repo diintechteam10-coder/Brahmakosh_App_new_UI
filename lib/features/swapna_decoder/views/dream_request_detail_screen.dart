@@ -15,7 +15,7 @@ class DreamRequestDetailScreen extends StatelessWidget {
       backgroundColor: Colors.black,
       appBar: AppBar(
         title: Text(
-          "Request Details",
+          "request_details_title".tr,
           style: GoogleFonts.lora(
             fontSize: 20,
             color: Colors.white,
@@ -72,7 +72,7 @@ class DreamRequestDetailScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        "Dream Symbol",
+                        "dream_symbol_label".tr,
                         style: GoogleFonts.poppins(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
@@ -107,7 +107,7 @@ class DreamRequestDetailScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        "Your Description",
+                        "your_description_label".tr,
                         style: GoogleFonts.poppins(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -149,7 +149,7 @@ class DreamRequestDetailScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Status",
+                        "status_label".tr,
                         style: GoogleFonts.poppins(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
@@ -208,7 +208,7 @@ class DreamRequestDetailScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 14),
                     Text(
-                      "Interpretation Available!",
+                      "interpretation_available".tr,
                       style: GoogleFonts.lora(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -217,7 +217,7 @@ class DreamRequestDetailScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      "Your dream has been decoded as '${request.completedDreamId?.symbolName}'.",
+                      "dream_decoded_msg".trParams({'symbol': request.completedDreamId?.symbolName ?? ""}),
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
                         fontSize: 14,
@@ -259,7 +259,7 @@ class DreamRequestDetailScreen extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              "View Interpretation",
+                              "view_interpretation_button".tr,
                               style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
@@ -289,22 +289,27 @@ class DreamRequestDetailScreen extends StatelessWidget {
     Color color;
     IconData icon;
 
+    String statusText;
     switch (status.toLowerCase()) {
       case 'completed':
         color = const Color(0xff2E7D32);
         icon = Icons.check_circle_outline;
+        statusText = 'completed_status'.tr;
         break;
       case 'in progress':
         color = const Color(0xffFF7438);
         icon = Icons.hourglass_bottom_rounded;
+        statusText = 'in_progress_status'.tr;
         break;
       case 'pending':
         color = const Color(0xffE53935);
         icon = Icons.schedule;
+        statusText = 'pending_status'.tr;
         break;
       default:
         color = Colors.grey;
         icon = Icons.help_outline;
+        statusText = status;
     }
 
     return Container(
@@ -320,7 +325,7 @@ class DreamRequestDetailScreen extends StatelessWidget {
           Icon(icon, size: 14, color: color),
           const SizedBox(width: 6),
           Text(
-            status,
+            statusText,
             style: GoogleFonts.poppins(
               fontSize: 13,
               fontWeight: FontWeight.w700,

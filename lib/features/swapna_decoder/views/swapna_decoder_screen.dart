@@ -34,7 +34,7 @@ class _SwapnaDecoderScreenState extends State<SwapnaDecoderScreen>
       backgroundColor: Colors.black,
       appBar: AppBar(
         title: Text(
-          "Swapna Decoder",
+          "swapna_decoder_title".tr,
           style: GoogleFonts.lora(
             fontSize: 22,
             color: Colors.white,
@@ -110,9 +110,9 @@ class _SwapnaDecoderScreenState extends State<SwapnaDecoderScreen>
                 fontWeight: FontWeight.w600,
                 fontSize: 13,
               ),
-              tabs: const [
-                Tab(text: "SEARCH DREAM"),
-                Tab(text: "MY REQUEST"),
+              tabs: [
+                Tab(text: "search_dream_cap".tr),
+                Tab(text: "my_request_cap".tr),
               ],
             ),
           ),
