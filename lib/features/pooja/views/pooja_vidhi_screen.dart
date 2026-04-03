@@ -345,6 +345,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                 children: [
                   _sectionHeader("required_samagri".tr),
                   SizedBox(height: 2.h),
+                  if (_translatedSamagri.isNotEmpty)
                     ..._translatedSamagri.map(
                       (item) => Padding(
                         padding: EdgeInsets.only(bottom: 1.h),

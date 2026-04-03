@@ -303,13 +303,13 @@ class AppDrawer extends StatelessWidget {
                                           ).changeTab(5);
                                         },
                                       ),
-                                      _menuItem(
-                                        icon: Icons.shopping_cart_outlined,
-                                        label: "orders".tr,
-                                        onTap: () {
-                                          Get.dialog(const ComingSoonPopup(feature: "Orders"));
-                                        },
-                                      ),
+                                        _menuItem(
+                                          icon: Icons.shopping_cart_outlined,
+                                          label: "orders".tr,
+                                          onTap: () {
+                                            Get.dialog(const ComingSoonPopup(feature: "orders"));
+                                          },
+                                        ),
                                       _menuItem(
                                         icon: Icons.receipt_long_outlined,
                                         label: "credit_history".tr,
@@ -337,7 +337,7 @@ class AppDrawer extends StatelessWidget {
                                         icon: Icons.settings_outlined,
                                         label: "settings".tr,
                                         onTap: () {
-                                          Get.dialog(const ComingSoonPopup(feature: "Settings"));
+                                          Get.dialog(const ComingSoonPopup(feature: "settings"));
                                         },
                                       ),
                                       _menuItem(
@@ -379,9 +379,9 @@ class AppDrawer extends StatelessWidget {
                                     onTap: () {
                                       Get.dialog(
                                         ActionConfirmationPopup(
-                                          title: "Logout",
-                                          description: "Are you sure you want to logout from Brahmakosh?",
-                                          confirmLabel: "Logout",
+                                          title: "logout".tr,
+                                          description: "confirm_logout".tr,
+                                          confirmLabel: "logout".tr,
                                           onConfirm: () async {
                                             await StorageService.setBool(
                                               AppConstants.keyIsLoggedIn,
@@ -552,7 +552,7 @@ class AppDrawer extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6), // Reduced padding
       child: InkWell(
-        onTap: () => Get.dialog(const ComingSoonPopup(feature: "Change Language")),
+        onTap: () => Get.dialog(const ComingSoonPopup(feature: "change_language")),
         child: Row(
           children: [
             const Icon(Icons.translate, color: Color(0xff5D4037), size: 18),

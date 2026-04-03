@@ -123,7 +123,7 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                                           Expanded(
                                             child: _buildSmallInfo(
                                               Icons.access_time_filled,
-                                              "${pooja.duration ?? 0} Mins",
+                                              "min_suffix".trParams({'min': (pooja.duration ?? 0).toString()}),
                                             ),
                                           ),
                                          
@@ -273,10 +273,10 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _buildSectionHeader("Benefits/Results"),
+                                _buildSectionHeader("benefits_results".tr),
                                 SizedBox(height: 1.h),
                                 Text(
-                                  "Detailed benefits for this ritual will be added soon.",
+                                  "benefits_available_soon".tr,
                                   style: GoogleFonts.poppins(
                                     fontSize: 11.sp,
                                     color: Colors.white.withOpacity(0.4),

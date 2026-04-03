@@ -171,8 +171,8 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                             const SizedBox(height: 16),
                             Text(
                               state.selectedCategory == 'Festival'
-                                  ? "No festivals found at the moment."
-                                  : "No poojas found.",
+                                  ? "no_festivals_found".tr
+                                  : "no_poojas_found".tr,
                               style: GoogleFonts.poppins(
                                 color: Colors.white.withOpacity(0.5),
                                 fontSize: 16,
@@ -213,11 +213,7 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
   ) {
     return GestureDetector(
       onTap: () {
-        String category = 'All';
-        if (label == 'FESTIVAL') {
-          category = 'Festival';
-        }
-        context.read<PoojaBloc>().add(FilterPoojas(category));
+        context.read<PoojaBloc>().add(FilterPoojas(categoryKey));
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 1.2.h),
@@ -346,7 +342,7 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                           elevation: 0,
                         ),
                         child: Text(
-                          "View",
+                          "view_btn".tr,
                           style: GoogleFonts.poppins(
                             color: Colors.black,
                             fontWeight: FontWeight.w600,

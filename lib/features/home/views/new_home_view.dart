@@ -35,7 +35,7 @@ import 'package:brahmakosh/features/profile/views/profile_view.dart'
     as brahmakosh_profile;
 import 'package:brahmakosh/features/notifications/blocs/notification_bloc.dart';
 import 'package:brahmakosh/features/redeem/controllers/redeem_controller.dart';
-import 'package:brahmakosh/features/remedies/views/remedies_web_view.dart';
+
 
 class NewHomeView extends StatefulWidget {
   final ScrollController? scrollController;
@@ -910,9 +910,10 @@ class _NewHomeViewState extends State<NewHomeView> {
           _buildGridItem(
             "remedies".tr,
             "assets/icons/remedies.png",
+           showComingSoon: true,
             onTap: () {
               _unfocusAll();
-              Get.to(() => const RemediesWebView());
+              Get.dialog(ComingSoonPopup(feature: "remedies"));
             },
           ),
           _buildGridItem(
@@ -937,7 +938,7 @@ class _NewHomeViewState extends State<NewHomeView> {
             showComingSoon: true,
             onTap: () {
               _unfocusAll();
-              Get.dialog(ComingSoonPopup(feature: "courses".tr));
+              Get.dialog(ComingSoonPopup(feature: "courses"));
             },
           ),
         ]),
@@ -1500,6 +1501,8 @@ class _NewHomeViewState extends State<NewHomeView> {
                           Expanded(
                             child: TranslatedText(
                               expert.name ?? "Expert",
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,  
                               style: GoogleFonts.poppins(
                                 color: Colors.white,
                                 fontSize: 12.sp,
@@ -2339,9 +2342,13 @@ class _NewHomeViewState extends State<NewHomeView> {
         "title": "Remedies",
         "desc": "Protect your energy & remove negativity",
         "icon": "assets/icons/remedies.png",
-        "onTap": () {
+        // "onTap": () {
+        //   _unfocusAll();
+        //   Get.to(() => const RemediesWebView());
+        // },
+         "onTap": () {
           _unfocusAll();
-          Get.to(() => const RemediesWebView());
+          Get.dialog(const ComingSoonPopup(feature: "remedies"));
         },
       },
       {
@@ -2364,13 +2371,13 @@ class _NewHomeViewState extends State<NewHomeView> {
         },
       },
       {
-        "title": "Courses",
-        "desc": "Learn sacred wisdom from experts",
+        "title": "courses_title".tr,
+        "desc": "courses_desc".tr,
         "icon": "assets/icons/courses.png",
         "isComingSoon": true,
-        "onTap": () {
+         "onTap": () {
           _unfocusAll();
-          Get.dialog(const ComingSoonPopup(feature: "Courses"));
+          Get.dialog(const ComingSoonPopup(feature: "courses"));
         },
       },
     ];
@@ -2543,7 +2550,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                 TranslatedText(
-                  "SANKALP TRACKER",
+                  "sankalp_tracker",
                   style: GoogleFonts.poppins(
                     color: Colors.white.withOpacity(0.7),
                     fontSize: 12.sp,
@@ -2554,7 +2561,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                     GestureDetector(
                       onTap: () => Get.to(() => const SankalpScreen()),
                       child: Text(
-                        "View All",
+                        "view_all".tr,
                         style: GoogleFonts.poppins(
                           color: AppTheme.primaryGold,
                           fontSize: 10.sp,
@@ -2584,24 +2591,24 @@ class _NewHomeViewState extends State<NewHomeView> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                TranslatedText(
-                                  activeCount > 0 ? "Daily Spiritual Progress" : "No Active Sankalp",
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.white,
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                TranslatedText(
-                                  activeCount > 0 
-                                    ? "Tracking $activeCount active spiritual habits."
-                                    : "Start a new Sankalp to track your spiritual journey.",
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.white.withOpacity(0.6),
-                                    fontSize: 9.75.sp,
-                                  ),
-                                ),
+                                 Text(
+                                   activeCount > 0 ? "daily_spiritual_progress".tr : "no_active_sankalp".tr,
+                                   style: GoogleFonts.poppins(
+                                     color: Colors.white,
+                                     fontSize: 12.sp,
+                                     fontWeight: FontWeight.w700,
+                                   ),
+                                 ),
+                                 const SizedBox(height: 4),
+                                 Text(
+                                   activeCount > 0 
+                                     ? "tracking_habits_desc".trParams({'count': activeCount.toString()})
+                                     : "start_sankalp_desc".tr,
+                                   style: GoogleFonts.poppins(
+                                     color: Colors.white.withOpacity(0.6),
+                                     fontSize: 9.75.sp,
+                                   ),
+                                 ),
                               ],
                             ),
                           ),
@@ -2634,7 +2641,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             TranslatedText(
-                              "OVERALL PROGRESS",
+                              "overall_progress",
                               style: GoogleFonts.poppins(
                                 color: Colors.white.withOpacity(0.5),
                                 fontSize: 11,
@@ -2727,7 +2734,7 @@ class _NewHomeViewState extends State<NewHomeView> {
             ),
             const SizedBox(width: 8),
             TranslatedText(
-              "TRACK YOUR SANKALP",
+              "track_your_sankalp",
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.bold,
                 fontSize: 12.sp,
