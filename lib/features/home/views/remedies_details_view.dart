@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import 'package:brahmakosh/features/home/models/remedies_model.dart';
+import '../../../core/utils/app_snackbar.dart';
 import 'package:brahmakosh/common/api_urls.dart';
 
 class GemstoneDetailView extends StatefulWidget {
@@ -682,13 +683,9 @@ class _PujaDetailViewState extends State<PujaDetailView> {
               padding: const EdgeInsets.fromLTRB(56, 12, 16, 0),
               child: InkWell(
                 onTap: () {
-                  Get.snackbar(
+                  AppSnackBar.showInfo(
                     "Puja Link",
                     suggestion.link!,
-                    snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: const Color(0xff4E342E),
-                    colorText: Colors.white,
-                    duration: const Duration(seconds: 3),
                   );
                 },
                 borderRadius: BorderRadius.circular(10),

@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:brahmakosh/core/localization/translate_helper.dart';
 import 'package:sizer/sizer.dart';
+import '../../../core/utils/app_snackbar.dart';
 
 class RedeemDetailView extends StatefulWidget {
   final RedeemItemModel item;
@@ -316,14 +317,9 @@ class _RedeemDetailViewState extends State<RedeemDetailView> {
                                   Get.dialog(const SuccessPopup());
                                 },
                                 onError: (error) {
-                                  Get.snackbar(
+                                  AppSnackBar.showError(
                                     "Error",
                                     error,
-                                    snackPosition: SnackPosition.BOTTOM,
-                                    margin: EdgeInsets.all(5.w),
-                                    backgroundColor: Colors.red.withValues(alpha: 0.8),
-                                    colorText: Colors.white,
-                                    duration: const Duration(seconds: 2),
                                   );
                                 },
                               );

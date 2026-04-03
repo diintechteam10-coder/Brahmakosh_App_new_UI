@@ -8,6 +8,7 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../../core/services/storage_service.dart';
 import '../models/profile_model.dart';
 import '../../../../core/common_imports.dart';
+import '../../../../core/utils/app_snackbar.dart';
 
 class ProfileViewModel extends ChangeNotifier {
   ProfileModel? _profile;
@@ -149,10 +150,10 @@ class ProfileViewModel extends ChangeNotifier {
              if (responseBody['success'] == true) {
                 // Refresh profile to get updated data
                 await fetchProfile();
-                Get.snackbar("success".tr, "profile_updated_success".tr);
+                AppSnackBar.showSuccess("success".tr, "profile_updated_success".tr);
              } else {
                 _errorMessage = responseBody['message'] ?? 'Failed to update profile';
-                Get.snackbar("Error".tr, _errorMessage!);
+                AppSnackBar.showError("Error".tr, _errorMessage!);
              }
            } catch (e) {
               print("❌ Error parsing update response: $e");
@@ -230,10 +231,10 @@ class ProfileViewModel extends ChangeNotifier {
            var success = response['success'];
            if (success == true) {
               await fetchProfile(); // Refresh to get new image URL
-              Get.snackbar("success".tr, "profile_image_updated_success".tr);
+              AppSnackBar.showSuccess("success".tr, "profile_image_updated_success".tr);
            } else {
               _errorMessage = response['message'] ?? 'Failed to upload image';
-              Get.snackbar("Error".tr, _errorMessage!);
+              AppSnackBar.showError("Error".tr, _errorMessage!);
            }
            _isLoading = false;
            _safeNotifyListeners();

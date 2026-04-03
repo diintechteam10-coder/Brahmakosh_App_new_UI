@@ -1,7 +1,9 @@
 import 'package:brahmakosh/core/common_imports.dart';
 import 'package:brahmakosh/core/constants/app_constants.dart';
-import 'package:brahmakosh/features/check_in/views/prayer_configuration_view.dart';
-import 'package:brahmakosh/features/check_in/views/chanting_configuration_view.dart';
+import 'package:brahmakosh/features/check_in/views/prayer_selection_view_v2.dart';
+import 'package:brahmakosh/features/check_in/views/chanting_selection_view_v2.dart';
+import 'package:brahmakosh/features/check_in/views/meditation_selection_view_v2.dart';
+import 'package:brahmakosh/features/check_in/views/silence_selection_view_v2.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_checkin_model.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,8 +32,6 @@ class _CheckInViewState extends State<CheckInView>
   // final CheckInController controller = Get.put(CheckInController()); // Removed
   int _currentStatIndex = 0;
   Timer? _timer;
-  final Map<String, String> _dynamicTranslations = {};
-  String _lastLang = 'en';
 
   @override
   void initState() {
@@ -75,62 +75,6 @@ class _CheckInViewState extends State<CheckInView>
     }
   }
 
-  Future<void> _translateAllContents(Data data) async {
-    final currentLang = Get.locale?.languageCode ?? 'en';
-    if (currentLang == 'en') {
-      if (_dynamicTranslations.isNotEmpty) {
-        setState(() {
-          _dynamicTranslations.clear();
-          _lastLang = 'en';
-        });
-      }
-      return;
-    }
-
-    final Set<String> toTranslate = {};
-    
-    // Activity titles
-    if (data.activities != null) {
-      for (var act in data.activities!) {
-        if (act.title != null) toTranslate.add(act.title!);
-      }
-    }
-
-    // Recent activity titles
-    if (data.recentActivities != null) {
-      for (var act in data.recentActivities!) {
-        if (act.title != null) toTranslate.add(act.title!);
-      }
-    }
-
-    // Motivation text
-    if (data.motivation?.text != null) {
-      toTranslate.add(data.motivation!.text!);
-    }
-
-    if (toTranslate.isEmpty) return;
-
-    final list = toTranslate.toList();
-    final results = await TranslateHelper.translateList(list);
-
-    bool changed = false;
-    for (int i = 0; i < list.length; i++) {
-      if (_dynamicTranslations[list[i]] != results[i]) {
-        _dynamicTranslations[list[i]] = results[i];
-        changed = true;
-      }
-    }
-
-    if (changed || _lastLang != currentLang) {
-      if (mounted) {
-        setState(() {
-          _lastLang = currentLang;
-        });
-      }
-    }
-  }
-
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -170,9 +114,7 @@ class _CheckInViewState extends State<CheckInView>
           } else if (state is CheckInLoaded) {
             // Close any lingering dialogs if needed (e.g. from refresh)
             if (Get.isDialogOpen == true) Get.back();
-            _translateAllContents(state.data);
           }
-
         },
         builder: (context, state) {
           if (state is CheckInLoading) {
@@ -252,8 +194,8 @@ class _CheckInViewState extends State<CheckInView>
                                   },
                                 ),
                               ),
-                                Text(
-                                  'are_you_spiritual'.tr,
+                              Text(
+                                '#AreYouSpiritual',
                                 style: GoogleFonts.lora(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -335,21 +277,38 @@ class _CheckInViewState extends State<CheckInView>
                                 final activity = activities[index];
                                 return _card(
                                   image: activity.image,
-                                  title: (_dynamicTranslations[activity.title] ?? activity.title ?? '').toUpperCase(),
+                                  title: activity.title?.toUpperCase() ?? '',
                                   onTap: () {
                                     if (activity.route != null) {
-                                      final title = activity.title ?? '';
-                                      if (title == 'Chanting') {
+                                      if (activity.title == 'Chanting') {
                                         Get.to(
-                                          () => ChantingConfigurationView(
-                                            chantingCategoryId: activity.id!,
-                                          ),
+                                          () => const ChantingSelectionViewV2(),
                                         );
-                                      } else if (title == 'Prayer' &&
+                                      } else if (activity.title == 'Prayer' &&
                                           activity.id != null) {
                                         Get.to(
-                                          () => PrayerConfigurationView(
+                                          () => PrayerSelectionViewV2(
                                             prayerCategoryId: activity.id!,
+                                          ),
+                                        );
+                                      } else if ((activity.title ==
+                                                  'Meditation' ||
+                                              activity.title == 'Mediation') &&
+                                          activity.id != null) {
+                                        Get.to(
+                                          () =>
+                                              MeditationSelectionViewV2(
+                                                 meditationCategoryId:
+                                                     activity.id!,
+                                               )
+,
+                                        );
+                                      } else if ((activity.title == 'Silence' ||
+                                              activity.title == 'silence') &&
+                                          activity.id != null) {
+                                        Get.to(
+                                          () => SilenceSelectionViewV2(
+                                            silenceCategoryId: activity.id!,
                                           ),
                                         );
                                       } else if (activity.id != null) {
@@ -711,15 +670,15 @@ class _CheckInViewState extends State<CheckInView>
             if (stats.bonus != null) ...[
               const Divider(color: Colors.white12, height: 1),
               _bonusRedemptionRow(
-                'bonus'.tr,
-                '${"bonuses_label".trParams({'count': '${stats.bonus!.count}'})} • ${"points_label".trParams({'count': '${stats.bonus!.totalBonusPoints}'})}',
+                'Bonus',
+                '${stats.bonus!.count} bonuses • ${stats.bonus!.totalBonusPoints} points',
               ),
             ],
             if (stats.redemption != null) ...[
               const Divider(color: Colors.white12, height: 1),
               _bonusRedemptionRow(
-                'redemption'.tr,
-                '${"redemptions_label".trParams({'count': '${stats.redemption!.count}'})} • ${"points_label".trParams({'count': '${stats.redemption!.totalRedeemPoints}'})}',
+                'Redemption',
+                '${stats.redemption!.count} redemptions • ${stats.redemption!.totalRedeemPoints} points',
               ),
             ],
           ],
@@ -778,7 +737,7 @@ class _CheckInViewState extends State<CheckInView>
           Expanded(
             flex: 1,
             child: Text(
-              '${detail.minutes} ${"mins_short".tr}',
+              '${detail.minutes} m',
               textAlign: TextAlign.right,
               style: GoogleFonts.poppins(fontSize: 13, color: Colors.white54),
             ),
@@ -841,13 +800,19 @@ class _CheckInViewState extends State<CheckInView>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            _dynamicTranslations[activity.title] ?? activity.title ?? '',
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
+                          FutureBuilder<String>(
+                            future: TranslateHelper.translate(activity.title ?? ''),
+                            initialData: activity.title ?? '',
+                            builder: (context, snapshot) {
+                              return Text(
+                                snapshot.data ?? '',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              );
+                            },
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -1029,8 +994,8 @@ class _CheckInViewState extends State<CheckInView>
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
-                        color: const Color(0xFFD4AF37), // Solid gold
-                        width: 1.5,
+                        color: Colors.white.withOpacity(0.1), // Solid gold
+                        width: 1.75,
                       ),
                     ),
                   ),

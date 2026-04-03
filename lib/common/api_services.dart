@@ -935,15 +935,16 @@ Future<SpiritualConfigurationResponse?> getSpiritualConfigurations(
   final url = "${ApiUrls.spiritualConfigurations}?categoryId=$categoryId";
 
   print("🔍 DEBUG_SPIRITUAL_Configuration: Requesting URL: $url");
-  print("🔍 DEBUG_SPIRITUAL_Configuration: CategoryId: $categoryId");
 
   await callWebApiGet(
     tickerProvider,
     url,
     token: token,
     onResponse: (response) {
-      print("✅ DEBUG_SPIRITUAL: Response Status: ${response.statusCode}");
-      print("✅ DEBUG_SPIRITUAL: Response Body: ${response.body}");
+      log('--- SPIRITUAL CONFIGURATION RAW RESPONSE ---', name: 'API_DEBUG');
+      log(response.body, name: 'API_DEBUG');
+      log('-------------------------------------------', name: 'API_DEBUG');
+      
       try {
         configResponse = SpiritualConfigurationResponse.fromJson(
           jsonDecode(response.body),
@@ -959,7 +960,7 @@ Future<SpiritualConfigurationResponse?> getSpiritualConfigurations(
       print("❌ DEBUG_SPIRITUAL: Error: $error");
       Utils.print('Error fetching spiritual configurations: $error');
     },
-    showLoader: false, // Independent loader in controller
+    showLoader: false,
     shouldLogoutOn401: false,
   );
   return configResponse;

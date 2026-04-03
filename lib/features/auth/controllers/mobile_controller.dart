@@ -4,6 +4,7 @@ import 'package:brahmakosh/features/auth/views/complete_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:brahmakosh/core/utils/app_snackbar.dart';
 
 class MobileOtpController extends GetxController {
   /// 📧 email from step-1 (REQUIRED)
@@ -76,15 +77,15 @@ class MobileOtpController extends GetxController {
 
       if (res.statusCode == 200 || res.statusCode == 201) {
         print("✅ MOBILE OTP RESENT SUCCESSFULLY");
-        Get.snackbar("Success", data['message'] ?? "OTP resent to mobile");
+        AppSnackBar.showSuccess("Success", data['message'] ?? "OTP resent to mobile");
       } else {
         print("❌ OTP RESEND FAILED");
-        Get.snackbar("Error", data['message'] ?? "Failed to resend OTP");
+        AppSnackBar.showError("Error", data['message'] ?? "Failed to resend OTP");
       }
     } catch (e, stack) {
       print("🔥 EXCEPTION: $e");
       print("🔥 STACK TRACE: $stack");
-      Get.snackbar("Error", e is http.ClientException ? "Connection timeout" : "Server error");
+      AppSnackBar.showError("Error", e is http.ClientException ? "Connection timeout" : "Server error");
     } finally {
       isLoading.value = false;
     }
@@ -96,7 +97,7 @@ class MobileOtpController extends GetxController {
     final mobile = phoneController.text.trim();
 
     if (mobile.isEmpty) {
-      Get.snackbar("Error", "Enter mobile number");
+      AppSnackBar.showError("Error", "Enter mobile number");
       return;
     }
 
@@ -159,15 +160,15 @@ class MobileOtpController extends GetxController {
       if (res.statusCode == 200 || res.statusCode == 201) {
         print("✅ OTP SENT SUCCESSFULLY");
         isOtpSent.value = true;
-        Get.snackbar("Success", data['message'] ?? "OTP sent to mobile");
+        AppSnackBar.showSuccess("Success", data['message'] ?? "OTP sent to mobile");
       } else {
         print("❌ API ERROR: ${data['message']}");
-        Get.snackbar("Error", data['message'] ?? "Failed to send OTP");
+        AppSnackBar.showError("Error", data['message'] ?? "Failed to send OTP");
       }
     } catch (e, stack) {
       print("🔥 EXCEPTION: $e");
       print("🔥 STACK TRACE: $stack");
-      Get.snackbar("Error", e is http.ClientException ? "Connection timeout" : "Server error");
+      AppSnackBar.showError("Error", e is http.ClientException ? "Connection timeout" : "Server error");
     } finally {
       isLoading.value = false;
       print("✅ Loading = FALSE");
@@ -179,7 +180,7 @@ class MobileOtpController extends GetxController {
 
     if (otpController.text.length != 6) {
       print("❌ Invalid OTP: ${otpController.text}");
-      Get.snackbar("Error", "Enter valid OTP");
+      AppSnackBar.showError("Error", "Enter valid OTP");
       return;
     }
 
@@ -222,19 +223,19 @@ class MobileOtpController extends GetxController {
 
       if (res.statusCode == 200 || res.statusCode == 201) {
         print("🎉 MOBILE VERIFICATION COMPLETE");
-        Get.snackbar("Success", "Mobile verified successfully");
+        AppSnackBar.showSuccess("Success", "Mobile verified successfully");
 
         /// 👉 Navigate to complete profile with email
         print("➡️ Navigating to Complete Profile with email: $email");
         Get.offAll(() => CompleteProfileView(email: email));
       } else {
         print("❌ VERIFY FAILED: ${data['message']}");
-        Get.snackbar("Error", data['message'] ?? "Invalid OTP");
+        AppSnackBar.showError("Error", data['message'] ?? "Invalid OTP");
       }
     } catch (e, stack) {
       print("🔥 VERIFY ERROR: $e");
       print("🔥 STACK: $stack");
-      Get.snackbar("Error", e is http.ClientException ? "Connection timeout" : "Server error");
+      AppSnackBar.showError("Error", e is http.ClientException ? "Connection timeout" : "Server error");
     } finally {
       isLoading.value = false;
     }

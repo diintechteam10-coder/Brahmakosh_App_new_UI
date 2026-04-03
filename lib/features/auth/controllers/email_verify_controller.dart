@@ -5,6 +5,7 @@ import 'package:brahmakosh/features/auth/views/mobile_number_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:brahmakosh/core/utils/app_snackbar.dart';
 
 class EmailOtpController extends GetxController {
   final otpController = TextEditingController();
@@ -19,7 +20,7 @@ class EmailOtpController extends GetxController {
 
     if (otpController.text.isEmpty) {
       print("❌ OTP empty");
-      Get.snackbar("Error", "OTP required");
+      AppSnackBar.showError("Error", "OTP required");
       return;
     }
 
@@ -49,7 +50,7 @@ class EmailOtpController extends GetxController {
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("✅ Email OTP verified successfully");
 
-        Get.snackbar("Success", "Email verified");
+        AppSnackBar.showSuccess("Success", "Email verified");
 
         /// 👉 Navigate to mobile OTP verification with verified email
         print("➡️ Navigating to Mobile OTP with verified email: $email");
@@ -62,14 +63,14 @@ class EmailOtpController extends GetxController {
       } else {
         print("❌ OTP verify failed");
 
-        Get.snackbar("Error", data['message'] ?? "Invalid OTP");
+        AppSnackBar.showError("Error", data['message'] ?? "Invalid OTP");
       }
     } catch (e, s) {
       print("🔥 Exception in OTP verify");
       print(e);
       print(s);
 
-      Get.snackbar("Error", "Server error");
+      AppSnackBar.showError("Error", "Server error");
     } finally {
       isLoading.value = false;
     }
@@ -103,16 +104,16 @@ class EmailOtpController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("✅ Email OTP resent successfully");
-        Get.snackbar("Success", data['message'] ?? "OTP resent to email");
+        AppSnackBar.showSuccess("Success", data['message'] ?? "OTP resent to email");
       } else {
         print("❌ OTP resend failed");
-        Get.snackbar("Error", data['message'] ?? "Failed to resend OTP");
+        AppSnackBar.showError("Error", data['message'] ?? "Failed to resend OTP");
       }
     } catch (e, s) {
       print("🔥 Exception in OTP resend");
       print(e);
       print(s);
-      Get.snackbar("Error", "Server error");
+      AppSnackBar.showError("Error", "Server error");
     } finally {
       isLoading.value = false;
     }
