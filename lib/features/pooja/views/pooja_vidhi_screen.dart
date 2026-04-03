@@ -2,6 +2,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/utils/app_snackbar.dart';
 
 import '../models/pooja_model.dart';
 import 'package:brahmakosh/core/localization/translate_helper.dart';
@@ -141,10 +142,9 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
 
   Future<void> _playPause() async {
     if (widget.pooja.audioUrl == null || widget.pooja.audioUrl!.isEmpty) {
-      Get.snackbar(
+ AppSnackBar.showError(
         "error".tr,
         "audio_not_available".tr,
-        snackPosition: SnackPosition.BOTTOM,
       );
       return;
     }
@@ -169,10 +169,9 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
       setState(() {
         _isLoading = false;
       });
-      Get.snackbar(
+         AppSnackBar.showError(
         "error".tr,
         "audio_play_error".trParams({'error': e.toString()}),
-        snackPosition: SnackPosition.BOTTOM,
       );
     }
   }

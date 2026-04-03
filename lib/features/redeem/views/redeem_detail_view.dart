@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+import '../../../core/utils/app_snackbar.dart';
 
 class RedeemDetailView extends StatelessWidget {
   final RedeemItemModel item;
@@ -263,14 +264,9 @@ class RedeemDetailView extends StatelessWidget {
                                   Get.dialog(const SuccessPopup());
                                 },
                                 onError: (error) {
-                                  Get.snackbar(
+                                  AppSnackBar.showError(
                                     "Error",
                                     error,
-                                    snackPosition: SnackPosition.BOTTOM,
-                                    margin: EdgeInsets.all(5.w),
-                                    backgroundColor: Colors.red.withValues(alpha: 0.8),
-                                    colorText: Colors.white,
-                                    duration: const Duration(seconds: 2),
                                   );
                                 },
                               );

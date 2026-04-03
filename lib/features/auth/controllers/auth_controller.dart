@@ -9,6 +9,7 @@ import 'package:brahmakosh/core/constants/app_constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:brahmakosh/core/services/push_notification_service.dart';
+import 'package:brahmakosh/core/utils/app_snackbar.dart';
 
 class AuthController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -34,7 +35,7 @@ class AuthController extends GetxController {
     final password = passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      Get.snackbar("Required", "Email & Password required");
+      AppSnackBar.showError("Required", "Email & Password required");
       return;
     }
 
@@ -83,14 +84,14 @@ class AuthController extends GetxController {
         Get.offAllNamed(AppConstants.routeDashboard);
       } else {
         final msg = jsonDecode(response.body)['message'] ?? "Login failed";
-        Get.snackbar("Login Failed", msg);
+        AppSnackBar.showError("Login Failed", msg);
       }
     } catch (e, stack) {
       print("❌ LOGIN EXCEPTION");
       print("Error: $e");
       print("StackTrace: $stack");
 
-      Get.snackbar("Error", "Something went wrong");
+      AppSnackBar.showError("Error", "Something went wrong");
     } finally {
       isEmailLoading.value = false;
     }
@@ -315,7 +316,7 @@ Future<void> signInWithApple() async {
     if (userEmail.isNotEmpty) {
       await _checkUserAfterSocialLogin(userEmail);
     } else {
-      Get.snackbar(
+      AppSnackBar.showError(
         "Apple Login",
         "Email not available. Please login again or use another method.",
       );
@@ -330,7 +331,7 @@ Future<void> signInWithApple() async {
       print("🔥 Firebase Error Message: ${e.message}");
     }
 
-    Get.snackbar("Apple Login Failed", e.toString());
+    AppSnackBar.showError("Apple Login Failed", e.toString());
   } finally {
     print('🔚 Apple Sign-In END');
     isAppleLoading.value = false;
@@ -385,11 +386,11 @@ Future<void> signInWithApple() async {
           Get.toNamed(AppConstants.mobileOtp, arguments: email);
         }
       } else {
-        Get.snackbar("Error", "User check failed");
+        AppSnackBar.showError("Error", "User check failed");
       }
     } catch (e) {
       print('❌ Check user error: $e');
-      Get.snackbar("Error", "Something went wrong");
+      AppSnackBar.showError("Error", "Something went wrong");
     }
   }
 

@@ -6,6 +6,7 @@ import 'package:brahmakosh/core/services/storage_service.dart';
 import 'package:brahmakosh/features/auth/views/create_avtar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:brahmakosh/core/utils/app_snackbar.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
@@ -69,7 +70,7 @@ class CompleteProfileController extends GetxController {
         timeController.text.isEmpty ||
         placeController.text.isEmpty ||
         gowthraController.text.isEmpty) {
-      Get.snackbar("Error", "Please fill all fields");
+      AppSnackBar.showError("Error", "Please fill all fields");
       return;
     }
 
@@ -123,17 +124,14 @@ class CompleteProfileController extends GetxController {
           print("✅ Token saved to SharedPreferences");
         }
 
-        Get.snackbar(
+        AppSnackBar.showSuccess(
           "Success",
           responseBody['message'] ?? "Profile completed",
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
         );
 
         Get.to(GenerateAvatarView());
       } else {
-        Get.snackbar(
+        AppSnackBar.showError(
           "Error",
           responseBody['message'] ?? "Failed to submit profile",
         );
@@ -141,7 +139,7 @@ class CompleteProfileController extends GetxController {
     } catch (e, stack) {
       print("🔥 ERROR: $e");
       print("🔥 STACK: $stack");
-      Get.snackbar("Error", "Server error");
+      AppSnackBar.showError("Error", "Server error");
     } finally {
       isLoading.value = false;
     }

@@ -63,6 +63,31 @@ class PrayerBloc extends Bloc<PrayerEvent, PrayerState> {
     // 2. Fetch API
     try {
       final response = await repository.getConfigurations(event.categoryId);
+
+      // ═══════════════════════════════════════════════════════════════
+      // 🚨 DEBUG LOG: PRAYER API RESPONSE
+      // ═══════════════════════════════════════════════════════════════
+      print('🚨 DEBUG_PRAYER: ─────────────────────────────────────────');
+      print('🚨 DEBUG_PRAYER: CategoryId = ${event.categoryId}');
+      print('🚨 DEBUG_PRAYER: success = ${response?.success}');
+      print('🚨 DEBUG_PRAYER: Total items = ${response?.data?.length ?? 0}');
+      if (response?.data != null) {
+        final byCategory = <String, List<dynamic>>{};
+        for (final c in response!.data!) {
+          final cat = c.category ?? 'Uncategorised';
+          byCategory.putIfAbsent(cat, () => []).add(c);
+        }
+        print('🚨 DEBUG_PRAYER: Categories (${byCategory.keys.length}):');
+        byCategory.forEach((cat, items) {
+          print('   📂 $cat (${items.length} items)');
+          for (final item in items) {
+            print('      • [${item.sId}] ${item.title ?? item.chantingType ?? "(no title)"} | duration=${item.duration} | emotion=${item.emotion} | karma=${item.karmaPoints} | subcategory=${item.subcategory}');
+          }
+        });
+      }
+      print('🚨 DEBUG_PRAYER: ─────────────────────────────────────────');
+      // ═══════════════════════════════════════════════════════════════
+
       if (response != null &&
           response.success == true &&
           response.data != null &&

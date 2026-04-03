@@ -65,6 +65,31 @@ class SpiritualConfigBloc
     // 2. Fetch from Repo
     try {
       final response = await repository.getConfigurations(event.categoryId);
+
+      // ═══════════════════════════════════════════════════════════════
+      // 🔍 DEBUG LOG: SILENCE API RESPONSE
+      // ═══════════════════════════════════════════════════════════════
+      print('🔔 DEBUG_SILENCE: ─────────────────────────────────────────');
+      print('🔔 DEBUG_SILENCE: CategoryId = ${event.categoryId}');
+      print('🔔 DEBUG_SILENCE: success = ${response?.success}');
+      print('🔔 DEBUG_SILENCE: Total items = ${response?.data?.length ?? 0}');
+      if (response?.data != null) {
+        final byCategory = <String, List<dynamic>>{};
+        for (final c in response!.data!) {
+          final cat = c.category ?? 'Uncategorised';
+          byCategory.putIfAbsent(cat, () => []).add(c);
+        }
+        print('🔔 DEBUG_SILENCE: Categories (${byCategory.keys.length}):');
+        byCategory.forEach((cat, items) {
+          print('   📂 $cat (${items.length} items)');
+          for (final item in items) {
+            print('      • [${item.sId}] ${item.title ?? item.chantingType ?? "(no title)"} | duration=${item.duration} | emotion=${item.emotion} | karma=${item.karmaPoints}');
+          }
+        });
+      }
+      print('🔔 DEBUG_SILENCE: ─────────────────────────────────────────');
+      // ═══════════════════════════════════════════════════════════════
+
       if (response != null &&
           response.success == true &&
           response.data != null &&

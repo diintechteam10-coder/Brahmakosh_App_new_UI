@@ -21,6 +21,17 @@ class ChantingConfigurationController extends GetxController {
   // Selected Configuration (Represents the mantra choice)
   final selectedConfiguration = Rxn<SpiritualConfiguration>();
 
+  // Grouped configurations by category
+  Map<String, List<SpiritualConfiguration>> get groupedConfigurations {
+    final Map<String, List<SpiritualConfiguration>> groups = {};
+    for (var config in allConfigurations) {
+      final cat = config.category ?? "Others";
+      if (!groups.containsKey(cat)) groups[cat] = [];
+      groups[cat]!.add(config);
+    }
+    return groups;
+  }
+
   // Available Counts
   final List<int> availableCounts = [27, 51, 108, 216, 324, 434, 540, 646];
 
@@ -53,6 +64,7 @@ class ChantingConfigurationController extends GetxController {
   }
 
   Future<void> fetchConfigurations() async {
+    print("🚀 DEBUG_CONTROLLER: Fetching Chanting Configurations for Category: $chantingCategoryId");
     isLoading.value = true;
     try {
       // 1. Try to load from cache first
@@ -197,9 +209,9 @@ class ChantingConfigurationController extends GetxController {
     selectedCount.value = count;
   }
 
-  void startSession() {
-    if (selectedConfiguration.value == null) return;
-
+  void startSession(SpiritualConfiguration config) {
+    selectedConfiguration.value = config;
+    
     // Navigate to Mantra Chanting with selected config
     Get.toNamed(
       AppConstants.routeMantraChanting,
@@ -207,8 +219,7 @@ class ChantingConfigurationController extends GetxController {
         'emotion': selectedEmotion.value,
         'count': selectedCount.value,
         'configuration': selectedConfiguration.value,
-        // Passing these for safety if next screen not updated yet
-        'mantra_title': selectedConfiguration.value?.chantingType,
+        'mantra_title': selectedConfiguration.value?.title ?? selectedConfiguration.value?.chantingType,
         'karma_points': selectedConfiguration.value?.karmaPoints,
       },
     );

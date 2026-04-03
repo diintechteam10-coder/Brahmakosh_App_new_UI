@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../core/utils/app_snackbar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -54,13 +55,9 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
             _showSuccessDialog(context, state.message);
             context.read<SankalpBloc>().add(FetchSankalpProgress(widget.sankalpId));
           } else if (state is SankalpError) {
-            Get.snackbar(
+            AppSnackBar.showError(
               "Error",
               state.message,
-              backgroundColor: Colors.red.withOpacity(0.8),
-              colorText: Colors.white,
-              snackPosition: SnackPosition.BOTTOM,
-              margin: const EdgeInsets.all(16),
             );
           }
         },
@@ -248,7 +245,7 @@ class _SankalpProgressScreenState extends State<SankalpProgressScreen> {
                             children: [
                               ClipOval(
                                 child: Image.asset(
-                                  'assets/images/brahmkosh_logo.jpeg',
+                                  'assets/images/brahmkosh_logo.png',
                                   width: 24,
                                   height: 24,
                                   fit: BoxFit.cover,

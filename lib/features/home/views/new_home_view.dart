@@ -21,8 +21,11 @@ import 'package:brahmakosh/features/dashboard/viewmodels/dashboard_viewmodel.dar
 import 'package:brahmakosh/core/constants/app_constants.dart';
 import 'package:brahmakosh/features/check_in/repositories/spiritual_repository.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_checkin_model.dart';
-import 'package:brahmakosh/features/check_in/views/chanting_configuration_view.dart';
-import 'package:brahmakosh/features/check_in/views/prayer_configuration_view.dart';
+import 'package:brahmakosh/features/check_in/views/chanting_selection_view_v2.dart';
+import 'package:brahmakosh/features/check_in/views/prayer_selection_view_v2.dart';
+import 'package:brahmakosh/features/check_in/views/silence_selection_view_v2.dart';
+import 'package:brahmakosh/features/check_in/views/meditation_selection_view_v2.dart';
+import 'package:brahmakosh/features/report/views/report_view.dart';
 import 'package:brahmakosh/features/ai_rashmi/views/ai_guide_view.dart';
 import 'package:brahmakosh/common/api_urls.dart';
 import 'package:brahmakosh/common/widgets/custom_popups.dart';
@@ -31,6 +34,7 @@ import 'package:brahmakosh/features/profile/views/profile_view.dart'
     as brahmakosh_profile;
 import 'package:brahmakosh/features/notifications/blocs/notification_bloc.dart';
 import 'package:brahmakosh/features/redeem/controllers/redeem_controller.dart';
+import 'package:brahmakosh/features/remedies/views/remedies_web_view.dart';
 
 class NewHomeView extends StatefulWidget {
   final ScrollController? scrollController;
@@ -222,7 +226,10 @@ final List<Map<String, String>> _comingSoonProjects = [
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
+    final isLargeTablet = screenWidth > 900;
     final padding = MediaQuery.of(context).padding;
+    final horizontalPadding = isLargeTablet ? 6.w : (isTablet ? 4.w : 2.w);
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Padding(
@@ -237,22 +244,21 @@ final List<Map<String, String>> _comingSoonProjects = [
               parent: AlwaysScrollableScrollPhysics(),
             ),
             slivers: [
-              _buildHeader(),
-              // _buildSearchBar(),
-              _buildTitle(),
-              _buildMainBanner(screenWidth),
-              _buildFeatureGrid(isTablet),
-              _buildSpiritualCheckIn(),
-              _buildKarmaDashboard(),
-              _buildExpertConnect(screenWidth),
-              _buildMuhuratSection(),
-              if (!Platform.isIOS) _buildRemediesSection(screenWidth),
-              // _buildSelfDiscoverySection(),
-              _buildSpiritualToolsSection(screenWidth),
-              _buildSankalpTracker(),
-              _buildSwapnaDecoder(),
-              _buildComingSoonProjectsSection(screenWidth),
-              _buildSponsorsSection(screenWidth),
+              _buildHeader(horizontalPadding),
+              _buildTitle(isTablet),
+              _buildMainBanner(screenWidth, isTablet),
+              _buildFeatureGrid(isTablet, isLargeTablet, horizontalPadding),
+              _buildSpiritualCheckIn(isTablet, horizontalPadding),
+              _buildKarmaDashboard(isTablet, horizontalPadding),
+              _buildExpertConnect(screenWidth, isTablet, horizontalPadding),
+              _buildMuhuratSection(isTablet, horizontalPadding),
+              // if (!Platform.isIOS) _buildRemediesSection(screenWidth, isTablet, horizontalPadding),
+              _buildSpiritualToolsSection(screenWidth, isTablet, horizontalPadding),
+              _buildSankalpTracker(isTablet, horizontalPadding),
+              _buildSwapnaDecoder(isTablet, horizontalPadding),
+              _buildComingSoonProjectsSection(screenWidth, isTablet, horizontalPadding),
+              // _buildSelfDiscoverySection(horizontalPadding),
+              // _buildSponsorsSection(screenWidth, isTablet, horizontalPadding),
               const SliverToBoxAdapter(child: SizedBox(height: 110)),
             ],
           ),
@@ -261,10 +267,10 @@ final List<Map<String, String>> _comingSoonProjects = [
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(double horizontalPadding) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15),
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -453,7 +459,7 @@ final List<Map<String, String>> _comingSoonProjects = [
   //   );
   // }
 
-  Widget _buildTitle() {
+  Widget _buildTitle(bool isTablet) {
     return SliverToBoxAdapter(
       child: Padding(
         padding: EdgeInsets.fromLTRB(4.w, 1.h, 4.w, 0.h),
@@ -487,10 +493,10 @@ final List<Map<String, String>> _comingSoonProjects = [
   }
 
 
-  Widget _buildMainBanner(double screenWidth) {
+  Widget _buildMainBanner(double screenWidth, bool isTablet) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 3.h),
+        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: isTablet ? 4.h : 3.h),
         child: IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -570,7 +576,7 @@ final List<Map<String, String>> _comingSoonProjects = [
         children: [
           // Image part with gradient
           SizedBox(
-            height: 22.h,
+            height: 20.h,
             child: ClipRRect(
               borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
               child: Stack(
@@ -610,7 +616,7 @@ final List<Map<String, String>> _comingSoonProjects = [
           ),
           // Content part
           Padding(
-            padding: EdgeInsets.fromLTRB(3.w, 0, 3.w, 2.h),
+            padding: EdgeInsets.fromLTRB(3.w, 0, 3.w, 1.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -652,39 +658,44 @@ final List<Map<String, String>> _comingSoonProjects = [
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.poppins(
                     color: Colors.white.withOpacity(0.6),
-                    fontSize: 10.sp,
-                    height: 1.2,
+                    fontSize: 7.5.sp,
+                    // height: 1.2,
                   ),
                 ),
                 SizedBox(height: 1.5.h),
-                SizedBox(
-                  width: double.infinity,
-                  height: 4.5.h,
-                  child: ElevatedButton(
-                    onPressed: onPressed,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFD4AF37),
-                      foregroundColor: Colors.black,
-                      padding: EdgeInsets.zero,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 3.9.h,
+                    child: ElevatedButton(
+                      onPressed: onPressed,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFD4AF37),
+                        foregroundColor: Colors.black,
+                        padding: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        elevation: 0,
                       ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      buttonText,
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
-                        fontSize: 8.5.sp,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0,
+                      child: Text(
+                        buttonText,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          fontSize: 8.5.sp,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0,
+                        ),
                       ),
                     ),
                   ),
                 ),
+
               ],
             ),
           ),
+          SizedBox(height: 0.5.h),
         ],
       ),
     );
@@ -786,15 +797,15 @@ final List<Map<String, String>> _comingSoonProjects = [
 
 
 
-  Widget _buildFeatureGrid(bool isTablet) {
+  Widget _buildFeatureGrid(bool isTablet, bool isLargeTablet, double horizontalPadding) {
     return SliverPadding(
-      padding: EdgeInsets.fromLTRB(4.w, 4.h, 4.w, 2.h),
+      padding: EdgeInsets.fromLTRB(horizontalPadding, 1.h, horizontalPadding, 2.h),
       sliver: SliverGrid(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-          mainAxisSpacing: 3.5.h, // Space for floating icons
-          crossAxisSpacing: 3.w,
-          childAspectRatio: 0.95,
+          crossAxisCount: isLargeTablet ? 8 : (isTablet ? 6 : 4),
+          mainAxisSpacing: isTablet ? 4.h : 3.5.h, // Space for floating icons
+          crossAxisSpacing: isTablet ? 4.w : 3.w,
+          childAspectRatio: isTablet ? 0.85 : 0.95,
         ),
         delegate: SliverChildListDelegate([
           _buildGridItem(
@@ -827,7 +838,7 @@ final List<Map<String, String>> _comingSoonProjects = [
             showComingSoon: false,
             onTap: () {
               _unfocusAll();
-              Get.dialog(const ComingSoonPopup(feature: "Reports"));
+              Get.to(() => const ReportView());
             },
           ),
           _buildGridItem(
@@ -835,7 +846,7 @@ final List<Map<String, String>> _comingSoonProjects = [
             "assets/icons/remedies.png",
             onTap: () {
               _unfocusAll();
-              Provider.of<DashboardViewModel>(context, listen: false).changeTab(4);
+              Get.to(() => const RemediesWebView());
             },
           ),
           _buildGridItem(
@@ -870,12 +881,12 @@ final List<Map<String, String>> _comingSoonProjects = [
 
 
   // Placeholder methods for other sections
-  Widget _buildSpiritualCheckIn() {
+  Widget _buildSpiritualCheckIn(bool isTablet, double horizontalPadding) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 1.5.h),
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 1.5.h),
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 2.h),
+          padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: isTablet ? 3.h : 2.h),
           decoration: BoxDecoration(
             color: const Color(0xFF111111), // Match dark background
             borderRadius: BorderRadius.circular(24),
@@ -1004,9 +1015,15 @@ final List<Map<String, String>> _comingSoonProjects = [
     final activity = _checkInActivities[_selectedCheckInIndex];
 
     if (activity.title == 'Chanting') {
-      Get.to(() => ChantingConfigurationView(chantingCategoryId: activity.id!));
+      Get.to(() => const ChantingSelectionViewV2());
     } else if (activity.title == 'Prayer' && activity.id != null) {
-      Get.to(() => PrayerConfigurationView(prayerCategoryId: activity.id!));
+      Get.to(() => PrayerSelectionViewV2(prayerCategoryId: activity.id!));
+    } else if ((activity.title == 'Silence' || activity.title == 'silence') &&
+        activity.id != null) {
+      Get.to(() => SilenceSelectionViewV2(silenceCategoryId: activity.id!));
+    } else if ((activity.title == 'Meditation' || activity.title == 'Mediation') &&
+        activity.id != null) {
+      Get.to(() => MeditationSelectionViewV2(meditationCategoryId: activity.id!));
     } else if (activity.id != null) {
       Get.toNamed(
         AppConstants.routeSpiritualConfiguration,
@@ -1078,15 +1095,15 @@ final List<Map<String, String>> _comingSoonProjects = [
     );
   }
 
-  Widget _buildKarmaDashboard() {
+  Widget _buildKarmaDashboard(bool isTablet, double horizontalPadding) {
     return SliverToBoxAdapter(
       child: Consumer<ProfileViewModel>(
         builder: (context, profileVM, child) {
           final karmaPoints = profileVM.profile?.karmaPoints ?? 0;
           return Padding(
-            padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 1.5.h),
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 3.h),
+              padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: isTablet ? 4.h : 3.h),
               decoration: BoxDecoration(
                 color: const Color(0xFF111111),
                 borderRadius: BorderRadius.circular(24),
@@ -1264,10 +1281,10 @@ final List<Map<String, String>> _comingSoonProjects = [
     );
   }
 
-  Widget _buildExpertConnect(double screenWidth) {
+  Widget _buildExpertConnect(double screenWidth, bool isTablet, double horizontalPadding) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1281,12 +1298,12 @@ final List<Map<String, String>> _comingSoonProjects = [
                 children: [
                   Text(
                     "expert_connect_title".tr,
-                    style: GoogleFonts.poppins(
-                      color: Colors.white.withOpacity(0.7),
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  style: GoogleFonts.poppins(
+                    color: Colors.white.withOpacity(0.7),
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w500,
                   ),
+                ),
                   GestureDetector(
                     onTap: () {
                       _unfocusAll();
@@ -1331,13 +1348,13 @@ final List<Map<String, String>> _comingSoonProjects = [
                 );
               }
               return SizedBox(
-                height: 24.h,
+                height: isTablet ? 22.h : 21.h,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  padding:  EdgeInsets.symmetric(horizontal: 2.w),
                   itemCount: experts.length,
                   itemBuilder: (context, index) {
-                    return _buildExpertCard(experts[index], screenWidth);
+                    return _buildExpertCard(experts[index], screenWidth, isTablet);
                   },
                 ),
               );
@@ -1348,7 +1365,7 @@ final List<Map<String, String>> _comingSoonProjects = [
     );
   }
 
-  Widget _buildExpertCard(dynamic expert, double screenWidth) {
+  Widget _buildExpertCard(dynamic expert, double screenWidth, bool isTablet) {
     bool isOnline =
         expert.status?.toLowerCase() == 'online' ||
         expert.status?.toLowerCase() == 'available';
@@ -1358,7 +1375,7 @@ final List<Map<String, String>> _comingSoonProjects = [
         astrologyController.navigateToProfile(expert);
       },
       child: Container(
-        width: screenWidth * 0.7, // Adaptive width
+        width: isTablet ? screenWidth * 0.35 : screenWidth * 0.65, // Adaptive width
         margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
@@ -1412,6 +1429,7 @@ final List<Map<String, String>> _comingSoonProjects = [
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
                             child: FutureBuilder<String>(
@@ -1445,7 +1463,7 @@ final List<Map<String, String>> _comingSoonProjects = [
                               isOnline ? "online".tr : "offline".tr,
                               style: GoogleFonts.poppins(
                                 color: isOnline ? Colors.green : Colors.grey,
-                                fontSize: 10,
+                                fontSize: 8,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -1481,14 +1499,14 @@ final List<Map<String, String>> _comingSoonProjects = [
                   "${expert.experience ?? 0}",
                   style: GoogleFonts.poppins(
                     color: const Color(0xFFD4AF37),
-                    fontSize: 12,
+                    fontSize: 8.sp,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
+                    horizontal: 4,
+                    vertical: 2,
                   ),
                   decoration: BoxDecoration(
                     color: const Color(
@@ -1505,16 +1523,16 @@ final List<Map<String, String>> _comingSoonProjects = [
                         style: GoogleFonts.poppins(
                           // Switched to Poppins for that clean look
                           color: Colors.white,
-                          fontSize: 12,
+                          fontSize: 8.sp,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       const SizedBox(width: 4), // Gap between text and star
-                      const Icon(
+                      Icon(
                         Icons
                             .star_rounded, // Rounded version looks more like the image
                         color: Color(0xFFFFD447), // Brighter yellow/gold
-                        size: 16,
+                        size: 12.sp,
                       ),
                     ],
                   ),
@@ -1557,7 +1575,7 @@ final List<Map<String, String>> _comingSoonProjects = [
   Widget _buildExpertActionButton(String label, {bool isPrimary = false}) {
     return Container(
       // height: 40,
-      width: 100,
+      width: 22.w,
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
       decoration: BoxDecoration(
         color: isPrimary ? const Color(0xFFD4AF37) : Colors.transparent,
@@ -1574,7 +1592,7 @@ final List<Map<String, String>> _comingSoonProjects = [
           label,
           style: GoogleFonts.poppins(
             color: isPrimary ? Colors.black : const Color(0xFFD4AF37),
-            fontSize: 16,
+            fontSize: 10.sp,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -1582,7 +1600,7 @@ final List<Map<String, String>> _comingSoonProjects = [
     );
   }
 
-  Widget _buildMuhuratSection() {
+  Widget _buildMuhuratSection(bool isTablet, double horizontalPadding) {
     return SliverToBoxAdapter(
       child: Obx(() {
         if (homeController.isLoading) {
@@ -1596,7 +1614,7 @@ final List<Map<String, String>> _comingSoonProjects = [
         final advanced = panchang.advancedPanchang;
 
         return Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -2006,271 +2024,262 @@ final List<Map<String, String>> _comingSoonProjects = [
     );
   }
 
-  Widget _buildRemediesSection(double screenWidth) {
-    // Hardcoded remedy data
-    final mustHaveRemedies = [
-      {
-        "title": "7 Mukhi Rudraksha",
-        "subtitle": "For spiritual protection & planet Saturn...",
-        "price": "1,299",
-        "image":
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSs1hx27RUdRVHpThGV_4DN3712p8UCKtndeA&s",
-      },
-      {
-        "title": "Yellow Sapphire",
-        "subtitle": "For wealth, prosperity & planet Jupiter...",
-        "price": "15,500",
-        "image":
-            "https://www.shivaago.com/wp-content/uploads/2021/03/IMG_20210307_160026_compress32-600x486.jpg",
-      },
-    ];
+  // Widget _buildRemediesSection(double screenWidth, bool isTablet, double horizontalPadding) {
+  //   // Hardcoded remedy data
+  //   final mustHaveRemedies = [
+  //     {
+  //       "title": "7 Mukhi Rudraksha",
+  //       "subtitle": "For spiritual protection & planet Saturn...",
+  //       "price": "1,299",
+  //       "image":
+  //           "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSs1hx27RUdRVHpThGV_4DN3712p8UCKtndeA&s",
+  //     },
+  //     {
+  //       "title": "Yellow Sapphire",
+  //       "subtitle": "For wealth, prosperity & planet Jupiter...",
+  //       "price": "15,500",
+  //       "image":
+  //           "https://www.shivaago.com/wp-content/uploads/2021/03/IMG_20210307_160026_compress32-600x486.jpg",
+  //     },
+  //   ];
 
-    final goodToHaveRemedies = [
-      {
-        "title": "Sphatik Mala",
-        "subtitle": "For peace, concentration & planet Moon...",
-        "price": "850",
-        "image":
-            "https://ik.imagekit.io/gemsonline/wp-content/uploads/2026/01/Spetics-mala-3-scaled.jpg",
-      },
-      {
-        "title": "Gomati Chakra",
-        "subtitle": "For protection, prosperity and bringing luck...",
-        "price": "150",
-        "image":
-            "https://m.media-amazon.com/images/I/A1QIkWYHngL._AC_UY1100_.jpg",
-      },
-    ];
+  //   final goodToHaveRemedies = [
+  //     {
+  //       "title": "Sphatik Mala",
+  //       "subtitle": "For peace, concentration & planet Moon...",
+  //       "price": "850",
+  //       "image":
+  //           "https://ik.imagekit.io/gemsonline/wp-content/uploads/2026/01/Spetics-mala-3-scaled.jpg",
+  //     },
+  //     {
+  //       "title": "Gomati Chakra",
+  //       "subtitle": "For protection, prosperity and bringing luck...",
+  //       "price": "150",
+  //       "image":
+  //           "https://m.media-amazon.com/images/I/A1QIkWYHngL._AC_UY1100_.jpg",
+  //     },
+  //   ];
 
-    final displayedRemedies = _selectedRemedyTab == "must_have"
-        ? mustHaveRemedies
-        : goodToHaveRemedies;
+  //   final displayedRemedies = _selectedRemedyTab == "MUST HAVE"
+  //       ? mustHaveRemedies
+  //       : goodToHaveRemedies;
 
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
-                vertical: 0.0,
-              ),
-              child: Text(
-                "personalized_remedies".tr,
-                style: GoogleFonts.poppins(
-                  color: Color(0xff8E8E93),
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1C1C1E),
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _buildTabButton(
-                        "must_have".tr,
-                        isSelected: _selectedRemedyTab == "must_have",
-                        onTap: () {
-                          setState(() {
-                            _selectedRemedyTab = "must_have";
-                          });
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: _buildTabButton(
-                        "good_to_have".tr,
-                        isSelected: _selectedRemedyTab == "good_to_have",
-                        onTap: () {
-                          setState(() {
-                            _selectedRemedyTab = "good_to_have";
-                          });
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: 35.h,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                itemCount: displayedRemedies.length,
-                itemBuilder: (context, index) {
-                  final remedy = displayedRemedies[index];
-                  return FutureBuilder<List<String>>(
-                    future: Future.wait([
-                      TranslateHelper.translate(remedy["title"]!),
-                      TranslateHelper.translate(remedy["subtitle"]!),
-                    ]),
-                    initialData: [remedy["title"]!, remedy["subtitle"]!],
-                    builder: (context, snapshot) {
-                      final translated = snapshot.data!;
-                      return _buildProductCard(
-                        translated[0],
-                        translated[1],
-                        remedy["price"]!,
-                        remedy["image"]!,
-                        screenWidth,
-                        isNetwork: true,
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  //   return SliverToBoxAdapter(
+  //     child: Padding(
+  //       padding: EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
+  //       child: Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Row(
+  //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //             children: [
+  //               Text(
+  //                 "PERSONALIZED REMEDIES",
+  //                 style: GoogleFonts.poppins(
+  //                   color: Colors.white.withOpacity(0.7),
+  //                   fontSize: 12.sp,
+  //                   fontWeight: FontWeight.w500,
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //           const SizedBox(height: 16),
+  //           Padding(
+  //             padding: const EdgeInsets.symmetric(horizontal: 16.0),
+  //             child: Container(
+  //               padding: const EdgeInsets.all(4),
+  //               decoration: BoxDecoration(
+  //                 color: const Color(0xFF1C1C1E),
+  //                 borderRadius: BorderRadius.circular(30),
+  //               ),
+  //               child: Row(
+  //                 children: [
+  //                   Expanded(
+  //                     child: _buildTabButton(
+  //                       "MUST HAVE",
+  //                       isSelected: _selectedRemedyTab == "MUST HAVE",
+  //                       onTap: () {
+  //                         setState(() {
+  //                           _selectedRemedyTab = "MUST HAVE";
+  //                         });
+  //                       },
+  //                     ),
+  //                   ),
+  //                   Expanded(
+  //                     child: _buildTabButton(
+  //                       "GOOD TO HAVE",
+  //                       isSelected: _selectedRemedyTab == "GOOD TO HAVE",
+  //                       onTap: () {
+  //                         setState(() {
+  //                           _selectedRemedyTab = "GOOD TO HAVE";
+  //                         });
+  //                       },
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //           ),
+  //           const SizedBox(height: 16),
+  //           SizedBox(
+  //             height: 35.h,
+  //             child: ListView.builder(
+  //               scrollDirection: Axis.horizontal,
+  //               padding: const EdgeInsets.symmetric(horizontal: 12),
+  //               itemCount: displayedRemedies.length,
+  //               itemBuilder: (context, index) {
+  //                 final remedy = displayedRemedies[index];
+  //                 return _buildProductCard(
+  //                   remedy["title"]!,
+  //                   remedy["subtitle"]!,
+  //                   remedy["price"]!,
+  //                   remedy["image"]!,
+  //                   screenWidth,
+  //                   isTablet,
+  //                   isNetwork: true,
+  //                 );
+  //               },
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  Widget _buildTabButton(
-    String label, {
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 1.25.h),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFD4AF37) : Colors.transparent,
-          borderRadius: BorderRadius.circular(25),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: const Color(0xFFD4AF37).withOpacity(0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
-        ),
-        child: Text(
-          label,
-          style: GoogleFonts.poppins(
-            color: isSelected ? Colors.black : Colors.white.withOpacity(0.5),
-            fontSize: 9.75.sp,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget _buildTabButton(
+  //   String label, {
+  //   required bool isSelected,
+  //   required VoidCallback onTap,
+  // }) {
+  //   return GestureDetector(
+  //     onTap: onTap,
+  //     child: Container(
+  //       padding: EdgeInsets.symmetric(vertical: 1.25.h),
+  //       alignment: Alignment.center,
+  //       decoration: BoxDecoration(
+  //         color: isSelected ? const Color(0xFFD4AF37) : Colors.transparent,
+  //         borderRadius: BorderRadius.circular(25),
+  //         boxShadow: isSelected
+  //             ? [
+  //                 BoxShadow(
+  //                   color: const Color(0xFFD4AF37).withOpacity(0.3),
+  //                   blurRadius: 10,
+  //                   offset: const Offset(0, 4),
+  //                 ),
+  //               ]
+  //             : null,
+  //       ),
+  //       child: Text(
+  //         label,
+  //         style: GoogleFonts.poppins(
+  //           color: isSelected ? Colors.black : Colors.white.withOpacity(0.5),
+  //           fontSize: 9.75.sp,
+  //           fontWeight: FontWeight.w600,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  Widget _buildProductCard(
-    String title,
-    String subtitle,
-    String price,
-    String imagePath,
-    double screenWidth, {
-    bool isNetwork = false,
-  }) {
-    return Container(
-      width: screenWidth * 0.48,
-      margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF141414),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(18),
-            child: SizedBox(
-              height: 17.5.h,
-              width: double.infinity,
-              child: isNetwork
-                  ? Image.network(
-                      imagePath,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        color: Colors.white10,
-                        child: const Icon(Icons.image, color: Colors.white24),
-                      ),
-                    )
-                  : Image.asset(imagePath, fit: BoxFit.cover),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.poppins(
-              color: Colors.white,
-              fontSize: 10.5.sp,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.poppins(
-              color: Colors.white.withOpacity(0.4),
-              fontSize: 8.25.sp,
-              height: 1.3,
-            ),
-          ),
-          const Spacer(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "₹$price",
-                style: GoogleFonts.poppins(
-                  color: const Color(0xFFD4AF37),
-                  fontSize: 11.25.sp,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFD4AF37),
-                  borderRadius: BorderRadius.circular(100),
-                ),
-                child: Text(
-                  "shop_btn".tr,
-                  style: GoogleFonts.poppins(
-                    color: Colors.black,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildProductCard(
+  //   String title,
+  //   String subtitle,
+  //   String price,
+  //   String imagePath,
+  //   double screenWidth,
+  //   bool isTablet, {
+  //   bool isNetwork = false,
+  // }) {
+  //   return Container(
+  //     width: isTablet ? screenWidth * 0.3 : screenWidth * 0.48,
+  //     margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+  //     padding: const EdgeInsets.all(12),
+  //     decoration: BoxDecoration(
+  //       color: const Color(0xFF141414),
+  //       borderRadius: BorderRadius.circular(24),
+  //       border: Border.all(color: Colors.white.withOpacity(0.05)),
+  //     ),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         ClipRRect(
+  //           borderRadius: BorderRadius.circular(18),
+  //           child: SizedBox(
+  //             height: 17.5.h,
+  //             width: double.infinity,
+  //             child: isNetwork
+  //                 ? Image.network(
+  //                     imagePath,
+  //                     fit: BoxFit.cover,
+  //                     errorBuilder: (context, error, stackTrace) => Container(
+  //                       color: Colors.white10,
+  //                       child: const Icon(Icons.image, color: Colors.white24),
+  //                     ),
+  //                   )
+  //                 : Image.asset(imagePath, fit: BoxFit.cover),
+  //           ),
+  //         ),
+  //         const SizedBox(height: 12),
+  //         Text(
+  //           title,
+  //           maxLines: 1,
+  //           overflow: TextOverflow.ellipsis,
+  //           style: GoogleFonts.poppins(
+  //             color: Colors.white,
+  //             fontSize: 10.5.sp,
+  //             fontWeight: FontWeight.w600,
+  //           ),
+  //         ),
+  //         const SizedBox(height: 4),
+  //         Text(
+  //           subtitle,
+  //           maxLines: 2,
+  //           overflow: TextOverflow.ellipsis,
+  //           style: GoogleFonts.poppins(
+  //             color: Colors.white.withOpacity(0.4),
+  //             fontSize: 8.25.sp,
+  //             height: 1.3,
+  //           ),
+  //         ),
+  //         const Spacer(),
+  //         Row(
+  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //           children: [
+  //             Text(
+  //               "₹$price",
+  //               style: GoogleFonts.poppins(
+  //                 color: const Color(0xFFD4AF37),
+  //                 fontSize: 11.25.sp,
+  //                 fontWeight: FontWeight.bold,
+  //               ),
+  //             ),
+  //             Container(
+  //               padding: const EdgeInsets.symmetric(
+  //                 horizontal: 14,
+  //                 vertical: 6,
+  //               ),
+  //               decoration: BoxDecoration(
+  //                 color: const Color(0xFFD4AF37),
+  //                 borderRadius: BorderRadius.circular(100),
+  //               ),
+  //               child: Text(
+  //                 "SHOP",
+  //                 style: GoogleFonts.poppins(
+  //                   color: Colors.black,
+  //                   fontSize: 12,
+  //                   fontWeight: FontWeight.bold,
+  //                 ),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
-  Widget _buildSpiritualToolsSection(double screenWidth) {
+  Widget _buildSpiritualToolsSection(double screenWidth, bool isTablet, double horizontalPadding) {
     final tools = [
       {
         "title": "Remedies",
@@ -2278,7 +2287,7 @@ final List<Map<String, String>> _comingSoonProjects = [
         "icon": "assets/icons/remedies.png",
         "onTap": () {
           _unfocusAll();
-          Provider.of<DashboardViewModel>(context, listen: false).changeTab(4);
+          Get.to(() => const RemediesWebView());
         },
       },
       {
@@ -2294,10 +2303,10 @@ final List<Map<String, String>> _comingSoonProjects = [
         "title": "Reports",
         "desc": "Get deep insights into your life's path",
         "icon": "assets/icons/reports.png",
-        "isComingSoon": true,
+        "isComingSoon": false,
         "onTap": () {
           _unfocusAll();
-          Get.dialog(const ComingSoonPopup(feature: "Reports"));
+          Get.to(() => const ReportView());
         },
       },
       {
@@ -2314,20 +2323,16 @@ final List<Map<String, String>> _comingSoonProjects = [
 
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                "SPIRITUAL TOOLS",
-                style: GoogleFonts.poppins(
-                  color: Colors.white.withOpacity(0.5),
-                  fontSize: 11.sp,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.8,
-                ),
+            Text(
+              "SPIRITUAL TOOLS",
+               style: GoogleFonts.poppins(
+                color:Colors.white.withOpacity(0.7),
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w500,
               ),
             ),
             const SizedBox(height: 14),
@@ -2344,6 +2349,7 @@ final List<Map<String, String>> _comingSoonProjects = [
                     tool["desc"] as String,
                     tool["icon"] as String,
                     screenWidth,
+                    isTablet,
                     tool["onTap"] as VoidCallback,
                     isComingSoon: tool["isComingSoon"] as bool? ?? false,
                   );
@@ -2361,13 +2367,14 @@ final List<Map<String, String>> _comingSoonProjects = [
     String desc,
     String iconPath,
     double screenWidth,
+    bool isTablet,
     VoidCallback onTap, {
     bool isComingSoon = false,
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: screenWidth * 0.72, // Responsive width showing partial next card
+        width: isTablet ? screenWidth * 0.4 : screenWidth * 0.72, // Responsive width showing partial next card
         margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -2448,10 +2455,9 @@ final List<Map<String, String>> _comingSoonProjects = [
                 child: Text(
                   "EXPLORE",
                   style: GoogleFonts.poppins(
-                    fontSize: 12.5.sp,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
-                    height: 1.0, // Ensures text fits vertically
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w600,
+                    // Ensures text fits vertically
                   ),
                 ),
               ),
@@ -2463,7 +2469,7 @@ final List<Map<String, String>> _comingSoonProjects = [
   }
 
 
-  Widget _buildSankalpTracker() {
+  Widget _buildSankalpTracker(bool isTablet, double horizontalPadding) {
     return BlocBuilder<SankalpBloc, SankalpState>(
       builder: (context, state) {
         List<UserSankalpModel> activeSankalps = [];
@@ -2485,10 +2491,9 @@ final List<Map<String, String>> _comingSoonProjects = [
             activeCount = activeSankalps.length;
           }
         }
-
         return SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 12.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -2498,10 +2503,10 @@ final List<Map<String, String>> _comingSoonProjects = [
                     Text(
                       "SANKALP TRACKER",
                       style: GoogleFonts.poppins(
-                        color: const Color(0xff8E8E93),
-                        fontSize: 13.5.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
+                color:Colors.white.withOpacity(0.7),
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w500,
+              ),
                     ),
                     if (activeSankalps.isNotEmpty)
                     GestureDetector(
@@ -2510,7 +2515,7 @@ final List<Map<String, String>> _comingSoonProjects = [
                         "View All",
                         style: GoogleFonts.poppins(
                           color: AppTheme.primaryGold,
-                          fontSize: 11.sp,
+                          fontSize: 10.sp,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -2541,8 +2546,8 @@ final List<Map<String, String>> _comingSoonProjects = [
                                   activeCount > 0 ? "Daily Spiritual Progress" : "No Active Sankalp",
                                   style: GoogleFonts.poppins(
                                     color: Colors.white,
-                                    fontSize: 13.5.sp,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w700,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
@@ -2693,10 +2698,10 @@ final List<Map<String, String>> _comingSoonProjects = [
     );
   }
 
-  Widget _buildSwapnaDecoder() {
+  Widget _buildSwapnaDecoder(bool isTablet, double horizontalPadding) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 1.5.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -2753,7 +2758,7 @@ final List<Map<String, String>> _comingSoonProjects = [
                                     "decode_your_dream".tr,
                                     style: GoogleFonts.poppins(
                                       color: Colors.white,
-                                      fontSize: 13.5.sp,
+                                      fontSize: 12.sp,
                                       fontWeight: FontWeight.w700,
                                     ),
                                     overflow: TextOverflow.ellipsis,
@@ -2866,33 +2871,27 @@ final List<Map<String, String>> _comingSoonProjects = [
     );
   }
 
-  Widget _buildComingSoonProjectsSection(double screenWidth) {
+  Widget _buildComingSoonProjectsSection(double screenWidth, bool isTablet, double horizontalPadding) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 24.0),
+        padding: EdgeInsets.symmetric(vertical: 24.0, horizontal: horizontalPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                "Coming Soon Projects",
-                style: GoogleFonts.lora(
-                  color: const Color(0xFFD4AF37),
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.bold,
-                ),
+            Text(
+              "Coming Soon Projects",
+              style: GoogleFonts.lora(
+                color: const Color(0xFFD4AF37),
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 4),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                "Building spiritual ecosystem for growth and learning...",
-                style: GoogleFonts.poppins(
-                  color: Colors.white.withOpacity(0.5),
-                  fontSize: 10.sp,
-                ),
+            Text(
+              "Building spiritual ecosystem for growth and learning...",
+              style: GoogleFonts.poppins(
+                color: Colors.white.withOpacity(0.5),
+                fontSize: 10.sp,
               ),
             ),
             const SizedBox(height: 20),
@@ -3045,13 +3044,13 @@ final List<Map<String, String>> _comingSoonProjects = [
     );
   }
 
-  Widget _buildSelfDiscoverySection() {
+  Widget _buildSelfDiscoverySection(double horizontalPadding) {
     return SliverToBoxAdapter(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 1.5.h),
             child: Text(
               "self_discovery_title".tr,
               style: GoogleFonts.lora(
@@ -3193,7 +3192,7 @@ final List<Map<String, String>> _comingSoonProjects = [
     }
   }
 
-  Widget _buildSponsorsSection(double screenWidth) {
+  Widget _buildSponsorsSection(double screenWidth, bool isTablet, double horizontalPadding) {
     return SliverToBoxAdapter(
       child: Obx(() {
         if (homeController.isSponsorLoading) {
@@ -3206,8 +3205,8 @@ final List<Map<String, String>> _comingSoonProjects = [
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
+              padding: EdgeInsets.symmetric(
+                horizontal: horizontalPadding,
                 vertical: 12.0,
               ),
               child: Text(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../core/utils/app_snackbar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' hide Transition;
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -47,7 +48,11 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
               color: Colors.white.withOpacity(0.05),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 16),
+            child: const Icon(
+              Icons.arrow_back_ios_new,
+              color: Colors.white,
+              size: 16,
+            ),
           ),
           onPressed: () => Get.back(),
         ),
@@ -67,11 +72,18 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
           BlocBuilder<SankalpBloc, SankalpState>(
             builder: (context, state) {
               if (state is SankalpLoading && (state is! SankalpLoaded)) {
-                return const Center(child: CircularProgressIndicator(color: AppTheme.primaryGold));
+                return const Center(
+                  child: CircularProgressIndicator(color: AppTheme.primaryGold),
+                );
               }
 
               if (state is SankalpError) {
-                return Center(child: Text(state.message, style: const TextStyle(color: Colors.white)));
+                return Center(
+                  child: Text(
+                    state.message,
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                );
               }
 
               List<SankalpModel> sankalps = [];
@@ -83,9 +95,18 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
 
               if (sankalps.isEmpty) {
                 if (state is SankalpLoading) {
-                  return const Center(child: CircularProgressIndicator(color: AppTheme.primaryGold));
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      color: AppTheme.primaryGold,
+                    ),
+                  );
                 }
-                return Center(child: Text("no_sankalps_available".tr, style: const TextStyle(color: Colors.white70)));
+                return Center(
+                  child: Text(
+                    "no_sankalps_available".tr,
+                    style: const TextStyle(color: Colors.white70),
+                  ),
+                );
               }
 
               // Build a set of sankalp IDs that the user has already joined/completed
@@ -114,14 +135,18 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
 
   void _handleNavigation(BuildContext context, SankalpModel sankalp) async {
     if (_isNavigating) return;
-    
-    debugPrint("ChooseSankalpScreen: Starting navigation to detail for ${sankalp.id}");
+
+    debugPrint(
+      "ChooseSankalpScreen: Starting navigation to detail for ${sankalp.id}",
+    );
     setState(() => _isNavigating = true);
 
     try {
       final bloc = context.read<SankalpBloc>();
-      debugPrint("ChooseSankalpScreen: Bloc obtained, pushing route via Navigator");
-      
+      debugPrint(
+        "ChooseSankalpScreen: Bloc obtained, pushing route via Navigator",
+      );
+
       await Navigator.push(
         context,
         MaterialPageRoute(
@@ -147,21 +172,18 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
   ) {
     final bool isAlreadyJoined = userStatus != null;
     final bool isCompleted = userStatus == 'completed';
-    final String statusLabel = isCompleted ? "completed_done".tr : "already_joined".tr;
+    final String statusLabel = isCompleted
+        ? "completed_done".tr
+        : "already_joined".tr;
 
     return InkWell(
       onTap: () {
         if (isAlreadyJoined) {
-          Get.snackbar(
+          AppSnackBar.showInfo(
             isCompleted ? "already_completed".tr : "already_active".tr,
             isCompleted
                 ? "already_completed_desc".tr
                 : "already_active_desc".tr,
-            backgroundColor: const Color(0xFF1C1C1E),
-            colorText: Colors.white,
-            snackPosition: SnackPosition.BOTTOM,
-            margin: const EdgeInsets.all(16),
-            borderRadius: 12,
           );
         } else {
           _handleNavigation(context, sankalp);
@@ -195,26 +217,35 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
                   ),
                   const SizedBox(width: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
-                      color: isAlreadyJoined 
-                        ? (isCompleted ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1))
-                        : const Color(0xFF1A3326),
+                      color: isAlreadyJoined
+                          ? (isCompleted
+                                ? Colors.green.withOpacity(0.1)
+                                : Colors.orange.withOpacity(0.1))
+                          : const Color(0xFF1A3326),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                        color: isAlreadyJoined 
-                          ? (isCompleted ? Colors.green.withOpacity(0.2) : Colors.orange.withOpacity(0.2))
-                          : Colors.green.withOpacity(0.2)
+                        color: isAlreadyJoined
+                            ? (isCompleted
+                                  ? Colors.green.withOpacity(0.2)
+                                  : Colors.orange.withOpacity(0.2))
+                            : Colors.green.withOpacity(0.2),
                       ),
                     ),
                     child: Text(
-                      isAlreadyJoined ? statusLabel : "${sankalp.totalDays}${"day_suffix".tr}",
+                      isAlreadyJoined
+                          ? statusLabel
+                          : "${sankalp.totalDays}${"day_suffix".tr}",
                       style: GoogleFonts.poppins(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
-                        color: isAlreadyJoined 
-                          ? (isCompleted ? Colors.green : Colors.orange)
-                          : const Color(0xFF4CAF50),
+                        color: isAlreadyJoined
+                            ? (isCompleted ? Colors.green : Colors.orange)
+                            : const Color(0xFF4CAF50),
                       ),
                     ),
                   ),
@@ -260,11 +291,15 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
                         children: [
                           ClipOval(
                             child: Image.asset(
-                              'assets/images/brahmkosh_logo.jpeg',
+                              'assets/images/brahmkosh_logo.png',
                               width: 18,
                               height: 18,
                               fit: BoxFit.cover,
-                              errorBuilder: (c, e, s) => const Icon(Icons.stars, color: Color(0xFFD4AF37), size: 18),
+                              errorBuilder: (c, e, s) => const Icon(
+                                Icons.stars,
+                                color: Color(0xFFD4AF37),
+                                size: 18,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -297,7 +332,10 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
                                 shadowColor: Colors.transparent,
                                 foregroundColor: Colors.black,
                                 elevation: 0,
-                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 0,
+                                ),
                                 minimumSize: const Size(80, 32),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20),

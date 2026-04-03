@@ -72,7 +72,7 @@ class BottomBrandingCard extends StatelessWidget {
                 ),
                 child: ClipOval(
                   child: Image.asset(
-                    "assets/images/brahmkosh_logo.jpeg",
+                    "assets/images/brahmkosh_logo.png",
                     fit: BoxFit.cover,
                   ),
                 ),

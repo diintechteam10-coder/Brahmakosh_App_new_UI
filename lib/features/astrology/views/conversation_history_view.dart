@@ -10,6 +10,7 @@ import '../../../common/models/astrologist_model.dart';
 import 'astrology_chat_view.dart';
 import 'call_history_view.dart';
 import '../../../common/utils.dart';
+import '../../../core/utils/app_snackbar.dart';
 
 class ConversationHistoryView extends StatelessWidget {
   const ConversationHistoryView({super.key});
@@ -261,12 +262,9 @@ class ConversationHistoryView extends StatelessWidget {
 
               // Guard: prevent navigation with empty partner ID
               if (partnerId.isEmpty) {
-                Get.snackbar(
+                AppSnackBar.showError(
                   'partner_error'.tr,
                   'partner_error_msg'.tr,
-                  backgroundColor: const Color(0xFFE57373),
-                  colorText: Colors.white,
-                  snackPosition: SnackPosition.BOTTOM,
                 );
                 return;
               }

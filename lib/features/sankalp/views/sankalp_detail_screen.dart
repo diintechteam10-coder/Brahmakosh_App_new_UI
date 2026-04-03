@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'sankalp_success_screen.dart';
+import '../../../../core/utils/app_snackbar.dart';
 
 import '../../../../core/theme/app_theme.dart';
 
@@ -81,11 +82,9 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
             () => SankalpSuccessScreen(sankalpTitle: widget.sankalp.title),
           );
         } else if (state is SankalpError) {
-          Get.snackbar(
+          AppSnackBar.showError(
             "Error",
             state.message,
-            backgroundColor: Colors.red.withOpacity(0.8),
-            colorText: Colors.white,
           );
         }
       },
@@ -241,11 +240,9 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
                           onPressed: () {
                             if (_selectedDurationIndex == 3 &&
                                 _currentTotalDays <= 0) {
-                              Get.snackbar(
+                              AppSnackBar.showError(
                                 "Invalid Duration",
                                 "Please enter valid days",
-                                backgroundColor: Colors.red,
-                                colorText: Colors.white,
                               );
                               return;
                             }
@@ -307,7 +304,7 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
           ),
           child: ClipOval(
             child: Image.asset(
-              'assets/images/brahmkosh_logo.jpeg',
+              'assets/images/brahmkosh_logo.png',
               fit: BoxFit.cover,
               errorBuilder: (c, e, s) =>
                   const Icon(Icons.stars, color: AppTheme.primaryGold, size: 16),

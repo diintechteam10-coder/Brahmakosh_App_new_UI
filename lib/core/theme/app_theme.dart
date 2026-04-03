@@ -298,6 +298,15 @@ class AppTheme {
         elevation: 4,
       ),
 
+      // SnackBar Theme (iOS-style glass fallback)
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: Colors.black.withOpacity(0.4),
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        contentTextStyle: GoogleFonts.poppins(color: Colors.white, fontSize: 14),
+      ),
+      
       // Divider Theme
       dividerTheme: const DividerThemeData(
         color: lightGold,

@@ -4,7 +4,7 @@ import 'package:brahmakosh/features/auth/views/login.dart';
 import 'package:brahmakosh/features/auth/views/mobile_number_page.dart';
 import 'package:brahmakosh/features/brahm_bazar/brahm_bazar_view.dart';
 import 'package:brahmakosh/features/check_in/views/check_in_view.dart';
-import 'package:brahmakosh/features/check_in/views/meditations.dart';
+import 'package:brahmakosh/features/check_in/views/meditation_selection_view_v2.dart';
 import 'package:brahmakosh/features/check_in/views/meditation_start.dart';
 import 'package:brahmakosh/features/check_in/views/spiritual_configuration_view.dart';
 import 'package:brahmakosh/features/home/mantra/mantra_chanting.dart';
@@ -39,9 +39,8 @@ import 'package:brahmakosh/features/home/views/astrology_details_screen.dart';
 import 'package:brahmakosh/features/pooja/views/pooja_list_screen.dart';
 import 'package:brahmakosh/features/swapna_decoder/views/swapna_decoder_screen.dart';
 import 'package:brahmakosh/features/gita/views/gita_chapter_screen.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../features/notifications/blocs/notification_bloc.dart';
-import '../../features/notifications/repositories/notification_repository.dart';
+
+
 
 class AppPages {
   static final List<GetPage> pages = [
@@ -141,7 +140,7 @@ class AppPages {
     GetPage(name: AppConstants.routeCheckIn, page: () => CheckInView()),
     GetPage(
       name: AppConstants.routeMeditate,
-      page: () => const MeditateScreen(),
+      page: () => const MeditationSelectionViewV2(meditationCategoryId: "69787dfbbeaf7e42675a221d"),
     ),
     GetPage(
       name: AppConstants.routeMantraChanting,

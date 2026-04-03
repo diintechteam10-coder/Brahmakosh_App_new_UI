@@ -8,7 +8,7 @@ class AuthLogoAvatar extends StatelessWidget {
   const AuthLogoAvatar({
     super.key,
     this.size = 100,
-    this.imagePath = 'assets/images/brahmkosh_logo.jpeg',
+    this.imagePath = 'assets/images/brahmkosh_logo.png',
   });
 
   @override

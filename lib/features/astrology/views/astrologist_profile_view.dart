@@ -12,6 +12,7 @@ import 'package:brahmakosh/core/services/storage_service.dart';
 import 'voice_call_view.dart';
 import 'package:brahmakosh/common/widgets/custom_profile_avatar.dart';
 import 'package:brahmakosh/core/localization/translate_helper.dart';
+import '../../../core/utils/app_snackbar.dart';
 
 class AstrologistProfileView extends StatefulWidget {
   final AstrologistItem expert;
@@ -920,11 +921,9 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                           if (credits >= minRequired) {
                             Get.to(() => VoiceCallView(expert: expert.toAstrologist()));
                           } else {
-                            Get.snackbar(
+                            AppSnackBar.showError(
                               "insufficient_credits".tr,
                               "insufficient_credits_desc".trParams({'min': minRequired.toString()}),
-                              backgroundColor: Colors.redAccent,
-                              colorText: Colors.white,
                             );
                             controller.showRechargeBottomSheet(context);
                           }

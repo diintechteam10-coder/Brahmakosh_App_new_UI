@@ -5,6 +5,7 @@ import 'package:brahmakosh/common/api_urls.dart';
 import 'package:brahmakosh/core/constants/app_constants.dart';
 import 'package:brahmakosh/core/services/storage_service.dart';
 import 'package:get/get.dart';
+import 'package:brahmakosh/core/utils/app_snackbar.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
@@ -52,14 +53,14 @@ class GenerateAvatarController extends GetxController {
 
   void generateAvatar() async {
     if (selectedImage.value == null) {
-      Get.snackbar("Error", "Please upload an image first");
+      AppSnackBar.showError("Error", "Please upload an image first");
       return;
     }
 
     // Get email from storage
     final email = StorageService.getString(AppConstants.keyUserEmail);
     if (email == null || email.isEmpty) {
-      Get.snackbar("Error", "Email not found. Please login again.");
+      AppSnackBar.showError("Error", "Email not found. Please login again.");
       return;
     }
 
@@ -98,18 +99,18 @@ class GenerateAvatarController extends GetxController {
           isLoading.value = false;
           print("✅ Avatar upload response: $responseJson");
           Get.offAllNamed(AppConstants.routeRegistrationSuccess);
-          Get.snackbar("Success", "Upload Image successfully 🎉");
+          AppSnackBar.showSuccess("Success", "Upload Image successfully 🎉");
         },
         onError: (error) {
           isLoading.value = false;
           print("❌ Avatar upload error: $error");
-          Get.snackbar("Error", "Failed to upload avatar. Please try again.");
+          AppSnackBar.showError("Error", "Failed to upload avatar. Please try again.");
         },
       );
     } catch (e) {
       isLoading.value = false;
       print("❌ Error: $e");
-      Get.snackbar("Error", "Something went wrong. Please try again.");
+      AppSnackBar.showError("Error", "Something went wrong. Please try again.");
     }
   }
 }

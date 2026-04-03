@@ -13,7 +13,7 @@ class _CreateAvatarViewState extends State<CreateAvatarView> {
   int _selectedGenderIndex = 0; // 0: Male, 1: Female, 2: Other
   int _selectedStyleIndex = 0;
   bool _isGenerating = false;
-
+  
   final List<String> _styles = [
     'Divine Aura',
     'Vedic Sage',

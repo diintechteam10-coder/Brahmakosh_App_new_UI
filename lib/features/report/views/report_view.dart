@@ -1,5 +1,4 @@
 import '../../../../core/common_imports.dart';
-import '../../dashboard/viewmodels/dashboard_viewmodel.dart';
 import '../../../common/widgets/custom_popups.dart';
 import 'package:get/get.dart';
 
@@ -15,16 +14,10 @@ class ReportView extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            // Navigate back to Home tab (index 0)
-            Provider.of<DashboardViewModel>(
-              context,
-              listen: false,
-            ).changeTab(0);
-          },
+          onPressed: () => Get.back(),
         ),
         title: Text(
-          'My Kosh',
+          'My Reports',
           style: GoogleFonts.lora(
             fontSize: 22,
             fontWeight: FontWeight.bold,

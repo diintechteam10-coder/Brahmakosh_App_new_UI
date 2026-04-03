@@ -213,7 +213,7 @@ class CompletedSankalpTab extends StatelessWidget {
                         children: [
                           ClipOval(
                             child: Image.asset(
-                              'assets/images/brahmkosh_logo.jpeg',
+                              'assets/images/brahmkosh_logo.png',
                               width: 18,
                               height: 18,
                               fit: BoxFit.cover,
