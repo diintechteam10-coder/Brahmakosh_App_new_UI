@@ -20,7 +20,7 @@ class TranslationService {
 
     try {
       final url = '$_baseUrl?key=$apiKey';
-      print('🚀 Google Translate API Hit: $url');
+      // print('🚀 Google Translate API Hit: $url'); // Removed to hide API key
       final response = await http.post(
         Uri.parse(url),
         body: jsonEncode({
@@ -36,12 +36,10 @@ class TranslationService {
             data['data']['translations'][0]['translatedText'];
         return translatedText;
       } else {
-        print('Translation Error: ${response.statusCode} - ${response.body}');
-        return text;
+        throw Exception('Translation Error: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
-      print('Translation Exception: $e');
-      return text;
+      rethrow;
     }
   }
 
@@ -58,7 +56,7 @@ class TranslationService {
 
     try {
       final url = '$_baseUrl?key=$apiKey';
-      print('🚀 Google Translate Batch API Hit: $url');
+      // print('🚀 Google Translate Batch API Hit: $url'); // Removed to hide API key
       final response = await http.post(
         Uri.parse(url),
         body: jsonEncode({
@@ -73,14 +71,10 @@ class TranslationService {
         final translations = data['data']['translations'] as List;
         return translations.map((t) => t['translatedText'] as String).toList();
       } else {
-        print(
-          'Batch Translation Error: ${response.statusCode} - ${response.body}',
-        );
-        return texts;
+        throw Exception('Batch Translation Error: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
-      print('Batch Translation Exception: $e');
-      return texts;
+      rethrow;
     }
   }
 }

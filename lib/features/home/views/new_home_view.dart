@@ -13,7 +13,6 @@ import 'package:brahmakosh/core/common_imports.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:brahmakosh/core/localization/translate_helper.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:brahmakosh/features/home/views/sponsor_card.dart';
@@ -29,6 +28,8 @@ import 'package:brahmakosh/features/report/views/report_view.dart';
 import 'package:brahmakosh/features/ai_rashmi/views/ai_guide_view.dart';
 import 'package:brahmakosh/common/api_urls.dart';
 import 'package:brahmakosh/common/widgets/custom_popups.dart';
+import 'package:brahmakosh/common/widgets/translated_text.dart';
+import 'package:brahmakosh/core/localization/translate_helper.dart';
 import 'package:brahmakosh/common/widgets/custom_profile_avatar.dart';
 import 'package:brahmakosh/features/profile/views/profile_view.dart'
     as brahmakosh_profile;
@@ -38,8 +39,7 @@ import 'package:brahmakosh/features/remedies/views/remedies_web_view.dart';
 
 class NewHomeView extends StatefulWidget {
   final ScrollController? scrollController;
-  const NewHomeView({super.key, this.scrollController});
-
+ NewHomeView({super.key, this.scrollController});
   @override
   State<NewHomeView> createState() => _NewHomeViewState();
 }
@@ -114,69 +114,7 @@ class _NewHomeViewState extends State<NewHomeView> {
   ];
 
   // Remedy lists moved to class level for pre-translation
-  final List<Map<String, String>> _mustHaveRemedies = [
-    {
-      "title": "7 Mukhi Rudraksha",
-      "subtitle": "For spiritual protection & planet Saturn...",
-      "price": "1,299",
-      "image":
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSs1hx27RUdRVHpThGV_4DN3712p8UCKtndeA&s",
-    },
-    {
-      "title": "Yellow Sapphire",
-      "subtitle": "For wealth, prosperity & planet Jupiter...",
-      "price": "15,500",
-      "image":
-          "https://www.shivaago.com/wp-content/uploads/2021/03/IMG_20210307_160026_compress32-600x486.jpg",
-    },
-  ];
 
-  final List<Map<String, String>> _goodToHaveRemedies = [
-    {
-      "title": "Sphatik Mala",
-      "subtitle": "For peace, concentration & planet Moon...",
-      "price": "850",
-      "image":
-          "https://ik.imagekit.io/gemsonline/wp-content/uploads/2026/01/Spetics-mala-3-scaled.jpg",
-    },
-    {
-      "title": "Gomati Chakra",
-      "subtitle": "For protection, prosperity and bringing luck...",
-      "price": "150",
-      "image":
-          "https://m.media-amazon.com/images/I/A1QIkWYHngL._AC_UY1100_.jpg",
-    },
-  ];
-
-  final List<Map<String, dynamic>> _spiritualTools = [
-    {
-      "title": "Remedies",
-      "desc": "Protect your energy & remove negativity",
-      "icon": "assets/icons/remedies.png",
-      "onTapId": 4, // Tab index
-    },
-    {
-      "title": "Puja Vidhi",
-      "desc": "Perform rituals with step-by-step guidance",
-      "icon": "assets/icons/puja_vidhi.png",
-      "route": AppConstants.routePoojaList,
-    },
-    {
-      "title": "Reports",
-      "desc": "Get deep insights into your life's path",
-      "icon": "assets/icons/reports.png",
-      "isComingSoon": true,
-    },
-    {
-      "title": "Courses",
-      "desc": "Learn sacred wisdom from experts",
-      "icon": "assets/icons/courses.png",
-      "isComingSoon": true,
-    },
-  ];
-
-  // Dynamic Translation Cache for this view
-  final Map<String, String> _dynamicTranslations = {};
   String _lastLang = 'en';
 
 
@@ -196,13 +134,62 @@ class _NewHomeViewState extends State<NewHomeView> {
     _lastLang = Get.locale?.languageCode ?? 'en';
     // Ensure data is fresh when viewing
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _translateAllContents();
       _handleRefresh();
       _fetchCheckInData();
       _unfocusAll(); // Initial clean state
       context.read<NotificationBloc>().add(RefreshUnreadCount());
       _startComingSoonTimer();
+      _warmupTranslations();
     });
+  }
+
+  void _warmupTranslations() {
+    final List<String> stringsToWarmup = [];
+
+    // 1. Spiritual Tools
+    const tools = [
+      {"title": "Pooja Vidhi", "desc": "Step-by-step guidance for rituals"},
+      {"title": "Daily Panchang", "desc": "Auspicious timings and planetary positions"},
+      {"title": "Sankalp Tracker", "desc": "Commit to your spiritual goals"},
+      {"title": "Muhurat", "desc": "Find the perfect time for new beginnings"},
+      {"title": "Reports", "desc": "Detailed analysis of your spiritual journey"},
+      {"title": "Remedies", "desc": "Personalized solutions for life's challenges"},
+    ];
+    for (var t in tools) {
+      stringsToWarmup.add(t["title"] as String);
+      stringsToWarmup.add(t["desc"] as String);
+    }
+
+    // 2. Coming Soon Projects
+    const comingSoon = [
+      {"title": "Brahmakosh \nExperience Centre", "subtitle": "Immersive spiritual experiences"},
+      {"title": "Spiritual \nRetreats", "subtitle": "Guided journeys to sacred places"},
+      {"title": "Global \nCommunity", "subtitle": "Connect with seekers worldwide"},
+    ];
+    for (var cs in comingSoon) {
+      stringsToWarmup.add(cs["title"] as String);
+      stringsToWarmup.add(cs["subtitle"] as String);
+    }
+
+    // 3. Expert Categories
+    stringsToWarmup.addAll(["Astrology", "Numerology", "Vastu", "Palmistry", "Tarot"]);
+
+    // 4. Section Headers & Key Strings
+    stringsToWarmup.addAll([
+      "SANKALP TRACKER",
+      "DAILY SPIRITUAL PROGRESS",
+      "SPIRITUAL TOOLS",
+      "COMING SOON PROJECTS",
+      "CONNECT WITH EXPERTS",
+      "SWAPNA DECODER",
+      "MUHURAT",
+      "Daily Spiritual Progress",
+      "No Active Sankalp",
+      "Tracking active spiritual habits.",
+      "Start a new Sankalp to track your spiritual journey.",
+    ]);
+
+    TranslateHelper.warmup(stringsToWarmup);
   }
 
   @override
@@ -211,60 +198,9 @@ class _NewHomeViewState extends State<NewHomeView> {
     final currentLang = Get.locale?.languageCode ?? 'en';
     if (currentLang != _lastLang) {
       _lastLang = currentLang;
-      _translateAllContents();
     }
   }
 
-  Future<void> _translateAllContents() async {
-    final lang = Get.locale?.languageCode ?? 'en';
-    if (lang == 'en') {
-      setState(() => _dynamicTranslations.clear());
-      return;
-    }
-
-    final Set<String> toTranslate = {};
-
-    // Collect from coming soon
-    for (var p in _comingSoonProjects) {
-      if (p["title"] != null) toTranslate.add(p["title"]!);
-      if (p["subtitle"] != null) toTranslate.add(p["subtitle"]!);
-    }
-
-    // Collect from remedies
-    for (var r in _mustHaveRemedies) {
-      if (r["title"] != null) toTranslate.add(r["title"]!);
-      if (r["subtitle"] != null) toTranslate.add(r["subtitle"]!);
-    }
-    for (var r in _goodToHaveRemedies) {
-      if (r["title"] != null) toTranslate.add(r["title"]!);
-      if (r["subtitle"] != null) toTranslate.add(r["subtitle"]!);
-    }
-
-    // Collect from tools
-    for (var t in _spiritualTools) {
-      if (t["title"] != null) toTranslate.add(t["title"]!);
-      if (t["desc"] != null) toTranslate.add(t["desc"]!);
-    }
-
-    // Collect from experts currently loaded
-    for (var e in astrologyController.experts) {
-      if (e.name != null) toTranslate.add(e.name!);
-      if (e.expertise != null) toTranslate.add(e.expertise!);
-    }
-
-    if (toTranslate.isEmpty) return;
-
-    final list = toTranslate.toList();
-    final results = await TranslateHelper.translateList(list);
-
-    if (mounted) {
-      setState(() {
-        for (int i = 0; i < list.length; i++) {
-          _dynamicTranslations[list[i]] = results[i];
-        }
-      });
-    }
-  }
 
   void _startComingSoonTimer() {
     _comingSoonTimer?.cancel();
@@ -348,7 +284,6 @@ class _NewHomeViewState extends State<NewHomeView> {
       Provider.of<ProfileViewModel>(context, listen: false).refreshProfile(),
     ]);
     if (mounted) {
-      _translateAllContents(); // Update translations for newly loaded experts
       context.read<NotificationBloc>().add(RefreshUnreadCount());
     }
   }
@@ -1479,7 +1414,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                 );
               }
               return SizedBox(
-                height: isTablet ? 22.h : 21.h,
+                height: isTablet ? 25.h : 23.5.h, // Increased height to prevent translated text overflow
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   padding:  EdgeInsets.symmetric(horizontal: 2.w),
@@ -1563,8 +1498,8 @@ class _NewHomeViewState extends State<NewHomeView> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
-                            child: Text(
-                              _dynamicTranslations[expert.name] ?? expert.name ?? "Expert",
+                            child: TranslatedText(
+                              expert.name ?? "Expert",
                               style: GoogleFonts.poppins(
                                 color: Colors.white,
                                 fontSize: 12.sp,
@@ -1595,8 +1530,8 @@ class _NewHomeViewState extends State<NewHomeView> {
                           ),
                         ],
                       ),
-                      Text(
-                        _dynamicTranslations[expert.expertise] ?? expert.expertise ?? "Astrology",
+                      TranslatedText(
+                        expert.expertise ?? "Astrology",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.poppins(
@@ -2446,7 +2381,7 @@ class _NewHomeViewState extends State<NewHomeView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            TranslatedText(
               "SPIRITUAL TOOLS",
                style: GoogleFonts.poppins(
                 color:Colors.white.withOpacity(0.7),
@@ -2460,9 +2395,9 @@ class _NewHomeViewState extends State<NewHomeView> {
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                itemCount: _spiritualTools.length,
+                itemCount: tools.length,
                 itemBuilder: (context, index) {
-                  final tool = _spiritualTools[index];
+                  final tool = tools[index];
                   return _buildSpiritualToolCard(
                     tool["title"] as String,
                     tool["desc"] as String,
@@ -2520,8 +2455,8 @@ class _NewHomeViewState extends State<NewHomeView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        _dynamicTranslations[title] ?? title,
+                      TranslatedText(
+                        title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.lora(
@@ -2530,8 +2465,8 @@ class _NewHomeViewState extends State<NewHomeView> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text(
-                        _dynamicTranslations[desc] ?? desc,
+                      TranslatedText(
+                        desc,
                         style: GoogleFonts.lora(
                           color: const Color(0xFFD4AF37),
                           fontSize: 7.5.sp,
@@ -2607,14 +2542,14 @@ class _NewHomeViewState extends State<NewHomeView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      "SANKALP TRACKER",
-                      style: GoogleFonts.poppins(
-                color:Colors.white.withOpacity(0.7),
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w500,
-              ),
-                    ),
+                TranslatedText(
+                  "SANKALP TRACKER",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white.withOpacity(0.7),
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
                     if (activeSankalps.isNotEmpty)
                     GestureDetector(
                       onTap: () => Get.to(() => const SankalpScreen()),
@@ -2649,7 +2584,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                TranslatedText(
                                   activeCount > 0 ? "Daily Spiritual Progress" : "No Active Sankalp",
                                   style: GoogleFonts.poppins(
                                     color: Colors.white,
@@ -2658,7 +2593,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                                   ),
                                 ),
                                 const SizedBox(height: 4),
-                                Text(
+                                TranslatedText(
                                   activeCount > 0 
                                     ? "Tracking $activeCount active spiritual habits."
                                     : "Start a new Sankalp to track your spiritual journey.",
@@ -2698,7 +2633,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
+                            TranslatedText(
                               "OVERALL PROGRESS",
                               style: GoogleFonts.poppins(
                                 color: Colors.white.withOpacity(0.5),
@@ -2791,7 +2726,7 @@ class _NewHomeViewState extends State<NewHomeView> {
               color: Colors.black,
             ),
             const SizedBox(width: 8),
-            Text(
+            TranslatedText(
               "TRACK YOUR SANKALP",
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.bold,
@@ -2985,7 +2920,7 @@ class _NewHomeViewState extends State<NewHomeView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            TranslatedText(
               "Coming Soon Projects",
               style: GoogleFonts.lora(
                 color: const Color(0xFFD4AF37),
@@ -2994,7 +2929,7 @@ class _NewHomeViewState extends State<NewHomeView> {
               ),
             ),
             const SizedBox(height: 4),
-            Text(
+            TranslatedText(
               "Building spiritual ecosystem for growth and learning...",
               style: GoogleFonts.poppins(
                 color: Colors.white.withOpacity(0.5),
@@ -3087,8 +3022,8 @@ class _NewHomeViewState extends State<NewHomeView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text(
-                    _dynamicTranslations[project["title"]] ?? project["title"]!,
+                  TranslatedText(
+                    project["title"]!,
                     style: GoogleFonts.lora(
                       color: Colors.white,
                       fontSize: 14.5.sp,
@@ -3097,8 +3032,8 @@ class _NewHomeViewState extends State<NewHomeView> {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    _dynamicTranslations[project["subtitle"]] ?? project["subtitle"]!,
+                  TranslatedText(
+                    project["subtitle"]!,
                     style: GoogleFonts.poppins(
                       color: Colors.white.withOpacity(0.7),
                       fontSize: 9.sp,
@@ -3131,8 +3066,8 @@ class _NewHomeViewState extends State<NewHomeView> {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          "Coming Soon",
+                        TranslatedText(
+                          "coming_soon",
                           style: GoogleFonts.poppins(
                             color: Colors.black,
                             fontSize: 8.sp,

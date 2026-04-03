@@ -12,7 +12,19 @@ class TranslateHelper {
   // Accumulator Queue for Batch API
   static final Map<String, Completer<String>> _queue = {};
   static Timer? _debounce;
-  static const Duration _debounceDuration = Duration(milliseconds: 50);
+  // Increase debounce to 2.5 seconds to group more strings and reduce API hits
+  static const Duration _debounceDuration = Duration(milliseconds: 2500);
+
+  // Rate Limit / Quota Handling
+  static DateTime? _lastQuotaErrorTime;
+  static const Duration _quotaCoolOff = Duration(minutes: 1);
+
+  // Session-level Failure Cache: strings that failed to translate recently
+  static final Set<String> _failedKeys = {};
+
+  static bool get _isInCoolOff =>
+      _lastQuotaErrorTime != null &&
+      DateTime.now().difference(_lastQuotaErrorTime!) < _quotaCoolOff;
 
   /// Returns the current language code (e.g., 'hi')
   static String get _currentLang => Get.locale?.languageCode ?? 'en';
@@ -22,7 +34,11 @@ class TranslateHelper {
 
   /// Initializes the cache from local storage.
   static void _initCache() {
-    if (_cache != null && StorageService.getString('last_lang') == _currentLang) return;
+    if (_cache != null && StorageService.getString('last_lang_v2') == _currentLang) return;
+    
+    // Lang changed, clear failure cache to allow retrying for the new language
+    _failedKeys.clear();
+    _lastQuotaErrorTime = null; // Also clear cooldown on language change
     
     // Load from persistent storage
     final cachedData = StorageService.getString(_langCacheKey);
@@ -37,7 +53,7 @@ class TranslateHelper {
     } else {
       _cache = {};
     }
-    StorageService.setString('last_lang', _currentLang);
+    StorageService.setString('last_lang_v2', _currentLang);
   }
 
   /// Saves the cache to local storage.
@@ -47,7 +63,7 @@ class TranslateHelper {
   }
 
   /// Normalizes the key for lookup
-  static String _normalize(String text) => text.trim().toLowerCase();
+  static String _normalize(String text) => text.trim();
 
   /// Smart Dictionary Lookup: Tries multiple formats in GetX Translations
   static String? _tryStaticTranslate(String text) {
@@ -102,12 +118,42 @@ class TranslateHelper {
       return _queue[key]!.future;
     }
 
+    // 5. Failure Cache & Cooldown Check
+    if (_failedKeys.contains(key) || _isInCoolOff) {
+      // If it failed before or we are in cooldown, don't hit the API
+      return text;
+    }
+
     final completer = Completer<String>();
     _queue[key] = completer;
 
     _scheduleBatch();
 
     return completer.future;
+  }
+
+  /// Pre-translates a list of strings in one giant batch if possible.
+  static void warmup(List<String> texts) {
+    if (_currentLang == 'en' || _isInCoolOff) return;
+    
+    for (final text in texts) {
+      if (text.trim().isEmpty) continue;
+      
+      final staticValue = _tryStaticTranslate(text);
+      if (staticValue != null) continue;
+
+      _initCache();
+      final key = _normalize(text);
+      if (_cache!.containsKey(key)) continue;
+      if (_failedKeys.contains(key)) continue;
+      if (_queue.containsKey(key)) continue;
+
+      _queue[key] = Completer<String>();
+    }
+
+    if (_queue.isNotEmpty) {
+      _scheduleBatch();
+    }
   }
 
   static void _scheduleBatch() {
@@ -139,12 +185,29 @@ class TranslateHelper {
         // Cache and complete
         if (translated.isNotEmpty && translated != original) {
           _cache![original] = translated;
+          _failedKeys.remove(original); // Clear from failed keys on success
+        } else {
+          // If translation is empty or same as original, mark as failed for this session
+          _failedKeys.add(original);
         }
-        currentQueue[original]?.complete(translated);
+
+        if (!currentQueue[original]!.isCompleted) {
+          currentQueue[original]?.complete(translated);
+        }
       }
       _saveCache();
     } catch (e) {
       print('❌ TranslateHelper Batch Error: $e');
+      
+      // Handle 403 Quota Error specifically
+      if (e.toString().contains('403') || e.toString().toLowerCase().contains('quota')) {
+        _lastQuotaErrorTime = DateTime.now();
+        print('⚠️ TranslateHelper: Entering 1-minute COOLDOWN due to API Rate Limit.');
+        
+        // Mark all keys in this batch as failed so we don't retry them immediately
+        _failedKeys.addAll(textsToTranslate);
+      }
+
       // Fallback: complete all with original text
       for (final entry in currentQueue.entries) {
         if (!entry.value.isCompleted) {
@@ -157,9 +220,15 @@ class TranslateHelper {
   /// Translates a list of strings efficiently.
   static Future<List<String>> translateList(List<String>? texts) async {
     if (texts == null || texts.isEmpty) return [];
+    if (_currentLang == 'en') return texts;
     
-    // Parallelize with the and batch accumulator
+    // Parallelize with the batch accumulator
     final futures = texts.map((t) => translate(t)).toList();
     return await Future.wait(futures);
   }
+}
+
+extension TranslationExtension on String {
+  /// Asynchronously translates the string using TranslateHelper (Batch/Cache/Static).
+  Future<String> get trAsync => TranslateHelper.translate(this);
 }

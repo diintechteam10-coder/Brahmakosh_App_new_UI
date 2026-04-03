@@ -8,9 +8,8 @@ import '../blocs/pooja_event.dart';
 import '../blocs/pooja_state.dart';
 
 import '../repositories/pooja_repository.dart';
-import '../models/pooja_model.dart';
 import 'pooja_vidhi_screen.dart';
-import 'package:brahmakosh/core/localization/translate_helper.dart';
+import 'package:brahmakosh/common/widgets/translated_text.dart';
 
 class PoojaDetailScreen extends StatefulWidget {
   final String poojaId;
@@ -21,54 +20,6 @@ class PoojaDetailScreen extends StatefulWidget {
 }
 
 class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
-  final Map<String, String> _dynamicTranslations = {};
-  String _lastLang = 'en';
-
-  Future<void> _translateAllContents(PoojaModel pooja) async {
-    final currentLang = Get.locale?.languageCode ?? 'en';
-    if (currentLang == 'en') {
-      if (_dynamicTranslations.isNotEmpty) {
-        setState(() {
-          _dynamicTranslations.clear();
-          _lastLang = 'en';
-        });
-      }
-      return;
-    }
-
-    final Set<String> toTranslate = {};
-    if (pooja.pujaName != null) toTranslate.add(pooja.pujaName!);
-    if (pooja.category != null) toTranslate.add(pooja.category!);
-    if (pooja.bestDay != null) toTranslate.add(pooja.bestDay!);
-    if (pooja.description != null) toTranslate.add(pooja.description!);
-    if (pooja.purpose != null) {
-      final points = pooja.purpose!.split('.').where((e) => e.trim().isNotEmpty);
-      for (var p in points) {
-        toTranslate.add(p.trim());
-      }
-    }
-
-    if (toTranslate.isEmpty) return;
-
-    final list = toTranslate.toList();
-    final results = await TranslateHelper.translateList(list);
-
-    bool changed = false;
-    for (int i = 0; i < list.length; i++) {
-      if (_dynamicTranslations[list[i]] != results[i]) {
-        _dynamicTranslations[list[i]] = results[i];
-        changed = true;
-      }
-    }
-
-    if (changed || _lastLang != currentLang) {
-      if (mounted) {
-        setState(() {
-          _lastLang = currentLang;
-        });
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,10 +54,6 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
               return const Center(child: CircularProgressIndicator());
             } else if (state is PoojaDetailLoaded) {
               final pooja = state.pooja;
-              // Trigger translation
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                _translateAllContents(pooja);
-              });
 
               return Stack(
                 children: [
@@ -142,8 +89,8 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  Text(
-                                    _dynamicTranslations[pooja.pujaName] ?? (pooja.pujaName ?? ""),
+                                  TranslatedText(
+                                    pooja.pujaName ?? "",
                                     style: GoogleFonts.lora(
                                       fontSize: 22,
                                       fontWeight: FontWeight.bold,
@@ -155,7 +102,7 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                                     children: [
                                       _buildSmallInfo(
                                         Icons.local_fire_department,
-                                        _dynamicTranslations[pooja.category] ?? (pooja.category ?? "Pooja"),
+                                        pooja.category ?? "Pooja",
                                       ),
                                   Spacer(),
                                       _buildSmallInfo(Icons.access_time_filled, "min_suffix".trParams({'min': (pooja.duration ?? 0).toString()})),
@@ -197,23 +144,23 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                                         const Icon(Icons.calendar_month, size: 16, color: Color(0xFFD4AF37)),
                                         const SizedBox(width: 8),
                                         Expanded(
-                                          child: Text(
-                                            "best_timing".trParams({
-                                              'day': _dynamicTranslations[pooja.bestDay] ?? (pooja.bestDay ?? "Friday"),
-                                            }),
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w600,
-                                              color: const Color(0xFFD4AF37),
-                                            ),
-                                          ),
+                                      child: TranslatedText(
+                                      "best_timing".trParams({
+                                        'day': pooja.bestDay ?? "Friday",
+                                      }),
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: const Color(0xFFD4AF37),
+                                      ),
+                                    ),
                                         ),
                                       ],
                                     ),
                                   ),
                                   const SizedBox(height: 16),
-                                  Text(
-                                    _dynamicTranslations[pooja.description] ?? (pooja.description ?? ""),
+                                  TranslatedText(
+                                    pooja.description ?? "",
                                     style: GoogleFonts.poppins(
                                       fontSize: 14,
                                       color: Colors.white.withOpacity(0.5),
@@ -291,8 +238,8 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              Text(
-                                                _dynamicTranslations[point.trim()] ?? point.trim(),
+                                              TranslatedText(
+                                                point.trim(),
                                                 style: GoogleFonts.poppins(
                                                   fontSize: 15,
                                                   fontWeight: FontWeight.bold,
@@ -413,7 +360,7 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
       children: [
         Icon(icon, size: 14, color: const Color(0xFFD4AF37)),
         const SizedBox(width: 6),
-        Text(
+        TranslatedText(
           text,
           style: GoogleFonts.poppins(
             fontSize: 12,

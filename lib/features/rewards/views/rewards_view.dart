@@ -3,11 +3,60 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:sizer/sizer.dart';
 import '../../../../core/common_imports.dart';
 import '../../profile/viewmodels/profile_viewmodel.dart';
+import 'package:brahmakosh/common/widgets/translated_text.dart';
+import 'package:brahmakosh/core/localization/translate_helper.dart';
 
-class RewardsView extends StatelessWidget {
+class RewardsView extends StatefulWidget {
   const RewardsView({super.key});
+
+  @override
+  State<RewardsView> createState() => _RewardsViewState();
+}
+
+class _RewardsViewState extends State<RewardsView> {
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _warmupTranslations();
+    });
+  }
+
+  void _warmupTranslations() {
+    final List<String> stringsToWarmup = [
+      "Rewards",
+      "MEMBERSHIP - SILVER",
+      "Silver",
+      "Gold",
+      "Platinum",
+      "Rewards Overview",
+      "Karma",
+      "+40 earned today",
+      "more to reach",
+      "DAILY ACTIVITIES",
+      "Spiritual Check -In",
+      "Daily Check-in +40karma day",
+      "Share App",
+      "Invite Friend >",
+      "GOALS & LEARNING",
+      "Sankalp Rewards",
+      "Set Goals Earn Up to 500 Karma",
+      "Course Completion",
+      "1,500 Karma / +800 bonus",
+      "View Courses >",
+      "CONTINUE",
+      "PURCHASE",
+      "membership",
+      "You are already a silver member.",
+      "You are already a gold member.",
+      "You are already a platinum member.",
+    ];
+    TranslateHelper.warmup(stringsToWarmup);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +93,7 @@ class RewardsView extends StatelessWidget {
           horizontal: horizontalPadding,
           vertical: 1.h,
         ),
-        child: Text(
+        child: TranslatedText(
           "Rewards",
           style: GoogleFonts.lora(
             color: Colors.white,
@@ -103,7 +152,7 @@ class RewardsView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: Colors.white.withOpacity(0.1)),
                   ),
-                  child: Text(
+                  child: TranslatedText(
                     "MEMBERSHIP - SILVER",
                     style: GoogleFonts.lora(
                       color: Colors.white.withOpacity(0.9),
@@ -170,7 +219,7 @@ class RewardsView extends StatelessWidget {
         children: [
           SvgPicture.asset(assetPath, height: isActive ? 7.h : 5.h),
           const SizedBox(height: 4),
-          Text(
+          TranslatedText(
             title,
             style: GoogleFonts.poppins(
               color: isActive ? Colors.white : Colors.white.withOpacity(0.6),
@@ -209,7 +258,7 @@ class RewardsView extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      TranslatedText(
                         "Rewards Overview",
                         style: GoogleFonts.lora(
                           color: Colors.white,
@@ -234,7 +283,7 @@ class RewardsView extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          Text(
+                          TranslatedText(
                             "Karma",
                             style: GoogleFonts.poppins(
                               color: Colors.white,
@@ -289,7 +338,7 @@ class RewardsView extends StatelessWidget {
                         children: [
                           Text("🔥", style: TextStyle(fontSize: 14.sp)),
                           const SizedBox(width: 8),
-                          Text(
+                          TranslatedText(
                             "+40 earned today",
                             style: GoogleFonts.crimsonPro(
                               color: Colors.white.withOpacity(0.9),
@@ -367,7 +416,7 @@ class RewardsView extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(
+                    child: TranslatedText(
                       "+${diff.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')} more to reach $nextTierName",
                       style: GoogleFonts.crimsonPro(
                         color: Colors.white,
@@ -396,7 +445,7 @@ class RewardsView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            TranslatedText(
               "DAILY ACTIVITIES",
               style: GoogleFonts.poppins(
                 color: Colors.white,
@@ -455,7 +504,7 @@ class RewardsView extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(
+                child: TranslatedText(
                   title,
                   style: GoogleFonts.poppins(
                     color: Colors.white,
@@ -469,7 +518,7 @@ class RewardsView extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          Text(
+          TranslatedText(
             subtitle,
             style: GoogleFonts.poppins(
               color: Colors.white,
@@ -512,7 +561,7 @@ class RewardsView extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text(
+                      TranslatedText(
                         "Share App",
                         style: GoogleFonts.poppins(
                           color: Colors.white,
@@ -541,7 +590,7 @@ class RewardsView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Center(
-                      child: Text(
+                      child: TranslatedText(
                         "Invite Friend >",
                         style: GoogleFonts.poppins(
                           color: Colors.black,
@@ -567,7 +616,7 @@ class RewardsView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            TranslatedText(
               "GOALS & LEARNING",
               style: GoogleFonts.poppins(
                 color: Colors.white,
@@ -635,7 +684,7 @@ class RewardsView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
+                  TranslatedText(
                     title,
                     style: GoogleFonts.poppins(
                       color: Colors.white,
@@ -647,7 +696,7 @@ class RewardsView extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
+                      TranslatedText(
                         subtitle,
                         style: GoogleFonts.poppins(
                           color: Colors.white.withOpacity(0.5),
@@ -656,7 +705,7 @@ class RewardsView extends StatelessWidget {
                         ),
                       ),
                       if (trailingText != null)
-                        Text(
+                        TranslatedText(
                           trailingText,
                           style: GoogleFonts.lora(
                             color: const Color(0xFFD4AF37),
@@ -709,13 +758,12 @@ class RewardsView extends StatelessWidget {
                 SvgPicture.asset(assetPath, height: 8.h, fit: BoxFit.contain),
                 const SizedBox(height: 16),
                 // Tier Title with Glow
-                Text(
+                TranslatedText(
                   "${tier.toUpperCase()} - MEMBERSHIP",
                   style: GoogleFonts.poppins(
                     color: Colors.white,
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w700,
-
                     shadows: [
                       Shadow(
                         color: Colors.white.withOpacity(0.5),
@@ -726,35 +774,15 @@ class RewardsView extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 // Description
-                RichText(
+                TranslatedText(
+                  currentKarma >= requiredKarma
+                      ? "You are already a ${tier.toLowerCase()} member."
+                      : "You need ${diff.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')} Karma Points to become ${tier.toLowerCase()} member.",
                   textAlign: TextAlign.center,
-                  text: TextSpan(
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    children: currentKarma >= requiredKarma
-                        ? [
-                            TextSpan(
-                              text: "You are already a ${tier.toLowerCase()} member.",
-                            ),
-                          ]
-                        : [
-                            const TextSpan(text: "You need "),
-                            TextSpan(
-                              text:
-                                  "${diff.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')} ",
-                              style: const TextStyle(
-                                color: Color(0xFFD4AF37),
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            TextSpan(
-                              text:
-                                  "Karma Points to become ${tier.toLowerCase()} member.",
-                            ),
-                          ],
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -770,13 +798,12 @@ class RewardsView extends StatelessWidget {
                     elevation: 0,
                     padding: EdgeInsets.zero,
                   ),
-                  child: Text(
+                  child: TranslatedText(
                     "CONTINUE",
                     style: GoogleFonts.poppins(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
                       fontSize: 14.sp,
-                      // letterSpacing: 0.5,
                     ),
                   ),
                 ),
@@ -797,7 +824,7 @@ class RewardsView extends StatelessWidget {
                       ),
                       padding: EdgeInsets.zero,
                     ),
-                    child: Text(
+                    child: TranslatedText(
                       "CLOSE",
                       style: GoogleFonts.poppins(
                         color: Colors.white,
@@ -853,7 +880,7 @@ class RewardsView extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                Text(
+                TranslatedText(
                   "Coming Soon!",
                   style: GoogleFonts.lora(
                     color: Colors.white,
@@ -862,7 +889,7 @@ class RewardsView extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                Text(
+                TranslatedText(
                   "We are working hard to bring this feature to you. Stay tuned for updates!",
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
@@ -881,7 +908,7 @@ class RewardsView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: Text(
+                  child: TranslatedText(
                     "GOT IT",
                     style: GoogleFonts.poppins(
                       color: Colors.black,

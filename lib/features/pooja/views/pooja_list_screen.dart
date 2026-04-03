@@ -10,7 +10,7 @@ import '../blocs/pooja_state.dart';
 import '../models/pooja_model.dart';
 import '../repositories/pooja_repository.dart';
 import 'pooja_detail_screen.dart';
-import 'package:brahmakosh/core/localization/translate_helper.dart';
+import 'package:brahmakosh/common/widgets/translated_text.dart';
 
 class PoojaListScreen extends StatefulWidget {
   const PoojaListScreen({super.key});
@@ -20,49 +20,6 @@ class PoojaListScreen extends StatefulWidget {
 }
 
 class _PoojaListScreenState extends State<PoojaListScreen> {
-  final Map<String, String> _dynamicTranslations = {};
-  String _lastLang = 'en';
-
-  Future<void> _translateAllContents(List<PoojaModel> poojas) async {
-    final currentLang = Get.locale?.languageCode ?? 'en';
-    if (currentLang == 'en') {
-      if (_dynamicTranslations.isNotEmpty) {
-        setState(() {
-          _dynamicTranslations.clear();
-          _lastLang = 'en';
-        });
-      }
-      return;
-    }
-
-    final Set<String> toTranslate = {};
-    for (var pooja in poojas) {
-      if (pooja.pujaName != null) toTranslate.add(pooja.pujaName!);
-      if (pooja.category != null) toTranslate.add(pooja.category!);
-      if (pooja.bestDay != null) toTranslate.add(pooja.bestDay!);
-    }
-
-    if (toTranslate.isEmpty) return;
-
-    final list = toTranslate.toList();
-    final results = await TranslateHelper.translateList(list);
-
-    bool changed = false;
-    for (int i = 0; i < list.length; i++) {
-      if (_dynamicTranslations[list[i]] != results[i]) {
-        _dynamicTranslations[list[i]] = results[i];
-        changed = true;
-      }
-    }
-
-    if (changed || _lastLang != currentLang) {
-      if (mounted) {
-        setState(() {
-          _lastLang = currentLang;
-        });
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -197,10 +154,6 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                   if (state is PoojaLoading) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (state is PoojaLoaded) {
-                    // Trigger translation
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      _translateAllContents(state.filteredPoojas);
-                    });
                     
                     return ListView.builder(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -292,8 +245,8 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    _dynamicTranslations[pooja.pujaName] ?? (pooja.pujaName ?? "Unknown Puja"),
+                  TranslatedText(
+                    pooja.pujaName ?? "Unknown Puja",
                     style: GoogleFonts.lora(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -307,7 +260,7 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                         flex: 3,
                         child: _buildInfoItem(
                           Icons.local_fire_department,
-                          _dynamicTranslations[pooja.category] ?? (pooja.category ?? "Pooja"),
+                          pooja.category ?? "Pooja",
                           const Color(0xFFD4AF37),
                         ),
                       ),
@@ -325,7 +278,7 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                         flex: 3,
                         child: _buildInfoItem(
                           Icons.calendar_month,
-                          _dynamicTranslations[pooja.bestDay] ?? (pooja.bestDay ?? "Friday"),
+                          pooja.bestDay ?? "Friday",
                           const Color(0xFFD4AF37),
                         ),
                       ),
@@ -377,7 +330,7 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
         Icon(icon, size: 14, color: iconColor),
         const SizedBox(width: 4),
         Expanded(
-          child: Text(
+          child: TranslatedText(
             text,
             style: GoogleFonts.poppins(
               fontSize: 11,
