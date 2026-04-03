@@ -94,7 +94,7 @@ class BrahmakoshBottomBar extends StatelessWidget {
                    _buildNavItem(3, 'assets/icons/connect_new.svg', 'connect'.tr),
                   //  _buildNavItem(4, 'assets/icons/cart_new.svg', 'remedies_nav'.tr),
                   //  _buildNavItem(3, 'assets/icons/connect_new.svg', 'Connect'),
-                   _buildNavItem(4, 'assets/rewards/silver.svg', 'Rewards'),
+                   _buildNavItem(4, 'assets/rewards/silver.svg', 'rewards'.tr),
                 ],
               ),
             ),

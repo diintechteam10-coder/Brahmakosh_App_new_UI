@@ -94,7 +94,7 @@ class _RewardsViewState extends State<RewardsView> {
           vertical: 1.h,
         ),
         child: TranslatedText(
-          "Rewards",
+          "rewards",
           style: GoogleFonts.lora(
             color: Colors.white,
             fontSize: 18.sp,
@@ -153,7 +153,7 @@ class _RewardsViewState extends State<RewardsView> {
                     border: Border.all(color: Colors.white.withOpacity(0.1)),
                   ),
                   child: TranslatedText(
-                    "MEMBERSHIP - SILVER",
+                    "membership_silver",
                     style: GoogleFonts.lora(
                       color: Colors.white.withOpacity(0.9),
                       fontSize: 10.sp,
@@ -171,7 +171,7 @@ class _RewardsViewState extends State<RewardsView> {
                       _buildCrownItem(
                         context,
                         'assets/rewards/silver.svg',
-                        "Silver",
+                        "silver",
                         currentKarma: currentKarma,
                         requiredKarma: 0,
                         isActive: true, // Assuming starting tier
@@ -179,7 +179,7 @@ class _RewardsViewState extends State<RewardsView> {
                       _buildCrownItem(
                         context,
                         'assets/rewards/gold.svg',
-                        "Gold",
+                        "gold",
                         currentKarma: currentKarma,
                         requiredKarma: 5000,
                         isActive: currentKarma >= 5000,
@@ -187,7 +187,7 @@ class _RewardsViewState extends State<RewardsView> {
                       _buildCrownItem(
                         context,
                         'assets/rewards/platinum.svg',
-                        "Platinum",
+                        "platinum",
                         currentKarma: currentKarma,
                         requiredKarma: 10000,
                         isActive: currentKarma >= 10000,
@@ -259,7 +259,7 @@ class _RewardsViewState extends State<RewardsView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TranslatedText(
-                        "Rewards Overview",
+                        "rewards_overview",
                         style: GoogleFonts.lora(
                           color: Colors.white,
                           fontSize: 12.sp,
@@ -284,7 +284,7 @@ class _RewardsViewState extends State<RewardsView> {
                           ),
                           const SizedBox(width: 8),
                           TranslatedText(
-                            "Karma",
+                            "karma",
                             style: GoogleFonts.poppins(
                               color: Colors.white,
                               fontSize: 16.sp,
@@ -339,7 +339,7 @@ class _RewardsViewState extends State<RewardsView> {
                           Text("🔥", style: TextStyle(fontSize: 14.sp)),
                           const SizedBox(width: 8),
                           TranslatedText(
-                            "+40 earned today",
+                            "karma_earned_today".trParams({'points': '40'}),
                             style: GoogleFonts.crimsonPro(
                               color: Colors.white.withOpacity(0.9),
                               fontSize: 13.sp,
@@ -417,7 +417,12 @@ class _RewardsViewState extends State<RewardsView> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: TranslatedText(
-                      "+${diff.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')} more to reach $nextTierName",
+                      "more_to_reach".trParams({
+                        'points': diff.toString().replaceAllMapped(
+                            RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                            (Match m) => '${m[1]},'),
+                        'tier': nextTierName.tr
+                      }),
                       style: GoogleFonts.crimsonPro(
                         color: Colors.white,
                         fontSize: 16.sp,
@@ -446,7 +451,7 @@ class _RewardsViewState extends State<RewardsView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TranslatedText(
-              "DAILY ACTIVITIES",
+              "daily_activities",
               style: GoogleFonts.poppins(
                 color: Colors.white,
                 fontSize: 14.sp,
@@ -562,7 +567,7 @@ class _RewardsViewState extends State<RewardsView> {
                   Row(
                     children: [
                       TranslatedText(
-                        "Share App",
+                        "share_app",
                         style: GoogleFonts.poppins(
                           color: Colors.white,
                           fontSize: 10.sp,
@@ -591,7 +596,7 @@ class _RewardsViewState extends State<RewardsView> {
                     ),
                     child: Center(
                       child: TranslatedText(
-                        "Invite Friend >",
+                        "invite_friend",
                         style: GoogleFonts.poppins(
                           color: Colors.black,
                           fontSize: 8.sp,
@@ -617,7 +622,7 @@ class _RewardsViewState extends State<RewardsView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TranslatedText(
-              "GOALS & LEARNING",
+              "goals_learning",
               style: GoogleFonts.poppins(
                 color: Colors.white,
                 fontSize: 14.sp,
@@ -626,7 +631,7 @@ class _RewardsViewState extends State<RewardsView> {
             ),
             const SizedBox(height: 16),
             _buildGoalListItem(
-              "Sankalp Rewards",
+              "sankalp_rewards",
               "Set Goals Earn Up to 500 Karma",
               'assets/icons/sankalptracker.png',
               onTap: () => Get.toNamed(AppConstants.routeSankalp),
@@ -634,7 +639,7 @@ class _RewardsViewState extends State<RewardsView> {
             ),
             const SizedBox(height: 14),
             _buildGoalListItem(
-              "Course Completion",
+              "course_completion",
               "1,500 Karma / +800 bonus",
               'assets/icons/courses.png',
               trailingText: "View Courses >",
@@ -759,7 +764,7 @@ class _RewardsViewState extends State<RewardsView> {
                 const SizedBox(height: 16),
                 // Tier Title with Glow
                 TranslatedText(
-                  "${tier.toUpperCase()} - MEMBERSHIP",
+                  "membership_$tier",
                   style: GoogleFonts.poppins(
                     color: Colors.white,
                     fontSize: 14.sp,
@@ -776,8 +781,13 @@ class _RewardsViewState extends State<RewardsView> {
                 // Description
                 TranslatedText(
                   currentKarma >= requiredKarma
-                      ? "You are already a ${tier.toLowerCase()} member."
-                      : "You need ${diff.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')} Karma Points to become ${tier.toLowerCase()} member.",
+                      ? "already_member".trParams({'tier': tier.tr})
+                      : "need_karma_member".trParams({
+                          'points': diff.toString().replaceAllMapped(
+                              RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                              (Match m) => '${m[1]},'),
+                          'tier': tier.tr
+                        }),
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
                     color: Colors.white,
