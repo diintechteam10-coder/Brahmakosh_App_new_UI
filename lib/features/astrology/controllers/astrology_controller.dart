@@ -429,4 +429,3 @@ class AstrologyController extends GetxController {
     super.onClose();
   }
 }
-

@@ -409,4 +409,3 @@ class ConversationMessagesView extends StatelessWidget {
     );
   }
 }
-

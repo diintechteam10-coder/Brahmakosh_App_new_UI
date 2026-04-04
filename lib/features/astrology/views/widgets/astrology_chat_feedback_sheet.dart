@@ -229,4 +229,3 @@ class _AstrologyChatFeedbackSheetState
     );
   }
 }
-

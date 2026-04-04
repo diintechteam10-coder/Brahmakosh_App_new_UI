@@ -928,4 +928,3 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
     });
   }
 }
-

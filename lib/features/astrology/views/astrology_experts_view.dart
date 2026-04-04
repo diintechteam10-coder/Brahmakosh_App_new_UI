@@ -109,10 +109,12 @@ class AstrologyExpertsView extends StatelessWidget {
                     final cat = allCategories[index];
                     final id = cat['_id'];
                     final name = cat['name'];
+                    final translatedCategoryName =
+                        name is String ? (controller.translatedData[name] ?? name) : '';
                     final isSelected = selectedId == id;
                     return _buildFilterChip(
                       context,
-                      controller.translatedData[name] ?? name,
+                      translatedCategoryName,
                       id,
                       isSelected,
                       controller,
@@ -293,6 +295,16 @@ class AstrologyExpertsView extends StatelessWidget {
       statusColor = Colors.orange;
     }
 
+    final expertName = expert.name;
+    final expertDisplayName = (expertName != null && expertName.isNotEmpty)
+        ? (controller.translatedData[expertName] ?? expertName)
+        : 'astrologer'.tr;
+    final expertise = expert.expertise;
+    final expertDisplayExpertise = (expertise != null && expertise.isNotEmpty)
+        ? (controller.translatedData[expertise] ??
+            expertise.split(',').take(2).join(", "))
+        : "vedic_astrology".tr;
+
     return Container(
       margin: EdgeInsets.only(bottom: 2.h),
       decoration: BoxDecoration(
@@ -358,7 +370,7 @@ class AstrologyExpertsView extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: Text(
-                                  controller.translatedData[expert.name] ?? expert.name ?? 'astrologer'.tr,
+                                  expertDisplayName,
                                   style: GoogleFonts.lora(
                                     fontSize: 14.sp,
                                     fontWeight: FontWeight.bold,
@@ -384,7 +396,7 @@ class AstrologyExpertsView extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            controller.translatedData[expert.expertise] ?? expert.expertise?.split(',').take(2).join(", ") ?? "vedic_astrology".tr,
+                            expertDisplayExpertise,
                             style: GoogleFonts.poppins(
                               fontSize: 10.sp,
                               color: Colors.white.withValues(alpha: 0.5),
@@ -936,4 +948,3 @@ class AstrologyExpertsView extends StatelessWidget {
     );
   }
 }
-

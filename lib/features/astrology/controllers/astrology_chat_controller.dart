@@ -1408,4 +1408,3 @@ class AstrologyChatController extends GetxController {
     super.onClose();
   }
 }
-

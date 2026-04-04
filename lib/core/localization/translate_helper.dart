@@ -89,15 +89,17 @@ class TranslateHelper {
   static Future<String> translate(String? text) async {
     if (text == null || text.trim().isEmpty) return '';
     
-    // Default language is English, no translation needed if app is in English
-    if (_currentLang == 'en') {
-      return text;
-    }
-
     // 1. Smart Dictionary Check (Static)
+    // Always check this first, even for English, because the input might be a key
     final staticValue = _tryStaticTranslate(text);
     if (staticValue != null) {
       return staticValue;
+    }
+
+    // Default language is English, no translation needed if app is in English
+    // and no static match is found.
+    if (_currentLang == 'en') {
+      return text;
     }
 
     _initCache();
@@ -220,8 +222,6 @@ class TranslateHelper {
   /// Translates a list of strings efficiently.
   static Future<List<String>> translateList(List<String>? texts) async {
     if (texts == null || texts.isEmpty) return [];
-    if (_currentLang == 'en') return texts;
-    
     // Parallelize with the batch accumulator
     final futures = texts.map((t) => translate(t)).toList();
     return await Future.wait(futures);

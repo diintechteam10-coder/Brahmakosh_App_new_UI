@@ -292,4 +292,3 @@ class CreditHistoryView extends StatelessWidget {
     return '';
   }
 }
-
