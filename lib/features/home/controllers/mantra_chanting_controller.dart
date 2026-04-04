@@ -6,7 +6,6 @@ import 'package:vibration/vibration.dart';
 import 'package:brahmakosh/common/api_services.dart';
 import 'package:brahmakosh/common/models/chanting_mantra.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_configuration_model.dart'; // Added
-import 'package:brahmakosh/core/constants/app_constants.dart';
 
 class MantraChantingController extends GetxController
     with GetTickerProviderStateMixin {
@@ -20,6 +19,7 @@ class MantraChantingController extends GetxController
   // New Variables for Dynamic Config
   SpiritualConfiguration? _spiritualConfig;
   String? _audioUrl;
+  String? _videoUrl;
   final AudioPlayer _backgroundAudioPlayer =
       AudioPlayer(); // For background chant
 
@@ -27,12 +27,14 @@ class MantraChantingController extends GetxController
   final isMantraVisible = false.obs;
   final animationTriggers = <int>[].obs;
 
-  List<Data> get chantingMantras => _chantingMantras.value;
+  List<Data> get chantingMantras => _chantingMantras.toList();
   Data? get chantingMantra => _chantingMantras.isNotEmpty
       ? _chantingMantras[_selectedIndex.value]
       : null;
   RxInt get selectedIndex => _selectedIndex;
   bool get isLoading => _isLoading.value;
+  String? get currentAudioUrl => _audioUrl;
+  String? get currentVideoUrl => _videoUrl;
   late AnimationController scaleController;
   late AnimationController rippleController;
   late AnimationController glowController;
@@ -109,7 +111,7 @@ class MantraChantingController extends GetxController
     // _playBackgroundAudio();
   }
 
-  void _handleArguments() {
+  Future<void> _handleArguments() async {
     if (Get.arguments != null && Get.arguments is Map) {
       final args = Get.arguments as Map;
 
@@ -138,6 +140,14 @@ class MantraChantingController extends GetxController
           if (args.containsKey('audioUrl')) {
             _audioUrl = args['audioUrl'];
           }
+          if (args.containsKey('videoUrl')) {
+            _videoUrl = args['videoUrl'];
+          }
+          if ((_audioUrl == null || _audioUrl!.isEmpty) &&
+              config.sId != null &&
+              config.sId!.isNotEmpty) {
+            await _loadClipMediaFromConfiguration(config.sId!);
+          }
           return; // Skip normal fetch
         }
       }
@@ -150,6 +160,9 @@ class MantraChantingController extends GetxController
   }
 
   String _getMantraNameFromConfig(SpiritualConfiguration config) {
+    if (config.title != null && config.title!.isNotEmpty) {
+      return config.title!;
+    }
     if (config.chantingType != null &&
         config.chantingType!.isNotEmpty &&
         config.chantingType != "Other") {
@@ -160,6 +173,21 @@ class MantraChantingController extends GetxController
       return config.customChantingType!;
     }
     return "Mantra";
+  }
+
+  Future<void> _loadClipMediaFromConfiguration(String configurationId) async {
+    try {
+      final clipResponse = await getClipsByConfigurationId(null, configurationId);
+      final clip = clipResponse?.data?.isNotEmpty == true
+          ? clipResponse!.data!.first
+          : null;
+      if (clip != null) {
+        _audioUrl = clip.audioUrl;
+        _videoUrl = clip.videoUrl;
+      }
+    } catch (e) {
+      debugPrint('Error fetching clip media for $configurationId: $e');
+    }
   }
 
   Future<void> startBackgroundAudio() async {
@@ -183,10 +211,15 @@ class MantraChantingController extends GetxController
     }
   }
 
-  void startChanting() {
+  Future<void> startChanting() async {
+    if ((_audioUrl == null || _audioUrl!.isEmpty) &&
+        _spiritualConfig?.sId != null &&
+        _spiritualConfig!.sId!.isNotEmpty) {
+      await _loadClipMediaFromConfiguration(_spiritualConfig!.sId!);
+    }
     isStarted.value = true;
     startTimer();
-    startBackgroundAudio();
+    await startBackgroundAudio();
   }
 
   void pauseBackgroundAudio() {
@@ -250,8 +283,9 @@ class MantraChantingController extends GetxController
 
   Future<void> incrementCount() async {
     if (chantingMantra == null ||
-        chantCount.value >= (chantingMantra!.malaCount ?? 108))
+        chantCount.value >= (chantingMantra!.malaCount ?? 108)) {
       return;
+    }
 
     // Start timer if first chant
     startTimer();
