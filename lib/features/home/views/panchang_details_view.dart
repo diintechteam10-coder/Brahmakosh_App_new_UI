@@ -100,11 +100,6 @@ class PanchangDetailsView extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
-        image: const DecorationImage(
-          image: AssetImage('assets/images/shubh_muhurat_bg.png'), // Using existing asset if available, or just gradient
-          fit: BoxFit.cover,
-          opacity: 0.2,
-        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -41,21 +41,28 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
 
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8E7),
+      backgroundColor: const Color(0xFF0D0D0D),
       appBar: AppBar(
         title: Text(
-          "Numerology",
-          style: GoogleFonts.merriweather(
-            fontSize: 20,
+          'numerology_title'.tr,
+          style: GoogleFonts.lora(
+            fontSize: 22.sp,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF6D3A0C),
+            color: Colors.white,
           ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF6D3A0C)),
+          icon: Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 1.8.h),
+          ),
           onPressed: () => Get.back(),
         ),
         actions: [
@@ -79,7 +86,7 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
         if (data == null) {
           return Center(
             child: Text(
-              "No numerology data found.",
+              'no_numerology_data'.tr,
               style: GoogleFonts.lora(fontSize: 16, color: Colors.grey),
             ),
           );
@@ -119,12 +126,12 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFFDF0D5), // Light beige match
+        color: const Color(0xFF1C1C1E), 
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white, width: 2),
+        border: Border.all(color: AppTheme.primaryGold.withValues(alpha: 0.15), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.orange.withOpacity(0.1),
+            color: AppTheme.primaryGold.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -180,18 +187,18 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    profileVM.profile?.profile?.name ?? data.name ?? "User Name",
-                    style: GoogleFonts.merriweather(
-                      fontSize: 16, // Reduced font size
+                    profileVM.profile?.profile?.name ?? data.name ?? 'user_name_placeholder'.tr,
+                    style: GoogleFonts.lora(
+                      fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF6D3A0C),
+                      color: Colors.white,
                     ),
                   ),
                   Text(
                     profileVM.profile?.profile?.dob?.split('T').first ?? "${data.year}-${data.month}-${data.day}",
-                    style: GoogleFonts.lora(
-                      fontSize: 12, // Reduced font size
-                      color: const Color(0xFF6D3A0C).withOpacity(0.7),
+                    style: GoogleFonts.poppins(
+                      fontSize: 10.sp,
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ),
                 ],
@@ -203,14 +210,14 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
             children: [
               Expanded(
                 child: _buildNumberChip(
-                  "DESTINY NUMBER",
+                  'destiny_number'.tr,
                   data.numeroTable?.destinyNumber?.toString() ?? "-",
                 ),
               ),
               const SizedBox(width: 8), // Reduced spacing
               Expanded(
                 child: _buildNumberChip(
-                  "RADICAL NUMBER",
+                  'radical_number'.tr,
                   data.numeroTable?.radicalNumber?.toString() ?? "-",
                 ),
               ),
@@ -224,30 +231,31 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
   Widget _buildNumberChip(String label, String number) {
     return Container(
       padding: const EdgeInsets.symmetric(
-        vertical: 8,
-        horizontal: 10,
-      ), // Reduced padding
+        vertical: 10,
+        horizontal: 12,
+      ), 
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
-            style: GoogleFonts.merriweather(
-              fontSize: 9, // Reduced font size
+            style: GoogleFonts.poppins(
+              fontSize: 8.sp, 
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF8D6E63),
+              color: AppTheme.primaryGold,
             ),
           ),
           Text(
             number,
-            style: GoogleFonts.merriweather(
-              fontSize: 14, // Reduced font size
+            style: GoogleFonts.lora(
+              fontSize: 14.sp, 
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF6D3A0C),
+              color: Colors.white,
             ),
           ),
         ],
@@ -258,41 +266,34 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
   Widget _buildTabBar() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      height: 40, // Fixed height for tighter look
+      height: 48, 
       decoration: BoxDecoration(
-        color: const Color(0xFFFDF0D5), // Background of the pill container
-        borderRadius: BorderRadius.circular(20),
+        color: const Color(0xFF1C1C1E), 
+        borderRadius: BorderRadius.circular(25),
       ),
       child: TabBar(
         controller: _tabController,
         indicatorSize: TabBarIndicatorSize.tab, // Important for pill shape
         indicator: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 2,
-              offset: const Offset(0, 1),
-            ),
-          ],
+          color: AppTheme.primaryGold,
+          borderRadius: BorderRadius.circular(25),
         ),
-        dividerColor: Colors.transparent, // Remove any underline
-        labelColor: const Color(0xFFE65100), // Orange active
-        unselectedLabelColor: const Color(0xFF6D3A0C), // Brown inactive
-        labelStyle: GoogleFonts.merriweather(
+        dividerColor: Colors.transparent, 
+        labelColor: Colors.black, 
+        unselectedLabelColor: Colors.grey, 
+        labelStyle: GoogleFonts.poppins(
           fontWeight: FontWeight.bold,
-          fontSize: 12, // Reduced font size
+          fontSize: 13, 
         ),
-        unselectedLabelStyle: GoogleFonts.lora(
-          fontWeight: FontWeight.w500,
-          fontSize: 12, // Reduced font size
+        unselectedLabelStyle: GoogleFonts.poppins(
+          fontWeight: FontWeight.w600,
+          fontSize: 13, 
         ),
         padding: const EdgeInsets.all(4),
-        tabs: const [
-          Tab(text: "Report"),
-          Tab(text: "Table"),
-          Tab(text: "Daily"),
+        tabs: [
+          Tab(text: 'report_tab'.tr),
+          Tab(text: 'table_tab'.tr),
+          Tab(text: 'daily_tab'.tr),
         ],
       ),
     );
@@ -320,27 +321,28 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: const Color(0xFF1C1C1E),
                 borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    data.numeroReport!.title ?? "Numerology Report",
-                    style: GoogleFonts.merriweather(
-                      fontSize: 14, // Reduced
+                    data.numeroReport!.title ?? 'numerology_report_title'.tr,
+                    style: GoogleFonts.lora(
+                      fontSize: 14.sp, 
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: AppTheme.primaryGold,
                     ),
                   ),
                   const SizedBox(height: 12),
                   Text(
                     data.numeroReport!.description ?? "",
-                    style: GoogleFonts.lora(
-                      fontSize: 12, // Reduced
-                      color: Colors.grey[700],
-                      height: 1.5,
+                    style: GoogleFonts.poppins(
+                      fontSize: 10.sp, 
+                      color: Colors.white.withValues(alpha: 0.7),
+                      height: 1.6,
                     ),
                     textAlign: TextAlign.justify,
                   ),
@@ -350,12 +352,12 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
                   // User asked to match UI. I will put placeholders or check if I can derive.
                   // For now, I'll extract some keywords or just skip to avoid fake data.
                   // But the image has tags: Creative, Disciplined, Optimistic.
-                  Row(
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
                       _buildTag("Creative"),
-                      const SizedBox(width: 8),
                       _buildTag("Disciplined"),
-                      const SizedBox(width: 8),
                       _buildTag("Optimistic"),
                     ],
                   ),
@@ -376,8 +378,9 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFF1C1C1E),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Row(
         children: [
@@ -395,18 +398,20 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "$planet INSIGHT",
-                style: GoogleFonts.merriweather(
-                  fontSize: 10,
-                  color: Colors.orange,
+                'insight_label'.trParams({'planet': planet}),
+                style: GoogleFonts.poppins(
+                  fontSize: 10.sp,
+                  color: AppTheme.primaryGold,
                   fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
                 ),
               ),
               Text(
-                "Number Energy",
-                style: GoogleFonts.merriweather(
-                  fontSize: 14, // Reduced
+                'number_energy'.tr,
+                style: GoogleFonts.lora(
+                  fontSize: 14.sp, 
                   fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
             ],
@@ -439,8 +444,9 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFF1C1C1E),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -460,18 +466,19 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    " Daily Lucky Color",
-                    style: GoogleFonts.merriweather(
-                      fontSize: 14, // Reduced
+                  'daily_lucky_color_title'.tr,
+                    style: GoogleFonts.lora(
+                      fontSize: 14.sp, 
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF6D3A0C),
+                      color: Colors.white,
                     ),
                   ),
                   Text(
                     color,
-                    style: GoogleFonts.merriweather(
-                      fontSize: 12, // Reduced
+                    style: GoogleFonts.poppins(
+                      fontSize: 12.sp, 
                       fontWeight: FontWeight.bold,
+                      color: AppTheme.primaryGold,
                     ),
                   ),
                 ],
@@ -504,7 +511,7 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
             children: [
               Expanded(
                 child: _buildGridItem(
-                  "Name Number",
+                  'name_number_label'.tr,
                   "${table.nameNumber}",
                   badge: true,
                 ),
@@ -512,7 +519,7 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
               const SizedBox(width: 12),
               Expanded(
                 child: _buildGridItem(
-                  "Radical Number",
+                  'radical_number'.tr,
                   "${table.radicalNumber}",
                   badge: true,
                 ),
@@ -524,7 +531,7 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
             children: [
               Expanded(
                 child: _buildGridItem(
-                  "Friendly Number",
+                  'friendly_number_label'.tr,
                   table.friendlyNum ?? "-",
                   greenBg: true,
                 ),
@@ -532,7 +539,7 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
               const SizedBox(width: 12),
               Expanded(
                 child: _buildGridItem(
-                  "Neutral Number",
+                  'neutral_number_label'.tr,
                   table.neutralNum ?? "-",
                   blueBg: true,
                 ),
@@ -546,7 +553,7 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
             children: [
               Expanded(
                 child: _buildGridItem(
-                  "Evil Number",
+                  'evil_number_label'.tr,
                   table.evilNum ?? "-",
                   redBg: true,
                 ),
@@ -554,7 +561,7 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
               const SizedBox(width: 12),
               Expanded(
                 child: _buildGridItemWithColorIcon(
-                  "Favorable Color",
+                  'fav_color_label'.tr,
                   table.favColor ?? "-",
                   Colors.yellow,
                 ),
@@ -566,11 +573,11 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
           Row(
             children: [
               Expanded(
-                child: _buildGridItem("Favorable God", table.favGod ?? "-"),
+                child: _buildGridItem('fav_god_label'.tr, table.favGod ?? "-"),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _buildGridItem("Favorable Day", table.favDay ?? "-"),
+                child: _buildGridItem('fav_day_label'.tr, table.favDay ?? "-"),
               ),
             ],
           ),
@@ -579,11 +586,11 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
           Row(
             children: [
               Expanded(
-                child: _buildGridItem("Favorable Metal", table.favMetal ?? "-"),
+                child: _buildGridItem('fav_metal_label'.tr, table.favMetal ?? "-"),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _buildGridItem("Favorable Stone", table.favStone ?? "-"),
+                child: _buildGridItem('fav_stone_label'.tr, table.favStone ?? "-"),
               ),
             ],
           ),
@@ -593,8 +600,9 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: const Color(0xFF1C1C1E),
               borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -603,19 +611,20 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Radical Ruler",
-                      style: GoogleFonts.merriweather(
-                        fontSize: 10, // Reduced
-                        color: const Color(0xFF6D3A0C),
+                      'radical_ruler_label'.tr,
+                      style: GoogleFonts.poppins(
+                        fontSize: 9.sp, 
+                        color: AppTheme.primaryGold,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       table.radicalRuler ?? "-",
-                      style: GoogleFonts.merriweather(
-                        fontSize: 16,
+                      style: GoogleFonts.lora(
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
                   ],
@@ -642,7 +651,7 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
               child: Column(
                 children: [
                   Text(
-                    "FAVORITE MANTRA",
+                    'fav_mantra_label'.tr,
                     style: GoogleFonts.merriweather(
                       color: Colors.white,
                       fontSize: 10, // Reduced
@@ -682,25 +691,17 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
     bool blueBg = false,
     bool redBg = false,
   }) {
-    Color bgColor = Colors.white;
-    if (greenBg) bgColor = const Color(0xFFE8F5E9);
-    if (blueBg) bgColor = const Color(0xFFE3F2FD);
-    if (redBg) bgColor = const Color(0xFFFFEBEE); // Light red
+    Color bgColor = const Color(0xFF1C1C1E);
+    if (greenBg) bgColor = const Color(0xFF1B2E1B);
+    if (blueBg) bgColor = const Color(0xFF1B222E);
+    if (redBg) bgColor = const Color(0xFF2E1B1B); 
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: badge
-            ? []
-            : [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.02),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -711,19 +712,19 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
           ],
           Text(
             label,
-            style: GoogleFonts.merriweather(
-              fontSize: 10, // Reduced
-              fontWeight: FontWeight.bold, // Bold label
-              color: const Color(0xFF6D3A0C),
+            style: GoogleFonts.poppins(
+              fontSize: 9.sp, 
+              fontWeight: FontWeight.bold, 
+              color: AppTheme.primaryGold.withValues(alpha: 0.8),
             ),
           ),
           const SizedBox(height: 4),
           Text(
             value,
-            style: GoogleFonts.merriweather(
-              fontSize: 14, // Reduced
+            style: GoogleFonts.lora(
+              fontSize: 14.sp, 
               fontWeight: FontWeight.w600,
-              color: Colors.black87,
+              color: Colors.white,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -737,18 +738,19 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFF1C1C1E),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             label,
-            style: GoogleFonts.merriweather(
-              fontSize: 10, // Reduced
+            style: GoogleFonts.poppins(
+              fontSize: 9.sp, 
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF6D3A0C),
+              color: AppTheme.primaryGold,
             ),
           ),
           const SizedBox(height: 8),
@@ -763,9 +765,10 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
               Expanded(
                 child: Text(
                   value,
-                  style: GoogleFonts.merriweather(
-                    fontSize: 12, // Reduced
+                  style: GoogleFonts.lora(
+                    fontSize: 12.sp, 
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -789,22 +792,22 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(
-                0xFFFFF3E0,
-              ), // Page background alike but slightly darker or lighter
+              color: const Color(0xFF1C1C1E),
               borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
             ),
             child: Column(
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.auto_awesome, color: Colors.orange),
+                    const Icon(Icons.auto_awesome, color: AppTheme.primaryGold),
                     const SizedBox(width: 8),
                     Text(
-                      "Daily Predication",
-                      style: GoogleFonts.merriweather(
-                        fontSize: 16,
+                      'daily_prediction_title'.tr,
+                      style: GoogleFonts.lora(
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
                   ],
@@ -813,11 +816,11 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
                 Text(
                   "\"${daily.prediction}\"",
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.lora(
-                    fontSize: 12, // Reduced
+                  style: GoogleFonts.poppins(
+                    fontSize: 11.sp, 
                     fontStyle: FontStyle.italic,
-                    color: Colors.grey[700],
-                    height: 1.5,
+                    color: Colors.white.withValues(alpha: 0.7),
+                    height: 1.6,
                   ),
                 ),
               ],
@@ -827,16 +830,16 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
           // Lucky Items
           _buildLuckyItemCard(
             Icons.palette,
-            "Daily Lucky Color",
+            'daily_lucky_color_title'.tr,
             daily.luckyColor ?? "-",
-            const Color(0xFFE8F5E9),
+            const Color(0xFF1C1C1E),
           ),
           const SizedBox(height: 16),
           _buildLuckyItemCard(
             Icons.tag,
-            "Daily Lucky Number",
+            'daily_lucky_number_title'.tr,
             daily.luckyNumber ?? "-",
-            Colors.white,
+            const Color(0xFF1C1C1E),
           ),
           const SizedBox(height: 20),
         ],
@@ -855,14 +858,7 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          if (bgColor == Colors.white)
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-        ],
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Row(
         children: [
@@ -885,17 +881,18 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
             children: [
               Text(
                 title,
-                style: GoogleFonts.merriweather(
-                  fontSize: 14,
+                style: GoogleFonts.poppins(
+                  fontSize: 10.sp,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF6D3A0C),
+                  color: AppTheme.primaryGold,
                 ),
               ),
               Text(
                 value,
-                style: GoogleFonts.merriweather(
-                  fontSize: 16,
+                style: GoogleFonts.lora(
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
             ],

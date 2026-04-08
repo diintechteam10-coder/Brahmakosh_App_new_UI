@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
@@ -56,21 +57,32 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
   bool showPlayUI = false;
   bool _isStarted = false;
   bool _isPlaying = false;
+  bool _audioStartedPlaying = false;
+  bool _isManualExit = false;
+  bool _isDisposed = false;
 
   late AnimationController _timerController;
 
   int _totalDuration = 60; // Default, will be updated from arguments
+  bool _isFetchingDuration = false;
+  bool _isDurationChoiceManual = false;
   SpiritualConfiguration? _config;
 
-  // 🔹 Audio Player
-  final AudioPlayer _audioPlayer = AudioPlayer();
+  // 🔹 Audio Player (Switched to just_audio for superior buffering/preloading)
+  late AudioPlayer _audioPlayer;
   String? _currentAudioUrl;
-  String? _currentVideoUrl; // Added to store video URL from API
+  String? _currentVideoUrl; 
   bool _isAudioInitialized = false;
+  bool _isAudioReady = false; // Flag for buffering completion
 
   // 🔹 Video Player
   late VideoPlayerController _videoController;
   bool _isVideoInitialized = false;
+
+  // 🔹 Media readiness: only audio gates interaction.
+  // Video is decorative background — loads in parallel, never blocks.
+  bool get _isMediaReady => _isAudioReady;
+
 
   /*
   bool _showSongSelection = false;
@@ -94,10 +106,16 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
       if (args['duration'] != null) {
         // duration passed in minutes, convert to seconds
         _totalDuration = (args['duration'] as num).toInt() * 60;
+        _isDurationChoiceManual = true;
       }
       if (args['config'] != null) {
         _config = args['config'] as SpiritualConfiguration?;
       }
+    }
+
+    final isPrayer = (_config?.type == 'prayer') || (_config?.prayerType != null);
+    if (isPrayer && !_isDurationChoiceManual) {
+      _isFetchingDuration = true;
     }
 
     _parseMediaUrls(); // Parse URLs early
@@ -175,9 +193,79 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
       }
     });
 
-    _initVideo();
-    _initAudio(); // Start initializing and buffering audio early
+    _initMedia(); // Unified preloading
   }
+
+  Future<void> _initMedia() async {
+    _audioPlayer = AudioPlayer();
+
+    // 1. Audio Readiness Listener
+    _audioPlayer.playerStateStream.listen((state) {
+      if (_isDisposed || !mounted) return;
+      if (state.processingState == ProcessingState.ready && !_isAudioReady) {
+        debugPrint("✅ Audio Ready (Buffered)");
+        setState(() => _isAudioReady = true);
+        // 🔹 Start decorations as soon as audio is ready (don't wait for video)
+        _startFlowDecorations();
+        if (_config?.type == 'prayer' || _config?.prayerType != null) {
+          _checkAndStartPrayer();
+        }
+      }
+    });
+
+    // 2. Sync with Real Audio Duration
+    _audioPlayer.durationStream.listen((duration) {
+      if (_isDisposed || !mounted) return;
+      final isPrayer = (_config?.type == 'prayer') || (_config?.prayerType != null);
+      if (duration != null && duration.inSeconds > 0 && (isPrayer || !_isDurationChoiceManual)) {
+        debugPrint("⏱️ Real Audio Duration Received: ${duration.inSeconds}s");
+        setState(() {
+          _isFetchingDuration = false;
+          _totalDuration = duration.inSeconds;
+          _timerController.duration = duration;
+        });
+      }
+    });
+
+    // 3. Track when audio actually starts playing
+    _audioPlayer.positionStream.listen((position) {
+      if (_isDisposed || !mounted) return;
+      if (position.inMilliseconds > 0 && !_audioStartedPlaying) {
+        debugPrint("🎵 Audio Started Playing: ${position.inMilliseconds}ms");
+        setState(() => _audioStartedPlaying = true);
+
+        final isPrayer = (_config?.type == 'prayer') || (_config?.prayerType != null);
+        if (isPrayer && _isStarted && _isPlaying && !_timerController.isAnimating) {
+          _timerController.forward();
+        }
+      }
+    });
+
+    // 🔹 Run AudioSession config, video init, and audio init ALL in parallel
+    // Previously AudioSession.configure() was awaited sequentially before init
+    await Future.wait([
+      _configureAudioSession(),
+      Future.microtask(() => _initVideo()),
+      _initAudio(),
+    ], eagerError: false);
+  }
+
+  Future<void> _configureAudioSession() async {
+    try {
+      final session = await AudioSession.instance;
+      await session.configure(const AudioSessionConfiguration.music());
+    } catch (e) {
+      debugPrint("⚠️ AudioSession config error (non-fatal): $e");
+    }
+  }
+
+  void _checkAndStartPrayer() {
+    if (_isMediaReady && _isStarted && _isPlaying) {
+      // If user tapped Begin or it's auto-start prayer
+      _audioPlayer.play();
+    }
+  }
+
 
   void _parseMediaUrls() {
     final args = Get.arguments;
@@ -258,133 +346,101 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
     _currentAudioUrl = sourceUrl;
   }
 
-  bool _isTransitionPlayed = false;
+
 
   void _initVideo() {
-    _videoController =
-        VideoPlayerController.asset(
-            'assets/images/Transition.mp4',
-            videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
-          )
-          ..initialize().then((_) {
-            setState(() {
-              _isVideoInitialized = true;
-            });
-            _videoController.setLooping(false);
-            _videoController.setVolume(0);
-            _videoController.play();
+    // Use network video if provided by API, otherwise fallback to default asset
+    if (_currentVideoUrl != null && _currentVideoUrl!.startsWith('http')) {
+      debugPrint("📹 Using network video for background: $_currentVideoUrl");
+      _videoController = VideoPlayerController.networkUrl(
+        Uri.parse(_currentVideoUrl!),
+        videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+      );
+    } else {
+      debugPrint("📹 Using default asset video for background");
+      _videoController = VideoPlayerController.asset(
+        'assets/images/Meditation_video.mp4',
+        videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+      );
+    }
 
-            _videoController.addListener(() {
-              if (_videoController.value.position >=
-                      _videoController.value.duration &&
-                  !_isTransitionPlayed) {
-                _isTransitionPlayed = true;
-                _switchToMainVideo();
-              }
-            });
-          });
-  }
-
-  void _switchToMainVideo() {
-    // Prevent multiple calls
-    _videoController.dispose();
-    setState(() {
-      _isVideoInitialized = false;
+    _videoController.initialize().then((_) {
+      if (_isDisposed || !mounted) return;
+      _videoController.setLooping(true);
+      _videoController.setVolume(0);
+      setState(() {
+        _isVideoInitialized = true;
+      });
+      _videoController.play();
+      // Flow decorations may already be started by audio ready callback
+      if (!showPlayImage) _startFlowDecorations();
+    }).catchError((error) {
+      debugPrint("❌ Error initializing main video: $error");
+      if (_currentVideoUrl != null && _currentVideoUrl!.startsWith('http')) {
+        _currentVideoUrl = null;
+        _initVideo();
+      }
     });
-
-    // ALWAYS use default video as per user request
-    _videoController =
-        VideoPlayerController.asset(
-            'assets/images/Meditation_video.mp4',
-            videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
-          )
-          ..initialize().then((_) {
-            _videoController.setLooping(true);
-            _videoController.setVolume(0);
-            setState(() {
-              _isVideoInitialized = true;
-            });
-            _videoController.play();
-
-            // Start the actual meditation flow (animations, audio) only after transition
-            _startFlow();
-          });
   }
+
 
   // ... _triggerSaveSession ...
 
   // ... _showCompletionDialog ...
 
-  void _startFlow() async {
-    final isPrayer = _config?.prayerType != null;
-
+  void _startFlowDecorations() {
+    if (_isDisposed || !mounted) return;
+    setState(() => showPlayImage = true);
+    _entryController.forward();
+    
+    final isPrayer = _config?.type == 'prayer' || _config?.prayerType != null;
     if (isPrayer) {
-      // Direct play for Prayer
+      // For Prayer, we "Start" the session logical state but wait for buffering
       setState(() {
-        showPlayImage = true;
         _isStarted = true;
         _isPlaying = true;
       });
-      _entryController.forward();
-
-      // Auto-start controllers
-      _timerController.forward();
       _breathingController.repeat(reverse: true);
       _rippleController.repeat();
-
-      await _initAudio();
-      try {
-        await _audioPlayer.resume();
-      } catch (e) {
-        print("Error resuming audio on auto-start: $e");
+      
+      if (_isMediaReady) {
+        _audioPlayer.play();
       }
-    } else {
-      _entryController.forward();
-      setState(() => showPlayImage = true);
-      // No longer need to call _initAudio here as it was started in initState
     }
   }
+
 
   Future<void> _initAudio() async {
     try {
       String sourceUrl = _currentAudioUrl ?? 'images/Default_music.mpeg';
       bool isNetwork = sourceUrl.toLowerCase().startsWith('http');
-      bool isAsset =
-          sourceUrl.toLowerCase().startsWith('assets/') ||
-          sourceUrl.toLowerCase().startsWith('images/');
-
-      await _audioPlayer.setReleaseMode(ReleaseMode.loop);
-
-      debugPrint(
-        "🎵 Audio Init: URL=$sourceUrl, Network=$isNetwork, Asset=$isAsset",
-      );
+      
+      debugPrint("🎵 Preloading Audio: $sourceUrl");
 
       if (isNetwork) {
-        await _audioPlayer.setSourceUrl(sourceUrl);
-      } else if (isAsset) {
-        // If it starts with assets/, remove it because AssetSource assumes it
-        String assetPath = sourceUrl;
-        if (assetPath.startsWith('assets/')) {
-          assetPath = assetPath.replaceFirst('assets/', '');
-        }
-        await _audioPlayer.setSource(AssetSource(assetPath));
+        await _audioPlayer.setAudioSource(
+          AudioSource.uri(Uri.parse(sourceUrl)),
+          preload: true,
+        );
       } else {
-        // Final Fallback if URL is invalid or unknown
-        debugPrint("🔊 Unknown audio source, falling back to default asset.");
-        await _audioPlayer.setSource(AssetSource('images/Default_music.mpeg'));
+        // Just_audio uses AssetSource differently, similar to audioplayers but needs full path usually
+        String assetPath = sourceUrl;
+        if (!assetPath.startsWith('assets/')) {
+          assetPath = 'assets/$assetPath';
+        }
+        await _audioPlayer.setAudioSource(
+          AudioSource.asset(assetPath),
+          preload: true,
+        );
       }
 
       _isAudioInitialized = true;
-      debugPrint("✅ Audio Initialized Successfully");
-
-      // Fix: Ensure video continues playing if it was impacted by audio init
-      if (_isVideoInitialized && !_videoController.value.isPlaying) {
-        _videoController.play();
-      }
+      debugPrint("✅ Audio Preloaded");
     } catch (e) {
-      debugPrint("❌ Error initializing audio: $e");
+      debugPrint("❌ Error preloading audio: $e");
     }
   }
+
 
   void _triggerSaveSession({
     String status = "completed",
@@ -570,79 +626,64 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
 
   @override
   void dispose() {
+    _isDisposed = true;
     _entryController.dispose();
     _breathingController.dispose();
     _haloController.dispose();
     _rippleController.dispose();
     _timerController.dispose();
-    _audioPlayer.dispose();
     if (_isVideoInitialized) {
       _videoController.dispose();
     }
+    _audioPlayer.dispose();
     super.dispose();
   }
 
-  Future<void> _toggleMeditation() async {
+
+  void _toggleMeditation() {
+    final isPrayer = (_config?.type == 'prayer') || (_config?.prayerType != null);
+    
+    // Near-instant interaction: No awaits here!
     if (!_isStarted) {
       setState(() {
         _isStarted = true;
         _isPlaying = true;
       });
-      _timerController.forward();
+      
+      if (!isPrayer || _audioStartedPlaying) {
+        _timerController.forward();
+      }
       _breathingController.repeat(reverse: true);
       _rippleController.repeat();
 
-      // NEW: If not initialized yet, wait for it
-      if (!_isAudioInitialized) {
-        debugPrint("⏳ Audio not ready, waiting for initialization...");
-        await _initAudio();
+      if (_isAudioReady) {
+        _audioPlayer.play();
+      } else {
+        debugPrint("⏳ Still buffering audio, will play once ready...");
       }
-
-      if (_isAudioInitialized) {
-        try {
-          await _audioPlayer.resume();
-        } catch (e) {
-          debugPrint("Error resuming audio: $e");
-        }
-      }
-      // Ensure video plays
+      
       if (_isVideoInitialized && !_videoController.value.isPlaying) {
         _videoController.play();
       }
     } else if (_isPlaying) {
-      setState(() {
-        _isPlaying = false;
-      });
+      setState(() => _isPlaying = false);
       _timerController.stop();
       _breathingController.stop();
       _rippleController.stop();
-      if (_isAudioInitialized) {
-        try {
-          await _audioPlayer.pause();
-        } catch (e) {
-          print("Error pausing audio: $e");
-        }
-      }
-      // Pause video if user pauses meditation
+      _audioPlayer.pause();
       if (_isVideoInitialized) _videoController.pause();
     } else {
-      setState(() {
-        _isPlaying = true;
-      });
-      _timerController.forward();
+      setState(() => _isPlaying = true);
+      if (!isPrayer || _audioStartedPlaying) {
+        _timerController.forward();
+      }
       _breathingController.repeat(reverse: true);
       _rippleController.repeat();
-      if (_isAudioInitialized) {
-        try {
-          // Explicit resume - player should maintain position
-          await _audioPlayer.resume();
-        } catch (e) {
-          print("Error resuming audio (2): $e");
-        }
-      }
+      _audioPlayer.play();
       if (_isVideoInitialized) _videoController.play();
     }
   }
+
 
   void _handleBackNavigation() {
     bool wasPlaying = _isPlaying;
@@ -841,7 +882,7 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
     );
   }
 
-  bool _isManualExit = false;
+
 
   @override
   Widget build(BuildContext context) {
@@ -948,8 +989,7 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
                   ),
                   */
                   const SizedBox(), // Spacer placeholder if needed or just empty
-                  if (_isTransitionPlayed)
-                    _CloseButton(onPressed: _handleBackNavigation),
+                  _CloseButton(onPressed: _handleBackNavigation),
                 ],
               ),
             ),
@@ -1001,7 +1041,11 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
                               animation.addStatusListener((status) {
                                 if (status == AnimationStatus.completed &&
                                     !showPlayUI) {
-                                  setState(() => showPlayUI = true);
+                                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                                    if (mounted && !_isDisposed) {
+                                      setState(() => showPlayUI = true);
+                                    }
+                                  });
                                 }
                               });
                               return ScaleTransition(
@@ -1031,19 +1075,51 @@ class _MeditationPlaybackViewState extends State<MeditationPlaybackView>
                       ),
                     ),
                   ),
-                ],
-              ),
-            ),
+ 
+                   /// 4. PRELOADING OVERLAY (Glassmorphism)
+                   if (!_isMediaReady)
+                     Positioned.fill(
+                       child: Container(
+                         color: Colors.black.withOpacity(0.4),
+                         child: Center(
+                           child: Column(
+                             mainAxisSize: MainAxisSize.min,
+                             children: [
+                               const CircularProgressIndicator(
+                                 color: Color(0xFFFFD700),
+                                 strokeWidth: 2,
+                               ),
+                               const SizedBox(height: 20),
+                               Text(
+                                 "PREPARING DIVINE SOUNDS...",
+                                 style: GoogleFonts.poppins(
+                                   color: Colors.white,
+                                   fontSize: 10.sp,
+                                   letterSpacing: 2,
+                                   fontWeight: FontWeight.w300,
+                                 ),
+                               ),
+                             ],
+                           ),
+                         ),
+                       ),
+                     ),
+                 ],
+               ),
+             ),
 
             /// 🔘 ELEGANT CONTROLS
             _BottomControls(
               isVisible: showPlayUI,
               isStarted: _isStarted,
               isPlaying: _isPlaying,
+              audioStartedPlaying: _audioStartedPlaying,
               onToggle: _toggleMeditation,
               timerController: _timerController,
               totalDuration: _totalDuration,
-              isPrayer: _config?.prayerType != null,
+              isPrayer: (_config?.type == 'prayer') || (_config?.prayerType != null),
+              isFetchingDuration: _isFetchingDuration,
+              isMediaReady: _isMediaReady,
             ),
 
             /// 🎵 SONG SELECTION GRID
@@ -1385,20 +1461,27 @@ class _BottomControls extends StatelessWidget {
   final bool isVisible;
   final bool isStarted;
   final bool isPlaying;
+  final bool audioStartedPlaying;
   final VoidCallback onToggle;
   final AnimationController timerController;
   final int totalDuration;
   final bool isPrayer;
+  final bool isFetchingDuration;
 
   const _BottomControls({
     required this.isVisible,
     required this.isStarted,
     required this.isPlaying,
+    required this.audioStartedPlaying,
     required this.onToggle,
     required this.timerController,
     required this.totalDuration,
     this.isPrayer = false,
+    this.isFetchingDuration = false,
+    required this.isMediaReady, // Added
   });
+
+  final bool isMediaReady; // Added
 
   @override
   Widget build(BuildContext context) {
@@ -1414,11 +1497,17 @@ class _BottomControls extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              !isStarted
-                  ? "READY TO MEDITATE"
-                  : isPlaying
-                  ? (isPrayer ? "PRAYER IN PROGRESS" : "INHALE ... EXHALE")
-                  : "PAUSED",
+              !isMediaReady
+                  ? "PREPARING ..."
+                  : !isStarted
+                      ? (isPrayer ? "READY FOR PRAYER" : "READY TO MEDITATE")
+                      : isPlaying
+                          ? (isPrayer
+                              ? (!audioStartedPlaying
+                                  ? "GET READY FOR PRAYER"
+                                  : "PRAYER IN PROGRESS")
+                              : "INHALE ... EXHALE")
+                          : "PAUSED",
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 16,
@@ -1426,15 +1515,23 @@ class _BottomControls extends StatelessWidget {
                 letterSpacing: 4,
               ),
             ),
+
             const SizedBox(height: 35),
             GestureDetector(
-              onTap: onToggle,
-              child: _PlayButton(isPlaying: isPlaying, isStarted: isStarted),
+              onTap: isMediaReady ? onToggle : null,
+              child: _PlayButton(
+                isPlaying: isPlaying,
+                isStarted: isStarted,
+                isReady: isMediaReady,
+              ),
             ),
             const SizedBox(height: 45),
             _ZenTimer(
               timerController: timerController,
               totalDuration: totalDuration,
+              isFetchingDuration: isFetchingDuration,
+              audioStartedPlaying: audioStartedPlaying,
+              isPrayer: isPrayer,
             ),
           ],
         ),
@@ -1446,7 +1543,13 @@ class _BottomControls extends StatelessWidget {
 class _PlayButton extends StatelessWidget {
   final bool isPlaying;
   final bool isStarted;
-  const _PlayButton({required this.isPlaying, required this.isStarted});
+  final bool isReady;
+  const _PlayButton({
+    required this.isPlaying,
+    required this.isStarted,
+    required this.isReady,
+  });
+
 
   @override
   Widget build(BuildContext context) {
@@ -1462,29 +1565,51 @@ class _PlayButton extends StatelessWidget {
           ],
         ),
         border: Border.all(color: Colors.white24, width: 1.5),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black54,
             blurRadius: 20,
-            offset: const Offset(0, 10),
+            offset: Offset(0, 10),
           ),
         ],
       ),
-      child: Icon(
-        !isStarted || !isPlaying
-            ? Icons.play_arrow_rounded
-            : Icons.pause_rounded,
-        color: Colors.white,
-        size: 45,
-      ),
+      child: !isReady
+          ? const Center(
+              child: SizedBox(
+                width: 30,
+                height: 30,
+                child: CircularProgressIndicator(
+                  color: Colors.white70,
+                  strokeWidth: 2,
+                ),
+              ),
+            )
+          : Icon(
+              !isStarted || !isPlaying
+                  ? Icons.play_arrow_rounded
+                  : Icons.pause_rounded,
+              color: Colors.white,
+              size: 45,
+            ),
     );
   }
 }
 
+
 class _ZenTimer extends StatelessWidget {
   final AnimationController timerController;
   final int totalDuration;
-  const _ZenTimer({required this.timerController, required this.totalDuration});
+  final bool isFetchingDuration;
+  final bool audioStartedPlaying;
+  final bool isPrayer;
+
+  const _ZenTimer({
+    required this.timerController,
+    required this.totalDuration,
+    this.isFetchingDuration = false,
+    this.audioStartedPlaying = true,
+    this.isPrayer = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1495,15 +1620,17 @@ class _ZenTimer extends StatelessWidget {
             totalDuration - (timerController.value * totalDuration).round();
         String time =
             "${(rem ~/ 60).toString().padLeft(2, '0')}:${(rem % 60).toString().padLeft(2, '0')}";
+        bool showLoading = isFetchingDuration || (isPrayer && !audioStartedPlaying);
         return Column(
           children: [
             Text(
-              time,
-              style: const TextStyle(
+              showLoading ? "Loading Divine Sounds..." : time,
+              textAlign: TextAlign.center,
+              style: TextStyle(
                 color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.w200,
-                letterSpacing: 6,
+                fontSize: showLoading ? 16 : 24,
+                fontWeight: showLoading ? FontWeight.w400 : FontWeight.w200,
+                letterSpacing: showLoading ? 2 : 6,
               ),
             ),
             const SizedBox(height: 20),

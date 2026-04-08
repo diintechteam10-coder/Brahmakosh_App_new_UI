@@ -1,11 +1,8 @@
 import 'package:brahmakosh/features/check_in/controllers/silence_configuration_controller.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_configuration_model.dart';
 import 'package:brahmakosh/features/check_in/repositories/spiritual_repository.dart';
-import 'package:brahmakosh/core/constants/app_constants.dart';
 import 'package:brahmakosh/common/utils.dart';
 import 'package:brahmakosh/core/common_imports.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'dart:ui' show ImageFilter;
 
 class SilenceSelectionViewV2 extends StatefulWidget {
   final String silenceCategoryId;

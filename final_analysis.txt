@@ -1,0 +1,158 @@
+﻿Analyzing check_in...                                           
+
+   info - The imported package 'bloc' isn't a dependency of the importing package - lib\features\check_in\blocs\chanting\chanting_bloc.dart:2:8 - depend_on_referenced_packages
+   info - The imported package 'collection' isn't a dependency of the importing package - lib\features\check_in\blocs\chanting\chanting_bloc.dart:7:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\chanting\chanting_bloc.dart:57:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\chanting\chanting_bloc.dart:231:11 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\chanting\chanting_bloc.dart:257:9 - avoid_print
+   info - The imported package 'bloc' isn't a dependency of the importing package - lib\features\check_in\blocs\check_in\check_in_bloc.dart:2:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\check_in\check_in_bloc.dart:163:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\check_in\check_in_bloc.dart:169:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\check_in\check_in_bloc.dart:185:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\check_in\check_in_bloc.dart:190:7 - avoid_print
+   info - The imported package 'bloc' isn't a dependency of the importing package - lib\features\check_in\blocs\meditation_session\meditation_session_bloc.dart:1:8 - depend_on_referenced_packages
+   info - The imported package 'bloc' isn't a dependency of the importing package - lib\features\check_in\blocs\prayer\prayer_bloc.dart:2:8 - depend_on_referenced_packages
+   info - The imported package 'collection' isn't a dependency of the importing package - lib\features\check_in\blocs\prayer\prayer_bloc.dart:7:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\prayer\prayer_bloc.dart:56:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\prayer\prayer_bloc.dart:70:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\prayer\prayer_bloc.dart:71:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\prayer\prayer_bloc.dart:72:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\prayer\prayer_bloc.dart:73:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\prayer\prayer_bloc.dart:80:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\prayer\prayer_bloc.dart:82:11 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\prayer\prayer_bloc.dart:84:13 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\prayer\prayer_bloc.dart:88:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\prayer\prayer_bloc.dart:116:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\prayer\prayer_bloc.dart:234:9 - avoid_print
+   info - The imported package 'bloc' isn't a dependency of the importing package - lib\features\check_in\blocs\spiritual_config\spiritual_config_bloc.dart:1:8 - depend_on_referenced_packages
+   info - The imported package 'collection' isn't a dependency of the importing package - lib\features\check_in\blocs\spiritual_config\spiritual_config_bloc.dart:7:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\spiritual_config\spiritual_config_bloc.dart:72:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\spiritual_config\spiritual_config_bloc.dart:73:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\spiritual_config\spiritual_config_bloc.dart:74:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\spiritual_config\spiritual_config_bloc.dart:75:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\spiritual_config\spiritual_config_bloc.dart:82:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\spiritual_config\spiritual_config_bloc.dart:84:11 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\spiritual_config\spiritual_config_bloc.dart:86:13 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\spiritual_config\spiritual_config_bloc.dart:90:7 - avoid_print
+warning - The value of the local variable 'startingState' isn't used - lib\features\check_in\blocs\spiritual_config\spiritual_config_bloc.dart:238:11 - unused_local_variable
+   info - Don't invoke 'print' in production code - lib\features\check_in\blocs\spiritual_config\spiritual_config_bloc.dart:293:7 - avoid_print
+   info - The imported package 'bloc' isn't a dependency of the importing package - lib\features\check_in\blocs\spiritual_stats\spiritual_stats_bloc.dart:2:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - lib\features\check_in\controllers\chanting_configuration_controller.dart:67:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\controllers\chanting_configuration_controller.dart:86:11 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\controllers\chanting_configuration_controller.dart:120:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\controllers\chanting_configuration_controller.dart:156:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\controllers\chanting_configuration_controller.dart:229:9 - avoid_print
+warning - The value of the local variable 'response' isn't used - lib\features\check_in\repositories\spiritual_repository.dart:25:31 - unused_local_variable
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:94:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:95:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:99:11 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:113:11 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:114:11 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:115:11 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:116:11 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:117:11 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:119:11 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:123:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:143:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:145:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:158:11 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:161:11 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:164:11 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:168:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:173:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:177:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:201:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:221:11 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:316:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:353:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:362:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:374:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\repositories\spiritual_repository.dart:406:7 - avoid_print
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\chanting_selection_view_v2.dart:21:34 - deprecated_member_use
+warning - The declaration '_getEmoji' isn't referenced - lib\features\check_in\views\chanting_selection_view_v2.dart:45:10 - unused_element
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\chanting_selection_view_v2.dart:162:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\chanting_selection_view_v2.dart:232:23 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\chanting_selection_view_v2.dart:233:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\chanting_selection_view_v2.dart:251:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\chanting_selection_view_v2.dart:282:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\chanting_selection_view_v2.dart:350:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\chanting_selection_view_v2.dart:354:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\chanting_selection_view_v2.dart:380:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\chanting_selection_view_v2.dart:467:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\chanting_selection_view_v2.dart:469:65 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\chanting_selection_view_v2.dart:603:30 - deprecated_member_use
+   info - 'Share' is deprecated and shouldn't be used. Use SharePlus instead - lib\features\check_in\views\check_in_view.dart:685:5 - deprecated_member_use
+   info - 'share' is deprecated and shouldn't be used. Use SharePlus.instance.share() instead - lib\features\check_in\views\check_in_view.dart:685:11 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\check_in_view.dart:1090:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_selection_view_v2.dart:66:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_selection_view_v2.dart:161:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_selection_view_v2.dart:241:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_selection_view_v2.dart:284:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_selection_view_v2.dart:285:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_selection_view_v2.dart:297:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_selection_view_v2.dart:347:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_selection_view_v2.dart:429:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_selection_view_v2.dart:433:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_selection_view_v2.dart:459:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_selection_view_v2.dart:475:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_selection_view_v2.dart:527:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_selection_view_v2.dart:532:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_selection_view_v2.dart:599:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_selection_view_v2.dart:647:46 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_selection_view_v2.dart:688:46 - deprecated_member_use
+   info - Don't invoke 'print' in production code - lib\features\check_in\views\meditation_start.dart:165:13 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\views\meditation_start.dart:254:11 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\views\meditation_start.dart:366:9 - avoid_print
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_start.dart:487:63 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_start.dart:490:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_start.dart:502:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_start.dart:527:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_start.dart:537:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_start.dart:539:69 - deprecated_member_use
+   info - Don't invoke 'print' in production code - lib\features\check_in\views\meditation_start.dart:650:11 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\check_in\views\meditation_start.dart:667:11 - avoid_print
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_start.dart:768:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_start.dart:778:57 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_start.dart:815:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_start.dart:1000:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_start.dart:1001:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_start.dart:1260:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_start.dart:1307:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_start.dart:1308:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_start.dart:1339:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_start.dart:1376:36 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_start.dart:1487:26 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\meditation_start.dart:1488:26 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:88:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:185:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:275:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:320:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:321:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:333:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:389:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:477:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:481:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:508:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:635:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:684:22 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:686:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\silence_selection_view_v2.dart:71:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\silence_selection_view_v2.dart:168:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\silence_selection_view_v2.dart:252:46 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\silence_selection_view_v2.dart:254:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\silence_selection_view_v2.dart:293:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\silence_selection_view_v2.dart:313:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\silence_selection_view_v2.dart:356:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\silence_selection_view_v2.dart:357:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\silence_selection_view_v2.dart:369:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\silence_selection_view_v2.dart:417:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\silence_selection_view_v2.dart:501:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\silence_selection_view_v2.dart:505:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\silence_selection_view_v2.dart:532:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\silence_selection_view_v2.dart:551:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\silence_selection_view_v2.dart:608:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\silence_selection_view_v2.dart:613:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\silence_selection_view_v2.dart:687:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\silence_selection_view_v2.dart:741:46 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\silence_selection_view_v2.dart:781:43 - deprecated_member_use
+

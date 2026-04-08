@@ -13,7 +13,7 @@ import 'voice_call_view.dart'; // Added VoiceCallView import
 import 'package:brahmakosh/core/services/storage_service.dart';
 import 'package:brahmakosh/features/dashboard/viewmodels/dashboard_viewmodel.dart';
 import '../../../../common/widgets/custom_profile_avatar.dart';
-import '../../../../core/localization/translate_helper.dart';
+
 import '../../../core/utils/app_snackbar.dart';
 
 class AstrologyExpertsView extends StatelessWidget {
@@ -95,18 +95,15 @@ class AstrologyExpertsView extends StatelessWidget {
                 border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
               ),
               child: Obx(() {
-                final allCategories = [
-                  {'name': 'all'.tr, '_id': 'all'},
-                  ...controller.categories,
-                ];
+                final categories = controller.categories;
                 final selectedId = controller.selectedCategoryId;
                 return ListView.builder(
                   controller: controller.categoryScrollController,
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 4),
-                  itemCount: allCategories.length,
+                  itemCount: categories.length,
                   itemBuilder: (context, index) {
-                    final cat = allCategories[index];
+                    final cat = categories[index];
                     final id = cat['_id'];
                     final name = cat['name'];
                     final translatedCategoryName =

@@ -183,7 +183,7 @@ class CheckInBloc extends Bloc<CheckInEvent, CheckInState> {
       } else {
         // API Failed
         print("❌ DEBUG_BLOC: API Response failure or success=false");
-        emit(CheckInError("Unable to fetch data."));
+        emit(const CheckInError("Unable to fetch data."));
         emit(currentState); // Revert to loaded
       }
     } catch (e) {

@@ -8,6 +8,7 @@ import 'package:brahmakosh/features/home/models/dosha_dasha_model.dart';
 import 'package:brahmakosh/features/home/models/remedies_model.dart';
 import 'package:brahmakosh/core/services/storage_service.dart';
 import 'package:brahmakosh/core/constants/app_constants.dart';
+import 'package:brahmakosh/features/home/models/horoscope_model.dart';
 import 'package:get/get.dart';
 
 import 'package:brahmakosh/common/models/user_complete_details_model.dart';
@@ -19,6 +20,12 @@ class HomeController extends GetxController {
   final RxList<Sponsor> sponsors = <Sponsor>[].obs;
   final _userCompleteDetails = Rxn<UserCompleteDetailsModel>();
   final _isUserDetailsLoading = false.obs;
+  
+  // Horoscope Data
+  final _dailyHoroscopeData = Rxn<DailyHoroscope>();
+  final _monthlyHoroscopeData = Rxn<MonthlyHoroscope>();
+  final _isHoroscopeLoading = false.obs;
+  final _selectedDailyCategory = "personal_life".obs;
 
   // Panchang Data
   final _panchangData = Rxn<PanchangData>();
@@ -35,6 +42,16 @@ class HomeController extends GetxController {
 
   PanchangData? get panchangData => _panchangData.value;
   bool get isPanchangLoading => _isPanchangLoading.value;
+
+  // Horoscope Getters
+  DailyHoroscope? get dailyHoroscope => _dailyHoroscopeData.value;
+  MonthlyHoroscope? get monthlyHoroscope => _monthlyHoroscopeData.value;
+  bool get isHoroscopeLoading => _isHoroscopeLoading.value;
+  String get selectedDailyCategory => _selectedDailyCategory.value;
+
+  void setDailyCategory(String category) {
+    _selectedDailyCategory.value = category;
+  }
 
   // Dosha Dasha Data
   final _doshaDashaData = Rxn<DoshaDashaModel>();
@@ -118,11 +135,61 @@ class HomeController extends GetxController {
       fetchFounderMessages(null),
       fetchSponsors(null),
       fetchUserCompleteDetails(null),
-      fetchSponsors(null),
-      fetchUserCompleteDetails(null),
       fetchDoshaDasha(null),
       fetchRemedies(null),
     ]);
+
+    // Fetch horoscope using user's sign
+    await fetchHoroscope(null);
+  }
+
+  String get userSign {
+    final sign = userCompleteDetails?.data?.astrology?.astroDetails?.sign;
+    if (sign == null || sign.isEmpty) return 'aries';
+    return sign.toLowerCase().trim();
+  }
+
+  Future<void> fetchHoroscope(String? sign) async {
+    _isHoroscopeLoading.value = true;
+    try {
+      final userId = StorageService.getString(AppConstants.keyUserId) ?? "";
+      if (userId.isEmpty) {
+        _isHoroscopeLoading.value = false;
+        return;
+      }
+
+      final targetSign = sign ?? userSign;
+      debugPrint("FETCHING HOROSCOPE FOR SIGN: $targetSign");
+
+      final responses = await Future.wait([
+        getDailyHoroscope(userId, targetSign),
+        getMonthlyHoroscope(userId, targetSign),
+      ]);
+
+      if (responses[0] != null && responses[0]!['success'] == true) {
+        String str = jsonEncode(responses[0]!['data']);
+        debugPrint("========== API RAW DAILY HOROSCOPE ==========");
+        for (int i = 0; i < str.length; i += 800) {
+          debugPrint(str.substring(i, i + 800 > str.length ? str.length : i + 800));
+        }
+        debugPrint("============================================");
+        _dailyHoroscopeData.value = DailyHoroscope.fromJson(responses[0]!['data']);
+      }
+
+      if (responses[1] != null && responses[1]!['success'] == true) {
+        String str = jsonEncode(responses[1]!['data']);
+        debugPrint("========== API RAW MONTHLY HOROSCOPE ==========");
+        for (int i = 0; i < str.length; i += 800) {
+          debugPrint(str.substring(i, i + 800 > str.length ? str.length : i + 800));
+        }
+        debugPrint("============================================");
+        _monthlyHoroscopeData.value = MonthlyHoroscope.fromJson(responses[1]!['data']);
+      }
+    } catch (e) {
+      debugPrint("Error fetching horoscope: $e");
+    } finally {
+      _isHoroscopeLoading.value = false;
+    }
   }
 
   Future<void> fetchUserCompleteDetails(TickerProvider? tickerProvider) async {

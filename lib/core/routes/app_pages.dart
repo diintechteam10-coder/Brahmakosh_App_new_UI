@@ -150,10 +150,10 @@ class AppPages {
       name: AppConstants.routeMeditationStart,
       page: () => const MeditationStart(),
     ),
-    GetPage(
-      name: AppConstants.routeSpiritualConfiguration,
-      page: () => const SpiritualConfigurationView(),
-    ),
+    // GetPage(
+    //   name: AppConstants.routeSpiritualConfiguration,
+    //   page: () => const SpiritualConfigurationView(),
+    // ),
     // GetPage(
     //   name: AppConstants.routeChantingConfiguration,
     //   page: () => ChantingConfigurationView(),
