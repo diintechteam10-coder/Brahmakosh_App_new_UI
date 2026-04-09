@@ -1136,7 +1136,7 @@ class _NewHomeViewState extends State<NewHomeView> {
         delegate: SliverChildListDelegate([
           _buildGridItem(
             "book_a_puja".tr,
-            "assets/icons/check_in.png",
+            "assets/icons/puja.png",
             showComingSoon: true,
             onTap: () {
               _unfocusAll();
