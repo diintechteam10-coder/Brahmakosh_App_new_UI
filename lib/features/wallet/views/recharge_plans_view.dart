@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:brahmakosh/core/common_imports.dart';
 import 'dart:io';
 import '../../../core/services/payment_service.dart';
+import '../../../core/services/iap_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/app_snackbar.dart';
 import '../../astrology/views/credit_history_view.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 
 class RechargePlansView extends StatefulWidget {
   const RechargePlansView({super.key});
@@ -14,14 +17,43 @@ class RechargePlansView extends StatefulWidget {
 
 class _RechargePlansViewState extends State<RechargePlansView> {
   int _selectedPlanIndex = 0;
-
   bool _isLoading = true;
   List<Map<String, dynamic>> _plans = [];
+  final IAPService _iapService = IAPService();
 
   @override
   void initState() {
     super.initState();
-    _fetchPlans();
+    _initData();
+  }
+
+  Future<void> _initData() async {
+    if (Platform.isIOS) {
+      await _iapService.initialize();
+      _loadIAPPlans();
+    } else {
+      _fetchPlans();
+    }
+  }
+
+  void _loadIAPPlans() {
+    if (mounted) {
+      setState(() {
+        _plans = _iapService.products.map((ProductDetails p) {
+          // Parse credits from ID (e.g., com.brahmakosh.coins.100 -> 100)
+          final parts = p.id.split('.');
+          final credits = parts.isNotEmpty ? parts.last : "0";
+          
+          return {
+            "credits": credits,
+            "price": p.price,
+            "originalPrice": p.price,
+            "productDetails": p,
+          };
+        }).toList();
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _fetchPlans() async {
@@ -127,58 +159,6 @@ class _RechargePlansViewState extends State<RechargePlansView> {
 
   @override
   Widget build(BuildContext context) {
-    if (Platform.isIOS) {
-      return Scaffold(
-        backgroundColor: Colors.black,
-        appBar: AppBar(
-          backgroundColor: Colors.black,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
-          ),
-          title: Text(
-            "Recharge Plans",
-            style: GoogleFonts.lora(
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-              color: Colors.white,
-            ),
-          ),
-          centerTitle: false,
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.account_balance_wallet_outlined,
-                size: 80,
-                color: AppTheme.primaryGold.withOpacity(0.5),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                "Coming Soon",
-                style: GoogleFonts.lora(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "We are bringing recharge plans to iOS soon!",
-                textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  color: Colors.white54,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -217,37 +197,73 @@ class _RechargePlansViewState extends State<RechargePlansView> {
                       color: AppTheme.primaryGold,
                     ),
                   )
-                : LayoutBuilder(
-                    builder: (context, constraints) {
-                      final gridWidth = constraints.maxWidth - 40;
-                      final cardWidth = (gridWidth - 20) / 2;
-                      // Dynamically compute a ratio that fits card content
-                      final double safeRatio =
-                          (cardWidth / (constraints.maxHeight / 2.1))
-                              .clamp(0.75, 1.0);
-                      return GridView.builder(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 16,
-                        ),
-                        gridDelegate:
-                            SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 20,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: safeRatio,
-                        ),
-                        itemCount: _plans.length,
-                        itemBuilder: (context, index) {
-                          final plan = _plans[index];
-                          final isSelected = _selectedPlanIndex == index;
-                          return _buildPlanCard(plan, index, isSelected);
+                : _plans.isEmpty 
+                    ? _buildEmptyState()
+                    : LayoutBuilder(
+                        builder: (context, constraints) {
+                          final gridWidth = constraints.maxWidth - 40;
+                          final cardWidth = (gridWidth - 20) / 2;
+                          final double safeRatio =
+                              (cardWidth / (constraints.maxHeight / 2.1))
+                                  .clamp(0.75, 1.0);
+                          return GridView.builder(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 16,
+                            ),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 20,
+                              mainAxisSpacing: 16,
+                              childAspectRatio: safeRatio,
+                            ),
+                            itemCount: _plans.length,
+                            itemBuilder: (context, index) {
+                              final plan = _plans[index];
+                              final isSelected = _selectedPlanIndex == index;
+                              return _buildPlanCard(plan, index, isSelected);
+                            },
+                          );
                         },
-                      );
-                    },
-                  ),
+                      ),
           ),
-          _buildBottomBar(),
+          if (_plans.isNotEmpty) _buildBottomBar(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.account_balance_wallet_outlined,
+            size: 60.sp,
+            color: AppTheme.primaryGold.withOpacity(0.5),
+          ),
+          SizedBox(height: 2.h),
+          Text(
+            Platform.isIOS ? "No products available" : "No plans available",
+            style: GoogleFonts.lora(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          SizedBox(height: 1.h),
+          Text(
+            Platform.isIOS 
+              ? "We couldn't fetch products from the App Store."
+              : "Please check back later.",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              fontSize: 11.sp,
+              color: Colors.white54,
+            ),
+          ),
         ],
       ),
     );
@@ -337,7 +353,7 @@ class _RechargePlansViewState extends State<RechargePlansView> {
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(
-                          "₹ ${plan['price']}",
+                          Platform.isIOS ? "${plan['price']}" : "₹ ${plan['price']}",
                           style: GoogleFonts.lora(
                             fontSize: 11.sp,
                             fontWeight: FontWeight.bold,
@@ -399,20 +415,25 @@ class _RechargePlansViewState extends State<RechargePlansView> {
       ),
       child: SafeArea(
         child: InkWell(
-          onTap: () {
+          onTap: () async {
             if (_plans.isEmpty) return;
-            // final selectedPlan = _plans[_selectedPlanIndex];
-            //
-            // final success = await PaymentService.startPayment(
-            //   planAmount: selectedPlan["price"],
-            // );
-            //
-            // if (success) {
-            //   _showCreditRequestPopup();
-            // } else {
-            //   AppSnackBar.showError("Error", "Payment failed");
-            // }
-            _showCreditRequestPopup();
+            final selectedPlan = _plans[_selectedPlanIndex];
+
+            if (Platform.isIOS) {
+              final product = selectedPlan["productDetails"] as ProductDetails;
+              await _iapService.buyProduct(product);
+            } else {
+              // Existing Stripe payment logic
+              final success = await PaymentService.startPayment(
+                planAmount: int.tryParse(selectedPlan["price"].toString()),
+              );
+
+              if (success) {
+                _showCreditRequestPopup();
+              } else {
+                AppSnackBar.showError("Error", "Payment failed");
+              }
+            }
           },
           borderRadius: BorderRadius.circular(16),
           child: Container(
@@ -437,7 +458,7 @@ class _RechargePlansViewState extends State<RechargePlansView> {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  "Proceed to Payment",
+                  Platform.isIOS ? "Buy with Apple Pay" : "Proceed to Payment",
                   style: GoogleFonts.lora(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

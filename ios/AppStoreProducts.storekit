@@ -1,0 +1,93 @@
+{
+  "identifier" : "BrahmakoshProducts",
+  "non_renewing_subscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "99",
+      "familyShareable" : false,
+      "internalID" : "1",
+      "localizations" : [
+        {
+          "description" : "100 Brahmakosh Coins",
+          "displayName" : "Brahmakosh Coins 100",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.brahmakosh.coins.100",
+      "referenceName" : "Brahmakosh Coins 100",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "999",
+      "familyShareable" : false,
+      "internalID" : "2",
+      "localizations" : [
+        {
+          "description" : "1000 Brahmakosh Coins",
+          "displayName" : "Brahmakosh Coins 1000",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.brahmakosh.coins.1000",
+      "referenceName" : "Brahmakosh Coins 1000",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "1999",
+      "familyShareable" : false,
+      "internalID" : "3",
+      "localizations" : [
+        {
+          "description" : "2000 Brahmakosh Coins",
+          "displayName" : "Brahmakosh Coins 2000",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.brahmakosh.coins.2000",
+      "referenceName" : "Brahmakosh Coins 2000",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "3999",
+      "familyShareable" : false,
+      "internalID" : "4",
+      "localizations" : [
+        {
+          "description" : "4000 Brahmakosh Coins",
+          "displayName" : "Brahmakosh Coins 4000",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.brahmakosh.coins.4000",
+      "referenceName" : "Brahmakosh Coins 4000",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "7999",
+      "familyShareable" : false,
+      "internalID" : "5",
+      "localizations" : [
+        {
+          "description" : "8000 Brahmakosh Coins",
+          "displayName" : "Brahmakosh Coins 8000",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.brahmakosh.coins.8000",
+      "referenceName" : "Brahmakosh Coins 8000",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 2,
+    "minor" : 0
+  }
+}
