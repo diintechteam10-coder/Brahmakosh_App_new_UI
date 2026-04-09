@@ -11,6 +11,7 @@ import 'package:brahmakosh/features/astrology/controllers/astrology_controller.d
 import 'package:brahmakosh/features/profile/viewmodels/profile_viewmodel.dart';
 import 'package:brahmakosh/core/common_imports.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:brahmakosh/features/home/views/horoscope_detail_view.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -20,10 +21,6 @@ import 'package:brahmakosh/features/dashboard/viewmodels/dashboard_viewmodel.dar
 import 'package:brahmakosh/core/constants/app_constants.dart';
 import 'package:brahmakosh/features/check_in/repositories/spiritual_repository.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_checkin_model.dart';
-import 'package:brahmakosh/features/check_in/views/chanting_selection_view_v2.dart';
-import 'package:brahmakosh/features/check_in/views/prayer_selection_view_v2.dart';
-import 'package:brahmakosh/features/check_in/views/silence_selection_view_v2.dart';
-import 'package:brahmakosh/features/check_in/views/meditation_selection_view_v2.dart';
 import 'package:brahmakosh/features/report/views/report_view.dart';
 import 'package:brahmakosh/features/ai_rashmi/views/ai_guide_view.dart';
 import 'package:brahmakosh/common/api_urls.dart';
@@ -35,7 +32,7 @@ import 'package:brahmakosh/features/profile/views/profile_view.dart'
     as brahmakosh_profile;
 import 'package:brahmakosh/features/notifications/blocs/notification_bloc.dart';
 import 'package:brahmakosh/features/redeem/controllers/redeem_controller.dart';
-import 'package:brahmakosh/features/remedies/views/remedies_web_view.dart';
+
 
 class NewHomeView extends StatefulWidget {
   final ScrollController? scrollController;
@@ -50,6 +47,18 @@ class _NewHomeViewState extends State<NewHomeView> {
     AstrologyController(),
   );
   final RedeemController redeemController = Get.put(RedeemController());
+
+  final ScrollController _horoscopeCategoryController = ScrollController();
+  final List<String> _horoscopeCategories = [
+    "personal_life",
+    "profession",
+    "health",
+    "travel",
+    "luck",
+    "emotions"
+  ];
+  late List<GlobalKey> _horoscopeCategoryKeys;
+
   int _selectedDiscoveryIndex = 0;
   final List<String> _discoveryTabs = [
     "health",
@@ -60,7 +69,7 @@ class _NewHomeViewState extends State<NewHomeView> {
     "travel",
   ];
 
-  int _selectedCheckInIndex = -1;
+
 
   List<Activities> _checkInActivities = [];
   bool _isCheckInLoading = false;
@@ -72,43 +81,43 @@ class _NewHomeViewState extends State<NewHomeView> {
 
   final List<Map<String, String>> _comingSoonProjects = [
     {
-      "title": "Brahmakosh \nExperience Centre",
-      "subtitle": "Immersive spiritual experiences",
+      "title": "exp_centre",
+      "subtitle": "exp_centre_desc",
       "image": "assets/icons/Expereince.jpg",
     },
     {
-      "title": "Brahmagyaan Library",
-      "subtitle": "Knowledge meets consciousness",
+      "title": "library",
+      "subtitle": "library_desc",
       "image": "assets/icons/library.jpg",
     },
     {
-      "title": "Brahma Bazar",
-      "subtitle": "Spiritual marketplace for all",
+      "title": "bazar",
+      "subtitle": "bazar_desc",
       "image": "assets/icons/bazar.jpg",
     },
     {
-      "title": "Brahma Daan",
-      "subtitle": "Service with compassion",
-      "image": "assets/icons/charity.jpg",
+      "title": "daan",
+      "subtitle": "daan_desc",
+      "image": "assets/icons/charity.jpeg",
     },
     {
-      "title": "Brahmakosh Gaushala",
-      "subtitle": "Protecting our sacred cows",
-      "image": "assets/icons/gaushala.jpg",
+      "title": "gaushala",
+      "subtitle": "gaushala_desc",
+      "image": "assets/icons/gaushala.jpeg",
     },
     {
-      "title": "Brahmakosh Gurukul",
-      "subtitle": "Ancient wisdom for modern kids",
-      "image": "assets/icons/gurukul.jpg",
+      "title": "gurukul",
+      "subtitle": "gurukul_desc",
+      "image": "assets/icons/gurukul.jpeg",
     },
     {
-      "title": "Brahma Vani",
-      "subtitle": "Voice of spiritual wisdom",
+      "title": "vani",
+      "subtitle": "vani_desc",
       "image": "assets/icons/vani.jpg",
     },
     {
-      "title": "Brahma Yatra",
-      "subtitle": "Pilgrimage to sacred lands",
+      "title": "yatra",
+      "subtitle": "yatra_desc",
       "image": "assets/icons/yatra.jpg",
     },
   ];
@@ -126,11 +135,15 @@ class _NewHomeViewState extends State<NewHomeView> {
   final FocusNode _swapnaFocusNode = FocusNode();
 
   // Scroll Controller for check-in activities
-  final ScrollController _checkInScrollController = ScrollController();
+
 
   @override
   void initState() {
     super.initState();
+    _horoscopeCategoryKeys = List.generate(
+      _horoscopeCategories.length,
+      (index) => GlobalKey(),
+    );
     _lastLang = Get.locale?.languageCode ?? 'en';
     // Ensure data is fresh when viewing
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -148,27 +161,27 @@ class _NewHomeViewState extends State<NewHomeView> {
 
     // 1. Spiritual Tools
     const tools = [
-      {"title": "Pooja Vidhi", "desc": "Step-by-step guidance for rituals"},
-      {"title": "Daily Panchang", "desc": "Auspicious timings and planetary positions"},
-      {"title": "Sankalp Tracker", "desc": "Commit to your spiritual goals"},
-      {"title": "Muhurat", "desc": "Find the perfect time for new beginnings"},
-      {"title": "Reports", "desc": "Detailed analysis of your spiritual journey"},
-      {"title": "Remedies", "desc": "Personalized solutions for life's challenges"},
+      {"title": "pooja_vidhi", "desc": "pooja_vidhi_desc"},
+      {"title": "daily_panchang", "desc": "daily_panchang_desc"},
+      {"title": "sankalp_tracker", "desc": "sankalp_tracker_desc"},
+      {"title": "muhurat", "desc": "muhurat_desc"},
+      {"title": "reports", "desc": "reports_desc"},
+      {"title": "remedies", "desc": "remedies_desc"},
     ];
     for (var t in tools) {
-      stringsToWarmup.add(t["title"] as String);
-      stringsToWarmup.add(t["desc"] as String);
+      stringsToWarmup.add(t["title"]!.tr);
+      stringsToWarmup.add(t["desc"]!.tr);
     }
 
     // 2. Coming Soon Projects
     const comingSoon = [
-      {"title": "Brahmakosh \nExperience Centre", "subtitle": "Immersive spiritual experiences"},
-      {"title": "Spiritual \nRetreats", "subtitle": "Guided journeys to sacred places"},
-      {"title": "Global \nCommunity", "subtitle": "Connect with seekers worldwide"},
+      {"title": "exp_centre", "subtitle": "exp_centre_desc"},
+      {"title": "library", "subtitle": "library_desc"},
+      {"title": "bazar", "subtitle": "bazar_desc"},
     ];
     for (var cs in comingSoon) {
-      stringsToWarmup.add(cs["title"] as String);
-      stringsToWarmup.add(cs["subtitle"] as String);
+      stringsToWarmup.add(cs["title"]!.tr);
+      stringsToWarmup.add(cs["subtitle"]!.tr);
     }
 
     // 3. Expert Categories
@@ -218,12 +231,25 @@ class _NewHomeViewState extends State<NewHomeView> {
 
   @override
   void dispose() {
+    _horoscopeCategoryController.dispose();
     _comingSoonTimer?.cancel();
     _comingSoonPageController.dispose();
     _searchFocusNode.dispose();
     _swapnaFocusNode.dispose();
-    _checkInScrollController.dispose();
     super.dispose();
+  }
+
+  void _centerHoroscopeCategory(int index) {
+    if (index >= 0 &&
+        index < _horoscopeCategoryKeys.length &&
+        _horoscopeCategoryKeys[index].currentContext != null) {
+      Scrollable.ensureVisible(
+        _horoscopeCategoryKeys[index].currentContext!,
+        alignment: 0.5,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   void _unfocusAll() {
@@ -244,9 +270,6 @@ class _NewHomeViewState extends State<NewHomeView> {
           response.data!.activities != null) {
         setState(() {
           _checkInActivities = response.data!.activities!;
-          if (_checkInActivities.isNotEmpty) {
-            _selectedCheckInIndex = 0; // Default to first item
-          }
         });
       }
     } catch (e) {
@@ -258,23 +281,7 @@ class _NewHomeViewState extends State<NewHomeView> {
     }
   }
 
-  void _scrollToSelectedCheckIn(int index) {
-    if (!_checkInScrollController.hasClients) return;
-    final screenWidth = MediaQuery.of(context).size.width;
-    double itemWidth = 22.w + 20.0;
-    double offset = (index * itemWidth) - (screenWidth / 2) + (26.w / 2);
 
-    if (offset < 0) offset = 0;
-    if (offset > _checkInScrollController.position.maxScrollExtent) {
-      offset = _checkInScrollController.position.maxScrollExtent;
-    }
-
-    _checkInScrollController.animateTo(
-      offset,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
-  }
 
   Future<void> _handleRefresh() async {
     await Future.wait([
@@ -285,6 +292,45 @@ class _NewHomeViewState extends State<NewHomeView> {
     ]);
     if (mounted) {
       context.read<NotificationBloc>().add(RefreshUnreadCount());
+    }
+    // Pre-warm translations for all dynamic backend content
+    _warmupDynamicTranslations();
+  }
+
+  /// Collects all dynamic strings coming from the backend and pre-translates
+  /// them in one batch so they are ready before the user sees them.
+  void _warmupDynamicTranslations() {
+    final List<String> dynamicStrings = [];
+
+    // ── Panchang / Muhurat Values ──────────────────────────────────────────
+    final panchang = homeController.panchangData;
+    if (panchang != null) {
+      final basic    = panchang.basicPanchang;
+      final advanced = panchang.advancedPanchang;
+      if (basic?.tithi?.isNotEmpty == true)           dynamicStrings.add(basic!.tithi!);
+      if (basic?.nakshatra?.isNotEmpty == true)        dynamicStrings.add(basic!.nakshatra!);
+      if (basic?.ritu?.isNotEmpty == true)             dynamicStrings.add(basic!.ritu!);
+      if (basic?.dishaShool?.isNotEmpty == true)       dynamicStrings.add(basic!.dishaShool!);
+      if (basic?.paksha?.isNotEmpty == true)           dynamicStrings.add(basic!.paksha!);
+      if (advanced?.hinduMaah?.purnimanta?.isNotEmpty == true) dynamicStrings.add(advanced!.hinduMaah!.purnimanta!);
+      if (advanced?.sunSign?.isNotEmpty == true)       dynamicStrings.add(advanced!.sunSign!);
+      if (advanced?.moonSign?.isNotEmpty == true)      dynamicStrings.add(advanced!.moonSign!);
+    }
+
+    // ── Daily Horoscope Predictions ────────────────────────────────────────
+    final prediction = homeController.dailyHoroscope?.prediction;
+    if (prediction != null) {
+      if (prediction.personalLife?.isNotEmpty == true) dynamicStrings.add(prediction.personalLife!);
+      if (prediction.profession?.isNotEmpty == true)   dynamicStrings.add(prediction.profession!);
+      if (prediction.health?.isNotEmpty == true)       dynamicStrings.add(prediction.health!);
+      if (prediction.travel?.isNotEmpty == true)       dynamicStrings.add(prediction.travel!);
+      if (prediction.luck?.isNotEmpty == true)         dynamicStrings.add(prediction.luck!);
+      if (prediction.emotions?.isNotEmpty == true)     dynamicStrings.add(prediction.emotions!);
+    }
+
+    if (dynamicStrings.isNotEmpty) {
+      TranslateHelper.warmup(dynamicStrings);
+      TranslateHelper.flush();
     }
   }
 
@@ -317,6 +363,7 @@ class _NewHomeViewState extends State<NewHomeView> {
               _buildSpiritualCheckIn(isTablet, horizontalPadding),
               _buildKarmaDashboard(isTablet, horizontalPadding),
               _buildExpertConnect(screenWidth, isTablet, horizontalPadding),
+              _buildDailyHoroscopeSection(isTablet, horizontalPadding),
               _buildMuhuratSection(isTablet, horizontalPadding),
               // if (!Platform.isIOS) _buildRemediesSection(screenWidth, isTablet, horizontalPadding),
               _buildSpiritualToolsSection(screenWidth, isTablet, horizontalPadding),
@@ -332,6 +379,219 @@ class _NewHomeViewState extends State<NewHomeView> {
       ),
     );
   }
+
+  Widget _buildDailyHoroscopeSection(bool isTablet, double horizontalPadding) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: horizontalPadding,
+          vertical: 2.h,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "daily_horoscope_cap".tr,
+                      style: GoogleFonts.lora(
+                        color: const Color(0xFFD4AF37),
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                    Obx(() {
+                      final predDate = homeController.dailyHoroscope?.predictionDate;
+                      if (predDate != null && predDate.isNotEmpty) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Text(
+                            predDate,
+                            style: GoogleFonts.poppins(
+                              color: Colors.white54,
+                              fontSize: 9.sp,
+                            ),
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    }),
+                  ],
+                ),
+                GestureDetector(
+                  onTap: () => Get.to(() => const HoroscopeDetailView()),
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 2),
+                    child: Text(
+                      "view_all".tr,
+                      style: GoogleFonts.poppins(
+                        color: const Color(0xFFD4AF37),
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 1.5.h),
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(5.w),
+              decoration: BoxDecoration(
+                color: const Color(0xFF141414),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: Colors.white.withOpacity(0.05)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(1.5.w),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF201D15),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: const Color(0xFFD4AF37),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: SvgPicture.asset(
+                          'assets/icons/star_rounded.svg',
+                          width: 18,
+                          height: 18,
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xFFD4AF37),
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 3.w),
+                      TranslatedText(
+                        (homeController.dailyHoroscope?.sunSign ?? homeController.userSign).toLowerCase(),
+                        uppercase: true,
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                      const Spacer(),
+                      Obx(() => homeController.isHoroscopeLoading
+                          ? const SizedBox(
+                              width: 14,
+                              height: 14,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Color(0xFFD4AF37),
+                              ),
+                            )
+                          : const SizedBox.shrink()),
+                    ],
+                  ),
+                  SizedBox(height: 2.h),
+                  // Category Chips
+                  SingleChildScrollView(
+                    controller: _horoscopeCategoryController,
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    child: Row(
+                      children: List.generate(_horoscopeCategories.length, (index) {
+                        final cat = _horoscopeCategories[index];
+                        return Obx(() {
+                          final isSelected =
+                              homeController.selectedDailyCategory == cat;
+                          return GestureDetector(
+                            key: _horoscopeCategoryKeys[index],
+                            onTap: () {
+                              homeController.setDailyCategory(cat);
+                              _centerHoroscopeCategory(index);
+                            },
+                            child: Container(
+                              margin: EdgeInsets.only(right: 2.w),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 5.w,
+                                vertical: 1.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? const Color(0xFFF0CE62)
+                                    : const Color(0xFF1E1E1E),
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              child: Text(
+                                cat.tr,
+                                style: GoogleFonts.poppins(
+                                  color: isSelected ? Colors.black : Colors.white70,
+                                  fontSize: 10.sp,
+                                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          );
+                        });
+                      }),
+                    ),
+                  ),
+                  SizedBox(height: 2.5.h),
+                  // Dynamic Content – uses TranslatedText so backend English
+                  // text is auto-translated to the user's selected language.
+                  Obx(() {
+                    final prediction = homeController.dailyHoroscope?.prediction;
+                    String content = "preparing_insights".tr;
+
+                    if (prediction != null) {
+                      switch (homeController.selectedDailyCategory) {
+                        case "personal_life":
+                          content = prediction.personalLife ?? "";
+                          break;
+                        case "profession":
+                          content = prediction.profession ?? "";
+                          break;
+                        case "health":
+                          content = prediction.health ?? "";
+                          break;
+                        case "travel":
+                          content = prediction.travel ?? "";
+                          break;
+                        case "luck":
+                          content = prediction.luck ?? "";
+                          break;
+                        case "emotions":
+                          content = prediction.emotions ?? "";
+                          break;
+                      }
+                    }
+
+                    return TranslatedText(
+                      content,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        color: Colors.white.withOpacity(0.85),
+                        fontSize: 10.5.sp,
+                        height: 1.5,
+                      ),
+                    );
+                  }),
+                  SizedBox(height: 1.h),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
 
   Widget _buildHeader(double horizontalPadding) {
     return SliverToBoxAdapter(
@@ -875,11 +1135,12 @@ class _NewHomeViewState extends State<NewHomeView> {
         ),
         delegate: SliverChildListDelegate([
           _buildGridItem(
-            "check_in".tr,
+            "book_a_puja".tr,
             "assets/icons/check_in.png",
+            showComingSoon: true,
             onTap: () {
               _unfocusAll();
-              Get.toNamed(AppConstants.routeCheckIn);
+              Get.dialog(ComingSoonPopup(feature: "book_a_puja"));
             },
           ),
           _buildGridItem(
@@ -910,9 +1171,10 @@ class _NewHomeViewState extends State<NewHomeView> {
           _buildGridItem(
             "remedies".tr,
             "assets/icons/remedies.png",
+           showComingSoon: true,
             onTap: () {
               _unfocusAll();
-              Get.to(() => const RemediesWebView());
+              Get.dialog(ComingSoonPopup(feature: "remedies"));
             },
           ),
           _buildGridItem(
@@ -937,7 +1199,7 @@ class _NewHomeViewState extends State<NewHomeView> {
             showComingSoon: true,
             onTap: () {
               _unfocusAll();
-              Get.dialog(ComingSoonPopup(feature: "courses".tr));
+              Get.dialog(ComingSoonPopup(feature: "courses"));
             },
           ),
         ]),
@@ -989,14 +1251,12 @@ class _NewHomeViewState extends State<NewHomeView> {
               ),
               const SizedBox(height: 24),
 
-              // Horizontal Activity List
               if (_isCheckInLoading && _checkInActivities.isEmpty)
                 const Center(
                   child: CircularProgressIndicator(color: Color(0xFFFFD447)),
                 )
               else
                 SingleChildScrollView(
-                  controller: _checkInScrollController,
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
                   child: Row(
@@ -1006,13 +1266,13 @@ class _NewHomeViewState extends State<NewHomeView> {
                         padding: EdgeInsets.symmetric(horizontal: 1.w),
                         child: GestureDetector(
                           onTap: () {
-                            setState(() => _selectedCheckInIndex = index);
-                            _scrollToSelectedCheckIn(index);
+                            _unfocusAll();
+                            Get.toNamed(AppConstants.routeCheckIn);
                           },
                           child: _buildActivityItem(
                             activity.title?.toLowerCase().tr ?? "",
                             _getActivityIconPath(activity.title ?? ""),
-                            isSelected: _selectedCheckInIndex == index,
+                            isSelected: false,
                           ),
                         ),
                       );
@@ -1036,7 +1296,10 @@ class _NewHomeViewState extends State<NewHomeView> {
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
-                  onPressed: _onCheckInNowPressed,
+                  onPressed: () {
+                    _unfocusAll();
+                    Get.toNamed(AppConstants.routeCheckIn);
+                  },
                   child: Text(
                     "check_in_now".tr,
                     style: GoogleFonts.poppins(
@@ -1071,34 +1334,7 @@ class _NewHomeViewState extends State<NewHomeView> {
     }
   }
 
-  void _onCheckInNowPressed() {
-    _unfocusAll();
-    if (_checkInActivities.isEmpty || _selectedCheckInIndex == -1) {
-      Get.toNamed(AppConstants.routeCheckIn);
-      return;
-    }
 
-    final activity = _checkInActivities[_selectedCheckInIndex];
-
-    if (activity.title == 'Chanting') {
-      Get.to(() => const ChantingSelectionViewV2());
-    } else if (activity.title == 'Prayer' && activity.id != null) {
-      Get.to(() => PrayerSelectionViewV2(prayerCategoryId: activity.id!));
-    } else if ((activity.title == 'Silence' || activity.title == 'silence') &&
-        activity.id != null) {
-      Get.to(() => SilenceSelectionViewV2(silenceCategoryId: activity.id!));
-    } else if ((activity.title == 'Meditation' || activity.title == 'Mediation') &&
-        activity.id != null) {
-      Get.to(() => MeditationSelectionViewV2(meditationCategoryId: activity.id!));
-    } else if (activity.id != null) {
-      Get.toNamed(
-        AppConstants.routeSpiritualConfiguration,
-        arguments: {'categoryId': activity.id!, 'title': activity.title},
-      );
-    } else {
-      Get.toNamed(AppConstants.routeCheckIn);
-    }
-  }
 
   Widget _buildActivityItem(
     String title,
@@ -1185,7 +1421,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "karma_dashboard".tr,
+                        "karma_dashboard_cap".tr,
                         style: GoogleFonts.poppins(
                           color: Color(0xff8E8E93),
                           fontSize: 12.sp,
@@ -1468,7 +1704,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                     backgroundImage: () {
                       if (expert.profilePhoto == null ||
                           expert.profilePhoto!.isEmpty) {
-                        return const AssetImage('assets/images/logo.png')
+                        return const AssetImage('assets/icons/User.jpg')
                             as ImageProvider;
                       }
                       final photo = expert.profilePhoto!;
@@ -1482,7 +1718,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                       }
                       final formattedUrl = ApiUrls.getFormattedImageUrl(photo);
                       if (formattedUrl == null) {
-                        return const AssetImage('assets/images/logo.png')
+                        return const AssetImage('assets/icons/User.jpg')
                             as ImageProvider;
                       }
                       return NetworkImage(formattedUrl);
@@ -1500,6 +1736,8 @@ class _NewHomeViewState extends State<NewHomeView> {
                           Expanded(
                             child: TranslatedText(
                               expert.name ?? "Expert",
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,  
                               style: GoogleFonts.poppins(
                                 color: Colors.white,
                                 fontSize: 12.sp,
@@ -2036,6 +2274,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                 ),
               ),
               const SizedBox(width: 12),
+              // Title is already a translated .tr key – keep as Text
               Text(
                 title,
                 style: GoogleFonts.poppins(
@@ -2045,7 +2284,8 @@ class _NewHomeViewState extends State<NewHomeView> {
                 ),
               ),
               const Spacer(),
-              Text(
+              // Value comes from the backend in English – translate it live
+              TranslatedText(
                 value,
                 style: GoogleFonts.poppins(
                   color: Colors.white,
@@ -2336,17 +2576,21 @@ class _NewHomeViewState extends State<NewHomeView> {
   Widget _buildSpiritualToolsSection(double screenWidth, bool isTablet, double horizontalPadding) {
     final tools = [
       {
-        "title": "Remedies",
-        "desc": "Protect your energy & remove negativity",
+        "title": "remedies".tr,
+        "desc": "remedies_desc".tr,
         "icon": "assets/icons/remedies.png",
-        "onTap": () {
+        // "onTap": () {
+        //   _unfocusAll();
+        //   Get.to(() => const RemediesWebView());
+        // },
+         "onTap": () {
           _unfocusAll();
-          Get.to(() => const RemediesWebView());
+          Get.dialog(const ComingSoonPopup(feature: "remedies"));
         },
       },
       {
-        "title": "Puja Vidhi",
-        "desc": "Perform rituals with step-by-step guidance",
+        "title": "puja_vidhi_title".tr,
+        "desc": "pooja_vidhi_desc".tr,
         "icon": "assets/icons/puja_vidhi.png",
         "onTap": () {
           _unfocusAll();
@@ -2354,8 +2598,8 @@ class _NewHomeViewState extends State<NewHomeView> {
         },
       },
       {
-        "title": "Reports",
-        "desc": "Get deep insights into your life's path",
+        "title": "all_reports".tr,
+        "desc": "reports_desc".tr,
         "icon": "assets/icons/reports.png",
         "isComingSoon": false,
         "onTap": () {
@@ -2364,13 +2608,13 @@ class _NewHomeViewState extends State<NewHomeView> {
         },
       },
       {
-        "title": "Courses",
-        "desc": "Learn sacred wisdom from experts",
+        "title": "courses_title".tr,
+        "desc": "courses_desc".tr,
         "icon": "assets/icons/courses.png",
         "isComingSoon": true,
-        "onTap": () {
+         "onTap": () {
           _unfocusAll();
-          Get.dialog(const ComingSoonPopup(feature: "Courses"));
+          Get.dialog(const ComingSoonPopup(feature: "courses"));
         },
       },
     ];
@@ -2382,7 +2626,7 @@ class _NewHomeViewState extends State<NewHomeView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TranslatedText(
-              "SPIRITUAL TOOLS",
+              "spiritual_tools_cap",
                style: GoogleFonts.poppins(
                 color:Colors.white.withOpacity(0.7),
                 fontSize: 12.sp,
@@ -2543,7 +2787,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                 TranslatedText(
-                  "SANKALP TRACKER",
+                  "sankalp_tracker",
                   style: GoogleFonts.poppins(
                     color: Colors.white.withOpacity(0.7),
                     fontSize: 12.sp,
@@ -2554,7 +2798,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                     GestureDetector(
                       onTap: () => Get.to(() => const SankalpScreen()),
                       child: Text(
-                        "View All",
+                        "view_all".tr,
                         style: GoogleFonts.poppins(
                           color: AppTheme.primaryGold,
                           fontSize: 10.sp,
@@ -2584,24 +2828,24 @@ class _NewHomeViewState extends State<NewHomeView> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                TranslatedText(
-                                  activeCount > 0 ? "Daily Spiritual Progress" : "No Active Sankalp",
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.white,
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                TranslatedText(
-                                  activeCount > 0 
-                                    ? "Tracking $activeCount active spiritual habits."
-                                    : "Start a new Sankalp to track your spiritual journey.",
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.white.withOpacity(0.6),
-                                    fontSize: 9.75.sp,
-                                  ),
-                                ),
+                                 Text(
+                                   activeCount > 0 ? "daily_spiritual_progress".tr : "no_active_sankalp".tr,
+                                   style: GoogleFonts.poppins(
+                                     color: Colors.white,
+                                     fontSize: 12.sp,
+                                     fontWeight: FontWeight.w700,
+                                   ),
+                                 ),
+                                 const SizedBox(height: 4),
+                                 Text(
+                                   activeCount > 0 
+                                     ? "tracking_habits_desc".trParams({'count': activeCount.toString()})
+                                     : "start_sankalp_desc".tr,
+                                   style: GoogleFonts.poppins(
+                                     color: Colors.white.withOpacity(0.6),
+                                     fontSize: 9.75.sp,
+                                   ),
+                                 ),
                               ],
                             ),
                           ),
@@ -2634,7 +2878,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             TranslatedText(
-                              "OVERALL PROGRESS",
+                              "overall_progress",
                               style: GoogleFonts.poppins(
                                 color: Colors.white.withOpacity(0.5),
                                 fontSize: 11,
@@ -2727,7 +2971,7 @@ class _NewHomeViewState extends State<NewHomeView> {
             ),
             const SizedBox(width: 8),
             TranslatedText(
-              "TRACK YOUR SANKALP",
+              "track_your_sankalp",
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.bold,
                 fontSize: 12.sp,
@@ -2921,7 +3165,7 @@ class _NewHomeViewState extends State<NewHomeView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TranslatedText(
-              "Coming Soon Projects",
+              "coming_soon_projects_cap",
               style: GoogleFonts.lora(
                 color: const Color(0xFFD4AF37),
                 fontSize: 18.sp,
@@ -2930,7 +3174,7 @@ class _NewHomeViewState extends State<NewHomeView> {
             ),
             const SizedBox(height: 4),
             TranslatedText(
-              "Building spiritual ecosystem for growth and learning...",
+              "coming_soon_subtitle",
               style: GoogleFonts.poppins(
                 color: Colors.white.withOpacity(0.5),
                 fontSize: 10.sp,
@@ -3086,204 +3330,204 @@ class _NewHomeViewState extends State<NewHomeView> {
     );
   }
 
-  Widget _buildSelfDiscoverySection(double horizontalPadding) {
-    return SliverToBoxAdapter(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 1.5.h),
-            child: Text(
-              "self_discovery_title".tr,
-              style: GoogleFonts.lora(
-                color: Colors.white.withOpacity(0.7),
-                fontSize: 10.5.sp,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Row(
-              children: List.generate(_discoveryTabs.length, (index) {
-                final isSelected = _selectedDiscoveryIndex == index;
-                return GestureDetector(
-                  onTap: () => setState(() => _selectedDiscoveryIndex = index),
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? const Color(0xFFD4AF37)
-                          : Colors.white.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      _discoveryTabs[index].toLowerCase().tr,
-                      style: GoogleFonts.lora(
-                        color: isSelected
-                            ? Colors.black
-                            : Colors.white.withOpacity(0.6),
-                        fontSize: 8.25.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                );
-              }),
-            ),
-          ),
-          Obx(() {
-            final panchang = homeController.panchangData;
-            final prediction = panchang?.dailyNakshatraPrediction?.prediction;
-            String content = "Loading insights for your star...";
+  // Widget _buildSelfDiscoverySection(double horizontalPadding) {
+  //   return SliverToBoxAdapter(
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Padding(
+  //           padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 1.5.h),
+  //           child: Text(
+  //             "self_discovery_title".tr,
+  //             style: GoogleFonts.lora(
+  //               color: Colors.white.withOpacity(0.7),
+  //               fontSize: 10.5.sp,
+  //               fontWeight: FontWeight.bold,
+  //             ),
+  //           ),
+  //         ),
+  //         SingleChildScrollView(
+  //           scrollDirection: Axis.horizontal,
+  //           padding: const EdgeInsets.symmetric(horizontal: 12),
+  //           child: Row(
+  //             children: List.generate(_discoveryTabs.length, (index) {
+  //               final isSelected = _selectedDiscoveryIndex == index;
+  //               return GestureDetector(
+  //                 onTap: () => setState(() => _selectedDiscoveryIndex = index),
+  //                 child: Container(
+  //                   margin: const EdgeInsets.symmetric(horizontal: 4),
+  //                   padding: const EdgeInsets.symmetric(
+  //                     horizontal: 16,
+  //                     vertical: 8,
+  //                   ),
+  //                   decoration: BoxDecoration(
+  //                     color: isSelected
+  //                         ? const Color(0xFFD4AF37)
+  //                         : Colors.white.withOpacity(0.05),
+  //                     borderRadius: BorderRadius.circular(20),
+  //                   ),
+  //                   child: Text(
+  //                     _discoveryTabs[index].toLowerCase().tr,
+  //                     style: GoogleFonts.lora(
+  //                       color: isSelected
+  //                           ? Colors.black
+  //                           : Colors.white.withOpacity(0.6),
+  //                       fontSize: 8.25.sp,
+  //                       fontWeight: FontWeight.bold,
+  //                     ),
+  //                   ),
+  //                 ),
+  //               );
+  //             }),
+  //           ),
+  //         ),
+  //         Obx(() {
+  //           final panchang = homeController.panchangData;
+  //           final prediction = panchang?.dailyNakshatraPrediction?.prediction;
+  //           String content = "Loading insights for your star...";
 
-            if (prediction != null) {
-              switch (_discoveryTabs[_selectedDiscoveryIndex]) {
-                case "Health":
-                  content =
-                      prediction.health ?? "Maintain a balanced diet today.";
-                  break;
-                case "Emotions":
-                  content = prediction.emotions ?? "Stay calm and meditative.";
-                  break;
-                case "Profession":
-                  content =
-                      prediction.profession ?? "Good day for new beginnings.";
-                  break;
-                case "Luck":
-                  content = prediction.luck ?? "Fortune favors the bold.";
-                  break;
-                case "Personal Life":
-                  content =
-                      prediction.personalLife ?? "Spend time with loved ones.";
-                  break;
-                case "Travel":
-                  content =
-                      prediction.travel ?? "Short trips might be beneficial.";
-                  break;
-              }
-            } else if (!homeController.isPanchangLoading) {
-              content = "Data unavailable at the moment.";
-            }
+  //           if (prediction != null) {
+  //             switch (_discoveryTabs[_selectedDiscoveryIndex]) {
+  //               case "Health":
+  //                 content =
+  //                     prediction.health ?? "Maintain a balanced diet today.";
+  //                 break;
+  //               case "Emotions":
+  //                 content = prediction.emotions ?? "Stay calm and meditative.";
+  //                 break;
+  //               case "Profession":
+  //                 content =
+  //                     prediction.profession ?? "Good day for new beginnings.";
+  //                 break;
+  //               case "Luck":
+  //                 content = prediction.luck ?? "Fortune favors the bold.";
+  //                 break;
+  //               case "Personal Life":
+  //                 content =
+  //                     prediction.personalLife ?? "Spend time with loved ones.";
+  //                 break;
+  //               case "Travel":
+  //                 content =
+  //                     prediction.travel ?? "Short trips might be beneficial.";
+  //                 break;
+  //             }
+  //           } else if (!homeController.isPanchangLoading) {
+  //             content = "Data unavailable at the moment.";
+  //           }
 
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF141414),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.white.withOpacity(0.1)),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [const Color(0xFF1A1A1A), const Color(0xFF141414)],
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Icon(
-                      _getDiscoveryIcon(
-                        _discoveryTabs[_selectedDiscoveryIndex],
-                      ),
-                      color: const Color(0xFFD4AF37),
-                      size: 24,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      content,
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.lora(
-                        color: Colors.white.withOpacity(0.8),
-                        fontSize: 9.75.sp,
-                        height: 1.6,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }),
-        ],
-      ),
-    );
-  }
+  //           return Padding(
+  //             padding: const EdgeInsets.all(16.0),
+  //             child: Container(
+  //               width: double.infinity,
+  //               padding: const EdgeInsets.all(20),
+  //               decoration: BoxDecoration(
+  //                 color: const Color(0xFF141414),
+  //                 borderRadius: BorderRadius.circular(24),
+  //                 border: Border.all(color: Colors.white.withOpacity(0.1)),
+  //                 gradient: LinearGradient(
+  //                   begin: Alignment.topLeft,
+  //                   end: Alignment.bottomRight,
+  //                   colors: [const Color(0xFF1A1A1A), const Color(0xFF141414)],
+  //                 ),
+  //               ),
+  //               child: Column(
+  //                 children: [
+  //                   Icon(
+  //                     _getDiscoveryIcon(
+  //                       _discoveryTabs[_selectedDiscoveryIndex],
+  //                     ),
+  //                     color: const Color(0xFFD4AF37),
+  //                     size: 24,
+  //                   ),
+  //                   const SizedBox(height: 12),
+  //                   Text(
+  //                     content,
+  //                     textAlign: TextAlign.center,
+  //                     style: GoogleFonts.lora(
+  //                       color: Colors.white.withOpacity(0.8),
+  //                       fontSize: 9.75.sp,
+  //                       height: 1.6,
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //           );
+  //         }),
+  //       ],
+  //     ),
+  //   );
+  // }
 
-  IconData _getDiscoveryIcon(String tab) {
-    switch (tab) {
-      case "Health":
-        return Icons.favorite_border;
-      case "Emotions":
-        return Icons.psychology_outlined;
-      case "Profession":
-        return Icons.work_outline;
-      case "Luck":
-        return Icons.auto_awesome_outlined;
-      case "Personal Life":
-        return Icons.home_outlined;
-      case "Travel":
-        return Icons.explore_outlined;
-      default:
-        return Icons.star_border;
-    }
-  }
+  // IconData _getDiscoveryIcon(String tab) {
+  //   switch (tab) {
+  //     case "Health":
+  //       return Icons.favorite_border;
+  //     case "Emotions":
+  //       return Icons.psychology_outlined;
+  //     case "Profession":
+  //       return Icons.work_outline;
+  //     case "Luck":
+  //       return Icons.auto_awesome_outlined;
+  //     case "Personal Life":
+  //       return Icons.home_outlined;
+  //     case "Travel":
+  //       return Icons.explore_outlined;
+  //     default:
+  //       return Icons.star_border;
+  //   }
+  // }
 
-  Widget _buildSponsorsSection(double screenWidth, bool isTablet, double horizontalPadding) {
-    return SliverToBoxAdapter(
-      child: Obx(() {
-        if (homeController.isSponsorLoading) {
-          return const SizedBox.shrink();
-        }
-        if (homeController.sponsors.isEmpty) {
-          return const SizedBox.shrink();
-        }
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: horizontalPadding,
-                vertical: 12.0,
-              ),
-              child: Text(
-                "our_sponsors".tr,
-                style: GoogleFonts.lora(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white.withOpacity(0.7),
-                  fontSize: 10.5.sp,
-                ),
-              ),
-            ),
-            Container(
-              height: screenWidth * 0.25, // Adaptive height
-              constraints: const BoxConstraints(maxHeight: 120, minHeight: 80),
-              margin: const EdgeInsets.only(top: 8, bottom: 20),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0F0F0F),
-                border: Border.symmetric(
-                  horizontal: BorderSide(color: Colors.white.withOpacity(0.08)),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: SponsorLogoTicker(sponsors: homeController.sponsors),
-            ),
-          ],
-        );
-      }),
-    );
-  }
+  // Widget _buildSponsorsSection(double screenWidth, bool isTablet, double horizontalPadding) {
+  //   return SliverToBoxAdapter(
+  //     child: Obx(() {
+  //       if (homeController.isSponsorLoading) {
+  //         return const SizedBox.shrink();
+  //       }
+  //       if (homeController.sponsors.isEmpty) {
+  //         return const SizedBox.shrink();
+  //       }
+  //       return Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Padding(
+  //             padding: EdgeInsets.symmetric(
+  //               horizontal: horizontalPadding,
+  //               vertical: 12.0,
+  //             ),
+  //             child: Text(
+  //               "our_sponsors".tr,
+  //               style: GoogleFonts.lora(
+  //                 fontWeight: FontWeight.bold,
+  //                 color: Colors.white.withOpacity(0.7),
+  //                 fontSize: 10.5.sp,
+  //               ),
+  //             ),
+  //           ),
+  //           Container(
+  //             height: screenWidth * 0.25, // Adaptive height
+  //             constraints: const BoxConstraints(maxHeight: 120, minHeight: 80),
+  //             margin: const EdgeInsets.only(top: 8, bottom: 20),
+  //             decoration: BoxDecoration(
+  //               color: const Color(0xFF0F0F0F),
+  //               border: Border.symmetric(
+  //                 horizontal: BorderSide(color: Colors.white.withOpacity(0.08)),
+  //               ),
+  //               boxShadow: [
+  //                 BoxShadow(
+  //                   color: Colors.black.withOpacity(0.3),
+  //                   blurRadius: 10,
+  //                   offset: const Offset(0, 4),
+  //                 ),
+  //               ],
+  //             ),
+  //             child: SponsorLogoTicker(sponsors: homeController.sponsors),
+  //           ),
+  //         ],
+  //       );
+  //     }),
+  //   );
+  // }
 }
 
 class TrianglePainter extends CustomPainter {

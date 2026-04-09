@@ -2,7 +2,9 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sizer/sizer.dart';
 
 import '../blocs/pooja_bloc.dart';
 import '../blocs/pooja_event.dart';
@@ -80,40 +82,40 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
         ),
         body: Column(
           children: [
-            const SizedBox(height: 16),
+            SizedBox(height: 2.h),
             // Search Bar
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: 4.w),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(horizontal: 4.w),
                 decoration: BoxDecoration(
                   color: const Color(0xFF1A1A1A),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: TextField(
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                  style: TextStyle(color: Colors.white, fontSize: 13.sp),
                   decoration: InputDecoration(
                     fillColor: Colors.transparent,
                     filled: true,
                     hintText: "search_hint".tr,
                     hintStyle: GoogleFonts.poppins(
-                      fontSize: 14,
+                      fontSize: 13.sp,
                       color: Colors.white.withOpacity(0.3),
                     ),
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,
                     focusedBorder: InputBorder.none,
-                    icon: Icon(Icons.search, color: Colors.white.withOpacity(0.3), size: 18),
+                    icon: Icon(Icons.search, color: Colors.white.withOpacity(0.3), size: 18.sp),
                     isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                    contentPadding: EdgeInsets.symmetric(vertical: 1.5.h),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 2.5.h),
             // Filter Tabs
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: 4.w),
               child: BlocBuilder<PoojaBloc, PoojaState>(
                 builder: (context, state) {
                   String selectedCategory = 'All';
@@ -146,7 +148,7 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                 },
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 2.5.h),
             // List
             Expanded(
               child: BlocBuilder<PoojaBloc, PoojaState>(
@@ -154,7 +156,32 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                   if (state is PoojaLoading) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (state is PoojaLoaded) {
-                    
+                    if (state.filteredPoojas.isEmpty) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              state.selectedCategory == 'Festival'
+                                  ? Icons.event_busy
+                                  : Icons.search_off,
+                              color: Colors.white.withOpacity(0.2),
+                              size: 64,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              state.selectedCategory == 'Festival'
+                                  ? "no_festivals_found".tr
+                                  : "no_poojas_found".tr,
+                              style: GoogleFonts.poppins(
+                                color: Colors.white.withOpacity(0.5),
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
                     return ListView.builder(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       itemCount: state.filteredPoojas.length,
@@ -189,7 +216,7 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
         context.read<PoojaBloc>().add(FilterPoojas(categoryKey));
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 10),
+        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 1.2.h),
         decoration: BoxDecoration(
           color: isSelected ? const Color(0xFFD4AF37) : Colors.transparent,
           borderRadius: BorderRadius.circular(30),
@@ -197,7 +224,7 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
         child: Text(
           label,
           style: GoogleFonts.poppins(
-            fontSize: 11,
+            fontSize: 10.sp,
             fontWeight: FontWeight.bold,
             color: isSelected ? Colors.black : Colors.white.withOpacity(0.3),
           ),
@@ -217,54 +244,60 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
         );
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 20),
+        margin: EdgeInsets.only(bottom: 2.h),
         decoration: BoxDecoration(
           color: const Color(0xFF131313),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(color: Colors.white.withOpacity(0.05)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-              child: Image.network(
-                pooja.thumbnailUrl ?? "",
-                height: 160,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  height: 160,
-                  color: Colors.grey[900],
-                  child: const Icon(Icons.image_not_supported, color: Colors.white24),
+            Padding(
+              padding: EdgeInsets.all(1.5.h),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.network(
+                  pooja.thumbnailUrl ?? "",
+                  height: 20.h,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    height: 20.h,
+                    color: Colors.grey[900],
+                    child: Icon(Icons.image_not_supported, color: Colors.white24, size: 24.sp),
+                  ),
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.fromLTRB(5.w, 0.5.h, 5.w, 2.5.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TranslatedText(
                     pooja.pujaName ?? "Unknown Puja",
                     style: GoogleFonts.lora(
-                      fontSize: 18,
+                      fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 1.h),
+                  Divider(color: Colors.white.withOpacity(0.05), height: 1),
+                  SizedBox(height: 1.5.h),
                   Row(
                     children: [
                       Expanded(
                         flex: 3,
                         child: _buildInfoItem(
-                          Icons.local_fire_department,
+                          null,
                           pooja.category ?? "Pooja",
                           const Color(0xFFD4AF37),
+                          isSvg: true,
                         ),
                       ),
-                      Container(width: 1, height: 16, color: Colors.white.withOpacity(0.1), margin: const EdgeInsets.symmetric(horizontal: 4)),
+                      Container(width: 1, height: 3.h, color: Colors.white.withOpacity(0.05), margin: EdgeInsets.symmetric(horizontal: 1.w)),
                       Expanded(
                         flex: 2,
                         child: _buildInfoItem(
@@ -273,7 +306,7 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                           const Color(0xFFD4AF37),
                         ),
                       ),
-                      Container(width: 1, height: 16, color: Colors.white.withOpacity(0.1), margin: const EdgeInsets.symmetric(horizontal: 4)),
+                      Container(width: 1, height: 3.h, color: Colors.white.withOpacity(0.05), margin: EdgeInsets.symmetric(horizontal: 1.w)),
                       Expanded(
                         flex: 3,
                         child: _buildInfoItem(
@@ -284,32 +317,37 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 44,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PoojaDetailScreen(poojaId: pooja.sId ?? ""),
+                  SizedBox(height: 2.5.h),
+                  Center(
+                    child: SizedBox(
+                      width: 70.w,
+                      height: 5.h,
+                      child: ElevatedButton(
+                        
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PoojaDetailScreen(poojaId: pooja.sId ?? ""),
+                            ),
+                          );
+                        },
+                        
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFD4AF37),
+                          padding: EdgeInsets.zero,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
                           ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFD4AF37),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                          elevation: 0,
                         ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        "view_btn".tr,
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                        child: Text(
+                          "view_btn".tr,
+                          style: GoogleFonts.poppins(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13.sp,
+                          ),
                         ),
                       ),
                     ),
@@ -323,17 +361,25 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
     );
   }
 
-  Widget _buildInfoItem(IconData icon, String text, Color iconColor) {
+  Widget _buildInfoItem(IconData? icon, String text, Color iconColor, {bool isSvg = false}) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 14, color: iconColor),
-        const SizedBox(width: 4),
+        if (isSvg)
+          SvgPicture.asset(
+            'assets/icons/diya.svg',
+            width: 14.sp,
+            height: 14.sp,
+            // colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+          )
+        else if (icon != null)
+          Icon(icon, size: 14.sp, color: iconColor),
+        SizedBox(width: 1.5.w),
         Expanded(
           child: TranslatedText(
             text,
             style: GoogleFonts.poppins(
-              fontSize: 11,
+              fontSize: 10.sp,
               color: Colors.white.withOpacity(0.7),
               fontWeight: FontWeight.w500,
             ),

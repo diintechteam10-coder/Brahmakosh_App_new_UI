@@ -1,6 +1,4 @@
-import 'dart:ui';
 import 'package:brahmakosh/core/common_imports.dart';
-import 'package:sizer/sizer.dart';
 import 'package:brahmakosh/features/check_in/controllers/chanting_configuration_controller.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_configuration_model.dart';
 

@@ -20,7 +20,7 @@ class LuckInFavourSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Luck in Favour",
+            "luck_in_favour".tr,
             style: GoogleFonts.lora(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -43,7 +43,7 @@ class LuckInFavourSection extends StatelessWidget {
               children: [
                 Expanded(
                   child: _buildCard(
-                    title: "Lucky No.",
+                    title: "lucky_no".tr,
                     frontImagePath: 'assets/images/YourLuckyNumber_outside.png',
                     backImagePath: 'assets/images/YourLuckyNumber_inside.png',
                     backContent: Text(
@@ -59,7 +59,7 @@ class LuckInFavourSection extends StatelessWidget {
                 const SizedBox(width: 8), // Reduced spacing
                 Expanded(
                   child: _buildCard(
-                    title: "Lucky Color",
+                    title: "lucky_color".tr,
                     frontImagePath: 'assets/images/YourLuckyColor_outside.png',
                     backImagePath: 'assets/images/YourLuckyColor_inside.png',
                     backContent: Padding(
@@ -80,7 +80,7 @@ class LuckInFavourSection extends StatelessWidget {
                 const SizedBox(width: 8), // Reduced spacing
                 Expanded(
                   child: _buildCard(
-                    title: "Day Energy",
+                    title: "day_energy".tr,
                     frontImagePath: 'assets/images/YourDayEnergy_outside.png',
                     backImagePath: 'assets/images/YourDayEnergy_inside.png',
                     backContent: Padding(
@@ -106,7 +106,7 @@ class LuckInFavourSection extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Read more',
+                              'read_more'.tr,
                               style: GoogleFonts.lora(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
@@ -136,7 +136,7 @@ class LuckInFavourSection extends StatelessWidget {
                 ),
                 SizedBox(width: 6),
                 Text(
-                  "Tap to reveal",
+                  "tap_to_reveal".tr,
                   style: GoogleFonts.lora(
                     fontSize: 14,
                     color: AppTheme.textSecondary,
@@ -157,7 +157,7 @@ class LuckInFavourSection extends StatelessWidget {
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
-      barrierLabel: "Read More",
+      barrierLabel: "read_more".tr,
       barrierColor: Colors.black.withOpacity(0.4), // Slightly lighter to show blur
       transitionDuration: const Duration(milliseconds: 500), // Slightly slower for elegance
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
@@ -208,7 +208,7 @@ class LuckInFavourSection extends StatelessWidget {
                               const Icon(Icons.auto_awesome, color: Color(0xFF6D3A0C), size: 24),
                               const SizedBox(height: 8),
                               Text(
-                                'Today’s Energy',
+                                'todays_energy'.tr,
                                 style: GoogleFonts.lora(
                                   fontSize: 19,
                                   fontWeight: FontWeight.bold,
@@ -247,7 +247,7 @@ class LuckInFavourSection extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                             ),
                             child: Text(
-                              'Blessings',
+                              'blessings'.tr,
                               style: GoogleFonts.lora(
                                 fontWeight: FontWeight.bold,
                                 color: const Color(0xFF6D3A0C),

@@ -296,7 +296,7 @@ class SpiritualConfigBloc
           navigationArgs: {
             'duration': current.selectedDuration,
             'config': current.selectedConfig,
-            'clips': [],
+            'clips': const [],
           },
           configurations: current.configurations,
           selectedConfig: current.selectedConfig,

@@ -1212,3 +1212,65 @@ Future<RemediesModel?> getRemedies(
   );
   return remediesModel;
 }
+
+Future<Map<String, dynamic>?> getDailyHoroscope(String userId, String sign) async {
+  final token = StorageService.getString(AppConstants.keyAuthToken) ?? "";
+  final url = "${ApiUrls.dailyHoroscope}/$userId/horoscope/daily/$sign";
+
+  Utils.print("🌞 DAILY HOROSCOPE REQUEST URL: $url");
+
+  Map<String, dynamic>? result;
+
+  await callWebApi(
+    null,
+    url,
+    {"timezone": 5.5},
+    token: token,
+    onResponse: (response) {
+      log("🌞 DAILY HOROSCOPE RESPONSE ($sign):\n${response.body}",
+          name: 'HOROSCOPE');
+      try {
+        result = jsonDecode(response.body);
+      } catch (e) {
+        Utils.print("❌ ERROR DECODING DAILY HOROSCOPE: $e");
+      }
+    },
+    onError: (error) {
+      Utils.print("❌ DAILY HOROSCOPE ERROR: $error");
+    },
+    showLoader: false,
+    shouldLogoutOn401: false,
+  );
+  return result;
+}
+
+Future<Map<String, dynamic>?> getMonthlyHoroscope(String userId, String sign) async {
+  final token = StorageService.getString(AppConstants.keyAuthToken) ?? "";
+  final url = "${ApiUrls.monthlyHoroscope}/$userId/horoscope/monthly/$sign";
+
+  Utils.print("🌙 MONTHLY HOROSCOPE REQUEST URL: $url");
+
+  Map<String, dynamic>? result;
+
+  await callWebApi(
+    null,
+    url,
+    {"timezone": 5.5},
+    token: token,
+    onResponse: (response) {
+      log("🌙 MONTHLY HOROSCOPE RESPONSE ($sign):\n${response.body}",
+          name: 'HOROSCOPE');
+      try {
+        result = jsonDecode(response.body);
+      } catch (e) {
+        Utils.print("❌ ERROR DECODING MONTHLY HOROSCOPE: $e");
+      }
+    },
+    onError: (error) {
+      Utils.print("❌ MONTHLY HOROSCOPE ERROR: $error");
+    },
+    showLoader: false,
+    shouldLogoutOn401: false,
+  );
+  return result;
+}

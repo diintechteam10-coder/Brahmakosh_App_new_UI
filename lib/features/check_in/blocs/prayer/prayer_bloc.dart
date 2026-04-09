@@ -158,7 +158,7 @@ class PrayerBloc extends Bloc<PrayerEvent, PrayerState> {
   void _emitFallback(Emitter<PrayerState> emit) {
     // Fallback if needed, though mostly we expect data
     // For Prayer, let's just emit empty or specific fallback if configured
-    emit(PrayerError("No configurations found"));
+    emit(const PrayerError("No configurations found"));
   }
 
   Future<void> _onSelectEmotion(

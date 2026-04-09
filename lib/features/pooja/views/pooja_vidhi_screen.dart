@@ -2,6 +2,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sizer/sizer.dart';
 import '../../../core/utils/app_snackbar.dart';
 
 import '../models/pooja_model.dart';
@@ -213,7 +214,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
         title: Text(
           "vidhi".tr,
           style: GoogleFonts.lora(
-            fontSize: 20,
+            fontSize: 16.sp,
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
@@ -221,86 +222,119 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
         backgroundColor: Colors.black,
         elevation: 0,
         leading: Container(
-          margin: const EdgeInsets.all(8),
+          margin: EdgeInsets.all(1.h),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.1),
             shape: BoxShape.circle,
           ),
           child: IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.arrow_back_ios_new,
               color: Colors.white,
-              size: 18,
+              size: 14.sp,
             ),
             onPressed: () => Get.back(),
           ),
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(4.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Auspicious Muhurat Header
             if (widget.pooja.muhurat != null)
               Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 10,
+                child: CustomPaint(
+                  painter: DashedBorderPainter(
+                    color: const Color(0xFF1B5E20),
+                    strokeWidth: 1.2,
+                    dash: 4,
+                    gap: 3,
+                    borderRadius: 12,
                   ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFD4AF37).withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: const Color(0xFFD4AF37).withOpacity(0.4),
-                      width: 1,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 4.w,
+                      vertical: 1.2.h,
                     ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.access_time,
-                        size: 16,
-                        color: Color(0xFFD4AF37),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        "auspicious_muhurat_label".tr,
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white.withOpacity(0.9),
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                        _translatedMuhurat!,
-                          style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD4AF37).withOpacity(0.02),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(top: 0.3.h),
+                          child: Icon(
+                            Icons.access_time,
+                            size: 14.sp,
                             color: const Color(0xFFD4AF37),
                           ),
                         ),
-                      ),
-                    ],
+                        SizedBox(width: 3.w),
+                        Expanded(
+                          child: Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: "Auspicious Muhurat: ",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 10.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white.withOpacity(0.9),
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: widget.pooja.muhurat!,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 10.sp,
+                                    fontWeight: FontWeight.w400,
+                                    color: const Color(0xFFD4AF37),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            const SizedBox(height: 24),
+            SizedBox(height: 3.h),
 
             // Puja Vidhi Steps
             _sectionHeader("puja_vidhi_title".tr),
-            const SizedBox(height: 16),
-            if (widget.pooja.pujaVidhi != null)
-              ..._buildVidhiContent(),
+            SizedBox(height: 1.5.h),
+            if (widget.pooja.pujaVidhi != null && widget.pooja.pujaVidhi!.isNotEmpty)
+              ..._buildVidhiContent()
+            else ...[
+              SizedBox(height: 1.h),
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(4.w),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  "Detailed Vidhi steps for this ritual will be available soon.",
+                  style: GoogleFonts.poppins(
+                    fontSize: 11.sp,
+                    color: Colors.white.withOpacity(0.4),
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+            ],
 
-            const SizedBox(height: 24),
+            SizedBox(height: 2.h),
 
             // Required Samagri
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(5.w),
               decoration: BoxDecoration(
                 color: const Color(0xFF111111),
                 borderRadius: BorderRadius.circular(20),
@@ -310,26 +344,27 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _sectionHeader("required_samagri".tr),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 2.h),
+                  if (_translatedSamagri.isNotEmpty)
                     ..._translatedSamagri.map(
                       (item) => Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
+                        padding: EdgeInsets.only(bottom: 1.h),
                         child: Row(
                           children: [
                             Container(
-                              width: 6,
-                              height: 6,
+                              width: 1.5.w,
+                              height: 1.5.w,
                               decoration: const BoxDecoration(
                                 color: Color(0xFFD4AF37),
                                 shape: BoxShape.circle,
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            SizedBox(width: 3.w),
                             Expanded(
                               child: Text(
                                 "${item.itemName ?? ''} ${item.quantity != null ? '(${item.quantity})' : ''}",
                                 style: GoogleFonts.poppins(
-                                  fontSize: 14,
+                                  fontSize: 11.sp,
                                   color: Colors.white.withOpacity(0.6),
                                 ),
                               ),
@@ -337,18 +372,30 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                           ],
                         ),
                       ),
+                    )
+                  else
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 1.h),
+                      child: Text(
+                        "No specific samagri list provided for this ritual.",
+                        style: GoogleFonts.poppins(
+                          fontSize: 10.sp,
+                          color: Colors.white.withOpacity(0.4),
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
                     ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: 2.h),
 
             // Main Audio Player (Redesigned Design 3 Large Gold Card)
             if (_translatedMantras.isNotEmpty)
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(28),
+                padding: EdgeInsets.all(6.w),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [Color(0xFF6B3E11), Color(0xFF91631B)],
@@ -360,7 +407,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                 child: Column(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 0.8.h),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(8),
@@ -368,26 +415,26 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                       child: Text(
                         "mantra_cap".tr,
                         style: GoogleFonts.poppins(
-                          fontSize: 10,
+                          fontSize: 8.sp,
                           letterSpacing: 2,
                           fontWeight: FontWeight.w900,
                           color: Colors.white,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 1.5.h),
                     Text(
                       _translatedPoojaName ?? "Mantra",
                       style: GoogleFonts.poppins(
-                        fontSize: 18,
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 2.5.h),
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(24),
+                      padding: EdgeInsets.all(5.w),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.12),
                         borderRadius: BorderRadius.circular(20),
@@ -399,19 +446,19 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                               _translatedMantras[0].mantraText ?? "",
                               textAlign: TextAlign.center,
                               style: GoogleFonts.notoSans(
-                                fontSize: 18,
+                                fontSize: 14.sp,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                                 height: 1.4,
                               ),
                             ),
                             if (_translatedMantras[0].meaning != null) ...[
-                              const SizedBox(height: 12),
+                              SizedBox(height: 1.5.h),
                               Text(
                                 "\"${_translatedMantras[0].meaning!}\"",
                                 textAlign: TextAlign.center,
                                 style: GoogleFonts.poppins(
-                                  fontSize: 13,
+                                  fontSize: 10.sp,
                                   color: Colors.white.withOpacity(0.9),
                                   fontStyle: FontStyle.italic,
                                 ),
@@ -420,31 +467,31 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 3.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _buildPlayerAction(Icons.replay_10, _seekBackward),
-                        const SizedBox(width: 24),
+                        SizedBox(width: 6.w),
                         GestureDetector(
                           onTap: _playPause,
                           child: Container(
-                            width: 56,
-                            height: 56,
+                            width: 14.w,
+                            height: 14.w,
                             decoration: const BoxDecoration(
                               color: Colors.white,
                               shape: BoxShape.circle,
                             ),
                             child: _isLoading
-                                ? const Center(child: CircularProgressIndicator(color: Colors.black, strokeWidth: 3))
+                                ? Center(child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2.sp))
                                 : Icon(
                                     _isPlaying ? Icons.pause : Icons.play_arrow,
                                     color: Colors.black,
-                                    size: 30,
+                                    size: 24.sp,
                                   ),
                           ),
                         ),
-                        const SizedBox(width: 24),
+                        SizedBox(width: 6.w),
                         _buildPlayerAction(Icons.forward_10, _seekForward),
                       ],
                     ),
@@ -452,21 +499,21 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                 ),
               ),
 
-            const SizedBox(height: 32),
+            SizedBox(height: 3.h),
 
             // Guidelines (Do's & Don'ts Layout)
             _sectionHeader("puja_guidelines".tr),
-            const SizedBox(height: 16),
+            SizedBox(height: 1.5.h),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(child: _buildGuidelineCard("dos".tr, true)),
-                const SizedBox(width: 12),
+                SizedBox(width: 3.w),
                 Expanded(child: _buildGuidelineCard("donts".tr, false)),
               ],
             ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: 3.h),
 
             // Guidelines
             if (widget.pooja.specialInstructions != null)
@@ -474,9 +521,9 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _sectionHeader("special_instructions".tr),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 1.5.h),
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(4.w),
                     decoration: BoxDecoration(
                       color: const Color(0xFF131313),
                       borderRadius: BorderRadius.circular(16),
@@ -485,7 +532,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                     child: Text(
                         _translatedInstructions!,
                       style: GoogleFonts.poppins(
-                        fontSize: 14,
+                        fontSize: 11.sp,
                         color: Colors.white.withOpacity(0.7),
                         height: 1.5,
                       ),
@@ -494,7 +541,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                 ],
               ),
 
-            const SizedBox(height: 40),
+            SizedBox(height: 4.h),
           ],
         ),
       ),
@@ -505,18 +552,18 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
     return Row(
       children: [
         Container(
-          width: 2,
-          height: 16,
+          width: 0.5.w,
+          height: 2.h,
           decoration: BoxDecoration(
             color: const Color(0xFFD4AF37),
             borderRadius: BorderRadius.circular(2),
           ),
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: 2.5.w),
         Text(
           title,
           style: GoogleFonts.lora(
-            fontSize: 18,
+            fontSize: 15.sp,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -542,8 +589,8 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
 
   Widget _buildStepCard(PujaVidhi step) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(20),
+      margin: EdgeInsets.only(bottom: 1.5.h),
+      padding: EdgeInsets.all(3.w),
       decoration: BoxDecoration(
         color: const Color(0xFF111111),
         borderRadius: BorderRadius.circular(20),
@@ -551,10 +598,11 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
-            width: 52,
-            height: 52,
+            width: 12.w,
+            height: 12.w,
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.05),
               borderRadius: BorderRadius.circular(12),
@@ -562,15 +610,15 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
             child: Center(
               child: Text(
                 step.stepNumber?.toString().padLeft(2, '0') ?? "01",
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
+                style: GoogleFonts.lora(
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.w900,
                   color: const Color(0xFFD4AF37).withOpacity(0.6),
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 4.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -578,16 +626,16 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                 Text(
                   step.title ?? "",
                   style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w500,
                     color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 6),
+                SizedBox(height: 0.8.h),
                 Text(
                   step.description ?? "",
                   style: GoogleFonts.poppins(
-                    fontSize: 13,
+                    fontSize: 10.sp,
                     color: Colors.white.withOpacity(0.5),
                     height: 1.5,
                   ),
@@ -602,8 +650,8 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
 
   Widget _buildMantraToChantCard(Mantras mantra) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(28),
+      margin: EdgeInsets.only(bottom: 2.h),
+      padding: EdgeInsets.all(6.w),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF8B4513), Color(0xFFD4AF37)],
@@ -618,12 +666,12 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.music_note, color: Colors.white, size: 14),
-              const SizedBox(width: 8),
+              Icon(Icons.music_note, color: Colors.white, size: 12.sp),
+              SizedBox(width: 2.w),
               Text(
                 "mantra_to_chant".tr,
                 style: GoogleFonts.poppins(
-                  fontSize: 10,
+                  fontSize: 9.sp,
                   fontWeight: FontWeight.w900,
                   color: Colors.white,
                   letterSpacing: 1.5,
@@ -631,15 +679,14 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 1.5.h),
           Text(
             mantra.mantraText ?? "",
             textAlign: TextAlign.center,
-            style: GoogleFonts.notoSans(
-              fontSize: 20,
+            style: GoogleFonts.lora(
+              fontSize: 16.sp,
               fontWeight: FontWeight.bold,
               color: Colors.white,
-              height: 1.5,
             ),
           ),
         ],
@@ -649,7 +696,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
 
   Widget _buildGuidelineCard(String title, bool isDo) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
         color: isDo ? const Color(0xFFE8F5E9).withOpacity(0.15) : const Color(0xFFFFEBEE).withOpacity(0.15),
         borderRadius: BorderRadius.circular(20),
@@ -661,25 +708,25 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
             children: [
               Icon(
                 isDo ? Icons.check_circle : Icons.cancel,
-                size: 18,
+                size: 14.sp,
                 color: isDo ? const Color(0xFF81C784) : const Color(0xFFE57373),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 2.w),
               Text(
                 title,
                 style: GoogleFonts.poppins(
-                  fontSize: 15,
+                  fontSize: 12.sp,
                   fontWeight: FontWeight.bold,
                   color: isDo ? const Color(0xFF81C784) : const Color(0xFFE57373),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 1.2.h),
           Text(
             isDo ? "dos_list".tr : "donts_list".tr,
             style: GoogleFonts.poppins(
-              fontSize: 12,
+              fontSize: 10.sp,
               color: isDo ? const Color(0xFF2E7D32).withOpacity(0.9) : const Color(0xFFC62828).withOpacity(0.9),
               height: 1.8,
               fontWeight: FontWeight.w500,
@@ -694,14 +741,57 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: EdgeInsets.all(3.w),
         decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.1),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: Colors.white, size: 24),
+        child: Icon(icon, color: Colors.white, size: 18.sp),
       ),
     );
   }
+}
+
+class DashedBorderPainter extends CustomPainter {
+  final Color color;
+  final double strokeWidth;
+  final double gap;
+  final double dash;
+  final double borderRadius;
+
+  DashedBorderPainter({
+    this.color = Colors.green,
+    this.strokeWidth = 1.0,
+    this.gap = 5.0,
+    this.dash = 5.0,
+    this.borderRadius = 12.0,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint paint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke;
+
+    final Path path = Path()
+      ..addRRect(RRect.fromLTRBR(0, 0, size.width, size.height, Radius.circular(borderRadius)));
+
+    final Path dashedPath = Path();
+    for (var pathMetric in path.computeMetrics()) {
+      double distance = 0.0;
+      while (distance < pathMetric.length) {
+        dashedPath.addPath(
+          pathMetric.extractPath(distance, distance + dash),
+          Offset.zero,
+        );
+        distance += dash + gap;
+      }
+    }
+    canvas.drawPath(dashedPath, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
 

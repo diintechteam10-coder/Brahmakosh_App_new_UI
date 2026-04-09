@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sizer/sizer.dart';
 
 import '../blocs/pooja_bloc.dart';
 import '../blocs/pooja_event.dart';
@@ -33,16 +35,16 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
           backgroundColor: Colors.black,
           elevation: 0,
           leading: Container(
-            margin: const EdgeInsets.all(8),
+            margin: EdgeInsets.all(1.h),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_back_ios_new,
                 color: Colors.white,
-                size: 18,
+                size: 14.sp,
               ),
               onPressed: () => Navigator.pop(context),
             ),
@@ -60,56 +62,77 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                   CustomScrollView(
                     slivers: [
                       // Image Card (Preserved data)
+                      // Redesigned Header Card
                       SliverToBoxAdapter(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
                           child: Container(
-                            height: 220,
                             decoration: BoxDecoration(
+                              color: const Color(0xFF131313),
                               borderRadius: BorderRadius.circular(24),
-                              image: DecorationImage(
-                                image: NetworkImage(pooja.thumbnailUrl ?? ""),
-                                fit: BoxFit.cover,
-                              ),
+                              border: Border.all(color: Colors.white.withOpacity(0.05)),
                             ),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(24),
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.black.withOpacity(0.1),
-                                    Colors.black.withOpacity(0.8),
-                                  ],
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.all(1.5.h),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: Image.network(
+                                      pooja.thumbnailUrl ?? "",
+                                      height: 25.h,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) => Container(
+                                        height: 25.h,
+                                        color: Colors.grey[900],
+                                        child: Icon(Icons.image_not_supported, color: Colors.white24, size: 24.sp),
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              padding: const EdgeInsets.all(20),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  TranslatedText(
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(5.w, 0.5.h, 5.w, 2.5.h),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                       TranslatedText(
                                     pooja.pujaName ?? "",
                                     style: GoogleFonts.lora(
                                       fontSize: 22,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                     ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  Row(
-                                    children: [
-                                      _buildSmallInfo(
-                                        Icons.local_fire_department,
-                                        pooja.category ?? "Pooja",
                                       ),
-                                  Spacer(),
-                                      _buildSmallInfo(Icons.access_time_filled, "min_suffix".trParams({'min': (pooja.duration ?? 0).toString()})),
+                                      SizedBox(height: 1.5.h),
+                                      Divider(color: Colors.white.withOpacity(0.05), height: 1),
+                                      SizedBox(height: 2.h),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                         
+                                            child: _buildSmallInfo(
+                                              null,
+                                              pooja.category ?? "Pooja",
+                                              isSvg: true,
+                                            ),
+                                          ),
+                                      
+                                          Expanded(
+                                            child: _buildSmallInfo(
+                                              Icons.access_time_filled,
+                                              "min_suffix".trParams({'min': (pooja.duration ?? 0).toString()}),
+                                            ),
+                                          ),
+                                         
+                                        ],
+                                      ),
                                     ],
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -118,9 +141,9 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                       if (pooja.description != null)
                         SliverToBoxAdapter(
                           child: Padding(
-                            padding: const EdgeInsets.all(16),
+                            padding: EdgeInsets.all(4.w),
                             child: Container(
-                              padding: const EdgeInsets.all(20),
+                              padding: EdgeInsets.all(5.w),
                               decoration: BoxDecoration(
                                 color: const Color(0xFF111111),
                                 borderRadius: BorderRadius.circular(20),
@@ -130,9 +153,9 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   _buildSectionHeader("puja_significance".tr),
-                                  const SizedBox(height: 16),
+                                  SizedBox(height: 1.5.h),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                    padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFD4AF37).withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(8),
@@ -141,8 +164,8 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        const Icon(Icons.calendar_month, size: 16, color: Color(0xFFD4AF37)),
-                                        const SizedBox(width: 8),
+                                        Icon(Icons.calendar_month, size: 14.sp, color: Color(0xFFD4AF37)),
+                                        SizedBox(width: 2.w),
                                         Expanded(
                                       child: TranslatedText(
                                       "best_timing".trParams({
@@ -158,61 +181,39 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                                       ],
                                     ),
                                   ),
-                                  const SizedBox(height: 16),
+                                  SizedBox(height: 2.h),
                                   TranslatedText(
                                     pooja.description ?? "",
                                     style: GoogleFonts.poppins(
-                                      fontSize: 14,
+                                      fontSize: 11.sp,
                                       color: Colors.white.withOpacity(0.5),
                                       height: 1.6,
                                     ),
-                                    maxLines: 6,
-                                    overflow: TextOverflow.ellipsis,
+                                    // maxLines: 6,
+                                    // overflow: TextOverflow.ellipsis,
                                   ),
-                                  // const SizedBox(height: 12),
-                                  // GestureDetector(
-                                  //   onTap: () {},
-                                  //   child: Row(
-                                  //     children: [
-                                  //       Text(
-                                  //         "Read More",
-                                  //         style: GoogleFonts.poppins(
-                                  //           fontSize: 13,
-                                  //           fontWeight: FontWeight.w600,
-                                  //           color: const Color(0xFFD4AF37),
-                                  //         ),
-                                  //       ),
-                                  //       const SizedBox(width: 4),
-                                  //       const Icon(
-                                  //         Icons.arrow_forward,
-                                  //         size: 14,
-                                  //         color: Color(0xFFD4AF37),
-                                  //       ),
-                                  //     ],
-                                  //   ),
-                                  // ),
                                 ],
                               ),
                             ),
                           ),
                         ),
 
-                      const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                      SliverToBoxAdapter(child: SizedBox(height: 3.h)),
 
-                      if (pooja.purpose != null)
+                      if (pooja.purpose != null && pooja.purpose!.trim().isNotEmpty)
                         SliverToBoxAdapter(
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            padding: EdgeInsets.symmetric(horizontal: 4.w),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _buildSectionHeader("benefits_results".tr),
-                                const SizedBox(height: 16),
+                                SizedBox(height: 1.5.h),
                                 // This would ideally be a list, but we'll adapt the single purpose string
                                 ... (pooja.purpose!.split('.').where((e) => e.trim().isNotEmpty).map((point) => 
                                   Container(
-                                    margin: const EdgeInsets.only(bottom: 12),
-                                    padding: const EdgeInsets.all(16),
+                                    margin: EdgeInsets.all(1.h),
+                                    padding: EdgeInsets.all(4.w),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFF111111),
                                       borderRadius: BorderRadius.circular(16),
@@ -221,19 +222,19 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                                     child: Row(
                                       children: [
                                         Container(
-                                          width: 32,
-                                          height: 32,
+                                          width: 8.w,
+                                          height: 8.w,
                                           decoration: BoxDecoration(
                                             color: Colors.white.withOpacity(0.08),
                                             shape: BoxShape.circle,
                                           ),
-                                          child: const Icon(
+                                          child: Icon(
                                             Icons.check,
-                                            size: 16,
-                                            color: Color(0xFFD4AF37),
+                                            size: 14.sp,
+                                            color: const Color(0xFFD4AF37),
                                           ),
                                         ),
-                                        const SizedBox(width: 16),
+                                        SizedBox(width: 4.w),
                                         Expanded(
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -264,21 +265,42 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                               ],
                             ),
                           ),
+                        )
+                      else
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: EdgeInsets.all(4.w),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildSectionHeader("benefits_results".tr),
+                                SizedBox(height: 1.h),
+                                Text(
+                                  "benefits_available_soon".tr,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 11.sp,
+                                    color: Colors.white.withOpacity(0.4),
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
 
-                      const SliverToBoxAdapter(
-                        child: SizedBox(height: 100),
+                      SliverToBoxAdapter(
+                        child: SizedBox(height: 12.h),
                       ), // Space for button
                     ],
                   ),
 
                   // Start Button
                   Positioned(
-                    bottom: 24,
-                    left: 24,
-                    right: 24,
+                    bottom: 3.h,
+                    left: 6.w,
+                    right: 6.w,
                     child: Container(
-                      height: 52,
+                      height: 6.h,
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
                           colors: [Color(0xFFD4AF37), Color(0xFFFFD700)],
@@ -302,15 +324,16 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.play_circle_filled,
                               color: Colors.black,
+                              size: 18.sp,
                             ),
-                            const SizedBox(width: 8),
+                            SizedBox(width: 2.w),
                             Text(
                               "start_puja_vidhi".tr,
                               style: GoogleFonts.poppins(
-                                fontSize: 16,
+                                fontSize: 13.sp,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
@@ -335,18 +358,18 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
     return Row(
       children: [
         Container(
-          width: 2,
-          height: 16,
+          width: 0.5.w,
+          height: 2.h,
           decoration: BoxDecoration(
             color: const Color(0xFFD4AF37),
             borderRadius: BorderRadius.circular(2),
           ),
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: 2.w),
         Text(
           title,
           style: GoogleFonts.lora(
-            fontSize: 18,
+            fontSize: 15.sp,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -355,17 +378,29 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
     );
   }
 
-  Widget _buildSmallInfo(IconData icon, String text) {
+  Widget _buildSmallInfo(IconData? icon, String text, {bool isSvg = false}) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 14, color: const Color(0xFFD4AF37)),
-        const SizedBox(width: 6),
-        TranslatedText(
-          text,
-          style: GoogleFonts.poppins(
-            fontSize: 12,
-            color: Colors.white.withOpacity(0.6),
-            fontWeight: FontWeight.w500,
+        if (isSvg)
+          SvgPicture.asset(
+            'assets/icons/diya.svg',
+            width: 14.sp,
+            height: 14.sp,
+            // colorFilter: const ColorFilter.mode(Color(0xFFD4AF37), BlendMode.srcIn),
+          )
+        else if (icon != null)
+          Icon(icon, size: 14.sp, color: const Color(0xFFD4AF37)),
+        SizedBox(width: 1.5.w),
+        Expanded(
+          child: TranslatedText(
+            text,
+            style: GoogleFonts.poppins(
+              fontSize: 10.sp,
+              color: Colors.white.withOpacity(0.7),
+              fontWeight: FontWeight.w500,
+            ),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],

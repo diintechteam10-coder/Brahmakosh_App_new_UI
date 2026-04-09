@@ -7,6 +7,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/app_snackbar.dart';
 import '../../astrology/views/credit_history_view.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'subscription_plans_view.dart';
 
 class RechargePlansView extends StatefulWidget {
   const RechargePlansView({super.key});
@@ -189,6 +190,7 @@ class _RechargePlansViewState extends State<RechargePlansView> {
       ),
       body: Column(
         children: [
+          // _buildSubscriptionBanner(),
           const SizedBox(height: 8),
           Expanded(
             child: _isLoading
@@ -268,6 +270,75 @@ class _RechargePlansViewState extends State<RechargePlansView> {
       ),
     );
   }
+
+  // Widget _buildSubscriptionBanner() {
+  //   return GestureDetector(
+  //     onTap: () => Get.to(() => const SubscriptionPlansView()),
+  //     child: Container(
+  //       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+  //       padding: const EdgeInsets.all(16),
+  //       decoration: BoxDecoration(
+  //         gradient: LinearGradient(
+  //           colors: [
+  //             AppTheme.primaryGold.withOpacity(0.15),
+  //             const Color(0xFFD4AF37).withOpacity(0.05)
+  //           ],
+  //           begin: Alignment.topLeft,
+  //           end: Alignment.bottomRight,
+  //         ),
+  //         borderRadius: BorderRadius.circular(20),
+  //         border: Border.all(
+  //           color: AppTheme.primaryGold.withOpacity(0.3),
+  //           width: 1.5,
+  //         ),
+  //         boxShadow: [
+  //           BoxShadow(
+  //             color: AppTheme.primaryGold.withOpacity(0.05),
+  //             blurRadius: 10,
+  //             offset: const Offset(0, 4),
+  //           )
+  //         ],
+  //       ),
+  //       child: Row(
+  //         children: [
+  //           Container(
+  //             padding: const EdgeInsets.all(10),
+  //             decoration: BoxDecoration(
+  //               color: AppTheme.primaryGold.withOpacity(0.15),
+  //               shape: BoxShape.circle,
+  //             ),
+  //             child: const Icon(Icons.star, color: AppTheme.primaryGold, size: 28),
+  //           ),
+  //           const SizedBox(width: 16),
+  //           Expanded(
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Text(
+  //                   "Upgrade to Pro",
+  //                   style: GoogleFonts.lora(
+  //                     fontSize: 14.sp,
+  //                     fontWeight: FontWeight.bold,
+  //                     color: AppTheme.primaryGold,
+  //                   ),
+  //                 ),
+  //                 const SizedBox(height: 4),
+  //                 Text(
+  //                   "Get unlimited talks, chats and 1-on-1 guidance.",
+  //                   style: GoogleFonts.poppins(
+  //                     fontSize: 10.sp,
+  //                     color: Colors.white70,
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //           const Icon(Icons.arrow_forward_ios, color: AppTheme.primaryGold, size: 16),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildPlanCard(
       Map<String, dynamic> plan, int index, bool isSelected) {

@@ -1,11 +1,8 @@
 import 'package:brahmakosh/features/check_in/controllers/meditation_configuration_controller.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_configuration_model.dart';
 import 'package:brahmakosh/features/check_in/repositories/spiritual_repository.dart';
-import 'package:brahmakosh/core/constants/app_constants.dart';
 import 'package:brahmakosh/common/utils.dart';
 import 'package:brahmakosh/core/common_imports.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'dart:ui' show ImageFilter;
 
 class MeditationSelectionViewV2 extends StatefulWidget {
   final String meditationCategoryId;
@@ -327,7 +324,10 @@ class _TrackTile extends StatelessWidget {
   final SpiritualConfiguration track;
   final VoidCallback onTap;
 
-  const _TrackTile({required this.track, required this.onTap});
+  const _TrackTile({
+    required this.track,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -359,7 +359,7 @@ class _TrackTile extends StatelessWidget {
                   ),
                   SizedBox(height: 0.5.h),
                   Text(
-                    "${track.subtitle ?? 'Self-Guided'} • ${track.duration ?? '10MIN'}",
+                    "${track.subtitle ?? 'Self-Guided'} • ${track.duration ?? '10 MIN'}",
                     style: GoogleFonts.poppins(
                       fontSize: 8.sp,
                       color: Colors.white38,

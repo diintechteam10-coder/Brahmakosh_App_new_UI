@@ -1,0 +1,16 @@
+﻿Analyzing prayer_selection_view_v2.dart...                      
+
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:88:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:188:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:278:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:323:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:324:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:336:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:392:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:485:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:489:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:516:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:649:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:698:22 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\check_in\views\prayer_selection_view_v2.dart:700:41 - deprecated_member_use
+

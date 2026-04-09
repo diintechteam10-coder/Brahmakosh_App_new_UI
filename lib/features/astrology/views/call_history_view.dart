@@ -419,4 +419,3 @@ class CallHistoryView extends StatelessWidget {
     );
   }
 }
-

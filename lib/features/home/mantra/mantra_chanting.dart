@@ -504,14 +504,15 @@ class MantraChantingView extends StatelessWidget {
 
     // Clamp
     if (percentage > 100) percentage = 100;
-    if (incomplete && percentage == 100)
+    if (incomplete && percentage == 100) {
       percentage = 99; // Ensure incomplete status if user said End
+    }
 
     // Explicit Args
     final args = Get.arguments as Map? ?? {};
     final audioUrl =
-        args['audioUrl'] ?? ""; // Assuming empty string if null, or null
-    final videoUrl = args['videoUrl'] ?? "";
+        args['audioUrl'] ?? controller.currentAudioUrl ?? "";
+    final videoUrl = args['videoUrl'] ?? controller.currentVideoUrl ?? "";
     final emotion = args['emotion'] ?? "neutral";
     final mantraTitle = args['mantra_title'] ?? mantra.name ?? "";
     // karmaPoints: will be 0 if incomplete, send 0 in request?
@@ -644,8 +645,8 @@ class _CompletionListenerState extends State<_CompletionListener> {
     if (percentage > 100) percentage = 100;
 
     final args = Get.arguments as Map? ?? {};
-    final audioUrl = args['audioUrl'] ?? "";
-    final videoUrl = args['videoUrl'] ?? "";
+    final audioUrl = args['audioUrl'] ?? controller.currentAudioUrl ?? "";
+    final videoUrl = args['videoUrl'] ?? controller.currentVideoUrl ?? "";
     final emotion = args['emotion'] ?? "neutral";
     final mantraTitle = args['mantra_title'] ?? mantra.name ?? "";
     final configPoints = args['karma_points'] ?? 0;
@@ -695,7 +696,7 @@ class _FloatingMantra extends StatefulWidget {
 class _FloatingMantraState extends State<_FloatingMantra>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<Alignment> _moveAnimation;
+  late Animation<double> _riseAnimation;
   late Animation<double> _scaleAnimation;
   late Animation<double> _opacityAnimation;
 
@@ -703,24 +704,26 @@ class _FloatingMantraState extends State<_FloatingMantra>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: 5),
+      duration: const Duration(milliseconds: 2400),
       vsync: this,
     );
 
-    _moveAnimation = Tween<Alignment>(
-      begin: Alignment.center,
-      end: const Alignment(0, -50),
+    _riseAnimation = Tween<double>(
+      begin: 0.0,
+      end: -220.0,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
     _scaleAnimation = Tween<double>(
       begin: 1.0,
-      end: 0.5,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+      end: 0.88,
+    ).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
+    );
 
     _opacityAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.5, 1.0, curve: Curves.easeOut),
+        curve: const Interval(0.34, 1.0, curve: Curves.easeOutCubic),
       ),
     );
 
@@ -742,28 +745,30 @@ class _FloatingMantraState extends State<_FloatingMantra>
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
-        return Align(
-          alignment: _moveAnimation.value,
+        return Center(
           child: Opacity(
             opacity: _opacityAnimation.value,
-            child: Transform.scale(
-              scale: _scaleAnimation.value,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  widget.mantraText,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.tiroDevanagariHindi(
-                    fontSize: 32,
-                    color: const Color(0xffFFD700),
-                    fontWeight: FontWeight.bold,
-                    shadows: [
-                      const Shadow(
-                        color: Colors.black45,
-                        offset: Offset(0, 2),
-                        blurRadius: 4,
-                      ),
-                    ],
+            child: Transform.translate(
+              offset: Offset(0, _riseAnimation.value),
+              child: Transform.scale(
+                scale: _scaleAnimation.value,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(
+                    widget.mantraText,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.tiroDevanagariHindi(
+                      fontSize: 32,
+                      color: const Color(0xffFFD700),
+                      fontWeight: FontWeight.bold,
+                      shadows: [
+                        const Shadow(
+                          color: Colors.black45,
+                          offset: Offset(0, 2),
+                          blurRadius: 4,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

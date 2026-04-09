@@ -89,15 +89,17 @@ class TranslateHelper {
   static Future<String> translate(String? text) async {
     if (text == null || text.trim().isEmpty) return '';
     
-    // Default language is English, no translation needed if app is in English
-    if (_currentLang == 'en') {
-      return text;
-    }
-
     // 1. Smart Dictionary Check (Static)
+    // Always check this first, even for English, because the input might be a key
     final staticValue = _tryStaticTranslate(text);
     if (staticValue != null) {
       return staticValue;
+    }
+
+    // Default language is English, no translation needed if app is in English
+    // and no static match is found.
+    if (_currentLang == 'en') {
+      return text;
     }
 
     _initCache();
@@ -161,11 +163,26 @@ class TranslateHelper {
     _debounce = Timer(_debounceDuration, () => _processQueue());
   }
 
+  /// Immediately cancels the debounce timer and processes all queued strings
+  /// right now. Call this after bulk data loads (e.g. horoscope / panchang)
+  /// so translations arrive before the user has time to notice the delay.
+  static void flush() {
+    if (_queue.isEmpty) return;
+    _debounce?.cancel();
+    _debounce = null;
+    _processQueue();
+  }
+
   static Future<void> _processQueue() async {
     if (_queue.isEmpty) return;
 
     final Map<String, Completer<String>> currentQueue = Map.from(_queue);
     _queue.clear();
+
+    // Register active requests so that fast follow-up UI builds attach to them.
+    for (var entry in currentQueue.entries) {
+      _ongoingRequests[entry.key] = entry.value.future;
+    }
 
     final List<String> textsToTranslate = currentQueue.keys.toList();
     final String targetLang = _currentLang;
@@ -214,14 +231,17 @@ class TranslateHelper {
           entry.value.complete(entry.key);
         }
       }
+    } finally {
+      // Clear from ongoing requests
+      for (var key in currentQueue.keys) {
+        _ongoingRequests.remove(key);
+      }
     }
   }
 
   /// Translates a list of strings efficiently.
   static Future<List<String>> translateList(List<String>? texts) async {
     if (texts == null || texts.isEmpty) return [];
-    if (_currentLang == 'en') return texts;
-    
     // Parallelize with the batch accumulator
     final futures = texts.map((t) => translate(t)).toList();
     return await Future.wait(futures);

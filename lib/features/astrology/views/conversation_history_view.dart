@@ -396,4 +396,3 @@ class ConversationHistoryView extends StatelessWidget {
     );
   }
 }
-

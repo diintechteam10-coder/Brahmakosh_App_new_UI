@@ -57,6 +57,10 @@ class ApiUrls {
   static const String numerologyHistory = '$baseUrl/api/client/users';
   static const String numerologyDetail = '$baseUrl/api/client/users';
   static const String doshaDasha = '$baseUrl/api/client/users';
+  static const String dailyHoroscope = '$baseUrl/api/client/users'; // /:userId/horoscope/daily/:sign
+  static const String monthlyHoroscope = '$baseUrl/api/client/users'; // /:userId/horoscope/monthly/:sign
+  static const String kundaliReport = '$baseUrl/api/client/users'; // /:userId/reports/kundali/:type
+  static const String matchMakingReport = '$baseUrl/api/client/users'; // /:userId/reports/match-making
 
   /// 🔹 Gita APIs
   static const String gitaChapters = '$baseUrl/api/chapters';

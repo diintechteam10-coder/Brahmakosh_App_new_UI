@@ -4,9 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:brahmakosh/core/common_imports.dart';
 import 'package:brahmakosh/common/api_services.dart';
 import 'package:brahmakosh/common/api_urls.dart';
-import 'package:brahmakosh/core/constants/app_constants.dart';
 
-import 'package:brahmakosh/core/services/storage_service.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_checkin_model.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_configuration_model.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_clip_model.dart';
@@ -163,7 +161,7 @@ class SpiritualRepository {
           print(
             '✅ DEBUG_REPO: Response size: ${responseBody?.length ?? 0} bytes',
           );
-          print('✅ DEBUG_REPO: Response size: ${responseBody} bytes');
+          print('✅ DEBUG_REPO: Response size: $responseBody bytes');
         },
       );
     } catch (e) {
@@ -220,7 +218,7 @@ class SpiritualRepository {
         hideLoader: false,
         onResponse: (httpResponse) {
           responseBody = httpResponse.body;
-          print('✅ DEBUG_REPO: Response my data: ${responseBody} bytes');
+          print('✅ DEBUG_REPO: Response my data: $responseBody bytes');
         },
       );
     } catch (e) {

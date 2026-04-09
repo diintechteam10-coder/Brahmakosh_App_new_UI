@@ -37,7 +37,7 @@ class ComingSoonPopup extends StatelessWidget {
             ),
             SizedBox(height: 3.h),
             Text(
-              "Coming Soon",
+              "coming_soon".tr,
               style: GoogleFonts.lora(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
@@ -46,7 +46,7 @@ class ComingSoonPopup extends StatelessWidget {
             ),
             SizedBox(height: 2.h),
             Text(
-              "The $feature feature is currently under development and will be available in a future update. Stay tuned!",
+              "coming_soon_desc".trParams({'feature': feature.tr}),
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: 11.sp,
@@ -67,7 +67,7 @@ class ComingSoonPopup extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  "Okay",
+                  "ok".tr,
                   style: GoogleFonts.poppins(
                     fontSize: 12.sp,
                     fontWeight: FontWeight.bold,

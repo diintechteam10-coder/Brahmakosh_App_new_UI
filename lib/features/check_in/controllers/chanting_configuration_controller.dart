@@ -190,7 +190,9 @@ class ChantingConfigurationController extends GetxController {
 
   // Helper to get display text
   String getDisplayMantraText(SpiritualConfiguration config) {
-    if (config.chantingType != null &&
+    if (config.title != null && config.title!.isNotEmpty) {
+      return config.title!;
+    } else if (config.chantingType != null &&
         config.chantingType!.isNotEmpty &&
         config.chantingType != "Other") {
       return config.chantingType!;
@@ -209,9 +211,25 @@ class ChantingConfigurationController extends GetxController {
     selectedCount.value = count;
   }
 
-  void startSession(SpiritualConfiguration config) {
+  Future<void> startSession(SpiritualConfiguration config) async {
     selectedConfiguration.value = config;
-    
+
+    String? audioUrl;
+    String? videoUrl;
+
+    if (config.sId != null && config.sId!.isNotEmpty) {
+      try {
+        final clipResponse = await getClipsByConfigurationId(null, config.sId!);
+        final clip = clipResponse?.data?.isNotEmpty == true
+            ? clipResponse!.data!.first
+            : null;
+        audioUrl = clip?.audioUrl;
+        videoUrl = clip?.videoUrl;
+      } catch (e) {
+        print("Error fetching chanting clips for ${config.sId}: $e");
+      }
+    }
+
     // Navigate to Mantra Chanting with selected config
     Get.toNamed(
       AppConstants.routeMantraChanting,
@@ -219,8 +237,10 @@ class ChantingConfigurationController extends GetxController {
         'emotion': selectedEmotion.value,
         'count': selectedCount.value,
         'configuration': selectedConfiguration.value,
-        'mantra_title': selectedConfiguration.value?.title ?? selectedConfiguration.value?.chantingType,
+        'mantra_title': getDisplayMantraText(config),
         'karma_points': selectedConfiguration.value?.karmaPoints,
+        'audioUrl': audioUrl,
+        'videoUrl': videoUrl,
       },
     );
   }

@@ -4,7 +4,6 @@ import 'package:equatable/equatable.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_configuration_model.dart';
 import 'package:brahmakosh/features/check_in/repositories/spiritual_repository.dart';
 import 'package:brahmakosh/core/services/storage_service.dart';
-import 'package:brahmakosh/common/utils.dart';
 import 'package:collection/collection.dart'; // for firstWhereOrNull
 
 part 'chanting_event.dart';

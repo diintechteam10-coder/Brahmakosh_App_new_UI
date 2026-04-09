@@ -259,4 +259,3 @@ class AstrologySettingsView extends StatelessWidget {
     );
   }
 }
-

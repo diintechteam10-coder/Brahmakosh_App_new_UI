@@ -18,6 +18,7 @@ class TranslatedText extends StatelessWidget {
   final TextWidthBasis? textWidthBasis;
   final TextHeightBehavior? textHeightBehavior;
   final Color? selectionColor;
+  final bool uppercase;
 
   const TranslatedText(
     this.text, {
@@ -35,6 +36,7 @@ class TranslatedText extends StatelessWidget {
     this.textHeightBehavior,
     this.selectionColor,
     this.textScaleFactor,
+    this.uppercase = false,
   });
 
   @override
@@ -44,7 +46,10 @@ class TranslatedText extends StatelessWidget {
       builder: (context, snapshot) {
         // Show original text while loading, with a slight fade if desired, 
         // or just the original text (which might already be translated in static cache).
-        final displayedText = snapshot.data ?? text;
+        String displayedText = snapshot.data ?? text;
+        if (uppercase) {
+          displayedText = displayedText.toUpperCase();
+        }
         
         return Text(
           displayedText,

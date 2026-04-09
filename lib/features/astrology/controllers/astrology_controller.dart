@@ -16,7 +16,7 @@ import '../../../core/localization/translate_helper.dart';
 class AstrologyController extends GetxController {
   final _experts = <AstrologistItem>[].obs;
   final _categories = <Map<String, dynamic>>[].obs;
-  final _selectedCategoryId = "all".obs; // Store ID of selected category
+  final _selectedCategoryId = "".obs; // Store ID of selected category
   final _searchQuery = "".obs;
   final searchController = TextEditingController();
   final categoryScrollController = ScrollController();
@@ -79,7 +79,7 @@ class AstrologyController extends GetxController {
     super.onInit();
     _lastLang = Get.locale?.languageCode ?? 'en';
     fetchCategories();
-    fetchExperts(); // initial load (cached by fetchExperts)
+    // fetchExperts(); // Removed as fetchCategories will now call fetchExperts(categoryId) correctly
     searchController.addListener(() {
       _searchQuery.value = searchController.text;
     });
@@ -146,7 +146,30 @@ class AstrologyController extends GetxController {
 
             if (categoryList.isNotEmpty) {
               final castedCategories = categoryList.cast<Map<String, dynamic>>();
+
+              // Sort categories based on requested priority
+              final priority = ['Astrology', 'Numerology', 'Tarot', 'Tarrot', 'Vastu', 'Healer'];
+              castedCategories.sort((a, b) {
+                final nameA = (a['name'] ?? '').toString();
+                final nameB = (b['name'] ?? '').toString();
+                
+                int indexA = priority.indexWhere((p) => nameA.toLowerCase().contains(p.toLowerCase()));
+                int indexB = priority.indexWhere((p) => nameB.toLowerCase().contains(p.toLowerCase()));
+                
+                if (indexA == -1) indexA = 999;
+                if (indexB == -1) indexB = 999;
+                
+                return indexA.compareTo(indexB);
+              });
+
               _categories.value = castedCategories;
+              
+              // Default to first category if none selected
+              if (_selectedCategoryId.value.isEmpty && _categories.isNotEmpty) {
+                _selectedCategoryId.value = _categories.first['_id'] ?? '';
+                fetchExperts(force: true, categoryId: _selectedCategoryId.value);
+              }
+              
               _translateAll();
             }
 
@@ -429,4 +452,3 @@ class AstrologyController extends GetxController {
     super.onClose();
   }
 }
-

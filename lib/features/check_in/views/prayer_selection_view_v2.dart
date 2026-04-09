@@ -1,11 +1,8 @@
 import 'package:brahmakosh/features/check_in/controllers/prayer_configuration_controller.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_configuration_model.dart';
-import 'package:brahmakosh/features/check_in/repositories/spiritual_repository.dart';
-import 'package:brahmakosh/core/constants/app_constants.dart';
+import 'package:brahmakosh/features/check_in/models/spiritual_clip_model.dart';
 import 'package:brahmakosh/common/utils.dart';
 import 'package:brahmakosh/core/common_imports.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'dart:ui' show ImageFilter;
 
 class PrayerSelectionViewV2 extends StatefulWidget {
   final String prayerCategoryId;
@@ -85,6 +82,11 @@ class _PrayerSelectionViewV2State extends State<PrayerSelectionViewV2> {
   }
 
   void _showPrayerSheet(SpiritualConfiguration track) {
+    // 🔹 PREFETCH: Start loading clips the moment sheet opens
+    if (track.sId != null) {
+      controller.prefetchClips(track.sId!);
+    }
+
     Get.generalDialog(
       barrierDismissible: true,
       barrierLabel: '',
@@ -106,7 +108,10 @@ class _PrayerSelectionViewV2State extends State<PrayerSelectionViewV2> {
             ),
             child: Align(
               alignment: Alignment.bottomCenter,
-              child: PrayerBeginSheet(track: track),
+              child: PrayerBeginSheet(
+                track: track,
+                controller: controller,
+              ),
             ),
           ),
         );
@@ -240,6 +245,7 @@ class _PrayerSelectionViewV2State extends State<PrayerSelectionViewV2> {
                             categoryName: categoryName,
                             tracks: tracks,
                             style: style,
+                            controller: controller, // Pass controller
                             isExpanded: _expandedCategoryId == categoryName,
                             getEmoji: _getEmoji,
                             getCleanTitle: _getCleanTitle,
@@ -248,6 +254,11 @@ class _PrayerSelectionViewV2State extends State<PrayerSelectionViewV2> {
                                 _expandedCategoryId =
                                     expanded ? categoryName : null;
                               });
+                              // 🔹 AGGRESSIVE PREFETCH: Load clips for all
+                              // tracks when category expands
+                              if (expanded) {
+                                controller.prefetchAllVisibleClips(tracks);
+                              }
                             },
                             onTrackTap: _showPrayerSheet,
                           );
@@ -290,6 +301,7 @@ class _CategoryCard extends StatelessWidget {
   final String categoryName;
   final List<SpiritualConfiguration> tracks;
   final _CategoryStyle style;
+  final PrayerConfigurationController controller; // Added controller
   final bool isExpanded;
   final Function(bool) onExpansionChanged;
   final Function(SpiritualConfiguration) onTrackTap;
@@ -300,6 +312,7 @@ class _CategoryCard extends StatelessWidget {
     required this.categoryName,
     required this.tracks,
     required this.style,
+    required this.controller, // Added controller
     required this.isExpanded,
     required this.onExpansionChanged,
     required this.onTrackTap,
@@ -353,6 +366,7 @@ class _CategoryCard extends StatelessWidget {
               .map(
                 (track) => _TrackTile(
                   track: track,
+                  controller: controller,
                   onTap: () => onTrackTap(track),
                 ),
               )
@@ -367,9 +381,14 @@ class _CategoryCard extends StatelessWidget {
 
 class _TrackTile extends StatelessWidget {
   final SpiritualConfiguration track;
+  final PrayerConfigurationController controller;
   final VoidCallback onTap;
 
-  const _TrackTile({required this.track, required this.onTap});
+  const _TrackTile({
+    required this.track,
+    required this.controller,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -400,14 +419,17 @@ class _TrackTile extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 0.5.h),
-                  Text(
-                    '${track.subcategory ?? track.subtitle ?? 'Prayer'} • ${track.duration ?? '15 MIN'}',
-                    style: GoogleFonts.poppins(
-                      fontSize: 8.sp,
-                      color: Colors.white38,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
+                  Obx(() {
+                    final realDur = controller.realDurations[track.sId];
+                    return Text(
+                      '${track.subcategory ?? track.subtitle ?? 'Prayer'} • ${realDur ?? track.duration ?? '15 MIN'}',
+                      style: GoogleFonts.poppins(
+                        fontSize: 8.sp,
+                        color: Colors.white38,
+                        letterSpacing: 0.5,
+                      ),
+                    );
+                  }),
                 ],
               ),
             ),
@@ -434,8 +456,13 @@ class _TrackTile extends StatelessWidget {
 
 class PrayerBeginSheet extends StatefulWidget {
   final SpiritualConfiguration track;
+  final PrayerConfigurationController controller; // Added controller
 
-  const PrayerBeginSheet({super.key, required this.track});
+  const PrayerBeginSheet({
+    super.key,
+    required this.track,
+    required this.controller, // Added controller
+  });
 
   @override
   State<PrayerBeginSheet> createState() => _PrayerBeginSheetState();
@@ -550,10 +577,16 @@ class _PrayerBeginSheetState extends State<PrayerBeginSheet> {
               // ── Info chips ────────────────────────────────────────────────
               Row(
                 children: [
-                  _infoChip(
-                    icon: Icons.access_time_rounded,
-                    label: widget.track.duration ?? '$durationMins MIN',
-                  ),
+                  Obx(() {
+                    final realDur =
+                        widget.controller.realDurations[widget.track.sId];
+                    return _infoChip(
+                      icon: Icons.access_time_rounded,
+                      label: realDur ??
+                          widget.track.duration ??
+                          '$durationMins MIN',
+                    );
+                  }),
                   SizedBox(width: 3.w),
                   _infoChip(
                     icon: Icons.stars_rounded,
@@ -572,10 +605,16 @@ class _PrayerBeginSheetState extends State<PrayerBeginSheet> {
                     : () async {
                         setState(() => _isStarting = true);
                         try {
-                          final repository = SpiritualRepository();
-                          final clipsResponse = await repository.getClips(
-                            widget.track.sId!,
-                          );
+                          // 🔹 USE PREFETCHED DATA — near-instant!
+                          // Try cached clips first (prefetched when sheet/category opened)
+                          SpiritualClipResponse? clipsResponse =
+                              widget.controller.getCachedClips(widget.track.sId!);
+
+                          // Fallback: if not cached yet, fetch now (rare edge case)
+                          if (clipsResponse == null) {
+                            clipsResponse = await widget.controller
+                                .prefetchClips(widget.track.sId!);
+                          }
 
                           if (clipsResponse != null &&
                               clipsResponse.success == true &&

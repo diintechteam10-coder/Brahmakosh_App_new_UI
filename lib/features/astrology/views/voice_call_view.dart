@@ -328,4 +328,3 @@ class _VoiceCallViewState extends State<VoiceCallView> {
     );
   }
 }
-

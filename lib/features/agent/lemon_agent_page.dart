@@ -76,7 +76,7 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
       final activeAvatars = controller.activeAvatars;
       final hasActive = controller.hasActiveAgents;
 
-      String backgroundAsset = 'assets/images/Chat_background.png';
+      String backgroundAsset = 'assets/icons/chat_bg_new.png';
       // String backgroundAsset = 'assets/images/Krishna_chat.png';
       // if (selectedAgent?.name?.toLowerCase().contains('rashmi') == true) {
       //   backgroundAsset = 'assets/images/Rashmi_chat.png';
@@ -147,11 +147,11 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
               onTap: () => Get.back(),
               child: Container(
                 padding: const EdgeInsets.all(8),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration:  BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.arrow_back, color: Colors.black),
+                child: const Icon(Icons.arrow_back, color: Colors.white),
               ),
             ),
           ),
@@ -178,7 +178,7 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
             decoration: BoxDecoration(
-              color: const Color(0xFFF3E4D4),
+              color: const Color(0xffD4AF37).withOpacity(0.5),
               borderRadius: BorderRadius.circular(30),
             ),
             child: Row(
@@ -194,7 +194,7 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFFB06A2B),
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(width: 6),
@@ -202,7 +202,7 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
                   isDropdownOpen
                       ? Icons.keyboard_arrow_up
                       : Icons.keyboard_arrow_down,
-                  color: const Color(0xFFB06A2B),
+                  color: Colors.white,
                 ),
               ],
             ),
@@ -218,7 +218,7 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
                   padding: const EdgeInsets.all(12),
                   width: MediaQuery.of(context).size.width - 48,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE9D2B8),
+                    color: Colors.black,
                     borderRadius: BorderRadius.circular(25),
                   ),
                   child: Wrap(
@@ -245,8 +245,8 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
                           ),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? const Color(0xFFFFF0D6)
-                                : Colors.white,
+                                ? Color(0xffD4AF37)
+                                : Color(0xffD4AF37).withOpacity(0.5),
                             borderRadius: BorderRadius.circular(16),
                             border: isSelected
                                 ? Border.all(
@@ -301,7 +301,7 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
                                   fontWeight: isSelected
                                       ? FontWeight.bold
                                       : FontWeight.w500,
-                                  color: const Color(0xFF4E342E),
+                                  color: Colors.white,
                                 ),
                               ),
                             ],
@@ -396,7 +396,7 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
                 child: ElevatedButton(
                   onPressed: hasActive ? _startTalking : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
+                    backgroundColor: Color(0xffD4AF37),
                     disabledBackgroundColor: Colors.white.withOpacity(0.5),
                     foregroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(

@@ -1,12 +1,10 @@
 import 'package:brahmakosh/core/common_imports.dart';
-import 'package:brahmakosh/core/constants/app_constants.dart';
 import 'package:brahmakosh/features/check_in/views/prayer_selection_view_v2.dart';
 import 'package:brahmakosh/features/check_in/views/chanting_selection_view_v2.dart';
 import 'package:brahmakosh/features/check_in/views/meditation_selection_view_v2.dart';
 import 'package:brahmakosh/features/check_in/views/silence_selection_view_v2.dart';
 import 'package:brahmakosh/features/check_in/models/spiritual_checkin_model.dart';
 
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:brahmakosh/features/check_in/blocs/check_in/check_in_bloc.dart';
 import 'package:brahmakosh/features/check_in/repositories/spiritual_repository.dart';
 import 'package:brahmakosh/common/utils.dart';
@@ -124,7 +122,35 @@ class _CheckInViewState extends State<CheckInView>
           }
 
           if (state is CheckInError) {
-            return SafeArea(child: Center(child: Text(state.message)));
+            return SafeArea(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error_outline, size: 48, color: Colors.red.withValues(alpha: 0.7)),
+                    const SizedBox(height: 16),
+                    Text(
+                      state.message,
+                      style: GoogleFonts.poppins(color: Colors.white, fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFD4AF37),
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                      ),
+                      onPressed: () {
+                        context.read<CheckInBloc>().add(LoadCheckIn());
+                      },
+                      child: const Text('RETRY', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
 
           Data? data;
@@ -136,11 +162,35 @@ class _CheckInViewState extends State<CheckInView>
             data = state.previousState.data;
           }
 
-          if (data == null) {
-            // Fallback or Initial
-            return SafeArea(child: Center(child: Text("loading".tr)));
+          if (data == null || (data.activities == null && data.stats == null)) {
+            return SafeArea(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset('assets/images/new_logo.png', width: 80, opacity: const AlwaysStoppedAnimation(0.5)),
+                    const SizedBox(height: 24),
+                    const CircularProgressIndicator(color: Color(0xFFD4AF37)),
+                    const SizedBox(height: 24),
+                    Text(
+                      "Connecting to spiritual realm...",
+                      style: GoogleFonts.poppins(color: Colors.white70, fontSize: 14),
+                    ),
+                    const SizedBox(height: 32),
+                    TextButton.icon(
+                      onPressed: () {
+                        context.read<CheckInBloc>().add(LoadCheckIn());
+                      },
+                      icon: const Icon(Icons.refresh, color: Color(0xFFD4AF37)),
+                      label: const Text('RELOAD', style: TextStyle(color: Color(0xFFD4AF37))),
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
 
+          final canPop = Navigator.canPop(context);
           final finalData = data;
 
           return Scaffold(
@@ -172,28 +222,42 @@ class _CheckInViewState extends State<CheckInView>
                             vertical: 8,
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Container(
-                                width: 36,
-                                height: 36,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.white.withValues(alpha: 0.05),
-                                  border: Border.all(color: Colors.white24),
-                                ),
-                                child: IconButton(
-                                  padding: EdgeInsets.zero,
-                                  icon: const Icon(
-                                    Icons.history,
-                                    color: Colors.white,
-                                    size: 18,
-                                  ),
-                                  onPressed: () {
-                                    Get.to(() => const SpiritualStatsScreen());
-                                  },
-                                ),
-                              ),
+                              // Conditional Back button and balancing spacer
+                              if (canPop)
+                                Row(
+                                  children: [
+                                    // Back Button
+                                    Container(
+                                      width: 36,
+                                      height: 36,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.white.withValues(alpha: 0.05),
+                                        border: Border.all(color: Colors.white24),
+                                      ),
+                                      child: IconButton(
+                                        padding: EdgeInsets.zero,
+                                        icon: const Icon(
+                                          Icons.chevron_left,
+                                          color: Colors.white,
+                                          size: 24,
+                                        ),
+                                        onPressed: () {
+                                          Get.back();
+                                        },
+                                      ),
+                                    ),
+                                    // Spacer to balance the two buttons on the right (36+8=44px)
+                                    const SizedBox(width: 44),
+                                  ],
+                                )
+                              else
+                                // Empty spacer to keep title centered when back button is hidden
+                                // (History 36 + Space 8 + Share 36 = 80px)
+                                const SizedBox(width: 80),
+                              
+                              const Spacer(),
                               Text(
                                 '#AreYouSpiritual',
                                 style: GoogleFonts.lora(
@@ -204,27 +268,56 @@ class _CheckInViewState extends State<CheckInView>
                                   ), // Primary Gold
                                 ),
                               ),
-                              Container(
-                                width: 36,
-                                height: 36,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.white.withValues(alpha: 0.05),
-                                  border: Border.all(color: Colors.white24),
-                                ),
-                                child: IconButton(
-                                  padding: EdgeInsets.zero,
-                                  icon: const Icon(
-                                    Icons.share,
-                                    color: Colors.white,
-                                    size: 18,
+                              const Spacer(),
+                              // Grouping History and Share buttons
+                              Row(
+                                children: [
+                                  // History Button
+                                  Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white.withValues(alpha: 0.05),
+                                      border: Border.all(color: Colors.white24),
+                                    ),
+                                    child: IconButton(
+                                      padding: EdgeInsets.zero,
+                                      icon: const Icon(
+                                        Icons.history,
+                                        color: Colors.white,
+                                        size: 18,
+                                      ),
+                                      onPressed: () {
+                                        Get.to(() => const SpiritualStatsScreen());
+                                      },
+                                    ),
                                   ),
-                                  onPressed: () {
-                                    if (data != null) {
-                                      _shareCheckInDetails(context, data);
-                                    }
-                                  },
-                                ),
+                                  const SizedBox(width: 8),
+                                  // Share Button
+                                  Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white.withValues(alpha: 0.05),
+                                      border: Border.all(color: Colors.white24),
+                                    ),
+                                    child: IconButton(
+                                      padding: EdgeInsets.zero,
+                                      icon: const Icon(
+                                        Icons.share,
+                                        color: Colors.white,
+                                        size: 18,
+                                      ),
+                                      onPressed: () {
+                                        if (data != null) {
+                                          _shareCheckInDetails(context, data);
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -576,8 +669,8 @@ class _CheckInViewState extends State<CheckInView>
         ? data.recentActivities!.first
         : null;
 
-    String shareMessage = "share_stats_msg".tr + "\n\n";
-    shareMessage += "my_progress_share".tr + "\n";
+    String shareMessage = "${"share_stats_msg".tr}\n\n";
+    shareMessage += "${"my_progress_share".tr}\n";
     shareMessage += "${"total_sessions_share".tr} ${stats.sessions ?? 0}\n";
     shareMessage += "${"karma_points_share".tr} ${stats.points ?? 0}\n";
     if (recent != null) {

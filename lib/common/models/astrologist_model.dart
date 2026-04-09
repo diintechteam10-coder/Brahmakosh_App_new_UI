@@ -131,41 +131,53 @@ class AstrologistItem {
   });
 
   AstrologistItem.fromJson(Map<String, dynamic> json) {
-    id = json['_id'] ?? json['id']?.toString();
-    name = json['name'];
-    experience = json['experience'];
-    expertise = json['expertise'];
-    profileSummary = json['profileSummary'];
-    profilePhoto = json['profileImageUrl'] ?? json['profilePhoto'] ?? json['profilePicture'] ?? json['profile_photo'] ?? json['profile_picture'] ?? json['image'];
-    profilePhotoKey = json['profilePhotoKey'] ?? json['profile_photo_key'];
-    backgroundBanner = json['backgroundBanner'];
-    backgroundBannerKey = json['backgroundBannerKey'];
-    chatCharge = json['chatCharge'];
-    voiceCharge = json['voiceCharge'];
-    videoCharge = json['videoCharge'];
-    status = json['status'];
-    rating = json['rating']?.toDouble() ?? 0.0;
-    reviews = json['reviews'] ?? 0;
-    clientId = json['clientId'];
-    categoryId = json['categoryId'];
-    isActive = json['isActive'];
-    isDeleted = json['isDeleted'];
-    createdAt = json['createdAt'];
-    updatedAt = json['updatedAt'];
-    version = json['__v'];
+    try {
+      id = json['_id'] ?? json['id']?.toString();
+      name = json['name'];
+      experience = json['experience'];
+      expertise = json['expertise'];
+      profileSummary = json['profileSummary'];
+      profilePhoto =
+          json['profileImageUrl'] ??
+          json['profilePhoto'] ??
+          json['profilePicture'] ??
+          json['profile_photo'] ??
+          json['profile_picture'] ??
+          json['image'];
+      profilePhotoKey = json['profilePhotoKey'] ?? json['profile_photo_key'];
+      backgroundBanner = json['backgroundBanner'];
+      backgroundBannerKey = json['backgroundBannerKey'];
+      chatCharge = json['chatCharge'];
+      voiceCharge = json['voiceCharge'];
+      videoCharge = json['videoCharge'];
+      status = json['status'];
+      rating = json['rating']?.toDouble() ?? 0.0;
+      reviews = json['reviews'] ?? 0;
+      clientId = json['clientId'];
+      categoryId = json['categoryId'];
+      isActive = json['isActive'];
+      isDeleted = json['isDeleted'];
+      createdAt = json['createdAt'];
+      updatedAt = json['updatedAt'];
+      version = json['__v'];
 
-    // Handle languages - can be a list or comma-separated string
-    if (json['languages'] != null) {
-      if (json['languages'] is List) {
-        languages = List<String>.from(json['languages']);
-      } else if (json['languages'] is String) {
-        languages = (json['languages'] as String)
-            .split(',')
-            .map((e) => e.trim())
-            .toList();
+      // Handle languages - can be a list or comma-separated string
+      if (json['languages'] != null) {
+        if (json['languages'] is List) {
+          languages = List<String>.from(json['languages']);
+        } else {
+          languages = json['languages'].toString()
+              .split(',')
+              .map((e) => e.trim())
+              .toList();
+        }
+      } else {
+        languages = ['Hindi', 'English']; // Default languages
       }
-    } else {
-      languages = ['Hindi', 'English']; // Default languages
+    } catch (e, stacktrace) {
+      debugPrint("❌ Error parsing AstrologistItem: $e");
+      debugPrint("❌ Raw JSON data: $json");
+      debugPrint("❌ Stacktrace: $stacktrace");
     }
   }
 
