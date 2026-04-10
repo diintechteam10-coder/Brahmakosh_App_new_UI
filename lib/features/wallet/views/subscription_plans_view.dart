@@ -16,58 +16,58 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
 
   final List<Map<String, dynamic>> _subscriptions = [
     {
-      "name": "Jigyashu",
-      "type": "FREEMIUM",
+      "name_key": "plan_explorer",
+      "type_key": "type_freemium",
       "basePrice": 0,
       "icon": Icons.spa_outlined,
       "features": [
-        "100 Credits",
-        "Krishna talk 5 minute",
-        "Ask Rashmi 10 questions",
-        "Expert chat 5 questions",
+        {"key": "feature_credits", "params": {"count": "100"}},
+        {"key": "feature_krishna_talk", "params": {"count": "5"}},
+        {"key": "feature_rashmi_questions", "params": {"count": "10"}},
+        {"key": "feature_expert_chat", "params": {"count": "5"}},
       ],
       "color": Colors.white70,
     },
     {
-      "name": "Seeker",
-      "type": "PREMIUM",
+      "name_key": "plan_seeker",
+      "type_key": "type_premium",
       "basePrice": 499,
       "icon": Icons.self_improvement,
       "features": [
-        "500 Credits",
-        "Krishna talk 30 minute",
-        "Ask Rashmi 50 questions",
-        "Expert chat 20 questions",
+        {"key": "feature_credits", "params": {"count": "500"}},
+        {"key": "feature_krishna_talk", "params": {"count": "30"}},
+        {"key": "feature_rashmi_questions", "params": {"count": "50"}},
+        {"key": "feature_expert_chat", "params": {"count": "20"}},
       ],
       "color": const Color(0xFFFF9800), // Vibrant Saffron
       "recommended": false,
     },
     {
-      "name": "Sadhak",
-      "type": "PREMIUM",
+      "name_key": "plan_sadhak",
+      "type_key": "type_premium",
       "basePrice": 999,
       "icon": Icons.workspace_premium,
       "features": [
-        "1000 Credits",
-        "Krishna talk 60 minute",
-        "Ask Rashmi 100 questions",
-        "Expert chat 50 questions",
-        "Priority Support",
+        {"key": "feature_credits", "params": {"count": "1000"}},
+        {"key": "feature_krishna_talk", "params": {"count": "60"}},
+        {"key": "feature_rashmi_questions", "params": {"count": "100"}},
+        {"key": "feature_expert_chat", "params": {"count": "50"}},
+        {"key": "feature_priority_support"},
       ],
       "color": AppTheme.primaryGold, // Classy Gold
       "recommended": true,
     },
     {
-      "name": "Brahmakosh Pro",
-      "type": "ELITE",
+      "name_key": "plan_pro",
+      "type_key": "type_elite",
       "basePrice": 2499,
       "icon": Icons.diamond_outlined,
       "features": [
-        "Unlimited Credits",
-        "Krishna talk unlimited",
-        "Ask Rashmi unlimited",
-        "Expert chat unlimited",
-        "1-on-1 Spiritual Guidance",
+        {"key": "feature_credits", "params": {"count": "Unlimited"}},
+        {"key": "feature_krishna_unlimited"},
+        {"key": "feature_rashmi_unlimited"},
+        {"key": "feature_expert_unlimited"},
+        {"key": "feature_one_on_one_guidance"},
       ],
       "color": const Color(0xFFB388FF), // Royal Purple
       "recommended": false,
@@ -86,7 +86,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          "Subscriptions",
+          "wallet_subscription".tr,
           style: GoogleFonts.lora(
             fontWeight: FontWeight.bold,
             fontSize: 22,
@@ -101,7 +101,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 5.w),
             child: Text(
-              "Choose your path to Spiritual Enlightenment",
+              "choose_spiritual_path".tr,
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: 13.sp,
@@ -125,6 +125,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
               },
             ),
           ),
+        
           _buildBottomAction(),
         ],
       ),
@@ -153,7 +154,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: Text(
-                  "Monthly",
+                  "monthly".tr,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
                     fontSize: 12.sp,
@@ -178,7 +179,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Yearly",
+                      "yearly".tr,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
                         fontSize: 12.sp,
@@ -194,11 +195,13 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
-                        "SAVE 17%",
+                        "save_percent".trParams({"percent": "17"}),
                         style: GoogleFonts.poppins(
                           fontSize: 8.sp,
                           fontWeight: FontWeight.bold,
-                          color: _isYearly ? AppTheme.primaryGold : AppTheme.primaryGold,
+                          color: _isYearly
+                              ? AppTheme.primaryGold
+                              : AppTheme.primaryGold,
                         ),
                       ),
                     ),
@@ -219,16 +222,16 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
     
     // Dynamic price calculation
     final String displayPrice = basePrice == 0
-        ? "Free"
+        ? "free".tr
         : _isYearly
             ? "₹${basePrice * 10}"
             : "₹$basePrice";
-            
+
     final String displayDuration = basePrice == 0
-        ? "Forever"
+        ? "forever".tr
         : _isYearly
-            ? "/year"
-            : "/month";
+            ? "per_year".tr
+            : "per_month".tr;
 
     return GestureDetector(
       onTap: () {
@@ -288,7 +291,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              sub["type"],
+                              (sub["type_key"] as String).tr,
                               style: GoogleFonts.poppins(
                                 fontSize: 10.sp,
                                 fontWeight: FontWeight.bold,
@@ -298,7 +301,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
                             ),
                             SizedBox(height: 0.5.h),
                             Text(
-                              sub["name"],
+                              (sub["name_key"] as String).tr,
                               style: GoogleFonts.lora(
                                 fontSize: 20.sp,
                                 fontWeight: FontWeight.bold,
@@ -347,7 +350,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
                           SizedBox(width: 3.w),
                           Expanded(
                             child: Text(
-                              sub["features"][fIndex],
+                              _getLocalizedFeature(sub["features"][fIndex]),
                               style: GoogleFonts.poppins(
                                 fontSize: 11.sp,
                                 color: Colors.white70,
@@ -379,7 +382,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
                     ],
                   ),
                   child: Text(
-                    "RECOMMENDED",
+                    "recommended_cap".tr,
                     style: GoogleFonts.poppins(
                       fontSize: 9.sp,
                       fontWeight: FontWeight.bold,
@@ -393,6 +396,17 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
         ),
       ),
     );
+  }
+
+
+
+  String _getLocalizedFeature(Map<String, dynamic> feature) {
+    if (feature.containsKey('params')) {
+      return (feature['key'] as String).trParams(
+        (feature['params'] as Map<String, String>),
+      );
+    }
+    return (feature['key'] as String).tr;
   }
 
   Widget _buildBottomAction() {
@@ -417,7 +431,11 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
           onPressed: () {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text("Selected plan: ${sub['name']}"),
+                content: Text(
+                  "selected_plan_msg".trParams({
+                    "name": (sub['name_key'] as String).tr,
+                  }),
+                ),
                 backgroundColor: sub["color"],
               ),
             );
@@ -432,7 +450,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
             shadowColor: sub["color"].withOpacity(0.3),
           ),
           child: Text(
-            sub["basePrice"] == 0 ? "Start Free Plan" : "Subscribe Now",
+            sub["basePrice"] == 0 ? "start_free_plan".tr : "subscribe_now".tr,
             style: GoogleFonts.poppins(
               fontSize: 13.sp,
               fontWeight: FontWeight.bold,

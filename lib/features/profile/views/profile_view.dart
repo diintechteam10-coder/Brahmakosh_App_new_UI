@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
-
 import '../../../../core/common_imports.dart';
 import '../../../common/utils.dart';
 import '../../../common/widgets/profile_image_view.dart';
 import '../../../common/widgets/custom_profile_avatar.dart';
+import '../../wallet/views/subscription_plans_view.dart';
 import '../viewmodels/profile_viewmodel.dart';
 import 'profile_details_view.dart';
 import 'update_profile_view.dart';
@@ -244,12 +244,20 @@ class _ProfileViewState extends State<ProfileView> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                _buildLangToggle("En", Get.locale?.languageCode == 'en', () {
-                                  _changeLanguage('en');
-                                }),
-                                _buildLangToggle("Hi", Get.locale?.languageCode == 'hi', () {
-                                  _changeLanguage('hi');
-                                }),
+                                _buildLangToggle(
+                                  "En",
+                                  Get.locale?.languageCode == 'en',
+                                  () {
+                                    _changeLanguage('en');
+                                  },
+                                ),
+                                _buildLangToggle(
+                                  "Hi",
+                                  Get.locale?.languageCode == 'hi',
+                                  () {
+                                    _changeLanguage('hi');
+                                  },
+                                ),
                               ],
                             ),
                           ),
@@ -261,42 +269,50 @@ class _ProfileViewState extends State<ProfileView> {
 
                 const SizedBox(height: 16),
 
-                // Wallets Row
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  child: Row(
-                    children: [
-                      // Karma Wallet
-                      Expanded(
-                        child: _buildWalletCard(
-                          title: "karma_wallet".tr,
-                          value: "${profile?.karmaPoints ?? 56}",
-                          subtitle: "your_karma_points".tr,
-                          buttonLabel: "redeem".tr,
-                          isKarma: true,
-                          onTap: () => Get.to(() => const RedeemListView()),
-                        ),
+                // Wallet & Subscription Section
+                _buildSectionContainer(
+                  title: "wallet_subscription".tr,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Row(
+                        children: [
+                          // Karma Wallet
+                          Expanded(
+                            child: _buildWalletCard(
+                              title: "karma_wallet".tr,
+                              value: "${profile?.karmaPoints ?? 56}",
+                              subtitle: "your_karma_points".tr,
+                              buttonLabel: "redeem".tr,
+                              isKarma: true,
+                              onTap: () => Get.to(() => const RedeemListView()),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          // Credit Wallet
+                          Expanded(
+                            child: _buildWalletCard(
+                              title: "credit_wallet".tr,
+                              value: "${profile?.credits ?? 1000}",
+                              subtitle: "your_credit_points".tr,
+                              buttonLabel: "add_credit".tr,
+                              isKarma: false,
+                              onTap: () =>
+                                  Get.to(() => const RechargePlansView()),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 12),
-                      // Credit Wallet
-                      Expanded(
-                        child: _buildWalletCard(
-                          title: "credit_wallet".tr,
-                          value: "${profile?.credits ?? 1000}",
-                          subtitle: "your_credit_points".tr,
-                          buttonLabel: "add_credit".tr,
-                          isKarma: false,
-                          onTap: () => Get.to(() => const RechargePlansView()),
-                        ),
+                    ),
+                    _buildSubscriptionBanner(
+                      margin: const EdgeInsets.only(
+                        left: 12,
+                        right: 12,
+                        bottom: 12,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-
-                const SizedBox(height: 16),
 
                 // Others Section
                 _buildSectionContainer(
@@ -409,6 +425,85 @@ class _ProfileViewState extends State<ProfileView> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildSubscriptionBanner({EdgeInsetsGeometry? margin}) {
+    return GestureDetector(
+      onTap: () => Get.to(() => const SubscriptionPlansView()),
+      child: Container(
+        margin:
+            margin ?? const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppTheme.primaryGold.withOpacity(0.15),
+              const Color(0xFFD4AF37).withOpacity(0.05),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: AppTheme.primaryGold.withOpacity(0.3),
+            width: 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.primaryGold.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryGold.withOpacity(0.15),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.star,
+                color: AppTheme.primaryGold,
+                size: 28,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "upgrade_to_premium".tr,
+                    style: GoogleFonts.lora(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.primaryGold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "upgrade_banner_desc".tr,
+                    style: GoogleFonts.poppins(
+                      fontSize: 10.sp,
+                      color: Colors.white70,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Icon(
+              Icons.arrow_forward_ios,
+              color: AppTheme.primaryGold,
+              size: 16,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -642,7 +737,7 @@ class _ProfileViewState extends State<ProfileView> {
 
     Get.updateLocale(locale);
     await StorageService.setString(AppConstants.keySelectedLanguage, langCode);
-    
+
     // Optional: Show a subtle toast or just rebuild
     if (mounted) {
       setState(() {});
@@ -690,9 +785,7 @@ class _ProfileViewState extends State<ProfileView> {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                'mail_app_error'.tr,
-              ),
+              content: Text('mail_app_error'.tr),
               backgroundColor: Colors.redAccent,
             ),
           );
@@ -703,9 +796,7 @@ class _ProfileViewState extends State<ProfileView> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              'mail_app_error'.tr,
-            ),
+            content: Text('mail_app_error'.tr),
             backgroundColor: Colors.redAccent,
           ),
         );

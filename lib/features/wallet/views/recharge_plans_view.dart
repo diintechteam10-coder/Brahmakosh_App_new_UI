@@ -190,7 +190,7 @@ class _RechargePlansViewState extends State<RechargePlansView> {
       ),
       body: Column(
         children: [
-          _buildSubscriptionBanner(),
+          // _buildSubscriptionBanner(),
           const SizedBox(height: 8),
           Expanded(
             child: _isLoading
