@@ -1134,15 +1134,7 @@ class _NewHomeViewState extends State<NewHomeView> {
           childAspectRatio: isTablet ? 0.85 : 0.95,
         ),
         delegate: SliverChildListDelegate([
-          _buildGridItem(
-            "book_a_puja".tr,
-            "assets/icons/puja.png",
-            showComingSoon: true,
-            onTap: () {
-              _unfocusAll();
-              Get.dialog(ComingSoonPopup(feature: "book_a_puja"));
-            },
-          ),
+         
           _buildGridItem(
             "astrology".tr,
             "assets/icons/astrology.png",
@@ -1168,15 +1160,7 @@ class _NewHomeViewState extends State<NewHomeView> {
               Get.to(() => const ReportView());
             },
           ),
-          _buildGridItem(
-            "remedies".tr,
-            "assets/icons/remedies.png",
-           showComingSoon: true,
-            onTap: () {
-              _unfocusAll();
-              Get.dialog(ComingSoonPopup(feature: "remedies"));
-            },
-          ),
+      
           _buildGridItem(
             "sankalp_tracker".tr,
             "assets/icons/sankalptracker.png",
@@ -1193,6 +1177,15 @@ class _NewHomeViewState extends State<NewHomeView> {
               Get.toNamed(AppConstants.routePoojaList);
             },
           ),
+           _buildGridItem(
+            "remedies".tr,
+            "assets/icons/remedies.png",
+           showComingSoon: true,
+            onTap: () {
+              _unfocusAll();
+              Get.dialog(ComingSoonPopup(feature: "remedies"));
+            },
+          ),
           _buildGridItem(
             "courses".tr,
             "assets/icons/courses.png",
@@ -1200,6 +1193,15 @@ class _NewHomeViewState extends State<NewHomeView> {
             onTap: () {
               _unfocusAll();
               Get.dialog(ComingSoonPopup(feature: "courses"));
+            },
+          ),
+           _buildGridItem(
+            "book_a_puja".tr,
+            "assets/icons/puja.png",
+            showComingSoon: true,
+            onTap: () {
+              _unfocusAll();
+              Get.dialog(ComingSoonPopup(feature: "book_a_puja"));
             },
           ),
         ]),
@@ -2576,19 +2578,6 @@ class _NewHomeViewState extends State<NewHomeView> {
   Widget _buildSpiritualToolsSection(double screenWidth, bool isTablet, double horizontalPadding) {
     final tools = [
       {
-        "title": "remedies".tr,
-        "desc": "remedies_desc".tr,
-        "icon": "assets/icons/remedies.png",
-        // "onTap": () {
-        //   _unfocusAll();
-        //   Get.to(() => const RemediesWebView());
-        // },
-         "onTap": () {
-          _unfocusAll();
-          Get.dialog(const ComingSoonPopup(feature: "remedies"));
-        },
-      },
-      {
         "title": "puja_vidhi_title".tr,
         "desc": "pooja_vidhi_desc".tr,
         "icon": "assets/icons/puja_vidhi.png",
@@ -2605,6 +2594,19 @@ class _NewHomeViewState extends State<NewHomeView> {
         "onTap": () {
           _unfocusAll();
           Get.to(() => const ReportView());
+        },
+      },
+      {
+        "title": "remedies".tr,
+        "desc": "remedies_desc".tr,
+        "icon": "assets/icons/remedies.png",
+        // "onTap": () {
+        //   _unfocusAll();
+        //   Get.to(() => const RemediesWebView());
+        // },
+         "onTap": () {
+          _unfocusAll();
+          Get.dialog(const ComingSoonPopup(feature: "remedies"));
         },
       },
       {
