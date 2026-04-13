@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:brahmakosh/core/common_imports.dart';
 import 'dart:io';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/services/iap_service.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 
 class SubscriptionPlansView extends StatefulWidget {
   const SubscriptionPlansView({super.key});
@@ -10,9 +12,52 @@ class SubscriptionPlansView extends StatefulWidget {
   State<SubscriptionPlansView> createState() => _SubscriptionPlansViewState();
 }
 
-class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
+class _SubscriptionPlansViewState extends State<SubscriptionPlansView> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
   int _selectedPlanIndex = 0;
   bool _isYearly = false;
+  bool _isIAPLoading = true;
+  final IAPService _iapService = IAPService();
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        setState(() {
+          _isYearly = _tabController.index == 1;
+        });
+      }
+    });
+    if (Platform.isIOS) {
+      _iapService.initialize().then((_) {
+        if (mounted) {
+          setState(() {
+            _isIAPLoading = false;
+          });
+        }
+      });
+    } else {
+      _isIAPLoading = false;
+    }
+  }
+
+  Future<void> _refreshProducts() async {
+    if (Platform.isIOS) {
+      setState(() => _isIAPLoading = true);
+      await _iapService.fetchProducts();
+      if (mounted) {
+        setState(() => _isIAPLoading = false);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   final List<Map<String, dynamic>> _subscriptions = [
     {
@@ -27,6 +72,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
         {"key": "feature_expert_chat", "params": {"count": "5"}},
       ],
       "color": Colors.white70,
+      "iosProductId": null,
     },
     {
       "name_key": "plan_seeker",
@@ -41,6 +87,8 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
       ],
       "color": const Color(0xFFFF9800), // Vibrant Saffron
       "recommended": false,
+      "iosProductIdMonthly": "com.brahmakosh.seekers.monthly",
+      "iosProductIdYearly": "com.brahmakosh.seeker.yearly",
     },
     {
       "name_key": "plan_sadhak",
@@ -56,6 +104,8 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
       ],
       "color": AppTheme.primaryGold, // Classy Gold
       "recommended": true,
+      "iosProductIdMonthly": "com.brahmakosh.sadhakplan.999",
+      "iosProductIdYearly": "com.brahmakosh.sadhak.yearly",
     },
     {
       "name_key": "plan_pro",
@@ -71,6 +121,8 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
       ],
       "color": const Color(0xFFB388FF), // Royal Purple
       "recommended": false,
+      "iosProductIdMonthly": "com.brahmakosh.pro",
+      "iosProductIdYearly": "com.brahmakosh.brahmakoshpro",
     },
   ];
 
@@ -112,18 +164,15 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
             ),
           ),
           SizedBox(height: 3.h),
-          _buildBillingToggle(),
+          _buildBillingTabs(),
           SizedBox(height: 2.h),
           Expanded(
-            child: ListView.builder(
-              padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 1.h),
-              physics: const BouncingScrollPhysics(),
-              itemCount: _subscriptions.length,
-              itemBuilder: (context, index) {
-                final sub = _subscriptions[index];
-                final isSelected = _selectedPlanIndex == index;
-                return _buildSubscriptionCard(sub, index, isSelected);
-              },
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildPlanList(isYearly: false),
+                _buildPlanList(isYearly: true),
+              ],
             ),
           ),
         ],
@@ -135,7 +184,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
     );
   }
 
-  Widget _buildBillingToggle() {
+  Widget _buildBillingTabs() {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 5.w),
       padding: EdgeInsets.all(1.w),
@@ -144,73 +193,44 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
         borderRadius: BorderRadius.circular(30),
         border: Border.all(color: Colors.white10),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: () => setState(() => _isYearly = false),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                padding: EdgeInsets.symmetric(vertical: 1.5.h),
-                decoration: BoxDecoration(
-                  color: !_isYearly ? AppTheme.primaryGold : Colors.transparent,
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Text(
-                  "monthly".tr,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.bold,
-                    color: !_isYearly ? Colors.black : Colors.white54,
+      child: TabBar(
+        controller: _tabController,
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: Colors.transparent,
+        indicator: BoxDecoration(
+          color: AppTheme.primaryGold,
+          borderRadius: BorderRadius.circular(30),
+        ),
+        labelColor: Colors.black,
+        unselectedLabelColor: Colors.white54,
+        labelStyle: GoogleFonts.poppins(
+          fontSize: 12.sp,
+          fontWeight: FontWeight.bold,
+        ),
+        tabs: [
+          Tab(text: "monthly".tr),
+          Tab(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("yearly".tr),
+                SizedBox(width: 1.w),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.2.h),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    "save_percent".trParams({"percent": "17"}),
+                    style: GoogleFonts.poppins(
+                      fontSize: 8.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: GestureDetector(
-              onTap: () => setState(() => _isYearly = true),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                padding: EdgeInsets.symmetric(vertical: 1.5.h),
-                decoration: BoxDecoration(
-                  color: _isYearly ? AppTheme.primaryGold : Colors.transparent,
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "yearly".tr,
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.bold,
-                        color: _isYearly ? Colors.black : Colors.white54,
-                      ),
-                    ),
-                    SizedBox(width: 1.w),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.2.h),
-                      decoration: BoxDecoration(
-                        color: _isYearly ? Colors.black : AppTheme.primaryGold.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        "save_percent".trParams({"percent": "17"}),
-                        style: GoogleFonts.poppins(
-                          fontSize: 8.sp,
-                          fontWeight: FontWeight.bold,
-                          color: _isYearly
-                              ? AppTheme.primaryGold
-                              : AppTheme.primaryGold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              ],
             ),
           ),
         ],
@@ -218,17 +238,59 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
     );
   }
 
+  Widget _buildPlanList({required bool isYearly}) {
+    return RefreshIndicator(
+      onRefresh: _refreshProducts,
+      color: AppTheme.primaryGold,
+      backgroundColor: const Color(0xFF141414),
+      child: ListView.builder(
+        padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 1.h),
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
+        itemCount: _subscriptions.length,
+        itemBuilder: (context, index) {
+          final sub = _subscriptions[index];
+          final isSelected = _selectedPlanIndex == index;
+          return _buildSubscriptionCard(sub, index, isSelected, isYearly: isYearly);
+        },
+      ),
+    );
+  }
+
   Widget _buildSubscriptionCard(
-      Map<String, dynamic> sub, int index, bool isSelected) {
+      Map<String, dynamic> sub, int index, bool isSelected, {bool isYearly = false}) {
     final bool isRecommended = sub["recommended"] ?? false;
     final int basePrice = sub["basePrice"] ?? 0;
     
     // Dynamic price calculation
-    final String displayPrice = basePrice == 0
-        ? "free".tr
-        : _isYearly
-            ? "₹${basePrice * 10}"
-            : "₹$basePrice";
+    String displayPrice = "";
+    if (Platform.isIOS && basePrice != 0) {
+      final String? productId = isYearly 
+          ? sub["iosProductIdYearly"] 
+          : sub["iosProductIdMonthly"];
+      
+      // Look for the product in the fetched list
+      ProductDetails? product;
+      try {
+        product = _iapService.products.firstWhere((p) => p.id == productId);
+      } catch (_) {
+        product = null;
+      }
+
+      if (product != null) {
+        displayPrice = product.price;
+      } else {
+        // Show placeholders if still loading
+        displayPrice = _isIAPLoading ? "..." : (isYearly ? "₹${basePrice * 10}" : "₹$basePrice");
+      }
+    } else {
+      displayPrice = basePrice == 0
+          ? "free".tr
+          : isYearly
+              ? "₹${basePrice * 10}"
+              : "₹$basePrice";
+    }
 
     final String displayDuration = basePrice == 0
         ? "forever".tr
@@ -431,17 +493,40 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
         width: double.infinity,
         height: 6.5.h,
         child: ElevatedButton(
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  "selected_plan_msg".trParams({
-                    "name": (sub['name_key'] as String).tr,
-                  }),
+          onPressed: () async {
+            if (Platform.isIOS && sub["basePrice"] != 0) {
+              final String? productId = _isYearly 
+                  ? sub["iosProductIdYearly"] 
+                  : sub["iosProductIdMonthly"];
+              
+              debugPrint("Subscription button pressed for ID: $productId");
+              if (productId != null) {
+                // Find matching ProductDetails from IAPService
+                ProductDetails? product;
+                try {
+                  product = _iapService.products.firstWhere((p) => p.id == productId);
+                  await _iapService.buyProduct(product);
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Subscription product not found. Please try again later."),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    "selected_plan_msg".trParams({
+                      "name": (sub['name_key'] as String).tr,
+                    }),
+                  ),
+                  backgroundColor: sub["color"],
                 ),
-                backgroundColor: sub["color"],
-              ),
-            );
+              );
+            }
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: sub["color"],
