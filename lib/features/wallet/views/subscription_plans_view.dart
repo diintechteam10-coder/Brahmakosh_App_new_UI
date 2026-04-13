@@ -76,6 +76,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
 
   @override
   Widget build(BuildContext context) {
+    final padding = MediaQuery.of(context).padding;
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -125,9 +126,11 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> {
               },
             ),
           ),
-        
-          _buildBottomAction(),
         ],
+      ),
+      bottomNavigationBar: Padding(
+        padding:  EdgeInsets.only(bottom:padding.bottom),
+        child: _buildBottomAction(),
       ),
     );
   }
