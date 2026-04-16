@@ -21,6 +21,7 @@ import '../../astrology/views/credit_history_view.dart';
 import '../../redeem/views/redeem_list_view.dart';
 import '../../../common/widgets/custom_popups.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../core/services/iap_service.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -339,6 +340,38 @@ class _ProfileViewState extends State<ProfileView> {
                         onTap: () => Utils.showToast('coming_soon'.tr),
                       ),
                     const Divider(color: Colors.white10, height: 1),
+                    // Restore Purchases (iOS only - Apple Guideline 3.1.1)
+                    if (Platform.isIOS)
+                      _buildListTile(
+                        icon: Icons.restore,
+                        title: "restore_purchases".tr,
+                        onTap: () async {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("restoring_purchases".tr),
+                              backgroundColor: AppTheme.primaryGold,
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                          await IAPService().restorePurchases();
+                          if (context.mounted) {
+                            final restored = IAPService().restoreStatus.value;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  restored == true
+                                      ? "restore_purchases_success".tr
+                                      : "restore_purchases_failed".tr,
+                                ),
+                                backgroundColor:
+                                    restored == true ? Colors.green : Colors.orange,
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    if (Platform.isIOS)
+                      const Divider(color: Colors.white10, height: 1),
                     _buildListTile(
                       icon: Icons.help_outline,
                       title: "help_support".tr,

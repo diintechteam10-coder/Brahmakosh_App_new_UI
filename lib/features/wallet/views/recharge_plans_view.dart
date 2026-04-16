@@ -39,12 +39,20 @@ class _RechargePlansViewState extends State<RechargePlansView> {
 
   void _loadIAPPlans() {
     if (mounted) {
+      final List<String> allowedProductIds = [
+        'com.brahmakosh.coins.100',
+        'com.brahmakosh.coins.1000',
+        'com.brahmakosh.coins.2000',
+        'com.brahmakosh.coins.4000',
+        'com.brahmakosh.coins.8000',
+      ];
+
       setState(() {
-        _plans = _iapService.products.map((ProductDetails p) {
-          // Parse credits from ID (e.g., com.brahmakosh.coins.100 -> 100)
+        _plans = _iapService.products
+            .where((p) => allowedProductIds.contains(p.id))
+            .map((ProductDetails p) {
           final parts = p.id.split('.');
           final credits = parts.isNotEmpty ? parts.last : "0";
-          
           return {
             "credits": credits,
             "price": p.price,
@@ -61,12 +69,16 @@ class _RechargePlansViewState extends State<RechargePlansView> {
     try {
       final plans = await PaymentService.getPlans();
       if (mounted) {
+        final List<int> allowedCredits = [100, 1000, 2000, 4000, 8000];
         setState(() {
-          _plans = List<Map<String, dynamic>>.from(plans.map((p) => {
+          _plans = plans
+              .where((p) => allowedCredits.contains(int.tryParse(p["credits"].toString())))
+              .map((p) => {
                 "credits": p["credits"],
                 "price": p["amount"],
                 "originalPrice": p["amount"],
-              }));
+              })
+              .toList();
           _isLoading = false;
         });
       }

@@ -19,18 +19,22 @@ class IAPService {
   List<ProductDetails> products = [];
   bool isAvailable = false;
 
+  /// Notifier for restore purchases result: true = success, false = no purchases found, null = in progress/idle
+  final ValueNotifier<bool?> restoreStatus = ValueNotifier<bool?>(null);
+  bool _restoredAny = false;
+
   final List<String> _productIds = [
     'com.brahmakosh.coins.100',
     'com.brahmakosh.coins.1000',
     'com.brahmakosh.coins.2000',
     'com.brahmakosh.coins.4000',
     'com.brahmakosh.coins.8000',
+    'com.brahmakoshseeker.499',
+    'com.brahmakoshseeker.yearly',
+    'com.brahmakoshsadhak.999',
+    'com.brahmakoshsadhak.yearly',
     'com.brahmakosh.pro',
-    'com.brahmakosh.brahmakoshpro',
-    'com.brahmakosh.sadhakplan.999',
-    'com.brahmakosh.sadhak.yearly',
-    'com.brahmakosh.seekers.monthly',
-    'com.brahmakosh.seeker.yearly',
+    'com.brahmakoshplus.yearly',
   ];
 
   static final Dio _dio =
@@ -101,9 +105,33 @@ class IAPService {
   }
 
   Future<void> buyProduct(ProductDetails product) async {
-    debugPrint("Initiating purchase for product: ${product.id}");
+    debugPrint("Initiating consumable purchase for product: ${product.id}");
     final PurchaseParam purchaseParam = PurchaseParam(productDetails: product);
     await _iap.buyConsumable(purchaseParam: purchaseParam);
+  }
+
+  /// Buy a subscription (non-consumable) product
+  Future<void> buySubscription(ProductDetails product) async {
+    debugPrint("Initiating subscription purchase for product: ${product.id}");
+    final PurchaseParam purchaseParam = PurchaseParam(productDetails: product);
+    await _iap.buyNonConsumable(purchaseParam: purchaseParam);
+  }
+
+  /// Restore previous purchases (required by Apple App Store Guidelines 3.1.1)
+  Future<void> restorePurchases() async {
+    debugPrint("=== Restoring Purchases ===");
+    _restoredAny = false;
+    restoreStatus.value = null; // in progress
+    try {
+      await _iap.restorePurchases();
+      // Give a short delay for the purchaseStream to deliver restored items
+      await Future.delayed(const Duration(seconds: 2));
+      restoreStatus.value = _restoredAny;
+      debugPrint("Restore completed. Found purchases: $_restoredAny");
+    } catch (e) {
+      debugPrint("Restore purchases error: $e");
+      restoreStatus.value = false;
+    }
   }
 
   void _listenToPurchaseUpdated(List<PurchaseDetails> purchaseDetailsList) {
@@ -118,6 +146,9 @@ class IAPService {
           debugPrint("Purchase Error: ${purchaseDetails.error}");
         } else if (purchaseDetails.status == PurchaseStatus.purchased ||
             purchaseDetails.status == PurchaseStatus.restored) {
+          if (purchaseDetails.status == PurchaseStatus.restored) {
+            _restoredAny = true;
+          }
           debugPrint("Purchase successful/restored, verifying...");
           bool valid = await _verifyPurchase(purchaseDetails);
           if (valid) {

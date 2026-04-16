@@ -44,20 +44,14 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>This app requires camera access to scan content and capture images.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>Brahmakosh uses the camera to allow users to capture profile photos and share images during spiritual consultations and guidance sessions within the app.</string>	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>This app may use location services to provide better functionality.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app uses your location to improve user experience.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>This app requires microphone access to let you talk to the AI agents.</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>This app needs permission to save photos to your library.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app requires photo library access to upload images.</string>
-	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>This app uses speech recognition to convert your voice into text.</string>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
+<string>Brahmakosh uses your location to provide personalized spiritual insights, such as astrology-based recommendations and region-specific guidance.</string>	<key>NSMicrophoneUsageDescription</key>
+<string>Brahmakosh uses the microphone to enable voice-based spiritual guidance and AI-powered conversations with sages and spiritual teachers.</string>	<key>NSPhotoLibraryAddUsageDescription</key>
+<string>Brahmakosh uses the photo library to let users upload images for profile customization and sharing during spiritual discussions.</string>	<key>NSPhotoLibraryUsageDescription</key>
+<string>Brahmakosh uses the photo library to let users upload images for profile customization and sharing during spiritual discussions.</string>	<key>NSSpeechRecognitionUsageDescription</key>
+<string>Brahmakosh uses speech recognition to convert your voice into text for seamless voice-based interactions and guidance.</string>	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
 	<array>

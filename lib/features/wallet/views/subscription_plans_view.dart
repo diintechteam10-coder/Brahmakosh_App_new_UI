@@ -4,6 +4,7 @@ import 'dart:io';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/services/iap_service.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SubscriptionPlansView extends StatefulWidget {
   const SubscriptionPlansView({super.key});
@@ -12,11 +13,13 @@ class SubscriptionPlansView extends StatefulWidget {
   State<SubscriptionPlansView> createState() => _SubscriptionPlansViewState();
 }
 
-class _SubscriptionPlansViewState extends State<SubscriptionPlansView> with SingleTickerProviderStateMixin {
+class _SubscriptionPlansViewState extends State<SubscriptionPlansView>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _selectedPlanIndex = 0;
   bool _isYearly = false;
   bool _isIAPLoading = true;
+  bool _isRestoring = false;
   final IAPService _iapService = IAPService();
 
   @override
@@ -66,10 +69,22 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> with Sing
       "basePrice": 0,
       "icon": Icons.spa_outlined,
       "features": [
-        {"key": "feature_credits", "params": {"count": "100"}},
-        {"key": "feature_krishna_talk", "params": {"count": "5"}},
-        {"key": "feature_rashmi_questions", "params": {"count": "10"}},
-        {"key": "feature_expert_chat", "params": {"count": "5"}},
+        {
+          "key": "feature_credits",
+          "params": {"count": "100"},
+        },
+        {
+          "key": "feature_krishna_talk",
+          "params": {"count": "5"},
+        },
+        {
+          "key": "feature_rashmi_questions",
+          "params": {"count": "10"},
+        },
+        {
+          "key": "feature_expert_chat",
+          "params": {"count": "5"},
+        },
       ],
       "color": Colors.white70,
       "iosProductId": null,
@@ -80,15 +95,27 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> with Sing
       "basePrice": 499,
       "icon": Icons.self_improvement,
       "features": [
-        {"key": "feature_credits", "params": {"count": "500"}},
-        {"key": "feature_krishna_talk", "params": {"count": "30"}},
-        {"key": "feature_rashmi_questions", "params": {"count": "50"}},
-        {"key": "feature_expert_chat", "params": {"count": "20"}},
+        {
+          "key": "feature_credits",
+          "params": {"count": "500"},
+        },
+        {
+          "key": "feature_krishna_talk",
+          "params": {"count": "30"},
+        },
+        {
+          "key": "feature_rashmi_questions",
+          "params": {"count": "50"},
+        },
+        {
+          "key": "feature_expert_chat",
+          "params": {"count": "20"},
+        },
       ],
       "color": const Color(0xFFFF9800), // Vibrant Saffron
       "recommended": false,
-      "iosProductIdMonthly": "com.brahmakosh.seekers.monthly",
-      "iosProductIdYearly": "com.brahmakosh.seeker.yearly",
+      "iosProductIdMonthly": "com.brahmakoshseeker.499",
+      "iosProductIdYearly": "com.brahmakoshseeker.yearly",
     },
     {
       "name_key": "plan_sadhak",
@@ -96,16 +123,28 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> with Sing
       "basePrice": 999,
       "icon": Icons.workspace_premium,
       "features": [
-        {"key": "feature_credits", "params": {"count": "1000"}},
-        {"key": "feature_krishna_talk", "params": {"count": "60"}},
-        {"key": "feature_rashmi_questions", "params": {"count": "100"}},
-        {"key": "feature_expert_chat", "params": {"count": "50"}},
+        {
+          "key": "feature_credits",
+          "params": {"count": "1000"},
+        },
+        {
+          "key": "feature_krishna_talk",
+          "params": {"count": "60"},
+        },
+        {
+          "key": "feature_rashmi_questions",
+          "params": {"count": "100"},
+        },
+        {
+          "key": "feature_expert_chat",
+          "params": {"count": "50"},
+        },
         {"key": "feature_priority_support"},
       ],
       "color": AppTheme.primaryGold, // Classy Gold
       "recommended": true,
-      "iosProductIdMonthly": "com.brahmakosh.sadhakplan.999",
-      "iosProductIdYearly": "com.brahmakosh.sadhak.yearly",
+      "iosProductIdMonthly": "com.brahmakoshsadhak.999",
+      "iosProductIdYearly": "com.brahmakoshsadhak.yearly",
     },
     {
       "name_key": "plan_pro",
@@ -113,7 +152,10 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> with Sing
       "basePrice": 2499,
       "icon": Icons.diamond_outlined,
       "features": [
-        {"key": "feature_credits", "params": {"count": "Unlimited"}},
+        {
+          "key": "feature_credits",
+          "params": {"count": "Unlimited"},
+        },
         {"key": "feature_krishna_unlimited"},
         {"key": "feature_rashmi_unlimited"},
         {"key": "feature_expert_unlimited"},
@@ -121,8 +163,8 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> with Sing
       ],
       "color": const Color(0xFFB388FF), // Royal Purple
       "recommended": false,
-      "iosProductIdMonthly": "com.brahmakosh.pro",
-      "iosProductIdYearly": "com.brahmakosh.brahmakoshpro",
+      "iosProductIdMonthly": "com.brahmakosh.pro.monthly",
+      "iosProductIdYearly": "com.brahmakoshplus.yearly",
     },
   ];
 
@@ -177,9 +219,11 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> with Sing
           ),
         ],
       ),
-      bottomNavigationBar: Padding(
-        padding:  EdgeInsets.only(bottom:padding.bottom),
-        child: _buildBottomAction(),
+      bottomNavigationBar: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.only(bottom: padding.bottom),
+          child: _buildBottomAction(),
+        ),
       ),
     );
   }
@@ -216,7 +260,10 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> with Sing
                 Text("yearly".tr),
                 SizedBox(width: 1.w),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.2.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 2.w,
+                    vertical: 0.2.h,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(10),
@@ -252,24 +299,33 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> with Sing
         itemBuilder: (context, index) {
           final sub = _subscriptions[index];
           final isSelected = _selectedPlanIndex == index;
-          return _buildSubscriptionCard(sub, index, isSelected, isYearly: isYearly);
+          return _buildSubscriptionCard(
+            sub,
+            index,
+            isSelected,
+            isYearly: isYearly,
+          );
         },
       ),
     );
   }
 
   Widget _buildSubscriptionCard(
-      Map<String, dynamic> sub, int index, bool isSelected, {bool isYearly = false}) {
+    Map<String, dynamic> sub,
+    int index,
+    bool isSelected, {
+    bool isYearly = false,
+  }) {
     final bool isRecommended = sub["recommended"] ?? false;
     final int basePrice = sub["basePrice"] ?? 0;
-    
+
     // Dynamic price calculation
     String displayPrice = "";
     if (Platform.isIOS && basePrice != 0) {
-      final String? productId = isYearly 
-          ? sub["iosProductIdYearly"] 
+      final String? productId = isYearly
+          ? sub["iosProductIdYearly"]
           : sub["iosProductIdMonthly"];
-      
+
       // Look for the product in the fetched list
       ProductDetails? product;
       try {
@@ -282,21 +338,23 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> with Sing
         displayPrice = product.price;
       } else {
         // Show placeholders if still loading
-        displayPrice = _isIAPLoading ? "..." : (isYearly ? "₹${basePrice * 10}" : "₹$basePrice");
+        displayPrice = _isIAPLoading
+            ? "..."
+            : (isYearly ? "₹${basePrice * 10}" : "₹$basePrice");
       }
     } else {
       displayPrice = basePrice == 0
           ? "free".tr
           : isYearly
-              ? "₹${basePrice * 10}"
-              : "₹$basePrice";
+          ? "₹${basePrice * 10}"
+          : "₹$basePrice";
     }
 
     final String displayDuration = basePrice == 0
         ? "forever".tr
         : _isYearly
-            ? "per_year".tr
-            : "per_month".tr;
+        ? "per_year".tr
+        : "per_month".tr;
 
     return GestureDetector(
       onTap: () {
@@ -327,7 +385,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> with Sing
                           color: sub["color"].withOpacity(0.2),
                           blurRadius: 20,
                           offset: const Offset(0, 5),
-                        )
+                        ),
                       ]
                     : [],
               ),
@@ -368,8 +426,8 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> with Sing
                             Text(
                               (sub["name_key"] as String).tr,
                               style: GoogleFonts.lora(
-                                fontSize: 20.sp,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.w600,
                                 color: Colors.white,
                               ),
                             ),
@@ -382,7 +440,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> with Sing
                           Text(
                             displayPrice,
                             style: GoogleFonts.lora(
-                              fontSize: 20.sp,
+                              fontSize: 16.sp,
                               fontWeight: FontWeight.bold,
                               color: isSelected ? sub["color"] : Colors.white,
                             ),
@@ -434,7 +492,10 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> with Sing
                 top: -12,
                 right: 20,
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 0.5.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 3.w,
+                    vertical: 0.5.h,
+                  ),
                   decoration: BoxDecoration(
                     color: sub["color"],
                     borderRadius: BorderRadius.circular(20),
@@ -443,7 +504,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> with Sing
                         color: sub["color"].withOpacity(0.5),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
-                      )
+                      ),
                     ],
                   ),
                   child: Text(
@@ -463,8 +524,6 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> with Sing
     );
   }
 
-
-
   String _getLocalizedFeature(Map<String, dynamic> feature) {
     if (feature.containsKey('params')) {
       return (feature['key'] as String).trParams(
@@ -478,75 +537,253 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView> with Sing
     final sub = _subscriptions[_selectedPlanIndex];
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h).copyWith(
-        bottom: Platform.isIOS ? 4.h : 3.h,
-      ),
+      padding: EdgeInsets.symmetric(
+        horizontal: 6.w,
+        vertical: 2.h,
+      ).copyWith(bottom: Platform.isIOS ? 2.h : 2.h),
       decoration: BoxDecoration(
         color: const Color(0xFF141414),
         border: Border(
-          top: BorderSide(
-            color: AppTheme.primaryGold.withOpacity(0.1),
-          ),
+          top: BorderSide(color: AppTheme.primaryGold.withOpacity(0.1)),
         ),
       ),
-      child: SizedBox(
-        width: double.infinity,
-        height: 6.5.h,
-        child: ElevatedButton(
-          onPressed: () async {
-            if (Platform.isIOS && sub["basePrice"] != 0) {
-              final String? productId = _isYearly 
-                  ? sub["iosProductIdYearly"] 
-                  : sub["iosProductIdMonthly"];
-              
-              debugPrint("Subscription button pressed for ID: $productId");
-              if (productId != null) {
-                // Find matching ProductDetails from IAPService
-                ProductDetails? product;
-                try {
-                  product = _iapService.products.firstWhere((p) => p.id == productId);
-                  await _iapService.buyProduct(product);
-                } catch (e) {
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Subscribe / Start Free Plan Button
+          SizedBox(
+            width: double.infinity,
+            height: 6.5.h,
+            child: ElevatedButton(
+              onPressed: () async {
+                if (Platform.isIOS && sub["basePrice"] != 0) {
+                  final String? productId = _isYearly
+                      ? sub["iosProductIdYearly"]
+                      : sub["iosProductIdMonthly"];
+
+                  debugPrint("Subscription button pressed for ID: $productId");
+                  if (productId != null) {
+                    ProductDetails? product;
+                    try {
+                      product = _iapService.products.firstWhere(
+                        (p) => p.id == productId,
+                      );
+                      await _iapService.buySubscription(product);
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            "Subscription product not found. Please try again later.",
+                          ),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
+                } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Subscription product not found. Please try again later."),
-                      backgroundColor: Colors.red,
+                    SnackBar(
+                      content: Text(
+                        "selected_plan_msg".trParams({
+                          "name": (sub['name_key'] as String).tr,
+                        }),
+                      ),
+                      backgroundColor: sub["color"],
                     ),
                   );
                 }
-              }
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    "selected_plan_msg".trParams({
-                      "name": (sub['name_key'] as String).tr,
-                    }),
-                  ),
-                  backgroundColor: sub["color"],
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: sub["color"],
+                foregroundColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
-              );
-            }
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: sub["color"],
-            foregroundColor: Colors.black,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            elevation: 10,
-            shadowColor: sub["color"].withOpacity(0.3),
-          ),
-          child: Text(
-            sub["basePrice"] == 0 ? "start_free_plan".tr : "subscribe_now".tr,
-            style: GoogleFonts.poppins(
-              fontSize: 13.sp,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
+                elevation: 10,
+                shadowColor: sub["color"].withOpacity(0.3),
+              ),
+              child: Text(
+                sub["basePrice"] == 0
+                    ? "start_free_plan".tr
+                    : "subscribe_now".tr,
+                style: GoogleFonts.poppins(
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
             ),
           ),
-        ),
+
+          // Restore Purchases Button (iOS only)
+          if (Platform.isIOS) ...[
+            SizedBox(height: 1.h),
+            SizedBox(
+              width: double.infinity,
+              height: 5.h,
+              child: TextButton(
+                onPressed: _isRestoring
+                    ? null
+                    : () async {
+                        setState(() => _isRestoring = true);
+                        await _iapService.restorePurchases();
+                        if (mounted) {
+                          setState(() => _isRestoring = false);
+                          final restored = _iapService.restoreStatus.value;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                restored == true
+                                    ? "restore_purchases_success".tr
+                                    : "restore_purchases_failed".tr,
+                              ),
+                              backgroundColor: restored == true
+                                  ? Colors.green
+                                  : Colors.orange,
+                            ),
+                          );
+                        }
+                      },
+                child: _isRestoring
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppTheme.primaryGold,
+                            ),
+                          ),
+                          SizedBox(width: 2.w),
+                          Text(
+                            "restoring_purchases".tr,
+                            style: GoogleFonts.poppins(
+                              fontSize: 11.sp,
+                              color: AppTheme.primaryGold,
+                            ),
+                          ),
+                        ],
+                      )
+                    : Text(
+                        "restore_purchases".tr,
+                        style: GoogleFonts.poppins(
+                          fontSize: 11.sp,
+                          fontWeight: FontWeight.w500,
+                          color: AppTheme.primaryGold,
+                          decoration: TextDecoration.underline,
+                          decorationColor: AppTheme.primaryGold,
+                        ),
+                      ),
+              ),
+            ),
+          ],
+
+          // Subscription Compliance Info (iOS only, Apple Guideline 3.1.2(c))
+          if (Platform.isIOS) ...[
+            SizedBox(height: 1.h),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 2.w),
+              child: Column(
+                children: [
+                  Text(
+                    "auto_renewal_info".tr,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontSize: 8.sp,
+                      color: Colors.white38,
+                      height: 1.4,
+                    ),
+                  ),
+                  SizedBox(height: 0.5.h),
+                  Text(
+                    "billing_info".tr,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontSize: 8.sp,
+                      color: Colors.white38,
+                      height: 1.4,
+                    ),
+                  ),
+                  SizedBox(height: 0.5.h),
+                  Text(
+                    "management_info".tr,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontSize: 8.sp,
+                      color: Colors.white38,
+                      height: 1.4,
+                    ),
+                  ),
+                  SizedBox(height: 1.h),
+                  Text(
+                    "credits_account_info".tr,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontSize: 8.sp,
+                      color: Colors.white38,
+                      height: 1.4,
+                    ),
+                  ),
+                  SizedBox(height: 1.5.h),
+                  // Privacy Policy & Terms of Use Links
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () => _launchUrl(
+                          'https://www.brahmakosh.com/privacy-policy',
+                        ),
+                        child: Text(
+                          "privacy_policy".tr,
+                          style: GoogleFonts.poppins(
+                            fontSize: 9.sp,
+                            color: AppTheme.primaryGold,
+                            decoration: TextDecoration.underline,
+                            decorationColor: AppTheme.primaryGold,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 3.w),
+                        child: Text(
+                          "|",
+                          style: GoogleFonts.poppins(
+                            fontSize: 9.sp,
+                            color: Colors.white24,
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => _launchUrl(
+                          'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
+                        ),
+                        child: Text(
+                          "terms_of_use".tr,
+                          style: GoogleFonts.poppins(
+                            fontSize: 9.sp,
+                            color: AppTheme.primaryGold,
+                            decoration: TextDecoration.underline,
+                            decorationColor: AppTheme.primaryGold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
       ),
     );
+  }
+
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
 }

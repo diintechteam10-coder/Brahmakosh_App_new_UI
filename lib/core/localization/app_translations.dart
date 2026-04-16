@@ -34,7 +34,7 @@ class AppTranslations extends Translations {
           'plan_explorer': 'Explorer',
           'plan_seeker': 'Seeker',
           'plan_sadhak': 'Sadhak',
-          'plan_pro': 'Brahmakosh Pro',
+          'plan_pro': 'Brahmakosh Plus',
 
           // Plan Types
           'type_freemium': 'FREEMIUM',
@@ -747,6 +747,18 @@ class AppTranslations extends Translations {
           'capricorn': 'Capricorn',
           'aquarius': 'Aquarius',
           'pisces': 'Pisces',
+
+          // Apple App Store Compliance (Guidelines 3.1.1 & 3.1.2(c))
+          'restore_purchases': 'Restore Purchases',
+          'restore_purchases_success': 'Purchases restored successfully',
+          'restore_purchases_failed': 'No purchases found to restore',
+          'restoring_purchases': 'Restoring purchases...',
+          'credits_account_info': 'Credits are associated with your account and will be available after login. You can also restore purchases using the restore option.',
+          'auto_renewal_info': 'This subscription automatically renews unless cancelled at least 24 hours before the end of the current period.',
+          'billing_info': 'Payment will be charged to your Apple ID account at confirmation of purchase.',
+          'management_info': 'You can manage or cancel your subscription in your Apple ID settings.',
+          'privacy_policy': 'Privacy Policy',
+          'terms_of_use': 'Terms of Use (EULA)',
         },
         'hi_IN': {
           'coming_soon': 'जल्द आ रहा है',
@@ -1486,6 +1498,18 @@ class AppTranslations extends Translations {
           'capricorn': 'मकर',
           'aquarius': 'कुंभ',
           'pisces': 'मीन',
+
+          // Apple App Store Compliance (Guidelines 3.1.1 & 3.1.2(c))
+          'restore_purchases': 'खरीदारी पुनर्स्थापित करें',
+          'restore_purchases_success': 'खरीदारी सफलतापूर्वक पुनर्स्थापित',
+          'restore_purchases_failed': 'पुनर्स्थापित करने के लिए कोई खरीदारी नहीं मिली',
+          'restoring_purchases': 'खरीदारी पुनर्स्थापित हो रही है...',
+          'credits_account_info': 'क्रेडिट आपके खाते से जुड़े हैं और लॉगिन के बाद उपलब्ध होंगे। आप रिस्टोर विकल्प का उपयोग करके खरीदारी पुनर्स्थापित कर सकते हैं।',
+          'auto_renewal_info': 'यह सदस्यता स्वचालित रूप से नवीनीकृत होती है जब तक कि वर्तमान अवधि समाप्त होने से कम से कम 24 घंटे पहले रद्द नहीं कर दी जाती।',
+          'billing_info': 'भुगतान खरीद की पुष्टि पर आपके Apple ID खाते में चार्ज किया जाएगा।',
+          'management_info': 'आप अपनी Apple ID सेटिंग्स में अपनी सदस्यता प्रबंधित या रद्द कर सकते हैं।',
+          'privacy_policy': 'गोपनीयता नीति',
+          'terms_of_use': 'उपयोग की शर्तें (EULA)',
         },
       };
 }
