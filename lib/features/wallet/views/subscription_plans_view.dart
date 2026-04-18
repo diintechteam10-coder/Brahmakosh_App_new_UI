@@ -16,7 +16,7 @@ class SubscriptionPlansView extends StatefulWidget {
 class _SubscriptionPlansViewState extends State<SubscriptionPlansView>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  int _selectedPlanIndex = 0;
+  int _selectedPlanIndex = 2;
   bool _isYearly = false;
   bool _isIAPLoading = true;
   bool _isRestoring = false;
@@ -199,12 +199,12 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView>
               "choose_spiritual_path".tr,
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
-                fontSize: 13.sp,
+                fontSize: 12.sp,
                 color: Colors.white70,
-                letterSpacing: 0.5,
               ),
             ),
           ),
+          
           SizedBox(height: 3.h),
           _buildBillingTabs(),
           SizedBox(height: 2.h),
@@ -537,10 +537,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView>
     final sub = _subscriptions[_selectedPlanIndex];
 
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 6.w,
-        vertical: 2.h,
-      ).copyWith(bottom: Platform.isIOS ? 2.h : 2.h),
+      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 1.5.h),
       decoration: BoxDecoration(
         color: const Color(0xFF141414),
         border: Border(
@@ -607,7 +604,7 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView>
                     ? "start_free_plan".tr
                     : "subscribe_now".tr,
                 style: GoogleFonts.poppins(
-                  fontSize: 13.sp,
+                  fontSize: 12.sp,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
                 ),
@@ -615,169 +612,203 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView>
             ),
           ),
 
-          // Restore Purchases Button (iOS only)
+          // Compact Footer for iOS Compliance
           if (Platform.isIOS) ...[
-            SizedBox(height: 1.h),
-            SizedBox(
-              width: double.infinity,
-              height: 5.h,
-              child: TextButton(
-                onPressed: _isRestoring
-                    ? null
-                    : () async {
-                        setState(() => _isRestoring = true);
-                        await _iapService.restorePurchases();
-                        if (mounted) {
-                          setState(() => _isRestoring = false);
-                          final restored = _iapService.restoreStatus.value;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                restored == true
-                                    ? "restore_purchases_success".tr
-                                    : "restore_purchases_failed".tr,
+            SizedBox(height: 1.5.h),
+            Column(
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  height: 4.5.h,
+                  child: OutlinedButton(
+                    onPressed: _isRestoring ? null : _handleRestorePurchases,
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(
+                        color: AppTheme.primaryGold.withOpacity(0.3),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: _isRestoring
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 14,
+                                height: 14,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppTheme.primaryGold,
+                                ),
                               ),
-                              backgroundColor: restored == true
-                                  ? Colors.green
-                                  : Colors.orange,
-                            ),
-                          );
-                        }
-                      },
-                child: _isRestoring
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppTheme.primaryGold,
-                            ),
-                          ),
-                          SizedBox(width: 2.w),
-                          Text(
-                            "restoring_purchases".tr,
+                              SizedBox(width: 10),
+                              Text(
+                                "restoring_purchases".tr,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 9.sp,
+                                  color: AppTheme.primaryGold.withOpacity(0.8),
+                                ),
+                              ),
+                            ],
+                          )
+                        : Text(
+                            "restore_purchases".tr,
                             style: GoogleFonts.poppins(
-                              fontSize: 11.sp,
-                              color: AppTheme.primaryGold,
+                              fontSize: 9.sp,
+                              color: AppTheme.primaryGold.withOpacity(0.8),
                             ),
                           ),
-                        ],
-                      )
-                    : Text(
-                        "restore_purchases".tr,
-                        style: GoogleFonts.poppins(
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.w500,
-                          color: AppTheme.primaryGold,
-                          decoration: TextDecoration.underline,
-                          decorationColor: AppTheme.primaryGold,
-                        ),
+                  ),
+                ),
+                SizedBox(height: 1.5.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildFooterLink(
+                      "subscription_info".tr,
+                      _showSubscriptionInfo,
+                    ),
+                    _buildFooterDivider(),
+                    _buildFooterLink(
+                      "privacy_policy".tr,
+                      () => _launchUrl(
+                        'https://www.brahmakosh.com/privacy-policy',
                       ),
-              ),
+                    ),
+                    _buildFooterDivider(),
+                    _buildFooterLink(
+                      "terms_of_use".tr,
+                      () => _launchUrl(
+                        'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
-
-          // Subscription Compliance Info (iOS only, Apple Guideline 3.1.2(c))
-          if (Platform.isIOS) ...[
             SizedBox(height: 1.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 2.w),
-              child: Column(
-                children: [
-                  Text(
-                    "auto_renewal_info".tr,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
-                      fontSize: 8.sp,
-                      color: Colors.white38,
-                      height: 1.4,
-                    ),
-                  ),
-                  SizedBox(height: 0.5.h),
-                  Text(
-                    "billing_info".tr,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
-                      fontSize: 8.sp,
-                      color: Colors.white38,
-                      height: 1.4,
-                    ),
-                  ),
-                  SizedBox(height: 0.5.h),
-                  Text(
-                    "management_info".tr,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
-                      fontSize: 8.sp,
-                      color: Colors.white38,
-                      height: 1.4,
-                    ),
-                  ),
-                  SizedBox(height: 1.h),
-                  Text(
-                    "credits_account_info".tr,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
-                      fontSize: 8.sp,
-                      color: Colors.white38,
-                      height: 1.4,
-                    ),
-                  ),
-                  SizedBox(height: 1.5.h),
-                  // Privacy Policy & Terms of Use Links
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () => _launchUrl(
-                          'https://www.brahmakosh.com/privacy-policy',
-                        ),
-                        child: Text(
-                          "privacy_policy".tr,
-                          style: GoogleFonts.poppins(
-                            fontSize: 9.sp,
-                            color: AppTheme.primaryGold,
-                            decoration: TextDecoration.underline,
-                            decorationColor: AppTheme.primaryGold,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 3.w),
-                        child: Text(
-                          "|",
-                          style: GoogleFonts.poppins(
-                            fontSize: 9.sp,
-                            color: Colors.white24,
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () => _launchUrl(
-                          'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
-                        ),
-                        child: Text(
-                          "terms_of_use".tr,
-                          style: GoogleFonts.poppins(
-                            fontSize: 9.sp,
-                            color: AppTheme.primaryGold,
-                            decoration: TextDecoration.underline,
-                            decorationColor: AppTheme.primaryGold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
           ],
         ],
       ),
     );
+  }
+
+  Widget _buildFooterLink(String label, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Text(
+        label,
+        style: GoogleFonts.poppins(
+          fontSize: 8.5.sp,
+          color: AppTheme.primaryGold.withOpacity(0.8),
+          decoration: TextDecoration.underline,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFooterDivider() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 2.w),
+      child: Text(
+        "|",
+        style: GoogleFonts.poppins(fontSize: 8.5.sp, color: Colors.white24),
+      ),
+    );
+  }
+
+  void _showSubscriptionInfo() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF141414),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.fromLTRB(6.w, 2.h, 6.w, 4.h),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.white10,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              SizedBox(height: 3.h),
+              Text(
+                "wallet_subscription".tr,
+                style: GoogleFonts.lora(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(height: 2.h),
+              _buildInfoText("auto_renewal_info".tr),
+              _buildInfoText("billing_info".tr),
+              _buildInfoText("management_info".tr),
+              _buildInfoText("credits_account_info".tr),
+              SizedBox(height: 2.h),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryGold,
+                  foregroundColor: Colors.black,
+                  minimumSize: Size(double.infinity, 5.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  "got_it".tr,
+                  style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildInfoText(String text) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 1.5.h),
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: GoogleFonts.poppins(
+          fontSize: 9.5.sp,
+          color: Colors.white70,
+          height: 1.5,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleRestorePurchases() async {
+    setState(() => _isRestoring = true);
+    await _iapService.restorePurchases();
+    if (mounted) {
+      setState(() => _isRestoring = false);
+      final restored = _iapService.restoreStatus.value;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            restored == true
+                ? "restore_purchases_success".tr
+                : "restore_purchases_failed".tr,
+          ),
+          backgroundColor: restored == true ? Colors.green : Colors.orange,
+        ),
+      );
+    }
   }
 
   Future<void> _launchUrl(String url) async {

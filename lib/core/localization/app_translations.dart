@@ -759,6 +759,8 @@ class AppTranslations extends Translations {
           'management_info': 'You can manage or cancel your subscription in your Apple ID settings.',
           'privacy_policy': 'Privacy Policy',
           'terms_of_use': 'Terms of Use (EULA)',
+          'subscription_info': 'Subscription Info',
+          'got_it': 'Got It',
         },
         'hi_IN': {
           'coming_soon': 'जल्द आ रहा है',
@@ -1510,6 +1512,8 @@ class AppTranslations extends Translations {
           'management_info': 'आप अपनी Apple ID सेटिंग्स में अपनी सदस्यता प्रबंधित या रद्द कर सकते हैं।',
           'privacy_policy': 'गोपनीयता नीति',
           'terms_of_use': 'उपयोग की शर्तें (EULA)',
+          'subscription_info': 'सब्सक्रिप्शन जानकारी',
+          'got_it': 'ठीक है',
         },
       };
 }

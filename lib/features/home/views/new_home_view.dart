@@ -16,7 +16,6 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:brahmakosh/features/home/views/sponsor_card.dart';
 import 'package:brahmakosh/features/dashboard/viewmodels/dashboard_viewmodel.dart';
 import 'package:brahmakosh/core/constants/app_constants.dart';
 import 'package:brahmakosh/features/check_in/repositories/spiritual_repository.dart';
@@ -33,10 +32,9 @@ import 'package:brahmakosh/features/profile/views/profile_view.dart'
 import 'package:brahmakosh/features/notifications/blocs/notification_bloc.dart';
 import 'package:brahmakosh/features/redeem/controllers/redeem_controller.dart';
 
-
 class NewHomeView extends StatefulWidget {
   final ScrollController? scrollController;
- NewHomeView({super.key, this.scrollController});
+  NewHomeView({super.key, this.scrollController});
   @override
   State<NewHomeView> createState() => _NewHomeViewState();
 }
@@ -55,7 +53,7 @@ class _NewHomeViewState extends State<NewHomeView> {
     "health",
     "travel",
     "luck",
-    "emotions"
+    "emotions",
   ];
   late List<GlobalKey> _horoscopeCategoryKeys;
 
@@ -69,74 +67,68 @@ class _NewHomeViewState extends State<NewHomeView> {
     "travel",
   ];
 
-
-
   List<Activities> _checkInActivities = [];
   bool _isCheckInLoading = false;
   String _selectedRemedyTab = "must_have";
   // Coming Soon Projects State
-  final PageController _comingSoonPageController =
-      PageController(viewportFraction: 0.82);
+  final PageController _comingSoonPageController = PageController(
+    viewportFraction: 0.82,
+  );
   int _comingSoonPageIndex = 0;
 
   final List<Map<String, String>> _comingSoonProjects = [
     {
       "title": "exp_centre",
       "subtitle": "exp_centre_desc",
-      "image": "assets/icons/Expereince.jpg",
+      "image": "assets/commingsoon/Expereince.jpg",
+      "fit": "cover",
     },
     {
       "title": "library",
       "subtitle": "library_desc",
-      "image": "assets/icons/library.jpg",
+      "image": "assets/commingsoon/library.jpg",
+      "fit": "cover",
     },
     {
       "title": "bazar",
       "subtitle": "bazar_desc",
-      "image": "assets/icons/bazar.jpg",
+      "image": "assets/commingsoon/bazar.png",
+      "fit": "cover",
     },
     {
       "title": "daan",
       "subtitle": "daan_desc",
-      "image": "assets/icons/charity.jpeg",
+      "image": "assets/commingsoon/charity.png",
+      "fit": "cover",
     },
     {
       "title": "gaushala",
       "subtitle": "gaushala_desc",
-      "image": "assets/icons/gaushala.jpeg",
+      "image": "assets/commingsoon/gaushala.png",
+      "fit": "cover", // Change this to "contain" if the image is vertical
     },
     {
       "title": "gurukul",
       "subtitle": "gurukul_desc",
-      "image": "assets/icons/gurukul.jpeg",
+      "image": "assets/commingsoon/gurukul.png",
+      "fit": "cover", // Change this to "contain" if the image is vertical
     },
     {
       "title": "vani",
       "subtitle": "vani_desc",
-      "image": "assets/icons/vani.jpg",
+      "image": "assets/commingsoon/vani.png",
     },
     {
       "title": "yatra",
       "subtitle": "yatra_desc",
-      "image": "assets/icons/yatra.jpg",
+      "image": "assets/commingsoon/yatra.png",
     },
   ];
 
-  // Remedy lists moved to class level for pre-translation
-
   String _lastLang = 'en';
-
-
   Timer? _comingSoonTimer;
-
-  // Focus management
-  // Focus management
   final FocusNode _searchFocusNode = FocusNode();
   final FocusNode _swapnaFocusNode = FocusNode();
-
-  // Scroll Controller for check-in activities
-
-
   @override
   void initState() {
     super.initState();
@@ -185,7 +177,13 @@ class _NewHomeViewState extends State<NewHomeView> {
     }
 
     // 3. Expert Categories
-    stringsToWarmup.addAll(["Astrology", "Numerology", "Vastu", "Palmistry", "Tarot"]);
+    stringsToWarmup.addAll([
+      "Astrology",
+      "Numerology",
+      "Vastu",
+      "Palmistry",
+      "Tarot",
+    ]);
 
     // 4. Section Headers & Key Strings
     stringsToWarmup.addAll([
@@ -213,7 +211,6 @@ class _NewHomeViewState extends State<NewHomeView> {
       _lastLang = currentLang;
     }
   }
-
 
   void _startComingSoonTimer() {
     _comingSoonTimer?.cancel();
@@ -281,8 +278,6 @@ class _NewHomeViewState extends State<NewHomeView> {
     }
   }
 
-
-
   Future<void> _handleRefresh() async {
     await Future.wait([
       homeController.refreshHomeData(),
@@ -305,27 +300,38 @@ class _NewHomeViewState extends State<NewHomeView> {
     // ── Panchang / Muhurat Values ──────────────────────────────────────────
     final panchang = homeController.panchangData;
     if (panchang != null) {
-      final basic    = panchang.basicPanchang;
+      final basic = panchang.basicPanchang;
       final advanced = panchang.advancedPanchang;
-      if (basic?.tithi?.isNotEmpty == true)           dynamicStrings.add(basic!.tithi!);
-      if (basic?.nakshatra?.isNotEmpty == true)        dynamicStrings.add(basic!.nakshatra!);
-      if (basic?.ritu?.isNotEmpty == true)             dynamicStrings.add(basic!.ritu!);
-      if (basic?.dishaShool?.isNotEmpty == true)       dynamicStrings.add(basic!.dishaShool!);
-      if (basic?.paksha?.isNotEmpty == true)           dynamicStrings.add(basic!.paksha!);
-      if (advanced?.hinduMaah?.purnimanta?.isNotEmpty == true) dynamicStrings.add(advanced!.hinduMaah!.purnimanta!);
-      if (advanced?.sunSign?.isNotEmpty == true)       dynamicStrings.add(advanced!.sunSign!);
-      if (advanced?.moonSign?.isNotEmpty == true)      dynamicStrings.add(advanced!.moonSign!);
+      if (basic?.tithi?.isNotEmpty == true) dynamicStrings.add(basic!.tithi!);
+      if (basic?.nakshatra?.isNotEmpty == true)
+        dynamicStrings.add(basic!.nakshatra!);
+      if (basic?.ritu?.isNotEmpty == true) dynamicStrings.add(basic!.ritu!);
+      if (basic?.dishaShool?.isNotEmpty == true)
+        dynamicStrings.add(basic!.dishaShool!);
+      if (basic?.paksha?.isNotEmpty == true) dynamicStrings.add(basic!.paksha!);
+      if (advanced?.hinduMaah?.purnimanta?.isNotEmpty == true)
+        dynamicStrings.add(advanced!.hinduMaah!.purnimanta!);
+      if (advanced?.sunSign?.isNotEmpty == true)
+        dynamicStrings.add(advanced!.sunSign!);
+      if (advanced?.moonSign?.isNotEmpty == true)
+        dynamicStrings.add(advanced!.moonSign!);
     }
 
     // ── Daily Horoscope Predictions ────────────────────────────────────────
     final prediction = homeController.dailyHoroscope?.prediction;
     if (prediction != null) {
-      if (prediction.personalLife?.isNotEmpty == true) dynamicStrings.add(prediction.personalLife!);
-      if (prediction.profession?.isNotEmpty == true)   dynamicStrings.add(prediction.profession!);
-      if (prediction.health?.isNotEmpty == true)       dynamicStrings.add(prediction.health!);
-      if (prediction.travel?.isNotEmpty == true)       dynamicStrings.add(prediction.travel!);
-      if (prediction.luck?.isNotEmpty == true)         dynamicStrings.add(prediction.luck!);
-      if (prediction.emotions?.isNotEmpty == true)     dynamicStrings.add(prediction.emotions!);
+      if (prediction.personalLife?.isNotEmpty == true)
+        dynamicStrings.add(prediction.personalLife!);
+      if (prediction.profession?.isNotEmpty == true)
+        dynamicStrings.add(prediction.profession!);
+      if (prediction.health?.isNotEmpty == true)
+        dynamicStrings.add(prediction.health!);
+      if (prediction.travel?.isNotEmpty == true)
+        dynamicStrings.add(prediction.travel!);
+      if (prediction.luck?.isNotEmpty == true)
+        dynamicStrings.add(prediction.luck!);
+      if (prediction.emotions?.isNotEmpty == true)
+        dynamicStrings.add(prediction.emotions!);
     }
 
     if (dynamicStrings.isNotEmpty) {
@@ -366,10 +372,18 @@ class _NewHomeViewState extends State<NewHomeView> {
               _buildDailyHoroscopeSection(isTablet, horizontalPadding),
               _buildMuhuratSection(isTablet, horizontalPadding),
               // if (!Platform.isIOS) _buildRemediesSection(screenWidth, isTablet, horizontalPadding),
-              _buildSpiritualToolsSection(screenWidth, isTablet, horizontalPadding),
+              _buildSpiritualToolsSection(
+                screenWidth,
+                isTablet,
+                horizontalPadding,
+              ),
               _buildSankalpTracker(isTablet, horizontalPadding),
               _buildSwapnaDecoder(isTablet, horizontalPadding),
-              _buildComingSoonProjectsSection(screenWidth, isTablet, horizontalPadding),
+              _buildComingSoonProjectsSection(
+                screenWidth,
+                isTablet,
+                horizontalPadding,
+              ),
               // _buildSelfDiscoverySection(horizontalPadding),
               // _buildSponsorsSection(screenWidth, isTablet, horizontalPadding),
               const SliverToBoxAdapter(child: SizedBox(height: 110)),
@@ -407,7 +421,8 @@ class _NewHomeViewState extends State<NewHomeView> {
                       ),
                     ),
                     Obx(() {
-                      final predDate = homeController.dailyHoroscope?.predictionDate;
+                      final predDate =
+                          homeController.dailyHoroscope?.predictionDate;
                       if (predDate != null && predDate.isNotEmpty) {
                         return Padding(
                           padding: const EdgeInsets.only(top: 2),
@@ -476,7 +491,9 @@ class _NewHomeViewState extends State<NewHomeView> {
                       ),
                       SizedBox(width: 3.w),
                       TranslatedText(
-                        (homeController.dailyHoroscope?.sunSign ?? homeController.userSign).toLowerCase(),
+                        (homeController.dailyHoroscope?.sunSign ??
+                                homeController.userSign)
+                            .toLowerCase(),
                         uppercase: true,
                         style: GoogleFonts.poppins(
                           color: Colors.white,
@@ -486,16 +503,18 @@ class _NewHomeViewState extends State<NewHomeView> {
                         ),
                       ),
                       const Spacer(),
-                      Obx(() => homeController.isHoroscopeLoading
-                          ? const SizedBox(
-                              width: 14,
-                              height: 14,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Color(0xFFD4AF37),
-                              ),
-                            )
-                          : const SizedBox.shrink()),
+                      Obx(
+                        () => homeController.isHoroscopeLoading
+                            ? const SizedBox(
+                                width: 14,
+                                height: 14,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Color(0xFFD4AF37),
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
                     ],
                   ),
                   SizedBox(height: 2.h),
@@ -505,7 +524,9 @@ class _NewHomeViewState extends State<NewHomeView> {
                     scrollDirection: Axis.horizontal,
                     physics: const BouncingScrollPhysics(),
                     child: Row(
-                      children: List.generate(_horoscopeCategories.length, (index) {
+                      children: List.generate(_horoscopeCategories.length, (
+                        index,
+                      ) {
                         final cat = _horoscopeCategories[index];
                         return Obx(() {
                           final isSelected =
@@ -531,9 +552,13 @@ class _NewHomeViewState extends State<NewHomeView> {
                               child: Text(
                                 cat.tr,
                                 style: GoogleFonts.poppins(
-                                  color: isSelected ? Colors.black : Colors.white70,
+                                  color: isSelected
+                                      ? Colors.black
+                                      : Colors.white70,
                                   fontSize: 10.sp,
-                                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.w500,
                                 ),
                               ),
                             ),
@@ -546,7 +571,8 @@ class _NewHomeViewState extends State<NewHomeView> {
                   // Dynamic Content – uses TranslatedText so backend English
                   // text is auto-translated to the user's selected language.
                   Obx(() {
-                    final prediction = homeController.dailyHoroscope?.prediction;
+                    final prediction =
+                        homeController.dailyHoroscope?.prediction;
                     String content = "preparing_insights".tr;
 
                     if (prediction != null) {
@@ -591,7 +617,6 @@ class _NewHomeViewState extends State<NewHomeView> {
       ),
     );
   }
-
 
   Widget _buildHeader(double horizontalPadding) {
     return SliverToBoxAdapter(
@@ -679,7 +704,9 @@ class _NewHomeViewState extends State<NewHomeView> {
                               ),
                               child: Center(
                                 child: Text(
-                                  state.unreadCount > 9 ? '9+' : state.unreadCount.toString(),
+                                  state.unreadCount > 9
+                                      ? '9+'
+                                      : state.unreadCount.toString(),
                                   style: GoogleFonts.poppins(
                                     color: Colors.white,
                                     fontSize: 8.sp,
@@ -818,11 +845,13 @@ class _NewHomeViewState extends State<NewHomeView> {
     );
   }
 
-
   Widget _buildMainBanner(double screenWidth, bool isTablet) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: isTablet ? 4.h : 3.h),
+        padding: EdgeInsets.symmetric(
+          horizontal: 4.w,
+          vertical: isTablet ? 4.h : 3.h,
+        ),
         child: IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -834,7 +863,10 @@ class _NewHomeViewState extends State<NewHomeView> {
                   description: "ask_deity_desc_short".tr,
                   buttonText: "ask_spiritual_guide".tr,
                   imageUrl: 'assets/icons/rashmi_new_avatar.png',
-                  alignment: const Alignment(0, -0.6), // Pull Rashmi up slightly
+                  alignment: const Alignment(
+                    0,
+                    -0.6,
+                  ), // Pull Rashmi up slightly
                   onPressed: () {
                     _unfocusAll();
                     Get.to(
@@ -878,8 +910,6 @@ class _NewHomeViewState extends State<NewHomeView> {
     );
   }
 
-
-
   Widget _buildBannerItem({
     required String title,
     String? role,
@@ -890,7 +920,6 @@ class _NewHomeViewState extends State<NewHomeView> {
     Alignment alignment = Alignment.topCenter, // Added this
     bool isNetwork = false,
   }) {
-
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF0F0F0F),
@@ -904,7 +933,9 @@ class _NewHomeViewState extends State<NewHomeView> {
           SizedBox(
             height: 20.h,
             child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
               child: Stack(
                 fit: StackFit.expand,
                 children: [
@@ -963,7 +994,10 @@ class _NewHomeViewState extends State<NewHomeView> {
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: Text(
                           "•",
-                          style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 10.sp),
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.3),
+                            fontSize: 10.sp,
+                          ),
                         ),
                       ),
                       Text(
@@ -1017,7 +1051,6 @@ class _NewHomeViewState extends State<NewHomeView> {
                     ),
                   ),
                 ),
-
               ],
             ),
           ),
@@ -1047,10 +1080,7 @@ class _NewHomeViewState extends State<NewHomeView> {
           ),
         ),
         // Small triangle pointer
-        CustomPaint(
-          size: const Size(6, 4),
-          painter: TrianglePainter(),
-        ),
+        CustomPaint(size: const Size(6, 4), painter: TrianglePainter()),
       ],
     );
   }
@@ -1087,7 +1117,12 @@ class _NewHomeViewState extends State<NewHomeView> {
               ),
             ),
             child: Padding(
-              padding: EdgeInsets.only(top: 5.h, bottom: 1.h, left: 1.w, right: 1.w),
+              padding: EdgeInsets.only(
+                top: 5.h,
+                bottom: 1.h,
+                left: 1.w,
+                right: 1.w,
+              ),
               child: Text(
                 title,
                 textAlign: TextAlign.center,
@@ -1104,28 +1139,28 @@ class _NewHomeViewState extends State<NewHomeView> {
           // Floating Icon
           Positioned(
             top: -1.h,
-            child: Image.asset(
-              iconPath,
-              height: 7.5.h,
-              fit: BoxFit.contain,
-            ),
+            child: Image.asset(iconPath, height: 7.5.h, fit: BoxFit.contain),
           ),
           // Badge
           if (showComingSoon)
-            Positioned(
-              top: -1.2.h,
-              child: _buildComingSoonBadge(),
-            ),
+            Positioned(top: -1.2.h, child: _buildComingSoonBadge()),
         ],
       ),
     );
   }
 
-
-
-  Widget _buildFeatureGrid(bool isTablet, bool isLargeTablet, double horizontalPadding) {
+  Widget _buildFeatureGrid(
+    bool isTablet,
+    bool isLargeTablet,
+    double horizontalPadding,
+  ) {
     return SliverPadding(
-      padding: EdgeInsets.fromLTRB(horizontalPadding, 1.h, horizontalPadding, 2.h),
+      padding: EdgeInsets.fromLTRB(
+        horizontalPadding,
+        1.h,
+        horizontalPadding,
+        2.h,
+      ),
       sliver: SliverGrid(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: isLargeTablet ? 8 : (isTablet ? 6 : 4),
@@ -1134,7 +1169,6 @@ class _NewHomeViewState extends State<NewHomeView> {
           childAspectRatio: isTablet ? 0.85 : 0.95,
         ),
         delegate: SliverChildListDelegate([
-         
           _buildGridItem(
             "astrology".tr,
             "assets/icons/astrology.png",
@@ -1148,7 +1182,10 @@ class _NewHomeViewState extends State<NewHomeView> {
             "assets/icons/expert_connect.png",
             onTap: () {
               _unfocusAll();
-              Provider.of<DashboardViewModel>(context, listen: false).changeTab(3);
+              Provider.of<DashboardViewModel>(
+                context,
+                listen: false,
+              ).changeTab(3);
             },
           ),
           _buildGridItem(
@@ -1160,7 +1197,7 @@ class _NewHomeViewState extends State<NewHomeView> {
               Get.to(() => const ReportView());
             },
           ),
-      
+
           _buildGridItem(
             "sankalp_tracker".tr,
             "assets/icons/sankalptracker.png",
@@ -1177,10 +1214,10 @@ class _NewHomeViewState extends State<NewHomeView> {
               Get.toNamed(AppConstants.routePoojaList);
             },
           ),
-           _buildGridItem(
+          _buildGridItem(
             "remedies".tr,
             "assets/icons/remedies.png",
-           showComingSoon: true,
+            showComingSoon: true,
             onTap: () {
               _unfocusAll();
               Get.dialog(ComingSoonPopup(feature: "remedies"));
@@ -1195,7 +1232,7 @@ class _NewHomeViewState extends State<NewHomeView> {
               Get.dialog(ComingSoonPopup(feature: "courses"));
             },
           ),
-           _buildGridItem(
+          _buildGridItem(
             "book_a_puja".tr,
             "assets/icons/puja.png",
             showComingSoon: true,
@@ -1209,14 +1246,19 @@ class _NewHomeViewState extends State<NewHomeView> {
     );
   }
 
-
   // Placeholder methods for other sections
   Widget _buildSpiritualCheckIn(bool isTablet, double horizontalPadding) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 1.5.h),
+        padding: EdgeInsets.symmetric(
+          horizontal: horizontalPadding,
+          vertical: 1.5.h,
+        ),
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: isTablet ? 3.h : 2.h),
+          padding: EdgeInsets.symmetric(
+            horizontal: 2.w,
+            vertical: isTablet ? 3.h : 2.h,
+          ),
           decoration: BoxDecoration(
             color: const Color(0xFF111111), // Match dark background
             borderRadius: BorderRadius.circular(24),
@@ -1319,8 +1361,6 @@ class _NewHomeViewState extends State<NewHomeView> {
     );
   }
 
-
-
   String _getActivityIconPath(String title) {
     switch (title.toLowerCase()) {
       case 'prayer':
@@ -1336,14 +1376,12 @@ class _NewHomeViewState extends State<NewHomeView> {
     }
   }
 
-
-
   Widget _buildActivityItem(
     String title,
     String imagePath, {
     bool isSelected = false,
   }) {
-    final double size =  20.w;
+    final double size = 20.w;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -1356,12 +1394,17 @@ class _NewHomeViewState extends State<NewHomeView> {
               height: size,
               width: size,
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.4), // Set white background for all image cards
+                color: Colors.black.withOpacity(
+                  0.4,
+                ), // Set white background for all image cards
                 borderRadius: BorderRadius.circular(16),
                 // Clean gold border only when selected
                 border: isSelected
                     ? Border.all(color: const Color(0xFFFFD447), width: 1)
-                    : Border.all(color: Colors.white.withOpacity(0.1), width: 1.0),
+                    : Border.all(
+                        color: Colors.white.withOpacity(0.1),
+                        width: 1.0,
+                      ),
                 boxShadow: isSelected
                     ? [
                         BoxShadow(
@@ -1372,10 +1415,15 @@ class _NewHomeViewState extends State<NewHomeView> {
                       ]
                     : [],
               ),
-              padding: const EdgeInsets.all(4), // Give uniform padding to keep image inside the borders nicely
+              padding: const EdgeInsets.all(
+                4,
+              ), // Give uniform padding to keep image inside the borders nicely
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: Image.asset(imagePath, fit: BoxFit.contain), // Use contain prevent cropping
+                child: Image.asset(
+                  imagePath,
+                  fit: BoxFit.contain,
+                ), // Use contain prevent cropping
               ),
             ),
           ),
@@ -1388,7 +1436,9 @@ class _NewHomeViewState extends State<NewHomeView> {
             child: Text(
               title,
               style: GoogleFonts.poppins(
-                color: isSelected ? Colors.white : Colors.white.withOpacity(0.5),
+                color: isSelected
+                    ? Colors.white
+                    : Colors.white.withOpacity(0.5),
                 fontSize: isSelected ? 10.sp : 9.sp,
                 fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
               ),
@@ -1405,9 +1455,15 @@ class _NewHomeViewState extends State<NewHomeView> {
         builder: (context, profileVM, child) {
           final karmaPoints = profileVM.profile?.karmaPoints ?? 0;
           return Padding(
-            padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 1.5.h),
+            padding: EdgeInsets.symmetric(
+              horizontal: horizontalPadding,
+              vertical: 1.5.h,
+            ),
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: isTablet ? 4.h : 3.h),
+              padding: EdgeInsets.symmetric(
+                horizontal: 5.w,
+                vertical: isTablet ? 4.h : 3.h,
+              ),
               decoration: BoxDecoration(
                 color: const Color(0xFF111111),
                 borderRadius: BorderRadius.circular(24),
@@ -1585,10 +1641,17 @@ class _NewHomeViewState extends State<NewHomeView> {
     );
   }
 
-  Widget _buildExpertConnect(double screenWidth, bool isTablet, double horizontalPadding) {
+  Widget _buildExpertConnect(
+    double screenWidth,
+    bool isTablet,
+    double horizontalPadding,
+  ) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
+        padding: EdgeInsets.symmetric(
+          vertical: 12,
+          horizontal: horizontalPadding,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1602,12 +1665,12 @@ class _NewHomeViewState extends State<NewHomeView> {
                 children: [
                   Text(
                     "expert_connect_title".tr,
-                  style: GoogleFonts.poppins(
-                    color: Colors.white.withOpacity(0.7),
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w500,
+                    style: GoogleFonts.poppins(
+                      color: Colors.white.withOpacity(0.7),
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
                   GestureDetector(
                     onTap: () {
                       _unfocusAll();
@@ -1640,7 +1703,7 @@ class _NewHomeViewState extends State<NewHomeView> {
               }
               if (experts.isEmpty) {
                 return SizedBox(
-                   height: 24.h,
+                  height: 24.h,
                   child: Center(
                     child: Text(
                       "no_experts".tr,
@@ -1652,13 +1715,19 @@ class _NewHomeViewState extends State<NewHomeView> {
                 );
               }
               return SizedBox(
-                height: isTablet ? 25.h : 23.5.h, // Increased height to prevent translated text overflow
+                height: isTablet
+                    ? 25.h
+                    : 23.5.h, // Increased height to prevent translated text overflow
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  padding:  EdgeInsets.symmetric(horizontal: 2.w),
+                  padding: EdgeInsets.symmetric(horizontal: 2.w),
                   itemCount: experts.length,
                   itemBuilder: (context, index) {
-                    return _buildExpertCard(experts[index], screenWidth, isTablet);
+                    return _buildExpertCard(
+                      experts[index],
+                      screenWidth,
+                      isTablet,
+                    );
                   },
                 ),
               );
@@ -1679,7 +1748,9 @@ class _NewHomeViewState extends State<NewHomeView> {
         astrologyController.navigateToProfile(expert);
       },
       child: Container(
-        width: isTablet ? screenWidth * 0.35 : screenWidth * 0.65, // Adaptive width
+        width: isTablet
+            ? screenWidth * 0.35
+            : screenWidth * 0.65, // Adaptive width
         margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
@@ -1739,7 +1810,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                             child: TranslatedText(
                               expert.name ?? "Expert",
                               maxLines: 2,
-                              overflow: TextOverflow.ellipsis,  
+                              overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.poppins(
                                 color: Colors.white,
                                 fontSize: 12.sp,
@@ -1908,7 +1979,10 @@ class _NewHomeViewState extends State<NewHomeView> {
         final advanced = panchang.advancedPanchang;
 
         return Padding(
-          padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 12),
+          padding: EdgeInsets.symmetric(
+            horizontal: horizontalPadding,
+            vertical: 12,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1999,7 +2073,8 @@ class _NewHomeViewState extends State<NewHomeView> {
                       "tithi".tr,
                       basic?.tithi ?? "Loading...",
                       advanced?.panchang?.tithi?.endTime != null
-                          ? "until".tr + " ${(advanced!.panchang!.tithi!.endTime!.hour! % 24).toString().padLeft(2, '0')}:${advanced!.panchang!.tithi!.endTime!.minute.toString().padLeft(2, '0')}"
+                          ? "until".tr +
+                                " ${(advanced!.panchang!.tithi!.endTime!.hour! % 24).toString().padLeft(2, '0')}:${advanced!.panchang!.tithi!.endTime!.minute.toString().padLeft(2, '0')}"
                           : (basic?.paksha ?? ""),
                       const Color(0xFFD4AF37),
                     ),
@@ -2007,7 +2082,8 @@ class _NewHomeViewState extends State<NewHomeView> {
                       "nakshatra".tr,
                       basic?.nakshatra ?? "--",
                       advanced?.panchang?.nakshatra?.endTime != null
-                          ? "until".tr + " ${(advanced!.panchang!.nakshatra!.endTime!.hour! % 24).toString().padLeft(2, '0')}:${advanced!.panchang!.nakshatra!.endTime!.minute.toString().padLeft(2, '0')}"
+                          ? "until".tr +
+                                " ${(advanced!.panchang!.nakshatra!.endTime!.hour! % 24).toString().padLeft(2, '0')}:${advanced!.panchang!.nakshatra!.endTime!.minute.toString().padLeft(2, '0')}"
                           : "",
                       const Color(0xFFD4AF37),
                     ),
@@ -2575,7 +2651,11 @@ class _NewHomeViewState extends State<NewHomeView> {
   //   );
   // }
 
-  Widget _buildSpiritualToolsSection(double screenWidth, bool isTablet, double horizontalPadding) {
+  Widget _buildSpiritualToolsSection(
+    double screenWidth,
+    bool isTablet,
+    double horizontalPadding,
+  ) {
     final tools = [
       {
         "title": "puja_vidhi_title".tr,
@@ -2604,7 +2684,7 @@ class _NewHomeViewState extends State<NewHomeView> {
         //   _unfocusAll();
         //   Get.to(() => const RemediesWebView());
         // },
-         "onTap": () {
+        "onTap": () {
           _unfocusAll();
           Get.dialog(const ComingSoonPopup(feature: "remedies"));
         },
@@ -2614,7 +2694,7 @@ class _NewHomeViewState extends State<NewHomeView> {
         "desc": "courses_desc".tr,
         "icon": "assets/icons/courses.png",
         "isComingSoon": true,
-         "onTap": () {
+        "onTap": () {
           _unfocusAll();
           Get.dialog(const ComingSoonPopup(feature: "courses"));
         },
@@ -2623,14 +2703,17 @@ class _NewHomeViewState extends State<NewHomeView> {
 
     return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
+        padding: EdgeInsets.symmetric(
+          vertical: 12,
+          horizontal: horizontalPadding,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TranslatedText(
               "spiritual_tools_cap",
-               style: GoogleFonts.poppins(
-                color:Colors.white.withOpacity(0.7),
+              style: GoogleFonts.poppins(
+                color: Colors.white.withOpacity(0.7),
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w500,
               ),
@@ -2674,7 +2757,9 @@ class _NewHomeViewState extends State<NewHomeView> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: isTablet ? screenWidth * 0.4 : screenWidth * 0.72, // Responsive width showing partial next card
+        width: isTablet
+            ? screenWidth * 0.4
+            : screenWidth * 0.72, // Responsive width showing partial next card
         margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -2756,7 +2841,6 @@ class _NewHomeViewState extends State<NewHomeView> {
     );
   }
 
-
   Widget _buildSankalpTracker(bool isTablet, double horizontalPadding) {
     return BlocBuilder<SankalpBloc, SankalpState>(
       builder: (context, state) {
@@ -2768,12 +2852,16 @@ class _NewHomeViewState extends State<NewHomeView> {
           activeSankalps = state.userSankalps
               .where((s) => s.status == 'active')
               .toList();
-          
+
           if (activeSankalps.isNotEmpty) {
             double totalProgressSum = 0;
             for (var us in activeSankalps) {
-              final completed = us.dailyReports.where((r) => r.status == 'yes').length;
-              totalProgressSum += us.totalDays > 0 ? (completed / us.totalDays) : 0;
+              final completed = us.dailyReports
+                  .where((r) => r.status == 'yes')
+                  .length;
+              totalProgressSum += us.totalDays > 0
+                  ? (completed / us.totalDays)
+                  : 0;
             }
             avgProgress = totalProgressSum / activeSankalps.length;
             activeCount = activeSankalps.length;
@@ -2781,33 +2869,36 @@ class _NewHomeViewState extends State<NewHomeView> {
         }
         return SliverToBoxAdapter(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 12.0),
+            padding: EdgeInsets.symmetric(
+              horizontal: horizontalPadding,
+              vertical: 12.0,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                TranslatedText(
-                  "sankalp_tracker",
-                  style: GoogleFonts.poppins(
-                    color: Colors.white.withOpacity(0.7),
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                    if (activeSankalps.isNotEmpty)
-                    GestureDetector(
-                      onTap: () => Get.to(() => const SankalpScreen()),
-                      child: Text(
-                        "view_all".tr,
-                        style: GoogleFonts.poppins(
-                          color: AppTheme.primaryGold,
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    TranslatedText(
+                      "sankalp_tracker",
+                      style: GoogleFonts.poppins(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
+                    if (activeSankalps.isNotEmpty)
+                      GestureDetector(
+                        onTap: () => Get.to(() => const SankalpScreen()),
+                        child: Text(
+                          "view_all".tr,
+                          style: GoogleFonts.poppins(
+                            color: AppTheme.primaryGold,
+                            fontSize: 10.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -2830,24 +2921,28 @@ class _NewHomeViewState extends State<NewHomeView> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                 Text(
-                                   activeCount > 0 ? "daily_spiritual_progress".tr : "no_active_sankalp".tr,
-                                   style: GoogleFonts.poppins(
-                                     color: Colors.white,
-                                     fontSize: 12.sp,
-                                     fontWeight: FontWeight.w700,
-                                   ),
-                                 ),
-                                 const SizedBox(height: 4),
-                                 Text(
-                                   activeCount > 0 
-                                     ? "tracking_habits_desc".trParams({'count': activeCount.toString()})
-                                     : "start_sankalp_desc".tr,
-                                   style: GoogleFonts.poppins(
-                                     color: Colors.white.withOpacity(0.6),
-                                     fontSize: 9.75.sp,
-                                   ),
-                                 ),
+                                Text(
+                                  activeCount > 0
+                                      ? "daily_spiritual_progress".tr
+                                      : "no_active_sankalp".tr,
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  activeCount > 0
+                                      ? "tracking_habits_desc".trParams({
+                                          'count': activeCount.toString(),
+                                        })
+                                      : "start_sankalp_desc".tr,
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white.withOpacity(0.6),
+                                    fontSize: 9.75.sp,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -2859,7 +2954,9 @@ class _NewHomeViewState extends State<NewHomeView> {
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFFD4AF37).withOpacity(0.15),
+                                  color: const Color(
+                                    0xFFD4AF37,
+                                  ).withOpacity(0.15),
                                   blurRadius: 25,
                                   spreadRadius: 3,
                                 ),
@@ -2873,7 +2970,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                           ),
                         ],
                       ),
-                      
+
                       if (activeSankalps.isNotEmpty) ...[
                         const SizedBox(height: 20),
                         Row(
@@ -2914,12 +3011,17 @@ class _NewHomeViewState extends State<NewHomeView> {
                                 height: 8,
                                 decoration: BoxDecoration(
                                   gradient: const LinearGradient(
-                                    colors: [Color(0xFFD4AF37), Color(0xFFFFD700)],
+                                    colors: [
+                                      Color(0xFFD4AF37),
+                                      Color(0xFFFFD700),
+                                    ],
                                   ),
                                   borderRadius: BorderRadius.circular(4),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: AppTheme.primaryGold.withOpacity(0.3),
+                                      color: AppTheme.primaryGold.withOpacity(
+                                        0.3,
+                                      ),
                                       blurRadius: 10,
                                       offset: const Offset(0, 0),
                                     ),
@@ -2989,7 +3091,10 @@ class _NewHomeViewState extends State<NewHomeView> {
   Widget _buildSwapnaDecoder(bool isTablet, double horizontalPadding) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 1.5.h),
+        padding: EdgeInsets.symmetric(
+          horizontal: horizontalPadding,
+          vertical: 1.5.h,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -3057,7 +3162,9 @@ class _NewHomeViewState extends State<NewHomeView> {
                                 GestureDetector(
                                   onTap: () {
                                     _unfocusAll();
-                                    Get.toNamed(AppConstants.routeSwapnaDecoder);
+                                    Get.toNamed(
+                                      AppConstants.routeSwapnaDecoder,
+                                    );
                                   },
                                   child: SvgPicture.asset(
                                     'assets/icons/go_tab.svg',
@@ -3159,10 +3266,17 @@ class _NewHomeViewState extends State<NewHomeView> {
     );
   }
 
-  Widget _buildComingSoonProjectsSection(double screenWidth, bool isTablet, double horizontalPadding) {
+  Widget _buildComingSoonProjectsSection(
+    double screenWidth,
+    bool isTablet,
+    double horizontalPadding,
+  ) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 24.0, horizontal: horizontalPadding),
+        padding: EdgeInsets.symmetric(
+          vertical: 24.0,
+          horizontal: horizontalPadding,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -3185,6 +3299,7 @@ class _NewHomeViewState extends State<NewHomeView> {
             const SizedBox(height: 20),
             SizedBox(
               height: 42.h,
+
               child: PageView.builder(
                 controller: _comingSoonPageController,
                 itemCount: _comingSoonProjects.length,
@@ -3201,6 +3316,7 @@ class _NewHomeViewState extends State<NewHomeView> {
                 },
               ),
             ),
+
             const SizedBox(height: 16),
             // Dots Indicator
             Row(
@@ -3246,7 +3362,10 @@ class _NewHomeViewState extends State<NewHomeView> {
               project["image"]!,
               width: double.infinity,
               height: double.infinity,
-              fit: BoxFit.cover,
+              fit: project["fit"] == "contain" ? BoxFit.contain : BoxFit.cover,
+              alignment: project["fit"] == "contain"
+                  ? Alignment.center
+                  : Alignment.topCenter,
             ),
             // Dark Gradient Overlay
             Container(
@@ -3551,4 +3670,3 @@ class TrianglePainter extends CustomPainter {
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
-
