@@ -11,6 +11,8 @@ import '../../../core/services/socket_service.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import '../../profile/viewmodels/profile_viewmodel.dart';
+import 'package:provider/provider.dart';
 
 // Hide navigator from get so flutter_webrtc can use it
 import 'package:get/get.dart' hide navigator;
@@ -225,7 +227,32 @@ class VoiceCallController extends GetxController {
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       duration.value++;
+      
+      // Check credits every 30 seconds
+      if (duration.value % 30 == 0) {
+        _checkCredits();
+      }
     });
+  }
+
+  Future<void> _checkCredits() async {
+    try {
+      final profileVM = Provider.of<ProfileViewModel>(Get.context!, listen: false);
+      await profileVM.fetchProfile();
+      
+      final currentCredits = profileVM.profile?.credits ?? 0;
+      final pricePerMinute = expert.pricePerMinute;
+      
+      Utils.print("[VOICE_CALL_LOG] 💰 Credit Check: Current=$currentCredits, Price=$pricePerMinute");
+      
+      if (currentCredits < pricePerMinute) {
+        Utils.print("[VOICE_CALL_LOG] 🚨 Insufficient credits! Ending call.");
+        endCall();
+        Utils.showInsufficientCreditsDialog();
+      }
+    } catch (e) {
+      Utils.print("[VOICE_CALL_LOG] ❌ Error checking credits: $e");
+    }
   }
 
   void toggleMute() {

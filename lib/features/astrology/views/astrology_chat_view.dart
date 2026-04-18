@@ -8,6 +8,7 @@ import '../controllers/astrology_chat_controller.dart';
 import '../models/chat_models.dart';
 import 'widgets/astrology_chat_feedback_sheet.dart';
 import '../../../common/widgets/custom_profile_avatar.dart';
+import '../../../common/utils.dart'; // Added
 
 class AstrologyChatView extends GetView<AstrologyChatController> {
   final Astrologist expert;
@@ -242,37 +243,60 @@ class AstrologyChatView extends GetView<AstrologyChatController> {
               final isRejected = controller.isChatRejected.value;
               if (isEnded || isRejected) return const SizedBox.shrink();
 
-              return InkWell(
-                onTap: () {
-                  if (controller.isRequestAccepted.value) {
-                    controller.showEndChatDialog(
-                      "end_chat_q".tr,
-                      "end_chat_confirm".tr,
-                    );
-                  } else {
-                    controller.cancelChatRequest();
-                  }
-                },
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: controller.isRequestAccepted.value
-                        ? Colors.red[900]
-                        : const Color(0xFFD4AF37),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    controller.isRequestAccepted.value ? "end_cap".tr : "cancel_cap".tr,
-                    style: GoogleFonts.poppins(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: controller.isRequestAccepted.value
-                          ? Colors.white
-                          : Colors.black,
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // TEST BUTTON FOR BOSS
+                  // InkWell(
+                  //   onTap: () => Utils.showInsufficientCreditsDialog(),
+                  //   child: Container(
+                  //     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  //     decoration: BoxDecoration(
+                  //       color: Colors.red.withOpacity(0.2),
+                  //       borderRadius: BorderRadius.circular(16),
+                  //       border: Border.all(color: Colors.red.withOpacity(0.5)),
+                  //     ),
+                  //     child: Text(
+                  //       "Show Alert",
+                  //       style: GoogleFonts.poppins(fontSize: 10, color: Colors.white),
+                  //     ),
+                  //   ),
+                  // ),
+                  // const SizedBox(width: 8),
+                  
+                  InkWell(
+                    onTap: () {
+                      if (controller.isRequestAccepted.value) {
+                        controller.showEndChatDialog(
+                          "end_chat_q".tr,
+                          "end_chat_confirm".tr,
+                        );
+                      } else {
+                        controller.cancelChatRequest();
+                      }
+                    },
+                    child: Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: controller.isRequestAccepted.value
+                            ? Colors.red[900]
+                            : const Color(0xFFD4AF37),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        controller.isRequestAccepted.value ? "end_cap".tr : "cancel_cap".tr,
+                        style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: controller.isRequestAccepted.value
+                              ? Colors.white
+                              : Colors.black,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               );
             }),
           ),

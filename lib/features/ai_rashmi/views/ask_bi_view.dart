@@ -63,17 +63,11 @@ class _AskBiViewState extends State<AskBiView> {
               children: [
                 /// TOP BAR
                 Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 4.w,
-                    vertical: 1.h,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
                   child: Row(
                     children: [
-                        IconButton(
-                          icon: const Icon(
-                            Icons.arrow_back,
-                            color: Colors.white,
-                          ),
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Colors.white),
                         onPressed: () {
                           Provider.of<DashboardViewModel>(
                             context,
@@ -171,10 +165,7 @@ class _AskBiViewState extends State<AskBiView> {
                           description: agent.firstMessage ?? "",
                           buttonText: "Explore",
                           buttonGradient: const LinearGradient(
-                            colors: [
-                              Color(0xFFFDB913),
-                              Color(0xFF9E7B15),
-                            ],
+                            colors: [Color(0xFFFDB913), Color(0xFF9E7B15)],
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                           ),
@@ -185,14 +176,18 @@ class _AskBiViewState extends State<AskBiView> {
                           textColor: Colors.white,
                           dividerColor: AppTheme.primaryGold.withOpacity(0.3),
                           // isLockIcon: isKrishna,
-                          borderColor: isKrishna ? AppTheme.primaryGold : Colors.transparent,
+                          borderColor: isKrishna
+                              ? AppTheme.primaryGold
+                              : AppTheme.primaryGold.withOpacity(0.4),
                           buttonTextColor: Colors.white,
                           onTap: () async {
                             if (!Get.isRegistered<AgentController>()) {
                               Get.put(AgentController());
                             }
-print("Selected Agent ID: ${agent.id}");
-print("Saved Agent ID: ${StorageService.getString('ai_selected_agent_id')}");
+                            print("Selected Agent ID: ${agent.id}");
+                            print(
+                              "Saved Agent ID: ${StorageService.getString('ai_selected_agent_id')}",
+                            );
                             final agentController = Get.find<AgentController>();
 
                             if (agentController.avatars.isEmpty) {
@@ -219,11 +214,15 @@ print("Saved Agent ID: ${StorageService.getString('ai_selected_agent_id')}");
                               'ai_selected_agent_name',
                               agent.name ?? '',
                             );
-                            
+
                             // Print to terminal
                             print("=== SAVED AGENT INFO ===");
-                            print("Saved Agent ID: ${StorageService.getString('ai_selected_agent_id')}");
-                            print("Saved Agent Name: ${StorageService.getString('ai_selected_agent_name')}");
+                            print(
+                              "Saved Agent ID: ${StorageService.getString('ai_selected_agent_id')}",
+                            );
+                            print(
+                              "Saved Agent Name: ${StorageService.getString('ai_selected_agent_name')}",
+                            );
                             print("========================");
 
                             Get.to(
@@ -232,8 +231,7 @@ print("Saved Agent ID: ${StorageService.getString('ai_selected_agent_id')}");
                                 subtitle: agent.description ?? "",
                                 firstMessage: agent.firstMessage,
                                 // subtitle: agent. "",
-                                backgroundImage:
-                                    'assets/icons/chat_bg_new.png',
+                                backgroundImage: 'assets/icons/chat_bg_new.png',
                                 characterImagePath: isKrishna
                                     ? 'assets/icons/krishna_neww.png'
                                     : 'assets/icons/Rashmi_new_chat.png',
@@ -259,7 +257,6 @@ print("Saved Agent ID: ${StorageService.getString('ai_selected_agent_id')}");
                     style: GoogleFonts.rozhaOne(
                       fontSize: 15.sp,
                       color: AppTheme.primaryGold,
-                      height: 1.4,
                     ),
                   ),
                 ),
@@ -283,7 +280,6 @@ print("Saved Agent ID: ${StorageService.getString('ai_selected_agent_id')}");
     required VoidCallback onTap,
     required Color textColor,
     required Color dividerColor,
-    // required bool isLockIcon,
     required Color borderColor,
     Color buttonTextColor = Colors.white,
   }) {
@@ -298,10 +294,7 @@ print("Saved Agent ID: ${StorageService.getString('ai_selected_agent_id')}");
           decoration: BoxDecoration(
             color: backgroundColor,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: borderColor.withOpacity(0.5),
-              width: 1,
-            ),
+            border: Border.all(color: borderColor.withOpacity(0.5), width: 1.5),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.3),
@@ -311,121 +304,90 @@ print("Saved Agent ID: ${StorageService.getString('ai_selected_agent_id')}");
             ],
           ),
           clipBehavior: Clip.hardEdge,
-          child: IntrinsicHeight(
-            child: Row(
-              children: [
-                SizedBox(
-                  width: imageWidth,
-                  child: Image.asset(
-                    characterImagePath,
-                    fit: BoxFit.cover,
-                    alignment: Alignment.bottomCenter,
-                  ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: imageWidth,
+                child: Image.asset(
+                  characterImagePath,
+                  fit: BoxFit.cover,
+                  alignment: Alignment.bottomCenter,
                 ),
-
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 3.w,
-                      vertical: 2.h,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: GoogleFonts.lora(
-                            fontSize: 13.5.sp,
-                            fontWeight: FontWeight.w600,
-                            color: textColor,
-                          ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 3.w,
+                    vertical: 2.h,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        title,
+                        style: GoogleFonts.lora(
+                          fontSize: 13.5.sp,
+                          fontWeight: FontWeight.w600,
+                          color: textColor,
                         ),
-
-                        Container(
-                          margin: const EdgeInsets.symmetric(vertical: 4),
-                          height: 1,
-                          width: double.infinity,
-                          color: dividerColor,
+                      ),
+                      Container(
+                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        height: 1,
+                        width: double.infinity,
+                        color: dividerColor,
+                      ),
+                      Text(
+                        subtitle,
+                        style: GoogleFonts.poppins(
+                          fontSize: 8.25.sp,
+                          fontWeight: FontWeight.w500,
+                          color: textColor.withOpacity(0.9),
                         ),
-
-                        Text(
-                          subtitle,
-                          style: GoogleFonts.poppins(
-                            fontSize: 8.25.sp,
-                            fontWeight: FontWeight.w500,
-                            color: textColor.withOpacity(0.9),
-                          ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        description,
+                        style: GoogleFonts.poppins(
+                          fontSize: 7.5.sp,
+                          fontStyle: FontStyle.italic,
+                          color: textColor.withOpacity(0.8),
                         ),
-
-                        const SizedBox(height: 2),
-
-                        Text(
-                          description,
-                          style: GoogleFonts.poppins(
-                            fontSize: 7.5.sp,
-                            fontStyle: FontStyle.italic,
-                            color: textColor.withOpacity(0.8),
-                          ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 3.5.w,
+                          vertical: 0.75.h,
                         ),
-
-                        const SizedBox(height: 8),
-
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 3.5.w,
-                            vertical: 0.75.h,
-                          ),
-                          decoration: BoxDecoration(
-                            gradient: buttonGradient,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // if (isLockIcon) ...[
-                              //   Icon(
-                              //     Icons.lock,
-                              //     size: 10,
-                              //     color: buttonTextColor,
-                              //   ),
-                              //   const SizedBox(width: 4),
-                              // ],
-
-                              Text(
-                                buttonText,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 8.25.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: buttonTextColor,
-                                ),
+                        decoration: BoxDecoration(
+                          gradient: buttonGradient,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              buttonText,
+                              style: GoogleFonts.poppins(
+                                fontSize: 8.25.sp,
+                                fontWeight: FontWeight.bold,
+                                color: buttonTextColor,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 }
-//                             ],
-//                           ),
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }

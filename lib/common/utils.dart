@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'colors.dart';
+import '../core/constants/app_constants.dart';
 
 class Utils {
   bool isSearchExpanded = false, isOpen = false;
@@ -451,6 +452,98 @@ class Utils {
           ),
         ),
       ),
+    );
+  }
+
+  static void showInsufficientCreditsDialog() {
+    Get.dialog(
+      Dialog(
+        backgroundColor: const Color(0xFF141414),
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: const BorderSide(color: Colors.white10),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1A1A1A),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.2)),
+                ),
+                child: const Icon(
+                  Icons.account_balance_wallet_outlined,
+                  color: Color(0xFFD4AF37),
+                  size: 28,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                "insufficient_credits_session_title".tr,
+                style: GoogleFonts.lora(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                "insufficient_credits_session_msg".tr,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: Colors.white70,
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Get.back();
+                    Get.toNamed(AppConstants.routesSubscription);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFD4AF37),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    "recharge_now".tr,
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () => Get.back(),
+                child: Text(
+                  "ok".tr,
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: Colors.white54,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      barrierDismissible: false,
     );
   }
 }

@@ -14,6 +14,8 @@ import '../../../core/services/chat_notification_service.dart';
 import '../../astrology/models/chat_models.dart';
 import '../../../core/services/socket_service.dart';
 import '../../../core/utils/app_snackbar.dart';
+import '../../profile/viewmodels/profile_viewmodel.dart';
+import 'package:provider/provider.dart';
 
 extension StringExtension on String {
   String capitalizeFirstLetter() {
@@ -1306,8 +1308,33 @@ class AstrologyChatController extends GetxController {
     _statusPollingTimer?.cancel(); // Stop polling once accepted
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       chatDuration.value++;
+      
+      // Check credits every 30 seconds
+      if (chatDuration.value % 30 == 0) {
+        _checkCredits();
+      }
     });
     Utils.print("📌 EXIT _startTimer");
+  }
+
+  Future<void> _checkCredits() async {
+    try {
+      final profileVM = Provider.of<ProfileViewModel>(Get.context!, listen: false);
+      await profileVM.fetchProfile();
+      
+      final currentCredits = profileVM.profile?.credits ?? 0;
+      final pricePerMinute = expert.pricePerMinute;
+      
+      Utils.print("💰 Credit Check: Current=$currentCredits, Price=$pricePerMinute");
+      
+      if (currentCredits < pricePerMinute) {
+        Utils.print("🚨 Insufficient credits! Ending chat.");
+        _endChat();
+        Utils.showInsufficientCreditsDialog();
+      }
+    } catch (e) {
+      Utils.print("❌ Error checking credits: $e");
+    }
   }
 
   String formatTime(int seconds) {

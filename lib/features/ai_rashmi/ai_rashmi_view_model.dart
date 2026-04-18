@@ -10,8 +10,12 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../profile/viewmodels/profile_viewmodel.dart';
 import 'ai_rashmi_service.dart';
 import 'voice_websocket_service.dart';
+// import '../../profile/viewmodels/profile_viewmodel.dart';
+import 'package:provider/provider.dart';
+import '../../../common/utils.dart';
 
 class Message {
   final String role; // 'user' or 'assistant'
@@ -44,17 +48,20 @@ class AiRashmiController extends GetxController {
   String? currentRecordingPath;
   Timer? _audioChunkTimer;
   List<Uint8List> _receivedAudioChunks = [];
+  Timer? _creditCheckTimer;
 
   @override
   void onInit() {
     super.onInit();
     loadHistory(); // sirf history, chat first message se banega
     _setupWebSocketCallbacks();
+    _startCreditCheck();
   }
 
   @override
   void onClose() {
     _audioChunkTimer?.cancel();
+    _creditCheckTimer?.cancel();
     _audioCompletionSubscription?.cancel();
     _voiceWebSocket.dispose();
     _audioRecorder.dispose();
@@ -779,5 +786,45 @@ class AiRashmiController extends GetxController {
       }
       _tempAudioFiles.clear();
     });
+  }
+
+  void _startCreditCheck() {
+    _creditCheckTimer?.cancel();
+    _creditCheckTimer = Timer.periodic(const Duration(seconds: 45), (timer) {
+      // Check credits only when in active session or about to send
+      if (chatId != null || isProcessingVoice || isPlayingAudio) {
+        _checkCredits();
+      }
+    });
+  }
+
+  Future<void> _checkCredits() async {
+    try {
+      final context = Get.context;
+      if (context == null) return;
+
+      final profileVM = Provider.of<ProfileViewModel>(context, listen: false);
+      await profileVM.fetchProfile();
+
+      final currentCredits = profileVM.profile?.credits ?? 0;
+      // Define a threshold for AI services, e.g., 5 credits
+      const threshold = 5;
+
+      if (currentCredits < threshold) {
+        print('🚨 [AiRashmiController] Insufficient credits: $currentCredits');
+        
+        // Stop active voice session if any
+        if (_voiceWebSocket.isConnected) {
+          _voiceWebSocket.stopSession();
+          isProcessingVoice = false;
+          isRecording = false;
+          update();
+        }
+        
+        Utils.showInsufficientCreditsDialog();
+      }
+    } catch (e) {
+      print('❌ [AiRashmiController] Error checking credits: $e');
+    }
   }
 }

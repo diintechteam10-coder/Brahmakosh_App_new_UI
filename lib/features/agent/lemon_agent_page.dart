@@ -3,6 +3,8 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:brahmakosh/features/agent/controllers/agent_controller.dart';
 
+import '../../common/utils.dart';
+
 class AvatarAgentPage extends StatefulWidget {
   final String? initialAgentId;
   const AvatarAgentPage({super.key, this.initialAgentId});
@@ -354,10 +356,10 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
               if (msg.message.contains("Insufficient balance") ||
                   msg.message.contains("Error fetching agent data")) {
                 setState(() {
-                  errorMessage =
-                      "Insufficient Balance: Please check your LemonSlice dashboard credits.";
+                  _isTalking = false; // Stop talking state
                   loading = false;
                 });
+                Utils.showInsufficientCreditsDialog();
               }
             },
           ),

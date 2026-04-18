@@ -51,6 +51,8 @@ class AppConstants {
   static const String routeGita = '/gita';
   static const String routeKrishnaChat = '/krishnaChat';
   static const String routeRashmiChat = '/rashmiChat';
+  static const String routeRechargePlans = '/rechargePlans';
+  static const String routesSubscription = '/subscription';
 
   // Cache Keys
   static const String cachePanchangData = 'cache_panchang_data';

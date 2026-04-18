@@ -39,6 +39,8 @@ import 'package:brahmakosh/features/home/views/astrology_details_screen.dart';
 import 'package:brahmakosh/features/pooja/views/pooja_list_screen.dart';
 import 'package:brahmakosh/features/swapna_decoder/views/swapna_decoder_screen.dart';
 import 'package:brahmakosh/features/gita/views/gita_chapter_screen.dart';
+import 'package:brahmakosh/features/wallet/views/recharge_plans_view.dart';
+import 'package:brahmakosh/features/wallet/views/subscription_plans_view.dart'; // Added
 
 
 
@@ -183,6 +185,14 @@ class AppPages {
     GetPage(
       name: AppConstants.routeGita,
       page: () => const GitaChapterScreen(),
+    ),
+    GetPage(
+      name: AppConstants.routeRechargePlans,
+      page: () => const RechargePlansView(),
+    ),
+    GetPage(
+      name: AppConstants.routesSubscription,
+      page: () => const SubscriptionPlansView(),
     ),
   ];
 }

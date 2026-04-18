@@ -6,6 +6,8 @@ import '../../../core/services/iap_service.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../astrology/views/credit_history_view.dart';
+
 class SubscriptionPlansView extends StatefulWidget {
   const SubscriptionPlansView({super.key});
 
@@ -188,7 +190,19 @@ class _SubscriptionPlansViewState extends State<SubscriptionPlansView>
             color: Colors.white,
           ),
         ),
+
         centerTitle: false,
+
+         actions: [
+          IconButton(
+            icon: const Icon(Icons.history, color: Colors.white),
+            onPressed: () {
+              Get.to(() => const CreditHistoryView());
+            },
+            // onPressed: _refreshProducts,
+            // tooltip: 'Refresh Plans',
+          ),
+        ],
       ),
       body: Column(
         children: [
