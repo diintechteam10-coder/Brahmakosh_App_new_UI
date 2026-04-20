@@ -8,6 +8,7 @@ import '../ai_rashmi_service.dart';
 import '../deity_selection_service.dart';
 import 'package:brahmakosh/features/agent/controllers/agent_controller.dart';
 import 'package:brahmakosh/core/services/storage_service.dart';
+import '../../agent/lemon_agent_page.dart';
 
 class AiGuideView extends StatefulWidget {
   final String deityName;
@@ -108,6 +109,55 @@ class _AiGuideViewState extends State<AiGuideView> {
         deityName: widget.deityName,
       ),
       transition: Transition.noTransition,
+    );
+  }
+
+  void _onTalkToAvatar() {
+    Get.to(
+      () => AvatarAgentPage(
+        initialAgentId: DeitySelectionService().selectedDeity?.agentId,
+        autoStart: true,
+      ),
+    );
+  }
+
+  Widget _buildTalkButton() {
+    return GestureDetector(
+      onTap: _onTalkToAvatar,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFFDB913), Color(0xFF9E7B15)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFFDB913).withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.mic, color: Colors.black, size: 4.5.w),
+            const SizedBox(width: 8),
+            Text(
+              "Talk",
+              style: GoogleFonts.poppins(
+                fontSize: 9.75.sp,
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -220,95 +270,105 @@ class _AiGuideViewState extends State<AiGuideView> {
                   // Action Buttons
                   Padding(
                     padding: const EdgeInsets.only(bottom: 40),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        // Tap To Talk Button
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: _onTapToTalk,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    Color(0xFFFDB913),
-                                    Color(0xFF9E7B15),
-                                  ],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                ),
-                                borderRadius: BorderRadius.circular(30),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFFFDB913).withOpacity(0.3),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.mic,
-                                    color: Colors.black,
-                                    size: 4.5.w,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    "tap_to_talk".tr,
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 9.75.sp,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.black,
+                    child: widget.deityName.toLowerCase().contains("krishna")
+                        ? _buildTalkButton()
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              // Tap To Talk Button
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: _onTapToTalk,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        colors: [
+                                          Color(0xFFFDB913),
+                                          Color(0xFF9E7B15),
+                                        ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                      ),
+                                      borderRadius: BorderRadius.circular(30),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(0xFFFDB913)
+                                              .withOpacity(0.3),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.mic,
+                                          color: Colors.black,
+                                          size: 4.5.w,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          "tap_to_talk".tr,
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 9.75.sp,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        // Text To Chat Button
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: _onTextToChat,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.3),
-                                borderRadius: BorderRadius.circular(30),
-                                border: Border.all(
-                                  color: const Color(0xFFFFD700).withOpacity(0.8),
-                                  width: 1.2,
                                 ),
                               ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.chat_bubble_outline,
-                                    color: Color(0xFFFFD700),
-                                    size: 4.w,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    "text_to_chat".tr,
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 9.75.sp,
-                                      fontWeight: FontWeight.w600,
-                                      color: const Color(0xFFFFD700),
+                              const SizedBox(width: 12),
+                              // Text To Chat Button
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: _onTextToChat,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withOpacity(0.3),
+                                      borderRadius: BorderRadius.circular(30),
+                                      border: Border.all(
+                                        color: const Color(0xFFFFD700)
+                                            .withOpacity(0.8),
+                                        width: 1.2,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.chat_bubble_outline,
+                                          color: Color(0xFFFFD700),
+                                          size: 4.w,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          "text_to_chat".tr,
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 9.75.sp,
+                                            fontWeight: FontWeight.w600,
+                                            color: const Color(0xFFFFD700),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
                   ),
+                
+                
                 ],
               ),
             ),

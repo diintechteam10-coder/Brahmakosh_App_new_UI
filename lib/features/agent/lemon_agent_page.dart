@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:brahmakosh/core/common_imports.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -7,7 +8,12 @@ import '../../common/utils.dart';
 
 class AvatarAgentPage extends StatefulWidget {
   final String? initialAgentId;
-  const AvatarAgentPage({super.key, this.initialAgentId});
+  final bool autoStart;
+  const AvatarAgentPage({
+    super.key,
+    this.initialAgentId,
+    this.autoStart = false,
+  });
 
   @override
   State<AvatarAgentPage> createState() => _AvatarAgentPageState();
@@ -24,17 +30,34 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
   bool _isTalking = false;
   String? errorMessage;
   bool isDropdownOpen = false;
+  bool _isMicMuted = false;
 
   @override
   void initState() {
     super.initState();
     checkPermissions();
     // Fetch avatars after the widget is built
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       debugPrint(
         'AvatarAgentPage: Received initialAgentId: ${widget.initialAgentId}',
       );
-      controller.fetchAvatars(this, preferredAgentId: widget.initialAgentId);
+      await controller.fetchAvatars(this, preferredAgentId: widget.initialAgentId);
+      
+      if (widget.autoStart) {
+        // If autoStart is true, we attempt to start talking immediately
+        // but we must ensure permissions are granted.
+        if (permissionsGranted) {
+          _startTalking();
+        } else {
+          // If permissions not granted yet, we can try requesting them again
+          // or just wait for the user to grant them and then they might have to click manually
+          // but usually permissions are requested in initState.
+          await checkPermissions();
+          if (permissionsGranted) {
+            _startTalking();
+          }
+        }
+      }
     });
   }
 
@@ -67,6 +90,20 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
       setState(() {
         _isTalking = true;
         loading = true;
+        _isMicMuted = false; // Reset mic state when starting
+      });
+    }
+  }
+
+  Future<void> _toggleMic() async {
+    if (webViewController != null) {
+      final newState = !_isMicMuted;
+      // Call the JS function we will define in _loadWidget
+      await webViewController?.evaluateJavascript(
+        source: newState ? "window.muteMic()" : "window.unmuteMic()",
+      );
+      setState(() {
+        _isMicMuted = newState;
       });
     }
   }
@@ -115,7 +152,7 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
                       Column(
                         children: [
                           // Custom Header
-                          _buildHeader(activeAvatars, selectedAgent),
+                          // _buildHeader(activeAvatars, selectedAgent),
                           Expanded(
                             child: permissionsGranted
                                 ? _buildMainContent(selectedAgent, hasActive)
@@ -131,193 +168,193 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
     });
   }
 
-  Widget _buildHeader(List<dynamic> activeAvatars, dynamic selectedAgent) {
-    return Container(
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 10,
-        left: 16,
-        right: 16,
-        bottom: 10,
-      ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Back Button
-          Align(
-            alignment: Alignment.centerLeft,
-            child: GestureDetector(
-              onTap: () => Get.back(),
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration:  BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.arrow_back, color: Colors.white),
-              ),
-            ),
-          ),
-          // Agent Selector (Top Center)
-          if (selectedAgent != null)
-            _buildAgentSelector(activeAvatars, selectedAgent),
-        ],
-      ),
-    );
-  }
+  // Widget _buildHeader(List<dynamic> activeAvatars, dynamic selectedAgent) {
+  //   return Container(
+  //     padding: EdgeInsets.only(
+  //       top: MediaQuery.of(context).padding.top + 10,
+  //       left: 16,
+  //       right: 16,
+  //       bottom: 10,
+  //     ),
+  //     child: Stack(
+  //       alignment: Alignment.center,
+  //       children: [
+  //         // Back Button
+  //         Align(
+  //           alignment: Alignment.centerLeft,
+  //           child: GestureDetector(
+  //             onTap: () => Get.back(),
+  //             child: Container(
+  //               padding: const EdgeInsets.all(8),
+  //               decoration:  BoxDecoration(
+  //                 color: Colors.white.withOpacity(0.2),
+  //                 shape: BoxShape.circle,
+  //               ),
+  //               child: const Icon(Icons.arrow_back, color: Colors.white),
+  //             ),
+  //           ),
+  //         ),
+  //         // Agent Selector (Top Center)
+  //         // if (selectedAgent != null)
+  //         //   _buildAgentSelector(activeAvatars, selectedAgent),
+  //       ],
+  //     ),
+  //   );
+  // }
 
-  Widget _buildAgentSelector(
-    List<dynamic> activeAvatars,
-    dynamic selectedAgent,
-  ) {
-    return Column(
-      children: [
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              isDropdownOpen = !isDropdownOpen;
-            });
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-            decoration: BoxDecoration(
-              color: const Color(0xffD4AF37).withOpacity(0.5),
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircleAvatar(
-                  radius: 16,
-                  backgroundImage: NetworkImage(selectedAgent.imageUrl ?? ''),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  selectedAgent.name ?? '',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Icon(
-                  isDropdownOpen
-                      ? Icons.keyboard_arrow_up
-                      : Icons.keyboard_arrow_down,
-                  color: Colors.white,
-                ),
-              ],
-            ),
-          ),
-        ),
+  // Widget _buildAgentSelector(
+  //   List<dynamic> activeAvatars,
+  //   dynamic selectedAgent,
+  // ) {
+  //   return Column(
+  //     children: [
+  //       GestureDetector(
+  //         onTap: () {
+  //           setState(() {
+  //             isDropdownOpen = !isDropdownOpen;
+  //           });
+  //         },
+  //         child: Container(
+  //           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+  //           decoration: BoxDecoration(
+  //             color: const Color(0xffD4AF37).withOpacity(0.5),
+  //             borderRadius: BorderRadius.circular(30),
+  //           ),
+  //           child: Row(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: [
+  //               CircleAvatar(
+  //                 radius: 16,
+  //                 backgroundImage: NetworkImage(selectedAgent.imageUrl ?? ''),
+  //               ),
+  //               const SizedBox(width: 8),
+  //               Text(
+  //                 selectedAgent.name ?? '',
+  //                 style: const TextStyle(
+  //                   fontSize: 18,
+  //                   fontWeight: FontWeight.w600,
+  //                   color: Colors.white,
+  //                 ),
+  //               ),
+  //               const SizedBox(width: 6),
+  //               Icon(
+  //                 isDropdownOpen
+  //                     ? Icons.keyboard_arrow_up
+  //                     : Icons.keyboard_arrow_down,
+  //                 color: Colors.white,
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
 
-        /// 👇 DROPDOWN BELOW SELECTOR
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 250),
-          child: isDropdownOpen
-              ? Container(
-                  margin: const EdgeInsets.only(top: 12),
-                  padding: const EdgeInsets.all(12),
-                  width: MediaQuery.of(context).size.width - 48,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  child: Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    alignment: WrapAlignment.center,
-                    children: activeAvatars.map((agent) {
-                      final isSelected = agent == controller.selectedAgent;
-                      final cardWidth =
-                          (MediaQuery.of(context).size.width - 48 - 24 - 20) /
-                          3;
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            isDropdownOpen = false;
-                          });
-                          _onAgentChanged(agent);
-                        },
-                        child: Container(
-                          width: cardWidth.clamp(80.0, 120.0),
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 12,
-                            horizontal: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? Color(0xffD4AF37)
-                                : Color(0xffD4AF37).withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(16),
-                            border: isSelected
-                                ? Border.all(
-                                    color: const Color(0xFFFF9800),
-                                    width: 2,
-                                  )
-                                : null,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
-                                blurRadius: 6,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.network(
-                                  agent.imageUrl ?? '',
-                                  height: 70,
-                                  width: 70,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Container(
-                                        height: 70,
-                                        width: 70,
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFF4E9E0),
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
-                                        child: const Icon(
-                                          Icons.person,
-                                          color: Color(0xff8D6E63),
-                                          size: 32,
-                                        ),
-                                      ),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                agent.name ?? '',
-                                textAlign: TextAlign.center,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: isSelected
-                                      ? FontWeight.bold
-                                      : FontWeight.w500,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                )
-              : const SizedBox(),
-        ),
-      ],
-    );
-  }
+  //       /// 👇 DROPDOWN BELOW SELECTOR
+  //       AnimatedSwitcher(
+  //         duration: const Duration(milliseconds: 250),
+  //         child: isDropdownOpen
+  //             ? Container(
+  //                 margin: const EdgeInsets.only(top: 12),
+  //                 padding: const EdgeInsets.all(12),
+  //                 width: MediaQuery.of(context).size.width - 48,
+  //                 decoration: BoxDecoration(
+  //                   color: Colors.black,
+  //                   borderRadius: BorderRadius.circular(25),
+  //                 ),
+  //                 child: Wrap(
+  //                   spacing: 10,
+  //                   runSpacing: 10,
+  //                   alignment: WrapAlignment.center,
+  //                   children: activeAvatars.map((agent) {
+  //                     final isSelected = agent == controller.selectedAgent;
+  //                     final cardWidth =
+  //                         (MediaQuery.of(context).size.width - 48 - 24 - 20) /
+  //                         3;
+  //                     return GestureDetector(
+  //                       onTap: () {
+  //                         setState(() {
+  //                           isDropdownOpen = false;
+  //                         });
+  //                         _onAgentChanged(agent);
+  //                       },
+  //                       child: Container(
+  //                         width: cardWidth.clamp(80.0, 120.0),
+  //                         padding: const EdgeInsets.symmetric(
+  //                           vertical: 12,
+  //                           horizontal: 8,
+  //                         ),
+  //                         decoration: BoxDecoration(
+  //                           color: isSelected
+  //                               ? Color(0xffD4AF37)
+  //                               : Color(0xffD4AF37).withOpacity(0.5),
+  //                           borderRadius: BorderRadius.circular(16),
+  //                           border: isSelected
+  //                               ? Border.all(
+  //                                   color: const Color(0xFFFF9800),
+  //                                   width: 2,
+  //                                 )
+  //                               : null,
+  //                           boxShadow: [
+  //                             BoxShadow(
+  //                               color: Colors.black.withOpacity(0.05),
+  //                               blurRadius: 6,
+  //                               offset: const Offset(0, 2),
+  //                             ),
+  //                           ],
+  //                         ),
+  //                         child: Column(
+  //                           mainAxisSize: MainAxisSize.min,
+  //                           children: [
+  //                             ClipRRect(
+  //                               borderRadius: BorderRadius.circular(12),
+  //                               child: Image.network(
+  //                                 agent.imageUrl ?? '',
+  //                                 height: 70,
+  //                                 width: 70,
+  //                                 fit: BoxFit.cover,
+  //                                 errorBuilder: (context, error, stackTrace) =>
+  //                                     Container(
+  //                                       height: 70,
+  //                                       width: 70,
+  //                                       decoration: BoxDecoration(
+  //                                         color: const Color(0xFFF4E9E0),
+  //                                         borderRadius: BorderRadius.circular(
+  //                                           12,
+  //                                         ),
+  //                                       ),
+  //                                       child: const Icon(
+  //                                         Icons.person,
+  //                                         color: Color(0xff8D6E63),
+  //                                         size: 32,
+  //                                       ),
+  //                                     ),
+  //                               ),
+  //                             ),
+  //                             const SizedBox(height: 8),
+  //                             Text(
+  //                               agent.name ?? '',
+  //                               textAlign: TextAlign.center,
+  //                               maxLines: 2,
+  //                               overflow: TextOverflow.ellipsis,
+  //                               style: TextStyle(
+  //                                 fontSize: 12,
+  //                                 fontWeight: isSelected
+  //                                     ? FontWeight.bold
+  //                                     : FontWeight.w500,
+  //                                 color: Colors.white,
+  //                               ),
+  //                             ),
+  //                           ],
+  //                         ),
+  //                       ),
+  //                     );
+  //                   }).toList(),
+  //                 ),
+  //               )
+  //             : const SizedBox(),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildMainContent(dynamic selectedAgent, bool hasActive) {
     if (_isTalking) {
@@ -362,6 +399,13 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
                 Utils.showInsufficientCreditsDialog();
               }
             },
+          ),
+          // Custom Floating Controls
+          Positioned(
+            bottom: 40,
+            left: 0,
+            right: 0,
+            child: _buildCustomControls(),
           ),
           if (loading)
             const Center(
@@ -422,6 +466,60 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
                 ),
               ),
             ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCustomControls() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Mic Toggle Button
+        GestureDetector(
+          onTap: _toggleMic,
+          child: ClipOval(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: _isMicMuted ? Colors.red.withOpacity(0.8) : Colors.white.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white.withOpacity(0.1)),
+                ),
+                child: Icon(
+                  _isMicMuted ? Icons.mic_off : Icons.mic,
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 24),
+        // End/Cancel Button
+        GestureDetector(
+          onTap: () => Get.back(),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.red.withOpacity(0.9),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.red.withOpacity(0.4),
+                  blurRadius: 15,
+                  spreadRadius: 2,
+                )
+              ],
+            ),
+            child: const Icon(
+              Icons.close,
+              color: Colors.white,
+              size: 28,
+            ),
           ),
         ),
       ],
@@ -561,6 +659,10 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
             all.forEach(el => {
               el.style.setProperty('border-radius', '0px', 'important');
               if (el.shadowRoot) {
+                // Hide controls inside shadow DOM
+                const controls = el.shadowRoot.querySelectorAll('[class*="controls"], [class*="bottom"], [class*="toolbar"]');
+                controls.forEach(c => c.style.display = 'none');
+                
                 const shadowAll = el.shadowRoot.querySelectorAll('*');
                 shadowAll.forEach(sel => {
                   sel.style.setProperty('border-radius', '0px', 'important');
@@ -568,6 +670,21 @@ class _AvatarAgentPageState extends State<AvatarAgentPage>
               }
             });
           }
+
+          // JS API for Flutter
+          window.muteMic = function() {
+            const widget = document.getElementById('main-widget');
+            if (widget && typeof widget.micOff === 'function') {
+               widget.micOff();
+            }
+          };
+          window.unmuteMic = function() {
+            const widget = document.getElementById('main-widget');
+            if (widget && typeof widget.micOn === 'function') {
+               widget.micOn();
+            }
+          };
+
           setInterval(flatAll, 500);
           flatAll();
         </script>
