@@ -22,7 +22,7 @@ class GlobalConnectivityOverlay extends StatelessWidget {
           }
 
           return Material(
-            color: Colors.black.withOpacity(0.7),
+            color: Colors.black.withValues(alpha: 0.7),
             child: PopScope(
               canPop: false,
               child: Center(
@@ -32,10 +32,10 @@ class GlobalConnectivityOverlay extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: const Color(0xFF1C1C1E), // Premium Dark
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: const Color(0xFFFFD4AF).withOpacity(0.2)),
+                    border: Border.all(color: const Color(0xFFFFD4AF).withValues(alpha: 0.2)),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.5),
+                        color: Colors.black.withValues(alpha: 0.5),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -47,7 +47,7 @@ class GlobalConnectivityOverlay extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.all(4.w),
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.1),
+                          color: Colors.red.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -86,7 +86,7 @@ class GlobalConnectivityOverlay extends StatelessWidget {
                         child: ElevatedButton.icon(
                           onPressed: () => connectivityService.refreshConnectivity(),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFFD4AF).withOpacity(0.1),
+                            backgroundColor: const Color(0xFFFFD4AF).withValues(alpha: 0.1),
                             foregroundColor: const Color(0xFFFFD4AF),
                             side: const BorderSide(color: Color(0xFFFFD4AF)),
                             padding: EdgeInsets.symmetric(vertical: 1.5.h),

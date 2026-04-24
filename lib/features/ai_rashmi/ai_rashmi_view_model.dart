@@ -6,7 +6,12 @@ import 'dart:math';
 
 import 'package:get/get.dart';
 import 'package:record/record.dart';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:audioplayers/audioplayers.dart'
+    hide
+        AVAudioSessionCategory,
+        AVAudioSessionCategoryOptions,
+        AVAudioSessionMode;
+import 'package:audio_session/audio_session.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -50,6 +55,13 @@ class AiRashmiController extends GetxController {
   List<Uint8List> _receivedAudioChunks = [];
   Timer? _creditCheckTimer;
 
+  // VAD (Voice Activity Detection) — auto-interruption while agent speaks
+  StreamSubscription<Uint8List>? _vadSubscription;
+  DateTime? _vadSpeechStart;
+  bool _isAutoInterrupting = false;
+  static const double _vadRmsThreshold = 0.025; // RMS level to consider as speech
+  static const Duration _vadSustainedDuration = Duration(milliseconds: 350); // Must speak this long to interrupt
+
   @override
   void onInit() {
     super.onInit();
@@ -63,6 +75,7 @@ class AiRashmiController extends GetxController {
     _audioChunkTimer?.cancel();
     _creditCheckTimer?.cancel();
     _audioCompletionSubscription?.cancel();
+    _vadSubscription?.cancel();
     _voiceWebSocket.dispose();
     _audioRecorder.dispose();
     _audioPlayer.dispose();
@@ -181,6 +194,13 @@ class AiRashmiController extends GetxController {
         _finalizeAudioPlayback();
         print('✅ [ViewModel] Audio playback finalized');
       });
+      print('📱 [ViewModel] ============================================');
+    };
+
+    _voiceWebSocket.onAudioInterrupted = () async {
+      print('📱 [ViewModel] ============================================');
+      print('📱 [ViewModel] Audio interrupted callback');
+      await _handleAudioInterrupted();
       print('📱 [ViewModel] ============================================');
     };
 
@@ -331,7 +351,7 @@ class AiRashmiController extends GetxController {
 
     // Use current title or default
     final title = currentTitle ?? 'New chat';
-    
+
     // Add the AI's first message
     messages.add(Message(role: 'assistant', content: message.trim()));
     update();
@@ -340,7 +360,7 @@ class AiRashmiController extends GetxController {
       if (chatId == null) {
         currentTitle = title;
         chatId = await service.createChat(title: title);
-        
+
         // Save the first message to the backend via service
         // Depending on your API, there might not be an explicit 'addMessage'
         // for assistant roles directly if it expects normal chat flow,
@@ -686,12 +706,15 @@ class AiRashmiController extends GetxController {
     if (!isPlayingAudio) {
       isPlayingAudio = true;
       update();
+      // Begin silent VAD monitoring so user can auto-interrupt by speaking
+      _startVadMonitoring();
     }
 
     await _playNextAudioChunk();
   }
 
   StreamSubscription? _audioCompletionSubscription;
+  Completer<void>? _chunkPlaybackCompleter;
 
   Future<void> _playNextAudioChunk() async {
     if (_receivedAudioChunks.isEmpty) {
@@ -701,7 +724,9 @@ class AiRashmiController extends GetxController {
       // Wait a bit before setting isPlayingAudio to false in case more chunks arrive
       Future.delayed(const Duration(milliseconds: 500), () {
         if (_receivedAudioChunks.isEmpty && !_isPlayingChunk) {
+          _stopVadMonitoring();
           isPlayingAudio = false;
+          isProcessingVoice = false;
           update();
         }
       });
@@ -728,8 +753,11 @@ class AiRashmiController extends GetxController {
 
       // Setup completion listener
       final completer = Completer<void>();
+      _chunkPlaybackCompleter = completer;
       _audioCompletionSubscription = _audioPlayer.onPlayerComplete.listen((_) {
-        completer.complete();
+        if (!completer.isCompleted) {
+          completer.complete();
+        }
       });
 
       // Play chunk
@@ -737,6 +765,7 @@ class AiRashmiController extends GetxController {
 
       // Wait for completion
       await completer.future;
+      _chunkPlaybackCompleter = null;
 
       // Clean up temp file
       try {
@@ -755,9 +784,11 @@ class AiRashmiController extends GetxController {
         await _playNextAudioChunk();
       } else {
         isPlayingAudio = false;
+        isProcessingVoice = false; // Re-enable button after agent finishes speaking
         update();
       }
     } catch (e) {
+      _chunkPlaybackCompleter = null;
       _isPlayingChunk = false;
       print('Error playing audio chunk: $e');
       // On error, try next chunk if available
@@ -765,9 +796,57 @@ class AiRashmiController extends GetxController {
         await _playNextAudioChunk();
       } else {
         isPlayingAudio = false;
+        isProcessingVoice = false; // Re-enable button on error too
         update();
       }
     }
+  }
+
+  Future<void> _handleAudioInterrupted() async {
+    print('🛑 [ViewModel] Audio interrupted by user speech');
+
+    // Stop VAD monitoring immediately so it doesn't re-trigger
+    await _stopVadMonitoring();
+
+    _receivedAudioChunks.clear();
+    _isPlayingChunk = false;
+
+    final playbackCompleter = _chunkPlaybackCompleter;
+    _chunkPlaybackCompleter = null;
+    if (playbackCompleter != null && !playbackCompleter.isCompleted) {
+      playbackCompleter.complete();
+    }
+
+    await _audioCompletionSubscription?.cancel();
+    _audioCompletionSubscription = null;
+
+    try {
+      await _audioPlayer.stop();
+    } catch (e) {
+      print('⚠️ [ViewModel] Error stopping interrupted audio: $e');
+    }
+
+    for (final file in List<File>.from(_tempAudioFiles)) {
+      try {
+        if (file.existsSync()) {
+          await file.delete();
+        }
+      } catch (e) {
+        print('⚠️ [ViewModel] Error deleting interrupted temp audio file: $e');
+      }
+    }
+    _tempAudioFiles.clear();
+
+    isPlayingAudio = false;
+    isProcessingVoice = false; // Reset so user can record again after interruption
+    update();
+  }
+
+  /// Called when user manually taps the mic button while agent is speaking.
+  /// Delegates to _triggerAutoInterrupt which handles the full flow.
+  Future<void> interruptAgent() async {
+    print('🛑 [ViewModel] interruptAgent() called - manual tap interrupt');
+    await _triggerAutoInterrupt();
   }
 
   void _finalizeAudioPlayback() {
@@ -786,6 +865,134 @@ class AiRashmiController extends GetxController {
       }
       _tempAudioFiles.clear();
     });
+  }
+
+  // ─── Client-Side VAD Auto-Interruption ──────────────────────────────────
+
+  /// Start silently monitoring the mic. When the user speaks for [_vadSustainedDuration]
+  /// while the agent is playing audio, the agent is automatically interrupted.
+  Future<void> _startVadMonitoring() async {
+    if (_vadSubscription != null || isRecording || _isAutoInterrupting) return;
+
+    // Wait for file recorder to fully release before starting stream
+    await Future.delayed(const Duration(milliseconds: 250));
+
+    // Re-check state after delay
+    if (_vadSubscription != null || isRecording || !isPlayingAudio) return;
+
+    try {
+      if (!await _audioRecorder.hasPermission()) {
+        print('⚠️ [VAD] No microphone permission, skipping VAD');
+        return;
+      }
+
+      // Configure audio session for SIMULTANEOUS play + record
+      // Without this, audioplayers holds exclusive focus and recorder fails
+      try {
+        final session = await AudioSession.instance;
+        await session.configure(AudioSessionConfiguration(
+          avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
+          avAudioSessionCategoryOptions:
+              AVAudioSessionCategoryOptions.defaultToSpeaker,
+          avAudioSessionMode: AVAudioSessionMode.voiceChat,
+          androidAudioAttributes: const AndroidAudioAttributes(
+            contentType: AndroidAudioContentType.speech,
+            flags: AndroidAudioFlags.none,
+            usage: AndroidAudioUsage.voiceCommunication,
+          ),
+          androidAudioFocusGainType:
+              AndroidAudioFocusGainType.gainTransientMayDuck,
+          androidWillPauseWhenDucked: false,
+        ));
+        print('✅ [VAD] Audio session configured for play+record');
+      } catch (e) {
+        print('⚠️ [VAD] Audio session config failed (continuing anyway): $e');
+      }
+
+      print('🎙️ [VAD] Starting VAD stream...');
+      final stream = await _audioRecorder.startStream(
+        const RecordConfig(
+          encoder: AudioEncoder.pcm16bits,
+          sampleRate: 16000,
+          numChannels: 1,
+          // voiceRecognition is less invasive on Android — allows simultaneous playback
+          androidConfig: AndroidRecordConfig(
+            audioSource: AndroidAudioSource.voiceRecognition,
+          ),
+        ),
+      );
+
+      print('✅ [VAD] Stream started — listening for user interruption');
+      _vadSpeechStart = null;
+      _vadSubscription = stream.listen(
+        _onVadChunk,
+        onError: (e) {
+          print('⚠️ [VAD] Stream error: $e');
+          _vadSubscription = null;
+        },
+        cancelOnError: true,
+      );
+    } catch (e, st) {
+      print('🔴 [VAD] Failed to start VAD stream: $e');
+      print('🔴 [VAD] StackTrace: $st');
+      _vadSubscription = null;
+    }
+  }
+
+  /// Stop VAD monitoring and release the mic for normal recording.
+  Future<void> _stopVadMonitoring() async {
+    final sub = _vadSubscription;
+    _vadSubscription = null;
+    _vadSpeechStart = null;
+    await sub?.cancel();
+    try {
+      if (await _audioRecorder.isRecording()) {
+        await _audioRecorder.stop();
+      }
+    } catch (_) {}
+  }
+
+  /// Processes each PCM chunk from the VAD stream.
+  void _onVadChunk(Uint8List data) {
+    if (!isPlayingAudio || _isAutoInterrupting) return;
+    final rms = _calcRms(data);
+    if (rms > _vadRmsThreshold) {
+      _vadSpeechStart ??= DateTime.now();
+      if (DateTime.now().difference(_vadSpeechStart!) >= _vadSustainedDuration) {
+        print('🗣️ [ViewModel] User speech detected (rms=$rms) — auto-interrupting agent');
+        _triggerAutoInterrupt();
+      }
+    } else {
+      _vadSpeechStart = null; // Reset on silence
+    }
+  }
+
+  /// RMS energy of a raw PCM-16 mono chunk.
+  double _calcRms(Uint8List bytes) {
+    if (bytes.length < 2) return 0.0;
+    double sum = 0;
+    final n = bytes.length ~/ 2;
+    for (int i = 0; i < bytes.length - 1; i += 2) {
+      int s = bytes[i] | (bytes[i + 1] << 8);
+      if (s >= 32768) s -= 65536;
+      final v = s / 32768.0;
+      sum += v * v;
+    }
+    return sqrt(sum / n);
+  }
+
+  /// Stops the agent, clears the queue, and immediately starts recording the
+  /// user's new question — called automatically by VAD or manually by UI tap.
+  Future<void> _triggerAutoInterrupt() async {
+    if (_isAutoInterrupting || !isPlayingAudio) return;
+    _isAutoInterrupting = true;
+    try {
+      await _handleAudioInterrupted(); // Stops VAD + audio + clears queue
+      await Future.delayed(const Duration(milliseconds: 120));
+      await startVoiceRecording();    // Start capturing user's question
+    } finally {
+      _isAutoInterrupting = false;
+    }
   }
 
   void _startCreditCheck() {
@@ -812,7 +1019,7 @@ class AiRashmiController extends GetxController {
 
       if (currentCredits < threshold) {
         print('🚨 [AiRashmiController] Insufficient credits: $currentCredits');
-        
+
         // Stop active voice session if any
         if (_voiceWebSocket.isConnected) {
           _voiceWebSocket.stopSession();
@@ -820,7 +1027,7 @@ class AiRashmiController extends GetxController {
           isRecording = false;
           update();
         }
-        
+
         Utils.showInsufficientCreditsDialog();
       }
     } catch (e) {

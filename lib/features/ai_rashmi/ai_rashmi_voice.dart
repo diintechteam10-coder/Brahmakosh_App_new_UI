@@ -175,20 +175,20 @@ class _RashmiVoicePageState extends State<RashmiVoicePage> {
                     if (vm.isPlayingAudio)
                       Container(
                         padding: EdgeInsets.symmetric(vertical: 1.h),
-                        color: Colors.purple.withOpacity(0.1),
+                        color: Colors.orange.withOpacity(0.1),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
                               Icons.volume_up,
-                              color: Colors.purple,
+                              color: Colors.orange,
                               size: 4.w,
                             ),
                             SizedBox(width: 8),
                             Text(
-                              'Playing response...',
+                              'Speaking... Tap mic to interrupt',
                               style: TextStyle(
-                                color: Colors.purple,
+                                color: Colors.orange,
                                 fontWeight: FontWeight.w500,
                                 fontSize: 10.5.sp,
                               ),
@@ -252,31 +252,40 @@ class _RashmiVoicePageState extends State<RashmiVoicePage> {
 
                     // Voice Recording Button
                     GestureDetector(
-                      onTap: (vm.isProcessingVoice && !vm.isRecording) ||
-                              vm.isSending
-                          ? null
-                          : () async {
-                              if (vm.isRecording) {
-                                await vm.stopVoiceRecording();
-                              } else {
-                                await vm.startVoiceRecording();
-                              }
-                            },
-                      onLongPress: (vm.isProcessingVoice && !vm.isRecording) ||
+                      onTap: vm.isPlayingAudio
+                          // Agent is speaking → tap to interrupt
+                          ? () async {
+                              await vm.interruptAgent();
+                            }
+                          : (vm.isProcessingVoice && !vm.isRecording) ||
+                                  vm.isSending
+                              ? null
+                              : () async {
+                                  if (vm.isRecording) {
+                                    await vm.stopVoiceRecording();
+                                  } else {
+                                    await vm.startVoiceRecording();
+                                  }
+                                },
+                      onLongPress: vm.isPlayingAudio ||
+                              (vm.isProcessingVoice && !vm.isRecording) ||
                               vm.isSending
                           ? null
                           : () async {
                               await vm.startVoiceRecording();
                             },
-                      child: Container(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
                         width: 30.w,
                         height: 30.w,
                         decoration: BoxDecoration(
-                          color: vm.isRecording
-                              ? Colors.green
-                              : (vm.isProcessingVoice || vm.isSending
-                                  ? Colors.white24
-                                  : Colors.blueAccent),
+                          color: vm.isPlayingAudio
+                              ? Colors.orange
+                              : vm.isRecording
+                                  ? Colors.green
+                                  : (vm.isProcessingVoice || vm.isSending
+                                      ? Colors.white24
+                                      : Colors.blueAccent),
                           shape: BoxShape.circle,
                           boxShadow: [
                             if (vm.isRecording)
@@ -285,35 +294,55 @@ class _RashmiVoicePageState extends State<RashmiVoicePage> {
                                 blurRadius: 20,
                                 spreadRadius: 5,
                               ),
+                            if (vm.isPlayingAudio)
+                              BoxShadow(
+                                color: Colors.orange.withOpacity(0.5),
+                                blurRadius: 24,
+                                spreadRadius: 6,
+                              ),
                           ],
                         ),
-                        child: vm.isProcessingVoice
-                            ? Padding(
-                                padding: EdgeInsets.all(7.5.w),
-                                child: const CircularProgressIndicator(
-                                  strokeWidth: 3,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.white,
-                                  ),
-                                ),
-                              )
-                            : Icon(
-                                vm.isRecording ? Icons.stop : Icons.mic,
+                        child: vm.isPlayingAudio
+                            // Show mic icon when agent is speaking (tap to interrupt)
+                            ? Icon(
+                                Icons.mic,
                                 color: Colors.white,
                                 size: 12.5.w,
-                              ),
+                              )
+                            : vm.isProcessingVoice && !vm.isRecording
+                                ? Padding(
+                                    padding: EdgeInsets.all(7.5.w),
+                                    child: const CircularProgressIndicator(
+                                      strokeWidth: 3,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                : Icon(
+                                    vm.isRecording ? Icons.stop : Icons.mic,
+                                    color: Colors.white,
+                                    size: 12.5.w,
+                                  ),
                       ),
                     ),
                     SizedBox(height: 2.5.h),
 
                     // Instruction Text
                     Text(
-                      vm.isRecording
-                          ? 'Streaming to AI... Tap to stop'
-                          : 'Tap to start listening',
+                      vm.isPlayingAudio
+                          ? 'Tap to interrupt'
+                          : vm.isRecording
+                              ? 'Streaming to AI... Tap to stop'
+                              : 'Tap to start listening',
                       style: TextStyle(
-                        color: Colors.white70,
+                        color: vm.isPlayingAudio
+                            ? Colors.orange.withOpacity(0.9)
+                            : Colors.white70,
                         fontSize: 10.5.sp,
+                        fontWeight: vm.isPlayingAudio
+                            ? FontWeight.w600
+                            : FontWeight.normal,
                       ),
                     ),
 

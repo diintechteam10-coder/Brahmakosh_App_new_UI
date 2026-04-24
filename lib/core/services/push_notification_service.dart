@@ -53,6 +53,25 @@ class PushNotificationService {
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
     FirebaseMessaging.onMessageOpenedApp.listen(_handleBackgroundMessage);
     
+    // Create high importance channel for Android
+    if (Platform.isAndroid) {
+      final AndroidFlutterLocalNotificationsPlugin? androidPlugin =
+          _localNotifications.resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
+      
+      const AndroidNotificationChannel channel = AndroidNotificationChannel(
+        'brahmakosh_urgent_notifications', // id
+        'Urgent Notifications', // title
+        description: 'This channel is used for important app notifications.',
+        importance: Importance.max,
+        playSound: true,
+        enableVibration: true,
+        showBadge: true,
+      );
+
+      await androidPlugin?.createNotificationChannel(channel);
+    }
+
     // Initial message if app was terminated
     RemoteMessage? initialMessage = await _fcm.getInitialMessage();
     if (initialMessage != null) {
@@ -124,10 +143,13 @@ class PushNotificationService {
 
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-      'high_importance_channel', // id
-      'High Importance Notifications', // title
+      'brahmakosh_urgent_notifications', // id
+      'Urgent Notifications', // title
+      channelDescription: 'This channel is used for important app notifications.',
       importance: Importance.max,
       priority: Priority.high,
+      playSound: true,
+      enableVibration: true,
       showWhen: true,
     );
     const NotificationDetails platformChannelSpecifics =

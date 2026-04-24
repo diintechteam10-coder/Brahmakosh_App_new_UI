@@ -86,7 +86,7 @@ class _NewHomeViewState extends State<NewHomeView> {
     {
       "title": "library",
       "subtitle": "library_desc",
-      "image": "assets/commingsoon/library.jpg",
+      "image": "assets/commingsoon/library.png",
       "fit": "cover",
     },
     {
@@ -3323,7 +3323,7 @@ class _NewHomeViewState extends State<NewHomeView> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(_comingSoonProjects.length, (index) {
                 return AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
+                  duration: const Duration(seconds: 2),
                   margin: const EdgeInsets.symmetric(horizontal: 3),
                   width: _comingSoonPageIndex == index ? 12 : 6,
                   height: 6,

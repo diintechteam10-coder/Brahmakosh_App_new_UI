@@ -2,6 +2,7 @@ import 'package:brahmakosh/core/common_imports.dart';
 import 'package:brahmakosh/common/utils.dart';
 import 'package:brahmakosh/features/report/controllers/report_controller.dart';
 import 'package:brahmakosh/features/report/models/kundali_history_model.dart';
+import 'package:brahmakosh/common/api_urls.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class KundaliHistoryView extends StatelessWidget {
@@ -194,20 +195,27 @@ class KundaliHistoryView extends StatelessWidget {
                         ),
                       )),
                     ),
-                    if (item.s3Url != null && item.s3Url!.isNotEmpty) ...[
+                    if (item.sId != null && item.sId!.isNotEmpty) ...[
                       SizedBox(width: 2.w),
-                      GestureDetector(
-                        onTap: () => _open(item.s3Url!),
+                      Obx(() => GestureDetector(
+                        onTap: ctrl.isDownloading.value ? null : () async {
+                          final url = await ctrl.downloadKundaliReport(item.sId ?? '');
+                          if (url != null && url.isNotEmpty) {
+                            _open(url);
+                          }
+                        },
                         child: Container(
                           padding: EdgeInsets.all(2.5.w),
                           decoration: BoxDecoration(
                               color: Colors.white.withValues(alpha: 0.06),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(color: Colors.white.withValues(alpha: 0.1))),
-                          child: Icon(Icons.open_in_new_rounded,
-                              color: Colors.white.withValues(alpha: 0.6), size: 2.h),
+                          child: ctrl.isDownloading.value
+                              ? SizedBox(width: 2.h, height: 2.h, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation(Colors.white.withValues(alpha: 0.4))))
+                              : Icon(Icons.open_in_new_rounded,
+                                  color: Colors.white.withValues(alpha: 0.6), size: 2.h),
                         ),
-                      ),
+                      )),
                     ],
                   ]),
                 ],
@@ -267,7 +275,8 @@ class KundaliHistoryView extends StatelessWidget {
 
   Future<void> _open(String url) async {
     try {
-      final uri = Uri.parse(url);
+      final formattedUrl = ApiUrls.getFormattedImageUrl(url) ?? url;
+      final uri = Uri.parse(formattedUrl);
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {

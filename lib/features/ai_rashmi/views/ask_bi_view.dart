@@ -162,7 +162,7 @@ class _AskBiViewState extends State<AskBiView> {
                           context,
                           title: name,
                           subtitle: agent.description ?? "",
-                          description: agent.firstMessage ?? "",
+                          description: "",
                           buttonText: "Explore",
                           buttonGradient: const LinearGradient(
                             colors: [Color(0xFFFDB913), Color(0xFF9E7B15)],

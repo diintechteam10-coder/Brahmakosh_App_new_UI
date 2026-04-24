@@ -307,7 +307,7 @@
 //               '[VoiceAgent] Stuck state timeout reached after local silence. No server response. Restarting mic...',
 //             );
 //             _setState(VoiceAgentState.LISTENING);
-//             _startMicrophone(); 
+//             _startMicrophone();
 //           }
 //         });
 //         return;
@@ -529,7 +529,6 @@
 //     super.dispose();
 //   }
 // }
-
 
 // // import 'dart:async';
 // // import 'dart:convert';
@@ -840,7 +839,7 @@
 // //               '[VoiceAgent] Stuck state timeout reached after local silence. No server response. Restarting mic...',
 // //             );
 // //             _setState(VoiceAgentState.LISTENING);
-// //             _startMicrophone(); 
+// //             _startMicrophone();
 // //           }
 // //         });
 // //         return;
@@ -1063,13 +1062,13 @@
 // //   }
 // // }
 
-
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:just_audio/just_audio.dart' as ja;
 import 'package:record/record.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -1213,10 +1212,11 @@ class VoiceAgentService extends ChangeNotifier {
             StorageService.getString('ai_selected_voice') ?? 'voice_1';
         final payload = {
           "type": "start",
+          "token": token,
           "userId": _currentUserId,
           "chatId": _currentChatId ?? "new",
           "agentId": agentId,
-          "voice": selectedVoice,
+          "voiceName": selectedVoice,
         };
         _sendWSMessage(payload);
       }
@@ -1258,25 +1258,28 @@ class VoiceAgentService extends ChangeNotifier {
         // Configure AudioSession for iOS Loudspeaker output
         try {
           final session = await AudioSession.instance;
-          await session.configure(const AudioSessionConfiguration(
-            avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
-            avAudioSessionCategoryOptions:
-                AVAudioSessionCategoryOptions.defaultToSpeaker,
-            avAudioSessionMode: AVAudioSessionMode.videoChat,
-            androidAudioAttributes: AndroidAudioAttributes(
-              contentType: AndroidAudioContentType.music,
-              flags: AndroidAudioFlags.none,
-              usage: AndroidAudioUsage.media,
+          await session.configure(
+            const AudioSessionConfiguration(
+              avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
+              avAudioSessionCategoryOptions:
+                  AVAudioSessionCategoryOptions.defaultToSpeaker,
+              avAudioSessionMode: AVAudioSessionMode.videoChat,
+              androidAudioAttributes: AndroidAudioAttributes(
+                contentType: AndroidAudioContentType.music,
+                flags: AndroidAudioFlags.none,
+                usage: AndroidAudioUsage.media,
+              ),
+              androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
             ),
-            androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
-          ));
+          );
           await session.setActive(true);
 
           // Explicitly set speakerphone ON using flutter_webrtc Helper
           await Helper.setSpeakerphoneOn(true);
 
           debugPrint(
-              '[VoiceAgent] AudioSession configured for loudspeaker using videoChat mode.');
+            '[VoiceAgent] AudioSession configured for loudspeaker using videoChat mode.',
+          );
         } catch (e) {
           debugPrint('[VoiceAgent] AudioSession Error: $e');
         }
@@ -1315,6 +1318,7 @@ class VoiceAgentService extends ChangeNotifier {
       }
     });
   }
+
   double _calculateRMS(Uint8List bytes) {
     if (bytes.isEmpty) return 0.0;
     double sumOfSquares = 0.0;
@@ -1329,6 +1333,7 @@ class VoiceAgentService extends ChangeNotifier {
     }
     return sqrt(sumOfSquares / samples);
   }
+
   Future<void> _stopMicrophone() async {
     debugPrint('[VoiceAgent] Pausing Microphone...');
     await _recordSub?.cancel();
@@ -1357,7 +1362,7 @@ class VoiceAgentService extends ChangeNotifier {
           '[VoiceAgent] Local silence detected after voice activity. Waiting for server to send user_message...',
         );
 
-        await _stopMicrophone();        // _sendWSMessage({"type": "stop"});
+        await _stopMicrophone(); // _sendWSMessage({"type": "stop"});
         // Setup a 10s timeout after local silence if no server response
         _processingTimeoutTimer?.cancel();
         _processingTimeoutTimer = Timer(const Duration(seconds: 10), () {
@@ -1367,7 +1372,7 @@ class VoiceAgentService extends ChangeNotifier {
               '[VoiceAgent] Stuck state timeout reached after local silence. No server response. Restarting mic...',
             );
             _setState(VoiceAgentState.LISTENING);
-            _startMicrophone(); 
+            _startMicrophone();
           }
         });
         return;
@@ -1381,7 +1386,7 @@ class VoiceAgentService extends ChangeNotifier {
 
   void stopSession() {
     debugPrint('[VoiceAgent] Stopping session (Screen Exit)...');
-     debugPrint('🔴 USER DISCONNECTED SOCKET');
+    debugPrint('🔴 USER DISCONNECTED SOCKET');
 
     _isIntentionalClose = true;
     _sendWSMessage({"type": "stop"});
@@ -1517,12 +1522,12 @@ class VoiceAgentService extends ChangeNotifier {
         _audioCompletionSubscription = _player.playerStateStream.listen((
           state,
         ) {
-          if (state.processingState == ProcessingState.completed) {
+          if (state.processingState == ja.ProcessingState.completed) {
             if (!completer.isCompleted) completer.complete();
           }
         });
 
-        await _player.setAudioSource(AudioSource.uri(Uri.file(chunkPath)));
+        await _player.setAudioSource(ja.AudioSource.uri(Uri.file(chunkPath)));
         await _player.play();
         await completer.future;
 

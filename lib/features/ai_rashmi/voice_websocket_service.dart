@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:brahmakosh/core/constants/app_constants.dart';
 import 'package:brahmakosh/core/services/storage_service.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+
 class VoiceWebSocketService {
   static const String _wsUrl =
       'wss://backend-jfg8.onrender.com/api/voice/agent';
@@ -22,6 +23,7 @@ class VoiceWebSocketService {
   Function(String text)? onAiResponse;
   Function(Uint8List audioData, int chunkIndex)? onAudioChunk;
   Function(int totalChunks)? onAudioComplete;
+  Function()? onAudioInterrupted;
   Function(String message)? onStopped;
   Function(String message, String? errorCode)? onError;
 
@@ -101,9 +103,9 @@ class VoiceWebSocketService {
       // Wait a moment for connection to stabilize, then send start message
       print('🔵 [WebSocket] Waiting 100ms for connection to stabilize...');
       await Future.delayed(const Duration(milliseconds: 100));
-final agentId =
-            StorageService.getString('ai_selected_agent_id') ?? 'default_agent';
-              // Send start message
+      final agentId =
+          StorageService.getString('ai_selected_agent_id') ?? 'default_agent';
+      // Send start message
       final startMessage = jsonEncode({
         'type': 'start',
         'userId': _currentUserId,
@@ -264,6 +266,11 @@ final agentId =
               : int.tryParse(data['totalChunks']?.toString() ?? '0') ?? 0;
           print('✅ [WebSocket] Audio complete! Total chunks: $totalChunks');
           onAudioComplete?.call(totalChunks);
+          break;
+
+        case 'audio_interrupted':
+          print('🛑 [WebSocket] Audio interrupted by user speech');
+          onAudioInterrupted?.call();
           break;
 
         case 'stopped':
