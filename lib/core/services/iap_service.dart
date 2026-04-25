@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:brahmakosh/features/profile/viewmodels/profile_viewmodel.dart';
 import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
@@ -7,6 +8,9 @@ import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 import 'package:dio/dio.dart';
 import '../constants/app_constants.dart';
 import 'storage_service.dart';
+import 'package:get/get.dart';
+import 'package:provider/provider.dart';
+import '../../features/profile/viewmodels/profile_viewmodel.dart';
 
 class IAPService {
   static final IAPService _instance = IAPService._internal();
@@ -153,6 +157,14 @@ class IAPService {
           bool valid = await _verifyPurchase(purchaseDetails);
           if (valid) {
             debugPrint("Verification successful! Delivering product...");
+            try {
+              final context = Get.context;
+              if (context != null) {
+                 Provider.of<ProfileViewModel>(context, listen: false).fetchProfile();
+              }
+            } catch (e) {
+              debugPrint("Failed to refresh profile after purchase: $e");
+            }
           } else {
             debugPrint("Verification FAILED.");
           }

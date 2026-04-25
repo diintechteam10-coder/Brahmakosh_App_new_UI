@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../../../core/common_imports.dart';
 import '../../../common/utils.dart';
 import '../viewmodels/dashboard_viewmodel.dart';
+import '../../profile/viewmodels/profile_viewmodel.dart';
 import '../../home/views/new_home_view.dart';
 import '../widgets/brahmakosh_bottom_bar.dart';
 
@@ -88,12 +89,19 @@ class _DashboardLayoutState extends State<DashboardLayout>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      Utils.print("App resumed - updating location");
+      Utils.print("App resumed - updating location and profile");
       // Update location when app comes to foreground
       Provider.of<DashboardViewModel>(
         context,
         listen: false,
       ).initLocationUpdate(null, forceRefresh: true);
+      
+      // Refresh profile to update credits in real-time
+      try {
+         Provider.of<ProfileViewModel>(context, listen: false).fetchProfile();
+      } catch (e) {
+         Utils.print("Error refreshing profile on resume: $e");
+      }
     }
   }
 

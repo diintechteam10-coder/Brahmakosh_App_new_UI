@@ -52,8 +52,7 @@ class VoiceWebSocketService {
     }
 
     try {
-      // Connect to WebSocket with auth token
-      // Try with token in query parameter first
+
       final fullUrl = '$_wsUrl?token=$token';
       print('🔵 [WebSocket] Connecting to: $fullUrl');
       print('🔵 [WebSocket] Parsing URI...');

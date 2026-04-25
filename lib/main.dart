@@ -127,6 +127,7 @@ class MyApp extends StatelessWidget {
                       barrierDismissible: false,
                       showIgnore: false,
                       showLater: false,
+                      shouldPopScope: () => false,
                       dialogStyle: UpgradeDialogStyle.material,
                       child: child ?? const SizedBox(),
                     ),

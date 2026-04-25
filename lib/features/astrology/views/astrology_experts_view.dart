@@ -47,8 +47,10 @@ class AstrologyExpertsView extends StatelessWidget {
               try {
                 // If we can't pop, we might be a tab in the Dashboard.
                 // Navigate back to the Home tab (index 0).
-                final dashboardVM =
-                    Provider.of<DashboardViewModel>(context, listen: false);
+                final dashboardVM = Provider.of<DashboardViewModel>(
+                  context,
+                  listen: false,
+                );
                 dashboardVM.changeTab(0);
               } catch (e) {
                 // Fallback to standard GetX back behavior if DashboardViewModel is not available
@@ -106,8 +108,9 @@ class AstrologyExpertsView extends StatelessWidget {
                     final cat = categories[index];
                     final id = cat['_id'];
                     final name = cat['name'];
-                    final translatedCategoryName =
-                        name is String ? (controller.translatedData[name] ?? name) : '';
+                    final translatedCategoryName = name is String
+                        ? (controller.translatedData[name] ?? name)
+                        : '';
                     final isSelected = selectedId == id;
                     return _buildFilterChip(
                       context,
@@ -162,7 +165,10 @@ class AstrologyExpertsView extends StatelessWidget {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFFFFD700),
                             foregroundColor: Colors.black,
-                            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 1.2.h),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8.w,
+                              vertical: 1.2.h,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30),
                             ),
@@ -207,8 +213,13 @@ class AstrologyExpertsView extends StatelessWidget {
         style: GoogleFonts.poppins(color: Colors.white),
         decoration: InputDecoration(
           hintText: "search".tr,
-          hintStyle: GoogleFonts.poppins(color: Colors.white.withValues(alpha: 0.4)),
-          prefixIcon: Icon(Icons.search, color: Colors.white.withValues(alpha: 0.4)),
+          hintStyle: GoogleFonts.poppins(
+            color: Colors.white.withValues(alpha: 0.4),
+          ),
+          prefixIcon: Icon(
+            Icons.search,
+            color: Colors.white.withValues(alpha: 0.4),
+          ),
           filled: false,
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 12),
@@ -230,16 +241,18 @@ class AstrologyExpertsView extends StatelessWidget {
     return InkWell(
       onTap: () {
         controller.selectCategory(id);
-        
+
         // Centering logic: (index * approx_width) - (screen_width / 2) + (approx_width / 2)
         // Adjusting for the capsule container padding and horizontal scroll physics
         final screenWidth = MediaQuery.of(context).size.width;
         const itemWidth = 110.0; // Approx width of a chip
-        double offset = (index * itemWidth) - (screenWidth / 2) + (itemWidth / 2);
-        
+        double offset =
+            (index * itemWidth) - (screenWidth / 2) + (itemWidth / 2);
+
         // Clamp offset to scroll bounds
         if (offset < 0) offset = 0;
-        final maxScroll = controller.categoryScrollController.position.maxScrollExtent;
+        final maxScroll =
+            controller.categoryScrollController.position.maxScrollExtent;
         if (offset > maxScroll) offset = maxScroll;
 
         controller.categoryScrollController.animateTo(
@@ -263,7 +276,9 @@ class AstrologyExpertsView extends StatelessWidget {
           style: GoogleFonts.poppins(
             fontSize: 9.sp,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-            color: isSelected ? Colors.black : Colors.white.withValues(alpha: 0.5),
+            color: isSelected
+                ? Colors.black
+                : Colors.white.withValues(alpha: 0.5),
             letterSpacing: 0.5,
           ),
         ),
@@ -299,7 +314,7 @@ class AstrologyExpertsView extends StatelessWidget {
     final expertise = expert.expertise;
     final expertDisplayExpertise = (expertise != null && expertise.isNotEmpty)
         ? (controller.translatedData[expertise] ??
-            expertise.split(',').take(2).join(", "))
+              expertise.split(',').take(2).join(", "))
         : "vedic_astrology".tr;
 
     return Container(
@@ -377,7 +392,11 @@ class AstrologyExpertsView extends StatelessWidget {
                               ),
                               Row(
                                 children: [
-                                  Icon(Icons.star, color: const Color(0xFFFFD700), size: 4.w),
+                                  Icon(
+                                    Icons.star,
+                                    color: const Color(0xFFFFD700),
+                                    size: 4.w,
+                                  ),
                                   SizedBox(width: 1.w),
                                   Text(
                                     "${expert.rating ?? 4.9}",
@@ -402,10 +421,14 @@ class AstrologyExpertsView extends StatelessWidget {
                           SizedBox(height: 1.h),
                           Row(
                             children: [
-                              Icon(Icons.work_outline, color: const Color(0xFFFFD700), size: 3.5.w),
+                              Icon(
+                                Icons.work_outline,
+                                color: const Color(0xFFFFD700),
+                                size: 3.5.w,
+                              ),
                               SizedBox(width: 2.w),
                               Text(
-                                "${expert.experience ?? '0'}+ ${"years_exp".tr}",
+                                "${expert.experience ?? '0'} Exp",
                                 style: GoogleFonts.poppins(
                                   fontSize: 9.sp,
                                   color: const Color(0xFFFFD700),
@@ -426,13 +449,18 @@ class AstrologyExpertsView extends StatelessWidget {
                     Expanded(
                       child: _buildActionButton(
                         icon: Icons.chat_outlined,
-                        price: "₹${expert.chatCharge?.toInt() ?? ""}${"per_min".tr}",
+                        price:
+                            "₹${expert.chatCharge?.toInt() ?? ""}${"per_min".tr}",
                         onTap: () {
                           if (status != 'online') {
                             _showExpertOfflineDialog(context);
                             return;
                           }
-                          _showChatConfirmationBottomSheet(context, expert, controller);
+                          _showChatConfirmationBottomSheet(
+                            context,
+                            expert,
+                            controller,
+                          );
                         },
                       ),
                     ),
@@ -440,18 +468,18 @@ class AstrologyExpertsView extends StatelessWidget {
                     Expanded(
                       child: _buildActionButton(
                         icon: Icons.phone_outlined,
-                        price: "₹${expert.voiceCharge?.toInt() ?? 0}${"per_min".tr}",
+                        price:
+                            "₹${expert.voiceCharge?.toInt() ?? 0}${"per_min".tr}",
                         onTap: () {
                           if (status != 'online') {
                             _showExpertOfflineDialog(context);
                             return;
                           }
-                          final hasInit = StorageService.getBool('chat_initiated_${expert.id}') ?? false;
-                          if (!hasInit) {
-                            _showInitiateChatFirstDialog(context);
-                          } else {
-                            _showVoiceCallConfirmationBottomSheet(context, expert, controller);
-                          }
+                          _showVoiceCallConfirmationBottomSheet(
+                            context,
+                            expert,
+                            controller,
+                          );
                         },
                       ),
                     ),
@@ -476,10 +504,7 @@ class AstrologyExpertsView extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 0.8.h, horizontal: 2.w),
         decoration: BoxDecoration(
-          border: Border.all(
-            color: const Color(0xFFFFD700),
-            width: 1,
-          ),
+          border: Border.all(color: const Color(0xFFFFD700), width: 1),
           borderRadius: BorderRadius.circular(24),
           color: Colors.transparent,
         ),
@@ -520,7 +545,10 @@ class AstrologyExpertsView extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF18151B), // Premium Dark
           borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 0.5),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.1),
+            width: 0.5,
+          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -544,7 +572,9 @@ class AstrologyExpertsView extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: const Color(0xFF262626),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFFFD700).withValues(alpha: 0.2)),
+                    border: Border.all(
+                      color: const Color(0xFFFFD700).withValues(alpha: 0.2),
+                    ),
                   ),
                   child: Icon(
                     Icons.message_rounded,
@@ -597,7 +627,9 @@ class AstrologyExpertsView extends StatelessWidget {
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: 1.5.h),
-                      side: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+                      side: BorderSide(
+                        color: Colors.white.withValues(alpha: 0.3),
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -617,7 +649,11 @@ class AstrologyExpertsView extends StatelessWidget {
                   child: Consumer<ProfileViewModel>(
                     builder: (context, profileVM, child) {
                       if (profileVM.isLoading) {
-                        return const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)));
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: Color(0xFFFFD700),
+                          ),
+                        );
                       }
 
                       return ElevatedButton(
@@ -626,7 +662,10 @@ class AstrologyExpertsView extends StatelessWidget {
                           Navigator.pop(context);
 
                           if (credits >= 100) {
-                            StorageService.setBool('chat_initiated_${expert.id}', true);
+                            StorageService.setBool(
+                              'chat_initiated_${expert.id}',
+                              true,
+                            );
                             controller.startChat(expert);
                           } else {
                             controller.showRechargeBottomSheet(context);
@@ -675,7 +714,10 @@ class AstrologyExpertsView extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF18151B), // Premium Dark
           borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 0.5),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.1),
+            width: 0.5,
+          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -699,7 +741,9 @@ class AstrologyExpertsView extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: const Color(0xFF262626),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFFFD700).withValues(alpha: 0.2)),
+                    border: Border.all(
+                      color: const Color(0xFFFFD700).withValues(alpha: 0.2),
+                    ),
                   ),
                   child: Icon(
                     Icons.phone_in_talk_rounded,
@@ -781,7 +825,9 @@ class AstrologyExpertsView extends StatelessWidget {
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: 1.5.h),
-                      side: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+                      side: BorderSide(
+                        color: Colors.white.withValues(alpha: 0.3),
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -801,7 +847,11 @@ class AstrologyExpertsView extends StatelessWidget {
                   child: Consumer<ProfileViewModel>(
                     builder: (context, profileVM, child) {
                       if (profileVM.isLoading) {
-                        return const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)));
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: Color(0xFFFFD700),
+                          ),
+                        );
                       }
                       return ElevatedButton(
                         onPressed: () {
@@ -811,11 +861,16 @@ class AstrologyExpertsView extends StatelessWidget {
                           Navigator.pop(context);
 
                           if (credits >= minRequired) {
-                            Get.to(() => VoiceCallView(expert: expert.toAstrologist()));
+                            Get.to(
+                              () =>
+                                  VoiceCallView(expert: expert.toAstrologist()),
+                            );
                           } else {
                             AppSnackBar.showError(
                               "insufficient_credits".tr,
-                              "insufficient_credits_desc".trParams({'min': minRequired.toString()}),
+                              "insufficient_credits_desc".trParams({
+                                'min': minRequired.toString(),
+                              }),
                             );
                             controller.showRechargeBottomSheet(context);
                           }
@@ -855,7 +910,10 @@ class AstrologyExpertsView extends StatelessWidget {
         backgroundColor: const Color(0xFF18151B),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: Colors.white.withValues(alpha: 0.1), width: 0.5),
+          side: BorderSide(
+            color: Colors.white.withValues(alpha: 0.1),
+            width: 0.5,
+          ),
         ),
         title: Text(
           "expert_offline_title".tr,
@@ -867,10 +925,7 @@ class AstrologyExpertsView extends StatelessWidget {
         ),
         content: Text(
           "expert_offline_msg".tr,
-          style: GoogleFonts.poppins(
-            color: Colors.white70,
-            fontSize: 11.sp,
-          ),
+          style: GoogleFonts.poppins(color: Colors.white70, fontSize: 11.sp),
         ),
         actions: [
           TextButton(
@@ -888,47 +943,6 @@ class AstrologyExpertsView extends StatelessWidget {
       ),
     );
   }
-
-  void _showInitiateChatFirstDialog(BuildContext context) {
-    Get.dialog(
-      AlertDialog(
-        backgroundColor: const Color(0xFF18151B),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: Colors.white.withValues(alpha: 0.1), width: 0.5),
-        ),
-        title: Text(
-          "chat_required_title".tr,
-          style: GoogleFonts.lora(
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFFFD700),
-            fontSize: 14.sp,
-          ),
-        ),
-        content: Text(
-          "chat_required_msg".tr,
-          style: GoogleFonts.poppins(
-            color: Colors.white70,
-            fontSize: 11.sp,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: Text(
-              "ok".tr.toUpperCase(),
-              style: GoogleFonts.poppins(
-                color: const Color(0xFFFFD700),
-                fontWeight: FontWeight.bold,
-                fontSize: 10.sp,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
 
   Widget _buildExpertCardShimmer() {
     return Shimmer.fromColors(

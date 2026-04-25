@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:http/http.dart' as http;
 import '../../../common/api_urls.dart';
@@ -103,9 +104,25 @@ class VoiceCallController extends GetxController {
     // Make sure we're joining the room for signs to pass through correctly if backend requires room joining.
     // However, the prompt says the event relies on conversationId payload.
     _socketService.on('voice:call:accepted', _onCallAccepted);
+    _socketService.on('voice:call:rejected', _onCallRejectedEvent);
+    _socketService.on('voice:call:error', _onCallErrorEvent);
     _socketService.on('voice:signal', _onSignalReceived);
     _socketService.on('voice:call:ended', _onCallEndedEvent);
     // You might also want to listen for rejected or offline errors.
+  }
+
+  void _onCallErrorEvent(dynamic data) {
+    if (data['conversationId'] == _conversationId) {
+      String message = data['message'] ?? "Call error";
+      Utils.showToast(message, Colors.red);
+      _endCallLocal(message);
+    }
+  }
+
+  void _onCallRejectedEvent(dynamic data) {
+    if (data['conversationId'] == _conversationId) {
+      _endCallLocal("Call rejected by expert");
+    }
   }
 
   void _initiateCall() {
@@ -305,8 +322,18 @@ class VoiceCallController extends GetxController {
 
     // Clean up listeners
     _socketService.off('voice:call:accepted', _onCallAccepted);
+    _socketService.off('voice:call:rejected', _onCallRejectedEvent);
+    _socketService.off('voice:call:error', _onCallErrorEvent);
     _socketService.off('voice:signal', _onSignalReceived);
     _socketService.off('voice:call:ended', _onCallEndedEvent);
+
+    // Refresh profile to update credits in real-time after call
+    try {
+      final profileVM = Provider.of<ProfileViewModel>(Get.context!, listen: false);
+      profileVM.fetchProfile();
+    } catch (e) {
+      Utils.print("[VOICE_CALL_LOG] ❌ Error refreshing profile after call: $e");
+    }
 
     Get.back(
       result: true,

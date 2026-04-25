@@ -4,6 +4,7 @@ import '../../common/models/astrologist_model.dart';
 import '../../common/utils.dart';
 import '../../features/astrology/views/astrology_chat_view.dart';
 import 'socket_service.dart';
+import 'push_notification_service.dart';
 
 /// Global service that manages in-app notification banners for chat events.
 ///
@@ -102,6 +103,21 @@ class ChatNotificationService extends GetxService {
     }
   }
 
+  /// New method to handle system notification taps via conversationId lookup
+  void handleNotificationTap(String? conversationId) {
+    Utils.print('📢 ChatNotificationService: Handling tap for $conversationId');
+    if (conversationId == null) return;
+
+    final tracked = _trackedConversations[conversationId];
+    if (tracked != null) {
+      Utils.print('📢 ChatNotificationService: Found tracked expert ${tracked.expert.name}');
+      Get.to(() => AstrologyChatView(expert: tracked.expert));
+    } else {
+      Utils.print('⚠️ ChatNotificationService: No tracked expert for $conversationId');
+      // If not tracked, we might need to fetch from API, but for now let's hope it's tracked.
+    }
+  }
+
   // ───────────────────────────────────────────────
   // SOCKET LISTENERS
   // ───────────────────────────────────────────────
@@ -152,6 +168,7 @@ class ChatNotificationService extends GetxService {
           body: '${tracked.expert.name} has joined the chat.',
           image: tracked.expert.image,
           expert: tracked.expert,
+          conversationId: conversationId,
         );
       }
     } catch (e) {
@@ -211,6 +228,7 @@ class ChatNotificationService extends GetxService {
           body: content.length > 80 ? '${content.substring(0, 80)}…' : content,
           image: tracked.expert.image,
           expert: tracked.expert,
+          conversationId: conversationId,
         );
       } else {
         Utils.print('ℹ️ [Global] Message is from user (self), ignoring banner');
@@ -259,6 +277,7 @@ class ChatNotificationService extends GetxService {
         body: content.length > 80 ? '${content.substring(0, 80)}…' : content,
         image: expert?.image ?? '',
         expert: expert ?? _createFallbackExpert(senderName, conversationId),
+        conversationId: conversationId,
       );
     } catch (e) {
       Utils.print('❌ [Global] Error in notification handler: $e');
@@ -291,9 +310,20 @@ class ChatNotificationService extends GetxService {
     required String body,
     required String image,
     required Astrologist expert,
+    required String conversationId,
   }) {
-    Utils.print('📢 [Global] TRIGGERING BANNER UI: $title - $body');
+    Utils.print('📢 [Global] TRIGGERING SYSTEM NOTIFICATION: $title - $body');
     _pendingExpert = expert;
+    
+    // Use device notification instead of in-app banner
+    PushNotificationService.showSimpleNotification(
+      title: title,
+      body: body,
+      payload: conversationId, // Use conversationId for lookup on tap
+    );
+
+    /* 
+    // Commenting out in-app banner logic as requested
     notificationTitle.value = title;
     notificationBody.value = body;
     notificationImage.value = image;
@@ -305,6 +335,7 @@ class ChatNotificationService extends GetxService {
       Utils.print('📢 [Global] Auto-dismissing banner');
       dismissNotification();
     });
+    */
   }
 
   @override

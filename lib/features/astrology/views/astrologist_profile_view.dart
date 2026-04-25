@@ -25,7 +25,7 @@ class AstrologistProfileView extends StatefulWidget {
 
 class _AstrologistProfileViewState extends State<AstrologistProfileView> {
   int _selectedTabIndex = 0;
-  
+
   // Translated Data
   String? _translatedSummary;
   String? _translatedExperience;
@@ -35,13 +35,13 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize with original values
     _translatedSummary = widget.expert.profileSummary;
     _translatedExperience = widget.expert.experience;
     _translatedExpertise = widget.expert.expertise;
     _translatedLanguages = widget.expert.languages ?? [];
-    
+
     _translateExpertData();
   }
 
@@ -81,7 +81,6 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
@@ -161,7 +160,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                   if (_selectedTabIndex == 0) _buildAboutContent(expert),
                   if (_selectedTabIndex == 1) _buildExpertiseContent(expert),
                   if (_selectedTabIndex == 2) _buildReviewsSection(expert),
-                  
+
                   SizedBox(height: 12.h),
                 ],
               ),
@@ -224,8 +223,12 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
   }
 
   Widget _buildExpertiseContent(AstrologistItem expert) {
-    final skills = _translatedExpertise?.split(',').map((e) => e.trim()).toList() ?? ["Vedic Astrology"];
-    final languages = _translatedLanguages.isNotEmpty ? _translatedLanguages : ["Hindi", "English"];
+    final skills =
+        _translatedExpertise?.split(',').map((e) => e.trim()).toList() ??
+        ["Vedic Astrology"];
+    final languages = _translatedLanguages.isNotEmpty
+        ? _translatedLanguages
+        : ["Hindi", "English"];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -257,7 +260,9 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
         Wrap(
           spacing: 3.w,
           runSpacing: 1.5.h,
-          children: languages.map((lang) => _buildExpertiseChip(lang, isLanguage: true)).toList(),
+          children: languages
+              .map((lang) => _buildExpertiseChip(lang, isLanguage: true))
+              .toList(),
         ),
       ],
     );
@@ -269,7 +274,9 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
       decoration: BoxDecoration(
         color: const Color(0xFF141414),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFFFD700).withValues(alpha: 0.3)),
+        border: Border.all(
+          color: const Color(0xFFFFD700).withValues(alpha: 0.3),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -361,7 +368,12 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
     );
   }
 
-  Widget _buildBadge(IconData? icon, String label, Color bgColor, Color textColor) {
+  Widget _buildBadge(
+    IconData? icon,
+    String label,
+    Color bgColor,
+    Color textColor,
+  ) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 0.8.h),
       decoration: BoxDecoration(
@@ -448,7 +460,14 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
               ),
               const Spacer(),
               Row(
-                children: List.generate(5, (index) => Icon(Icons.star, color: const Color(0xFFFFD700), size: 3.w)),
+                children: List.generate(
+                  5,
+                  (index) => Icon(
+                    Icons.star,
+                    color: const Color(0xFFFFD700),
+                    size: 3.w,
+                  ),
+                ),
               ),
             ],
           ),
@@ -497,7 +516,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                   return;
                 }
                 _showChatConfirmationBottomSheet(context, controller, expert);
-              }
+              },
             ),
           ),
           SizedBox(width: 5.w),
@@ -512,19 +531,12 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                   return;
                 }
 
-                final hasInit =
-                    StorageService.getBool('chat_initiated_${expert.id}') ??
-                    false;
-                if (!hasInit) {
-                  _showInitiateChatFirstDialog(context);
-                } else {
-                  _showVoiceCallConfirmationBottomSheet(
-                    context,
-                    expert,
-                    controller,
-                  );
-                }
-              }
+                _showVoiceCallConfirmationBottomSheet(
+                  context,
+                  expert,
+                  controller,
+                );
+              },
             ),
           ),
         ],
@@ -655,7 +667,9 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                   decoration: BoxDecoration(
                     color: const Color(0xFF262626),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFFFD700).withValues(alpha: 0.2)),
+                    border: Border.all(
+                      color: const Color(0xFFFFD700).withValues(alpha: 0.2),
+                    ),
                   ),
                   child: Icon(
                     Icons.message,
@@ -702,7 +716,9 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
             SizedBox(height: 3.h),
 
             Text(
-              "deduction_msg".trParams({'charge': (expert.chatCharge ?? 15).toString()}),
+              "deduction_msg".trParams({
+                'charge': (expert.chatCharge ?? 15).toString(),
+              }),
               style: GoogleFonts.poppins(
                 fontSize: 11.sp,
                 fontWeight: FontWeight.w600,
@@ -749,14 +765,21 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                   child: Consumer<ProfileViewModel>(
                     builder: (context, profileVM, child) {
                       if (profileVM.isLoading) {
-                        return const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)));
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: Color(0xFFFFD700),
+                          ),
+                        );
                       }
                       return ElevatedButton(
                         onPressed: () {
                           final credits = profileVM.profile?.credits ?? 0;
                           Navigator.pop(context);
                           if (credits >= 100) {
-                            StorageService.setBool('chat_initiated_${expert.id}', true);
+                            StorageService.setBool(
+                              'chat_initiated_${expert.id}',
+                              true,
+                            );
                             controller.startChat(expert);
                           } else {
                             controller.showRechargeBottomSheet(context);
@@ -817,7 +840,9 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                   decoration: BoxDecoration(
                     color: const Color(0xFF262626),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFFFD700).withValues(alpha: 0.2)),
+                    border: Border.all(
+                      color: const Color(0xFFFFD700).withValues(alpha: 0.2),
+                    ),
                   ),
                   child: Icon(
                     Icons.phone_in_talk,
@@ -864,7 +889,9 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
             SizedBox(height: 3.h),
 
             Text(
-              "deduction_msg".trParams({'charge': (expert.voiceCharge ?? 20).toString()}),
+              "deduction_msg".trParams({
+                'charge': (expert.voiceCharge ?? 20).toString(),
+              }),
               style: GoogleFonts.poppins(
                 fontSize: 11.sp,
                 fontWeight: FontWeight.w600,
@@ -911,7 +938,11 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                   child: Consumer<ProfileViewModel>(
                     builder: (context, profileVM, child) {
                       if (profileVM.isLoading) {
-                        return const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)));
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: Color(0xFFFFD700),
+                          ),
+                        );
                       }
                       return ElevatedButton(
                         onPressed: () {
@@ -919,11 +950,16 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                           final minRequired = (expert.voiceCharge ?? 20) * 5;
                           Navigator.pop(context);
                           if (credits >= minRequired) {
-                            Get.to(() => VoiceCallView(expert: expert.toAstrologist()));
+                            Get.to(
+                              () =>
+                                  VoiceCallView(expert: expert.toAstrologist()),
+                            );
                           } else {
                             AppSnackBar.showError(
                               "insufficient_credits".tr,
-                              "insufficient_credits_desc".trParams({'min': minRequired.toString()}),
+                              "insufficient_credits_desc".trParams({
+                                'min': minRequired.toString(),
+                              }),
                             );
                             controller.showRechargeBottomSheet(context);
                           }
@@ -962,55 +998,23 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
       AlertDialog(
         backgroundColor: const Color(0xFF141414),
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-            side: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
+          borderRadius: BorderRadius.circular(24),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+        ),
         title: Text(
           "expert_offline_title".tr,
           style: GoogleFonts.lora(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFFFD700)),
+            fontSize: 16.sp,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFFFFD700),
+          ),
         ),
         content: Text(
           "expert_offline_msg".tr,
           style: GoogleFonts.poppins(
-              fontSize: 10.sp, color: Colors.white.withValues(alpha: 0.7)),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: Text(
-              "ok".tr.toUpperCase(),
-              style: GoogleFonts.poppins(
-                color: const Color(0xFFFFD700),
-                fontWeight: FontWeight.bold,
-                fontSize: 10.sp,
-              ),
-            ),
+            fontSize: 10.sp,
+            color: Colors.white.withValues(alpha: 0.7),
           ),
-        ],
-      ),
-    );
-  }
-
-  void _showInitiateChatFirstDialog(BuildContext context) {
-    Get.dialog(
-      AlertDialog(
-        backgroundColor: const Color(0xFF141414),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-            side: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
-        title: Text(
-          "chat_required_title".tr,
-          style: GoogleFonts.lora(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFFFD700)),
-        ),
-        content: Text(
-          "chat_required_msg".tr,
-          style: GoogleFonts.poppins(
-              fontSize: 10.sp, color: Colors.white.withValues(alpha: 0.7)),
         ),
         actions: [
           TextButton(

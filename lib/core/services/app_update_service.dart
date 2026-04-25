@@ -10,10 +10,8 @@ class AppUpdateService {
     upgrader = Upgrader(
       // Can be set to true for testing to always show the dialog
       debugDisplayAlways: false, 
-      // How often to check for updates
-      durationUntilAlertAgain: const Duration(hours: 2),
-      // Minimum time between checks
-      minAppVersion: '1.0.0',
+      // Set to 0 to check for update on every app launch
+      durationUntilAlertAgain: Duration.zero,
     );
   }
 }

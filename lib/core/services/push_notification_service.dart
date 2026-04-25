@@ -3,7 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../../features/notifications/repositories/notification_repository.dart';
+import 'chat_notification_service.dart';
 import '../../common/utils.dart';
+import 'package:get/get.dart';
 
 class PushNotificationService {
   static final PushNotificationService instance = PushNotificationService._internal();
@@ -46,6 +48,14 @@ class PushNotificationService {
       onDidReceiveNotificationResponse: (NotificationResponse response) {
         // Handle notification tap when app is in foreground
         Utils.print('Notification Tapped: ${response.payload}');
+        if (response.payload != null) {
+          try {
+            final ChatNotificationService notifService = Get.find<ChatNotificationService>();
+            notifService.handleNotificationTap(response.payload);
+          } catch (e) {
+            Utils.print('❌ Error handling notification tap: $e');
+          }
+        }
       },
     );
 
@@ -59,7 +69,7 @@ class PushNotificationService {
           _localNotifications.resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>();
       
-      const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      const AndroidNotificationChannel urgentChannel = AndroidNotificationChannel(
         'brahmakosh_urgent_notifications', // id
         'Urgent Notifications', // title
         description: 'This channel is used for important app notifications.',
@@ -69,7 +79,18 @@ class PushNotificationService {
         showBadge: true,
       );
 
-      await androidPlugin?.createNotificationChannel(channel);
+      const AndroidNotificationChannel chatChannel = AndroidNotificationChannel(
+        'brahmakosh_chat_notifications', // id
+        'Chat Notifications', // title
+        description: 'This channel is used for chat message notifications.',
+        importance: Importance.max,
+        playSound: true,
+        enableVibration: true,
+        showBadge: true,
+      );
+
+      await androidPlugin?.createNotificationChannel(urgentChannel);
+      await androidPlugin?.createNotificationChannel(chatChannel);
     }
 
     // Initial message if app was terminated
@@ -161,6 +182,58 @@ class PushNotificationService {
       body: message.notification?.body ?? message.data['body'],
       notificationDetails: platformChannelSpecifics,
       payload: message.data['url'],
+    );
+  }
+
+  static Future<void> showSimpleNotification({
+    required String title,
+    required String body,
+    String? payload,
+  }) async {
+    final FlutterLocalNotificationsPlugin localNotifications = FlutterLocalNotificationsPlugin();
+
+    // Ensure settings are initialized (especially important for background/socket usage)
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings();
+    const InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsIOS,
+    );
+    await localNotifications.initialize(
+      settings: initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+        if (response.payload != null) {
+          try {
+            final ChatNotificationService notifService = Get.find<ChatNotificationService>();
+            notifService.handleNotificationTap(response.payload);
+          } catch (e) {
+            Utils.print('❌ Error handling notification tap: $e');
+          }
+        }
+      },
+    );
+
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'brahmakosh_chat_notifications', // id
+      'Chat Notifications', // title
+      channelDescription: 'This channel is used for chat message notifications.',
+      importance: Importance.max,
+      priority: Priority.high,
+      playSound: true,
+      enableVibration: true,
+      showWhen: true,
+    );
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await localNotifications.show(
+      id: DateTime.now().microsecondsSinceEpoch % 1000000,
+      title: title,
+      body: body,
+      notificationDetails: platformChannelSpecifics,
+      payload: payload,
     );
   }
 }

@@ -8,6 +8,7 @@ import '../../../core/utils/app_snackbar.dart';
 import '../../astrology/views/credit_history_view.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'subscription_plans_view.dart';
+import '../../profile/viewmodels/profile_viewmodel.dart';
 
 class RechargePlansView extends StatefulWidget {
   const RechargePlansView({super.key});
@@ -512,6 +513,8 @@ class _RechargePlansViewState extends State<RechargePlansView> {
               );
 
               if (success) {
+                // Fetch updated profile to reflect the new credits immediately
+                Provider.of<ProfileViewModel>(context, listen: false).fetchProfile();
                 _showCreditRequestPopup();
               } else {
                 AppSnackBar.showError("Error", "Payment failed");

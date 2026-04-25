@@ -727,7 +727,7 @@ class AppTranslations extends Translations {
           'bazar_desc': 'Spiritual marketplace for all',
           'daan': 'Brahma Daan',
           'daan_desc': 'Service with compassion',
-          'gaushala': 'Brahma Gaushala',
+          'gaushala': 'Brahma Gaushaala',
           'gaushala_desc': 'Protecting our sacred cows',
           'gurukul': 'Brahmakosh Gurukul',
           'gurukul_desc': 'Ancient wisdom for modern kids',
