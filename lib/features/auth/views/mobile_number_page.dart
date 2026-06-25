@@ -311,7 +311,7 @@ class PhoneOtpView extends StatelessWidget {
 
   Widget _methodCard({
     required String title,
-    required IconData icon,
+    required dynamic icon,
     required bool isSelected,
     required VoidCallback onTap,
     required Color accentColor,
@@ -339,11 +339,17 @@ class PhoneOtpView extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Icon(
-              icon,
-              color: isSelected ? accentColor : Colors.white54,
-              size: 28,
-            ),
+            icon is IconData
+                ? Icon(
+                    icon,
+                    color: isSelected ? accentColor : Colors.white54,
+                    size: 28,
+                  )
+                : FaIcon(
+                    icon,
+                    color: isSelected ? accentColor : Colors.white54,
+                    size: 28,
+                  ),
             const SizedBox(height: 12),
             Text(
               title,

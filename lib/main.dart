@@ -24,6 +24,7 @@ import 'features/notifications/repositories/notification_repository.dart';
 import 'core/localization/app_translations.dart';
 import 'core/services/app_update_service.dart';
 import 'package:upgrader/upgrader.dart';
+import 'features/home/controllers/home_controller.dart';
 
 
 
@@ -75,6 +76,7 @@ class GlobalBindings extends Bindings {
   void dependencies() {
     Get.put(ChatNotificationService(), permanent: true);
     Get.put(ConnectivityService(), permanent: true);
+    Get.lazyPut(() => HomeController(), fenix: true);
   }
 }
 

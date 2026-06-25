@@ -136,7 +136,7 @@ class _MySankalpTabState extends State<MySankalpTab> {
               
               // Bottom Action Button: Choose Another Sankalp
               Padding(
-                padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+                padding: EdgeInsets.fromLTRB(24, 8, 24, 32 + MediaQuery.of(context).padding.bottom),
                 child: SizedBox(
                   width: double.infinity,
                   height: 56,

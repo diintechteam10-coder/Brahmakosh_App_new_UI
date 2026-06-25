@@ -55,31 +55,31 @@ class _SwapnaDecoderScreenState extends State<SwapnaDecoderScreen>
           ),
           onPressed: () => Get.back(),
         ),
-        actions: [
-          IconButton(
-            icon: Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.notifications_none_rounded,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const NotificationScreen(),
-                ),
-              );
-            },
-          ),
-          const SizedBox(width: 8),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: Container(
+        //       padding: const EdgeInsets.all(6),
+        //       decoration: BoxDecoration(
+        //         color: Colors.white.withOpacity(0.1),
+        //         shape: BoxShape.circle,
+        //       ),
+        //       child: const Icon(
+        //         Icons.notifications_none_rounded,
+        //         color: Colors.white,
+        //         size: 20,
+        //       ),
+        //     ),
+        //     onPressed: () {
+        //       Navigator.push(
+        //         context,
+        //         MaterialPageRoute(
+        //           builder: (context) => const NotificationScreen(),
+        //         ),
+        //       );
+        //     },
+        //   ),
+        //   const SizedBox(width: 8),
+        // ],
       ),
       body: Column(
         children: [
@@ -94,9 +94,10 @@ class _SwapnaDecoderScreenState extends State<SwapnaDecoderScreen>
             child: TabBar(
               controller: _tabController,
               indicator: BoxDecoration(
-                borderRadius: BorderRadius.circular(25),
+                borderRadius: BorderRadius.circular(21),
                 color: const Color(0xFFD4AF37),
               ),
+              indicatorPadding: const EdgeInsets.all(4),
               indicatorSize: TabBarIndicatorSize.tab,
               dividerColor: Colors.transparent,
               labelColor: Colors.black,

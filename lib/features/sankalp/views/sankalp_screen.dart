@@ -73,35 +73,35 @@ class _SankalpScreenState extends State<SankalpScreen>
             },
 
           ),
-          actions: [
-            IconButton(
-              icon: Stack(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.notifications_none_rounded, color: Colors.white, size: 20),
-                  ),
-                  Positioned(
-                    right: 8,
-                    top: 8,
-                    child: Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              onPressed: () => Get.to(() => const NotificationScreen()),
-            ),
-          ],
+          // actions: [
+          //   IconButton(
+          //     icon: Stack(
+          //       children: [
+          //         Container(
+          //           padding: const EdgeInsets.all(8),
+          //           decoration: BoxDecoration(
+          //             color: Colors.white.withOpacity(0.05),
+          //             shape: BoxShape.circle,
+          //           ),
+          //           child: const Icon(Icons.notifications_none_rounded, color: Colors.white, size: 20),
+          //         ),
+          //         Positioned(
+          //           right: 8,
+          //           top: 8,
+          //           child: Container(
+          //             width: 8,
+          //             height: 8,
+          //             decoration: const BoxDecoration(
+          //               color: Colors.red,
+          //               shape: BoxShape.circle,
+          //             ),
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //     onPressed: () => Get.to(() => const NotificationScreen()),
+          //   ),
+          // ],
         ),
         body: Stack(
           children: [
@@ -125,11 +125,13 @@ class _SankalpScreenState extends State<SankalpScreen>
                   decoration: BoxDecoration(
                     color: const Color(0xFF1C1C1E).withOpacity(0.8),
                     borderRadius: BorderRadius.circular(30),
+                    border: Border.all(color: Colors.white.withOpacity(0.1), width: 1)
                   ),
                   child: TabBar(
                     controller: _tabController,
+                    indicatorPadding: const EdgeInsets.all(4),
                     indicator: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
+                      borderRadius: BorderRadius.circular(26),
                       color: AppTheme.primaryGold,
                     ),
                     indicatorSize: TabBarIndicatorSize.tab,

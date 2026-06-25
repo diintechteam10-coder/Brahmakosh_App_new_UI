@@ -52,7 +52,6 @@ class GitaHeader extends StatelessWidget {
                 Icons.arrow_back_ios_new_outlined,
                 onBack,
               ),
-              _roundIcon(Icons.menu, onMenu),
             ],
           ),
         ),

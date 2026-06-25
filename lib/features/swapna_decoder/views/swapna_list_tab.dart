@@ -113,7 +113,7 @@ class SwapnaListView extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 100),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 0.62,
+                childAspectRatio: 0.59,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
               ),
@@ -218,6 +218,7 @@ class SwapnaListView extends StatelessWidget {
                             color: const Color(0xFFD4AF37),
                             borderRadius: BorderRadius.circular(20),
                           ),
+                          child: Center(
                             child: Text(
                               "reveal_meaning".tr,
                               style: GoogleFonts.poppins(
@@ -226,6 +227,7 @@ class SwapnaListView extends StatelessWidget {
                                 color: Colors.black,
                               ),
                             ),
+                          ),
                         ),
                       ],
                     ),

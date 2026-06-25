@@ -143,7 +143,6 @@ class _GitaChapterViewState extends State<_GitaChapterView> {
                 Icons.arrow_back_ios_new_outlined,
                 () => Navigator.pop(context),
               ),
-              _roundIcon(Icons.menu, () {}),
             ],
           ),
         ),

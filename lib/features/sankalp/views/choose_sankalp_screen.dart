@@ -162,7 +162,7 @@ class _ChooseSankalpScreenState extends State<ChooseSankalpScreen> {
               }
 
               return ListView.builder(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.of(context).padding.bottom),
                 itemCount: sankalps.length,
                 itemBuilder: (context, index) {
                   final sankalp = sankalps[index];

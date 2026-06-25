@@ -111,10 +111,6 @@ class _SilenceSelectionViewV2State extends State<SilenceSelectionViewV2> {
                     icon: Icons.chevron_left_rounded,
                     onTap: () => Get.back(),
                   ),
-                  _circleIconButton(
-                    icon: Icons.more_vert_rounded,
-                    onTap: () {},
-                  ),
                 ],
               ),
             ),

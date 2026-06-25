@@ -75,42 +75,45 @@ class _NumerologyHistoryViewState extends State<NumerologyHistoryView>
           // ),
         ],
       ),
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          return const Center(
-            child: CircularProgressIndicator(color: Color(0xFF6D3A0C)),
-          );
-        }
+      body: SafeArea(
+        bottom: true,
+        child: Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(
+              child: CircularProgressIndicator(color: Color(0xFF6D3A0C)),
+            );
+          }
 
-        final data = controller.userNumerology.value;
-        if (data == null) {
-          return Center(
-            child: Text(
-              'no_numerology_data'.tr,
-              style: GoogleFonts.lora(fontSize: 16, color: Colors.grey),
-            ),
-          );
-        }
-
-        return Column(
-          children: [
-            _buildProfileHeader(data),
-            const SizedBox(height: 16),
-            _buildTabBar(),
-            const SizedBox(height: 16),
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildOverviewTab(data),
-                  _buildNumeroTableTab(data),
-                  _buildDailyTab(data),
-                ],
+          final data = controller.userNumerology.value;
+          if (data == null) {
+            return Center(
+              child: Text(
+                'no_numerology_data'.tr,
+                style: GoogleFonts.lora(fontSize: 16, color: Colors.grey),
               ),
-            ),
-          ],
-        );
-      }),
+            );
+          }
+
+          return Column(
+            children: [
+              _buildProfileHeader(data),
+              const SizedBox(height: 16),
+              _buildTabBar(),
+              const SizedBox(height: 16),
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildOverviewTab(data),
+                    _buildNumeroTableTab(data),
+                    _buildDailyTab(data),
+                  ],
+                ),
+              ),
+            ],
+          );
+        }),
+      ),
     );
   }
 

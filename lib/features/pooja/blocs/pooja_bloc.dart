@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../repositories/pooja_repository.dart';
+import '../models/pooja_model.dart';
 import 'pooja_event.dart';
 import 'pooja_state.dart';
 import 'package:get/get.dart';
@@ -11,6 +12,7 @@ class PoojaBloc extends Bloc<PoojaEvent, PoojaState> {
   PoojaBloc({required this.repository}) : super(PoojaInitial()) {
     on<FetchPoojas>(_onFetchPoojas);
     on<FilterPoojas>(_onFilterPoojas);
+    on<SearchPoojas>(_onSearchPoojas);
     on<FetchPoojaDetail>(_onFetchPoojaDetail);
   }
 
@@ -36,53 +38,71 @@ class PoojaBloc extends Bloc<PoojaEvent, PoojaState> {
     }
   }
 
+  List<PoojaModel> _filterPoojasList({
+    required List<PoojaModel> poojas,
+    required String category,
+    required String query,
+  }) {
+    List<PoojaModel> result = poojas;
+
+    // Filter by category
+    if (category != 'All') {
+      result = result.where((p) {
+        return (p.category?.toLowerCase().contains(category.toLowerCase()) ?? false) ||
+               (p.subcategory?.toLowerCase().contains(category.toLowerCase()) ?? false);
+      }).toList();
+    }
+
+    // Filter by search query
+    if (query.trim().isNotEmpty) {
+      final q = query.trim().toLowerCase();
+      result = result.where((p) {
+        return (p.pujaName?.toLowerCase().contains(q) ?? false) ||
+               (p.category?.toLowerCase().contains(q) ?? false) ||
+               (p.subcategory?.toLowerCase().contains(q) ?? false) ||
+               (p.description?.toLowerCase().contains(q) ?? false) ||
+               (p.purpose?.toLowerCase().contains(q) ?? false);
+      }).toList();
+    }
+
+    return result;
+  }
+
   void _onFilterPoojas(FilterPoojas event, Emitter<PoojaState> emit) {
     if (state is PoojaLoaded) {
       final currentState = state as PoojaLoaded;
-      final allPoojas = currentState.poojas;
-      final selectedCategory = event.category;
+      final filtered = _filterPoojasList(
+        poojas: currentState.poojas,
+        category: event.category,
+        query: currentState.searchQuery,
+      );
+      emit(
+        PoojaLoaded(
+          poojas: currentState.poojas,
+          filteredPoojas: filtered,
+          selectedCategory: event.category,
+          searchQuery: currentState.searchQuery,
+        ),
+      );
+    }
+  }
 
-      if (selectedCategory == 'All') {
-        emit(
-          PoojaLoaded(
-            poojas: allPoojas,
-            filteredPoojas: allPoojas,
-            selectedCategory: selectedCategory,
-          ),
-        );
-      } else {
-        // Assuming 'category' field in model or usage of tags.
-        // Based on user request/JSON, category is "Daily Puja" etc.
-        // User UI has "Festival" tab. Let's filter by category or subcategory containing 'Festival' or similar logic?
-        // Or if the user meant specific "Festival" category.
-        // For now, let's filter where category or subcategory matches, or if we define a mapping.
-        // In the mock controller, it filtered by tags "FESTIVAL PUJA".
-        // In new model, we have 'category', 'subcategory'.
-        // Let's assume we filter by category for now.
-
-        // However, user specifically asked for "All" and "Festival".
-        // Let's implement basic filtering. If the category name contains 'Festival' or if we want exact match.
-        // I will act conservatively and filter by category name contains the string, case insensitive.
-
-        final filtered = allPoojas.where((p) {
-          return (p.category?.toLowerCase().contains(
-                    selectedCategory.toLowerCase(),
-                  ) ??
-                  false) ||
-              (p.subcategory?.toLowerCase().contains(
-                    selectedCategory.toLowerCase(),
-                  ) ??
-                  false);
-        }).toList();
-
-        emit(
-          PoojaLoaded(
-            poojas: allPoojas,
-            filteredPoojas: filtered,
-            selectedCategory: selectedCategory,
-          ),
-        );
-      }
+  void _onSearchPoojas(SearchPoojas event, Emitter<PoojaState> emit) {
+    if (state is PoojaLoaded) {
+      final currentState = state as PoojaLoaded;
+      final filtered = _filterPoojasList(
+        poojas: currentState.poojas,
+        category: currentState.selectedCategory,
+        query: event.query,
+      );
+      emit(
+        PoojaLoaded(
+          poojas: currentState.poojas,
+          filteredPoojas: filtered,
+          selectedCategory: currentState.selectedCategory,
+          searchQuery: event.query,
+        ),
+      );
     }
   }
 

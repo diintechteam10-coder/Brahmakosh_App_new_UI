@@ -269,7 +269,7 @@ class _AiGuideViewState extends State<AiGuideView> {
           
                   // Action Buttons
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 40),
+                    padding: EdgeInsets.only(bottom: 40 + MediaQuery.of(context).padding.bottom),
                     child: widget.deityName.toLowerCase().contains("krishna")
                         ? _buildTalkButton()
                         : Row(

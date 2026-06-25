@@ -104,7 +104,7 @@ class ReportView extends StatelessWidget {
                       flex: 3,
                       height: 18.h,
                       title: 'kundali_report'.tr,
-                      desc: 'kundli_desc'.tr,
+                      desc: 'kundali_desc'.tr,
                       icon: Icons.auto_stories_rounded,
                       gradient: const LinearGradient(
                         begin: Alignment.topLeft,

@@ -48,72 +48,75 @@ class ConversationHistoryView extends StatelessWidget {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          _buildFilterChips(controller),
-          Expanded(
-            child: RefreshIndicator(
-              color: AppTheme.primaryGold,
-              onRefresh: controller.fetchConversations,
-              child: Obx(() {
-                Utils.print(
-                  '🔄 Obx rebuild: isLoading=${controller.isLoading.value}, count=${controller.conversations.length}',
-                );
-                if (controller.isLoading.value) {
+      body: SafeArea(
+        bottom: true,
+        child: Column(
+          children: [
+            _buildFilterChips(controller),
+            Expanded(
+              child: RefreshIndicator(
+                color: AppTheme.primaryGold,
+                onRefresh: controller.fetchConversations,
+                child: Obx(() {
+                  Utils.print(
+                    '🔄 Obx rebuild: isLoading=${controller.isLoading.value}, count=${controller.conversations.length}',
+                  );
+                  if (controller.isLoading.value) {
+                    return ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: 6,
+                      itemBuilder: (_, __) => _buildShimmerCard(),
+                    );
+                  }
+
+                  if (controller.conversations.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.chat_bubble_outline,
+                            size: 72,
+                            color: Colors.white.withOpacity(0.2),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'no_conversations_yet'.tr,
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'start_chat_with_expert'.tr,
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              color: Colors.white.withOpacity(0.5),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
                   return ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: 6,
-                    itemBuilder: (_, __) => _buildShimmerCard(),
-                  );
-                }
-
-                if (controller.conversations.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.chat_bubble_outline,
-                          size: 72,
-                          color: Colors.white.withOpacity(0.2),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'no_conversations_yet'.tr,
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'start_chat_with_expert'.tr,
-                          style: GoogleFonts.poppins(
-                            fontSize: 13,
-                            color: Colors.white.withOpacity(0.5),
-                          ),
-                        ),
-                      ],
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
                     ),
+                    itemCount: controller.conversations.length,
+                    itemBuilder: (context, index) {
+                      final conv = controller.conversations[index];
+                      return _buildConversationCard(context, conv, controller);
+                    },
                   );
-                }
-
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  itemCount: controller.conversations.length,
-                  itemBuilder: (context, index) {
-                    final conv = controller.conversations[index];
-                    return _buildConversationCard(context, conv, controller);
-                  },
-                );
-              }),
+                }),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

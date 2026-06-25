@@ -107,71 +107,75 @@ class _AstrologyDetailsScreenState extends State<AstrologyDetailsScreen>
                     ),
                   ),
                 )
-              : Column(
-                  children: [
-                    _buildHeader(astro),
-                    _buildTabBar(),
-                    Expanded(
-                      child: TabBarView(
-                        controller: _tabController,
-                        children: [
-                          BasicInfoTab(
-                            astroDetails:
-                                astro.astroDetails ?? AstroDetails(),
-                            ghatChakra: astro.ghatChakra,
-                            ayanamsha: astro.ayanamsha,
-                          ),
-                          PlanetsTab(
-                            planets: astro.planets ?? [],
-                            onViewAllTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      PlanetPositionsScreen(
-                                    planets: astro.planets ?? [],
-                                    planetsExtended:
-                                        astro.planetsExtended ?? [],
+              : SafeArea(
+                  bottom: true,
+                  top: false,
+                  child: Column(
+                    children: [
+                      _buildHeader(astro),
+                      _buildTabBar(),
+                      Expanded(
+                        child: TabBarView(
+                          controller: _tabController,
+                          children: [
+                            BasicInfoTab(
+                              astroDetails:
+                                  astro.astroDetails ?? AstroDetails(),
+                              ghatChakra: astro.ghatChakra,
+                              ayanamsha: astro.ayanamsha,
+                            ),
+                            PlanetsTab(
+                              planets: astro.planets ?? [],
+                              onViewAllTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        PlanetPositionsScreen(
+                                      planets: astro.planets ?? [],
+                                      planetsExtended:
+                                          astro.planetsExtended ?? [],
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                          ),
-                          BirthChartTab(
-                            birthChart: astro.birthChart!,
-                            birthExtendedChart: astro.birthExtendedChart,
-                            astroDetails: astro.astroDetails,
-                          ),
-                          BhavChalitTab(
-                            bhavMadhya:
-                                astro.bhavMadhya ?? BhavMadhya(),
-                          ),
-                          DoshasTab(
-                            doshas: _data?.data?.doshas ?? Doshas(),
-                            sadhesatiLifeDetails:
-                                astro.sadhesatiLifeDetails,
-                            pitraDoshaReport: astro.pitraDoshaReport,
-                          ),
-                          DashasTab(dashas: _getEffectiveDashas()),
-                          SarvashtakTab(
-                            sarvashtak:
-                                astro.sarvashtak ?? SarvAshtak(),
-                            ascendantSign:
-                                astro.astroDetails?.ascendant,
-                          ),
-                          AshtakvargaTab(
-                            planetAshtak: astro.planetAshtak,
-                            ascendantSign:
-                                astro.astroDetails?.ascendant,
-                          ),
-                          RemediesTab(
-                            gemstoneSuggestion:
-                                astro.gemstoneSuggestion,
-                          ),
-                        ],
+                                );
+                              },
+                            ),
+                            BirthChartTab(
+                              birthChart: astro.birthChart!,
+                              birthExtendedChart: astro.birthExtendedChart,
+                              astroDetails: astro.astroDetails,
+                            ),
+                            BhavChalitTab(
+                              bhavMadhya:
+                                  astro.bhavMadhya ?? BhavMadhya(),
+                            ),
+                            DoshasTab(
+                              doshas: _data?.data?.doshas ?? Doshas(),
+                              sadhesatiLifeDetails:
+                                  astro.sadhesatiLifeDetails,
+                              pitraDoshaReport: astro.pitraDoshaReport,
+                            ),
+                            DashasTab(dashas: _getEffectiveDashas()),
+                            SarvashtakTab(
+                              sarvashtak:
+                                  astro.sarvashtak ?? SarvAshtak(),
+                              ascendantSign:
+                                  astro.astroDetails?.ascendant,
+                            ),
+                            AshtakvargaTab(
+                              planetAshtak: astro.planetAshtak,
+                              ascendantSign:
+                                  astro.astroDetails?.ascendant,
+                            ),
+                            RemediesTab(
+                              gemstoneSuggestion:
+                                  astro.gemstoneSuggestion,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
     );
   }

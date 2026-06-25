@@ -302,7 +302,7 @@ class LoginView extends StatelessWidget {
   Widget _buildSocialButton({
     required String text,
     String? imagePath,
-    IconData? iconData,
+    FaIconData? iconData,
     VoidCallback? onTap,
     bool isLoading = false,
     required Color backgroundColor,

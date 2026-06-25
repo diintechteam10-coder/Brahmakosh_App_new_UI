@@ -42,6 +42,9 @@ class VoiceCallController extends GetxController {
   MediaStream? _localStream;
   MediaStream? _remoteStream;
 
+  bool _isInsufficientCredits = false;
+  String? _errorMsg;
+
   @override
   void onInit() {
     super.onInit();
@@ -62,14 +65,26 @@ class VoiceCallController extends GetxController {
       _setupSocketListeners();
       _initiateCall();
     } else {
-      _endCallLocal("Failed to create conversation");
+      await _endCallLocal(_errorMsg ?? "Failed to create conversation");
+      if (_isInsufficientCredits) {
+        Future.delayed(const Duration(milliseconds: 300), () {
+          Utils.showInsufficientCreditsDialog();
+        });
+      } else if (_errorMsg != null) {
+        Future.delayed(const Duration(milliseconds: 300), () {
+          Utils.showToast(_errorMsg!);
+        });
+      }
     }
   }
 
   Future<void> _createConversation() async {
     try {
       final token = StorageService.getString(AppConstants.keyAuthToken);
-      if (token == null) return;
+      if (token == null) {
+        _errorMsg = "Authentication token not found";
+        return;
+      }
 
       final body = {"partnerId": expert.id};
 
@@ -89,13 +104,24 @@ class VoiceCallController extends GetxController {
           Utils.print(
             "[VOICE_CALL_LOG] ✅ Conversation Created: $_conversationId",
           );
+        } else {
+          _errorMsg = data['message'] ?? "Failed to create conversation";
         }
       } else {
         Utils.print(
           "[VOICE_CALL_LOG] ❌ Failed to create conversation: ${response.statusCode} - ${response.body}",
         );
+        final message = data != null ? data['message'] : null;
+        if (response.statusCode == 402 || 
+            (message != null && message.toString().toLowerCase().contains("insufficient credits"))) {
+          _isInsufficientCredits = true;
+          _errorMsg = message ?? "Insufficient credits. Please recharge before starting a chat.";
+        } else {
+          _errorMsg = message ?? "Failed to create conversation";
+        }
       }
     } catch (e) {
+      _errorMsg = e.toString();
       Utils.print("[VOICE_CALL_LOG] ❌ Exception creating conversation: $e");
     }
   }

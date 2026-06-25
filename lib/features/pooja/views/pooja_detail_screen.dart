@@ -289,14 +289,14 @@ class _PoojaDetailScreenState extends State<PoojaDetailScreen> {
                         ),
 
                       SliverToBoxAdapter(
-                        child: SizedBox(height: 12.h),
+                        child: SizedBox(height: 12.h + MediaQuery.of(context).padding.bottom),
                       ), // Space for button
                     ],
                   ),
 
                   // Start Button
                   Positioned(
-                    bottom: 3.h,
+                    bottom: 3.h + MediaQuery.of(context).padding.bottom,
                     left: 6.w,
                     right: 6.w,
                     child: Container(

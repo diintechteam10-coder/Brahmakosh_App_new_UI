@@ -166,7 +166,6 @@ class _ChantingSelectionViewV2State extends State<ChantingSelectionViewV2> {
                   child: Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 14.sp),
                 ),
               ),
-              Icon(Icons.more_vert, color: Colors.white, size: 18.sp),
             ],
           ),
           SizedBox(height: 3.h),

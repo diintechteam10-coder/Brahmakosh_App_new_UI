@@ -42,7 +42,7 @@ class ProfileDetailsView extends StatelessWidget {
                   color: const Color(0xFFD4AF37),
                   backgroundColor: Colors.black,
                   child: ListView(
-                    padding: const EdgeInsets.only(bottom: 24),
+                    padding: EdgeInsets.only(bottom: 24 + MediaQuery.of(context).padding.bottom),
                     children: [
                       // Top Card
                       Container(

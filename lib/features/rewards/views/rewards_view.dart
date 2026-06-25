@@ -72,7 +72,7 @@ class _RewardsViewState extends State<RewardsView> {
       backgroundColor: Colors.black,
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.only(top: topPadding + 2.h, bottom: 4.h),
+          padding: EdgeInsets.only(top: topPadding + 2.h, bottom: 125 + MediaQuery.of(context).padding.bottom),
           child: Column(
             children: [
               // Header

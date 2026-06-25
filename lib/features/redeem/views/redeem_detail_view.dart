@@ -348,78 +348,10 @@ class _RedeemDetailViewState extends State<RedeemDetailView> {
               ),
             ),
 
-            SizedBox(height: 4.h),
-
-            Row(
-              children: [
-                const Expanded(
-                  child: Divider(color: Colors.white24, thickness: 0.5),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 3.w),
-                  child: Text(
-                    "what_happens_next".tr,
-                    style: GoogleFonts.lora(
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                const Expanded(
-                  child: Divider(color: Colors.white24, thickness: 0.5),
-                ),
-              ],
-            ),
-            SizedBox(height: 3.h),
-
-            _buildStepRow(
-              "redeem_step_1".tr,
-            ),
-            SizedBox(height: 1.5.h),
-            _buildStepRow(
-              "redeem_step_2".tr,
-            ),
-            SizedBox(height: 1.5.h),
-            _buildStepRow(
-              "redeem_step_3".tr,
-            ),
-            SizedBox(height: 1.5.h),
-            _buildStepRow(
-              "redeem_step_4".tr,
-            ),
-
             SizedBox(height: 5.h),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildStepRow(String text) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          margin: EdgeInsets.only(top: 0.5.h),
-          child: Icon(
-            Icons.check_circle,
-            size: 14.sp,
-            color: const Color(0xFFD4AF37),
-          ),
-        ),
-        SizedBox(width: 4.w),
-        Expanded(
-          child: Text(
-            text,
-            style: GoogleFonts.poppins(
-              fontSize: 10.sp,
-              color: Colors.white70,
-              height: 1.5,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

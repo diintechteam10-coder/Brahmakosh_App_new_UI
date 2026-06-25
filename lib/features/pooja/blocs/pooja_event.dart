@@ -26,3 +26,12 @@ class FilterPoojas extends PoojaEvent {
   @override
   List<Object> get props => [category];
 }
+
+class SearchPoojas extends PoojaEvent {
+  final String query;
+
+  const SearchPoojas(this.query);
+
+  @override
+  List<Object> get props => [query];
+}

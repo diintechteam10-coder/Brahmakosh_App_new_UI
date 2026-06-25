@@ -16,15 +16,17 @@ class PoojaLoaded extends PoojaState {
   final List<PoojaModel> poojas;
   final List<PoojaModel> filteredPoojas;
   final String selectedCategory;
+  final String searchQuery;
 
   const PoojaLoaded({
     required this.poojas,
     required this.filteredPoojas,
     this.selectedCategory = 'All',
+    this.searchQuery = '',
   });
 
   @override
-  List<Object> get props => [poojas, filteredPoojas, selectedCategory];
+  List<Object> get props => [poojas, filteredPoojas, selectedCategory, searchQuery];
 }
 
 class PoojaDetailLoading extends PoojaState {}

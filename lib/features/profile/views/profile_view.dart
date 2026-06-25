@@ -57,7 +57,7 @@ class _ProfileViewState extends State<ProfileView> {
             color: const Color(0xFFD4AF37),
             backgroundColor: Colors.black,
             child: ListView(
-              padding: const EdgeInsets.only(bottom: 24),
+              padding: EdgeInsets.only(bottom: 24 + MediaQuery.of(context).padding.bottom),
               children: [
                 // Top header section with Avatar, Name, Email/Phone, and Edit Button
                 Padding(
@@ -721,18 +721,21 @@ class _ProfileViewState extends State<ProfileView> {
     required String title,
     required VoidCallback onTap,
   }) {
-    return ListTile(
-      onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      leading: Icon(icon, color: Colors.white70, size: 24),
-      title: Text(
-        title,
-        style: GoogleFonts.poppins(fontSize: 16, color: Colors.white),
-      ),
-      trailing: const Icon(
-        Icons.chevron_right,
-        color: Colors.white38,
-        size: 24,
+    return Material(
+      color: Colors.transparent,
+      child: ListTile(
+        onTap: onTap,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        leading: Icon(icon, color: Colors.white70, size: 24),
+        title: Text(
+          title,
+          style: GoogleFonts.poppins(fontSize: 16, color: Colors.white),
+        ),
+        trailing: const Icon(
+          Icons.chevron_right,
+          color: Colors.white38,
+          size: 24,
+        ),
       ),
     );
   }
@@ -863,50 +866,56 @@ class _ProfileViewState extends State<ProfileView> {
               ),
             ),
             const SizedBox(height: 20),
-            ListTile(
-              leading: const CircleAvatar(
-                backgroundColor: Color(0xFFD4AF37),
-                radius: 20,
-                child: Icon(Icons.person, color: Colors.black, size: 20),
-              ),
-              title: Text(
-                'view_profile_pic'.tr,
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                  color: Colors.white,
+            Material(
+              color: Colors.transparent,
+              child: ListTile(
+                leading: const CircleAvatar(
+                  backgroundColor: Color(0xFFD4AF37),
+                  radius: 20,
+                  child: Icon(Icons.person, color: Colors.black, size: 20),
                 ),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                Get.to(
-                  () => ProfileImageView(
-                    imageUrl: imageUrl,
-                    heroTag: 'profile_pic_home',
+                title: Text(
+                  'view_profile_pic'.tr,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    color: Colors.white,
                   ),
-                  transition: Transition.fadeIn,
-                );
-              },
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Get.to(
+                    () => ProfileImageView(
+                      imageUrl: imageUrl,
+                      heroTag: 'profile_pic_home',
+                    ),
+                    transition: Transition.fadeIn,
+                  );
+                },
+              ),
             ),
             const Divider(color: Colors.white10),
-            ListTile(
-              leading: const CircleAvatar(
-                backgroundColor: Color(0xFFD4AF37),
-                radius: 20,
-                child: Icon(Icons.edit, color: Colors.black, size: 20),
-              ),
-              title: Text(
-                'edit_profile_pic'.tr,
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                  color: Colors.white,
+            Material(
+              color: Colors.transparent,
+              child: ListTile(
+                leading: const CircleAvatar(
+                  backgroundColor: Color(0xFFD4AF37),
+                  radius: 20,
+                  child: Icon(Icons.edit, color: Colors.black, size: 20),
                 ),
+                title: Text(
+                  'edit_profile_pic'.tr,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showImageSourceSheet(context, viewModel);
+                },
               ),
-              onTap: () {
-                Navigator.pop(context);
-                _showImageSourceSheet(context, viewModel);
-              },
             ),
             const SizedBox(height: 30),
           ],
@@ -927,42 +936,48 @@ class _ProfileViewState extends State<ProfileView> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(
-              leading: const Icon(Icons.camera_alt, color: Colors.white70),
-              title: Text(
-                "camera".tr,
-                style: GoogleFonts.poppins(color: Colors.white),
+            Material(
+              color: Colors.transparent,
+              child: ListTile(
+                leading: const Icon(Icons.camera_alt, color: Colors.white70),
+                title: Text(
+                  "camera".tr,
+                  style: GoogleFonts.poppins(color: Colors.white),
+                ),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final ImagePicker picker = ImagePicker();
+                  final XFile? image = await picker.pickImage(
+                    source: ImageSource.camera,
+                    imageQuality: 50,
+                  );
+                  if (image != null) {
+                    viewModel.uploadProfileImage(File(image.path));
+                  }
+                },
               ),
-              onTap: () async {
-                Navigator.pop(context);
-                final ImagePicker picker = ImagePicker();
-                final XFile? image = await picker.pickImage(
-                  source: ImageSource.camera,
-                  imageQuality: 50,
-                );
-                if (image != null) {
-                  viewModel.uploadProfileImage(File(image.path));
-                }
-              },
             ),
             const Divider(color: Colors.white10),
-            ListTile(
-              leading: const Icon(Icons.photo, color: Colors.white70),
-              title: Text(
-                "gallery".tr,
-                style: GoogleFonts.poppins(color: Colors.white),
+            Material(
+              color: Colors.transparent,
+              child: ListTile(
+                leading: const Icon(Icons.photo, color: Colors.white70),
+                title: Text(
+                  "gallery".tr,
+                  style: GoogleFonts.poppins(color: Colors.white),
+                ),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final ImagePicker picker = ImagePicker();
+                  final XFile? image = await picker.pickImage(
+                    source: ImageSource.gallery,
+                    imageQuality: 50,
+                  );
+                  if (image != null) {
+                    viewModel.uploadProfileImage(File(image.path));
+                  }
+                },
               ),
-              onTap: () async {
-                Navigator.pop(context);
-                final ImagePicker picker = ImagePicker();
-                final XFile? image = await picker.pickImage(
-                  source: ImageSource.gallery,
-                  imageQuality: 50,
-                );
-                if (image != null) {
-                  viewModel.uploadProfileImage(File(image.path));
-                }
-              },
             ),
           ],
         ),

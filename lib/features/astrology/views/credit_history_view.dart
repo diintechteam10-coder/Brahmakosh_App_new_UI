@@ -31,51 +31,54 @@ class CreditHistoryView extends StatelessWidget {
         ),
         centerTitle: false,
       ),
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          return const Center(
-            child: CircularProgressIndicator(color: AppTheme.primaryGold),
-          );
-        }
+      body: SafeArea(
+        bottom: true,
+        child: Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(
+              child: CircularProgressIndicator(color: AppTheme.primaryGold),
+            );
+          }
 
-        if (controller.creditHistory.isEmpty) {
-          return _buildEmptyState();
-        }
+          if (controller.creditHistory.isEmpty) {
+            return _buildEmptyState();
+          }
 
-        return RefreshIndicator(
-          color: AppTheme.primaryGold,
-          onRefresh: () => controller.fetchCreditHistory(),
-          child: NotificationListener<ScrollNotification>(
-            onNotification: (notification) {
-              if (notification is ScrollEndNotification &&
-                  notification.metrics.extentAfter < 100) {
-                controller.fetchCreditHistory(loadMore: true);
-              }
-              return false;
-            },
-            child: ListView.builder(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-              itemCount:
-                  controller.creditHistory.length +
-                  (controller.hasMore.value ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index == controller.creditHistory.length) {
-                  return const Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: AppTheme.primaryGold,
-                        strokeWidth: 2,
-                      ),
-                    ),
-                  );
+          return RefreshIndicator(
+            color: AppTheme.primaryGold,
+            onRefresh: () => controller.fetchCreditHistory(),
+            child: NotificationListener<ScrollNotification>(
+              onNotification: (notification) {
+                if (notification is ScrollEndNotification &&
+                    notification.metrics.extentAfter < 100) {
+                  controller.fetchCreditHistory(loadMore: true);
                 }
-                return _buildHistoryCard(controller.creditHistory[index]);
+                return false;
               },
+              child: ListView.builder(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                itemCount:
+                    controller.creditHistory.length +
+                    (controller.hasMore.value ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index == controller.creditHistory.length) {
+                    return const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: AppTheme.primaryGold,
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    );
+                  }
+                  return _buildHistoryCard(controller.creditHistory[index]);
+                },
+              ),
             ),
-          ),
-        );
-      }),
+          );
+        }),
+      ),
     );
   }
 

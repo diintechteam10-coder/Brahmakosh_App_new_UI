@@ -22,6 +22,21 @@ class PoojaListScreen extends StatefulWidget {
 }
 
 class _PoojaListScreenState extends State<PoojaListScreen> {
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,69 +63,94 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
               onPressed: () => Navigator.pop(context),
             ),
           ),
-          title: null,
-          actions: [
-            Container(
-              margin: const EdgeInsets.only(right: 16),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                   IconButton(
-                    icon: const Icon(Icons.notifications_none, color: Colors.white),
-                    onPressed: () {},
-                  ),
-                  Positioned(
-                    top: 12,
-                    right: 12,
-                    child: Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  )
-                ],
-              ),
+          title: Text(
+            "puja_vidhi".tr,
+            style: GoogleFonts.lora(
+              fontSize: 22,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
             ),
-          ],
+          ),
+          centerTitle: true,
+          // actions: [
+          //   Container(
+          //     margin: const EdgeInsets.only(right: 16),
+          //     decoration: BoxDecoration(
+          //       color: Colors.white.withOpacity(0.1),
+          //       shape: BoxShape.circle,
+          //     ),
+          //     child: Stack(
+          //       alignment: Alignment.center,
+          //       children: [
+          //          IconButton(
+          //           icon: const Icon(Icons.notifications_none, color: Colors.white),
+          //           onPressed: () {},
+          //         ),
+          //         Positioned(
+          //           top: 12,
+          //           right: 12,
+          //           child: Container(
+          //             width: 8,
+          //             height: 8,
+          //             decoration: const BoxDecoration(
+          //               color: Colors.red,
+          //               shape: BoxShape.circle,
+          //             ),
+          //           ),
+          //         )
+          //       ],
+          //     ),
+          //   ),
+          // ],
         ),
         body: Column(
           children: [
             SizedBox(height: 2.h),
             // Search Bar
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 4.w),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 4.w),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: TextField(
-                  style: TextStyle(color: Colors.white, fontSize: 13.sp),
-                  decoration: InputDecoration(
-                    fillColor: Colors.transparent,
-                    filled: true,
-                    hintText: "search_hint".tr,
-                    hintStyle: GoogleFonts.poppins(
-                      fontSize: 13.sp,
-                      color: Colors.white.withOpacity(0.3),
+            Builder(
+              builder: (context) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 4.w),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 4.w),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1A1A1A),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    icon: Icon(Icons.search, color: Colors.white.withOpacity(0.3), size: 18.sp),
-                    isDense: true,
-                    contentPadding: EdgeInsets.symmetric(vertical: 1.5.h),
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (value) {
+                        context.read<PoojaBloc>().add(SearchPoojas(value));
+                      },
+                      style: TextStyle(color: Colors.white, fontSize: 13.sp),
+                      decoration: InputDecoration(
+                        fillColor: Colors.transparent,
+                        filled: true,
+                        hintText: "search_hint".tr,
+                        hintStyle: GoogleFonts.poppins(
+                          fontSize: 13.sp,
+                          color: Colors.white.withOpacity(0.3),
+                        ),
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        icon: Icon(Icons.search, color: Colors.white.withOpacity(0.3), size: 18.sp),
+                        suffixIcon: _searchController.text.isNotEmpty
+                            ? GestureDetector(
+                                onTap: () {
+                                  _searchController.clear();
+                                  context.read<PoojaBloc>().add(const SearchPoojas(''));
+                                },
+                                child: Icon(Icons.clear, color: Colors.white.withOpacity(0.3), size: 18.sp),
+                              )
+                            : null,
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(vertical: 1.5.h),
+                      ),
+                    ),
                   ),
-                ),
-              ),
+                );
+              }
             ),
             SizedBox(height: 2.5.h),
             // Filter Tabs
@@ -123,6 +163,7 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                     selectedCategory = state.selectedCategory;
                   }
                   return Container(
+                    padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
                       color: const Color(0xFF1A1A1A),
                       borderRadius: BorderRadius.circular(30),
@@ -183,7 +224,7 @@ class _PoojaListScreenState extends State<PoojaListScreen> {
                       );
                     }
                     return ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: EdgeInsets.fromLTRB(16, 0, 16, MediaQuery.of(context).padding.bottom + 16),
                       itemCount: state.filteredPoojas.length,
                       itemBuilder: (context, index) {
                         return _buildPoojaCard(

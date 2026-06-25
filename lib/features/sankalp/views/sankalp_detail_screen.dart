@@ -176,7 +176,7 @@ class _SankalpDetailScreenState extends State<SankalpDetailScreen> {
               ),
               SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 100, 12, 20),
+                  padding: EdgeInsets.fromLTRB(12, 100, 12, 20 + MediaQuery.of(context).padding.bottom),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

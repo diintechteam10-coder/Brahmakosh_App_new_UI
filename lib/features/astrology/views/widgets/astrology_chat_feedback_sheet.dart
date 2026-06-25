@@ -23,7 +23,12 @@ class _AstrologyChatFeedbackSheetState
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+      padding: EdgeInsets.fromLTRB(
+        24,
+        12,
+        24,
+        32 + (MediaQuery.of(context).viewInsets.bottom > 0 ? MediaQuery.of(context).viewInsets.bottom : MediaQuery.of(context).padding.bottom),
+      ),
       decoration: const BoxDecoration(
         color: Color(0xFF141414),
         borderRadius: BorderRadius.only(

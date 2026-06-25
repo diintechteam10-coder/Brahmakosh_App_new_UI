@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:brahmakosh/features/astrology/controllers/astrology_controller.dart';
 import 'package:flutter/material.dart';
@@ -182,7 +181,7 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
           children: [
             Expanded(
               child: _buildProfileStatCard(
-                "${_translatedExperience ?? "No experience"}",
+                _translatedExperience ?? "No experience",
                 "experience".tr,
                 icon: Icons.auto_awesome,
               ),
@@ -416,74 +415,25 @@ class _AstrologistProfileViewState extends State<AstrologistProfileView> {
                 color: Colors.white,
               ),
             ),
-            TextButton(
-              onPressed: () {},
-              child: Text(
-                "see_all".tr,
-                style: GoogleFonts.poppins(
-                  color: const Color(0xFFFFD700),
-                  fontSize: 10.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
           ],
         ),
         SizedBox(height: 2.h),
-        _buildReviewCard("Rohan Sharma", "accurate_review".tr),
-        SizedBox(height: 1.5.h),
-        _buildReviewCard("Ananya Gupta", "clear_guidance_review".tr),
+        Center(
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 4.h),
+            child: Text(
+              "No reviews available yet.",
+              style: GoogleFonts.poppins(
+                color: Colors.white38,
+                fontSize: 11.sp,
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildReviewCard(String name, String comment) {
-    return Container(
-      padding: EdgeInsets.all(4.w),
-      decoration: BoxDecoration(
-        color: const Color(0xFF141414),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                name,
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  fontSize: 11.sp,
-                ),
-              ),
-              const Spacer(),
-              Row(
-                children: List.generate(
-                  5,
-                  (index) => Icon(
-                    Icons.star,
-                    color: const Color(0xFFFFD700),
-                    size: 3.w,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 1.h),
-          Text(
-            comment,
-            style: GoogleFonts.poppins(
-              color: Colors.white.withValues(alpha: 0.6),
-              fontSize: 9.sp,
-              height: 1.4,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildBottomActionBar(
     BuildContext context,

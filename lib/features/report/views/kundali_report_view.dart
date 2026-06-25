@@ -157,7 +157,7 @@ class _KundaliReportViewState extends State<KundaliReportView> {
                   ),
                 ),
                 Text(
-                  'kundli_desc'.tr,
+                  'kundali_desc'.tr,
                   style: GoogleFonts.poppins(
                     fontSize: 9.sp,
                     color: Colors.white.withValues(alpha: 0.5),

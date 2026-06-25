@@ -541,7 +541,7 @@ class _PoojaVidhiScreenState extends State<PoojaVidhiScreen> {
                 ],
               ),
 
-            SizedBox(height: 4.h),
+            SizedBox(height: 4.h + MediaQuery.of(context).padding.bottom),
           ],
         ),
       ),

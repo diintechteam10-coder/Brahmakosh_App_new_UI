@@ -37,7 +37,7 @@ class DreamRequestDetailScreen extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + MediaQuery.of(context).padding.bottom),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

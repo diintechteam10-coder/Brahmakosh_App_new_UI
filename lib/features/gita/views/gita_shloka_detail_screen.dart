@@ -287,7 +287,6 @@ class _GitaDetailView extends StatelessWidget {
                 Icons.arrow_back_ios_new_outlined,
                 () => Navigator.pop(context),
               ),
-              _roundIcon(Icons.menu, () {}),
             ],
           ),
         ),

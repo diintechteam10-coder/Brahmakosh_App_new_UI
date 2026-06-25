@@ -135,7 +135,7 @@ class _CompletedSankalpTabState extends State<CompletedSankalpTab> {
               },
               child: ListView.builder(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: EdgeInsets.fromLTRB(16, 8, 16, 8 + MediaQuery.of(context).padding.bottom),
                 itemCount: completedSankalps.length,
                 itemBuilder: (context, index) {
                   final userSankalp = completedSankalps[index];
