@@ -61,15 +61,8 @@ class _VoiceCallViewState extends State<VoiceCallView> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        // Prevent back button from killing the call without proper end
-        // Provide a confirmation or just end the call
-        if (!controller.isEnded.value) {
-          controller.endCall();
-        }
-        return true;
-      },
+    return PopScope(
+      canPop: false,
       child: Scaffold(
         backgroundColor: const Color(0xFF1E1E1E), // Dark background for calls
         body: SafeArea(

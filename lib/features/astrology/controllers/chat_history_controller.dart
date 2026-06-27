@@ -516,10 +516,10 @@ class ChatHistoryController extends GetxController {
   String getConversationId(Map<String, dynamic> conv) {
     final cId = conv['conversationId'];
     if (cId is Map) {
-      return cId['_id'] ?? '';
+      return cId['conversationId']?.toString() ?? cId['_id']?.toString() ?? '';
     }
     if (cId is String) return cId;
-    return conv['_id'] ?? '';
+    return conv['conversationId']?.toString() ?? conv['_id']?.toString() ?? '';
   }
 
   /// Get status from the conversation request.

@@ -157,19 +157,44 @@ class VoiceCallController extends GetxController {
     isConnecting.value = false;
     isRinging.value = true;
 
-    Utils.print(
-      "[VOICE_CALL_LOG] 🔔 Emitting 'voice:call:initiate' for conversation: $_conversationId",
-    );
-    _socketService.emit('voice:call:initiate', {
-      "conversationId": _conversationId,
-    });
+    void emitCall() {
+      Utils.print(
+        "[VOICE_CALL_LOG] 🔔 Emitting 'voice:call:initiate' for conversation: $_conversationId",
+      );
+      _socketService.emit('voice:call:initiate', {
+        "conversationId": _conversationId,
+      });
 
-    // Auto-timeout if no answer after 30s
-    Future.delayed(const Duration(seconds: 30), () {
-      if (isRinging.value && !isConnected.value) {
-        _endCallLocal("No answer");
-      }
-    });
+      // Auto-timeout if no answer after 30s
+      Future.delayed(const Duration(seconds: 30), () {
+        if (isRinging.value && !isConnected.value) {
+          _endCallLocal("No answer");
+        }
+      });
+    }
+
+    if (_socketService.isConnected) {
+      emitCall();
+    } else {
+      Utils.print("[VOICE_CALL_LOG] ⏳ Socket not connected yet. Waiting for connection...");
+      StreamSubscription<bool>? subscription;
+      subscription = _socketService.connected$.listen((connected) {
+        if (connected) {
+          Utils.print("[VOICE_CALL_LOG] 🟢 Socket connected! Now initiating call.");
+          emitCall();
+          subscription?.cancel();
+        }
+      });
+      // Safety timeout in case connection takes too long (10s)
+      Future.delayed(const Duration(seconds: 10), () {
+        if (subscription != null) {
+          subscription.cancel();
+          if (!isConnected.value && isRinging.value) {
+            _endCallLocal("Connection timeout");
+          }
+        }
+      });
+    }
   }
 
   Future<void> _onCallAccepted(dynamic data) async {
